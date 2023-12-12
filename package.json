@@ -1,0 +1,30 @@
+{
+  "name": "lookit-jspsych",
+  "version": "1.0.0",
+  "description": "JsPsych packages used in the Lookit project. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ./packages/**/*.ts --fix",
+    "format": "prettier . --write"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lookit/lookit-jspsych.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lookit/lookit-jspsych/issues"
+  },
+  "homepage": "https://github.com/lookit/lookit-jspsych#readme",
+  "dependencies": {
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.1.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "eslint": "^8.55.0"
+  }
+}
