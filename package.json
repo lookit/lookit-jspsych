@@ -28,7 +28,7 @@
     "eslint": "^8.55.0"
   },
   "workspaces": [
-    "packages/lookit-initjspsych"
+    "packages/*"
   ],
   "engines": {
     "node": ">=20.0.0 <21.0.0"
