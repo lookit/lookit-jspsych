@@ -1,0 +1,16 @@
+{
+  "name": "lookit-initjspsych",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup --config"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@jspsych/config": "^2.0.0",
+    "jspsych": "^7.3.4"
+  }
+}

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint ./packages/**/*.ts --fix",
+    "lint": "eslint ./packages/**/src/**/*.ts --fix",
     "format": "prettier . --write"
   },
   "repository": {
@@ -26,5 +26,11 @@
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
     "eslint": "^8.55.0"
+  },
+  "workspaces": [
+    "packages/lookit-initjspsych"
+  ],
+  "engines": {
+    "node": ">=20.0.0 <21.0.0"
   }
 }
