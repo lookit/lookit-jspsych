@@ -12,7 +12,7 @@ To auto fix linting/formating issues:
 npm run fix
 ```
 
-Unfixable issues will be diplayed as errors. 
+Unfixable issues will be diplayed as errors.
 
 ## Create new package
 
@@ -23,6 +23,8 @@ To create a new package, run the following at the root of the project:
 ```
 npm init --scope @lookit --workspace packages/<name of new package>
 ```
+
+Giving the default answers to `npm init` seems to work okay. I am sure this will change.
 
 Add build script to new package's `package.json`:
 
@@ -71,7 +73,7 @@ npm i @jspsych/config -w @lookit/<name of new package>
 
 We can use npm workspaces to build all packages.
 
-First, install JavaScript packages:
+First, install dependencies:
 
 ```
 npm ci
@@ -80,7 +82,15 @@ npm ci
 Build all packages:
 
 ```
-npm run build --workspaces
+npm run build
 ```
 
-## Deploy NPM
+## Change log
+
+Adding a change log through `changeset` is done with the following command:
+
+```
+npm run changeset
+```
+
+Make sure to add the change log found in the `.changeset` directory to the PR.
