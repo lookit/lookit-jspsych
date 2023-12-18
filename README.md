@@ -24,6 +24,8 @@ To create a new package, run the following at the root of the project:
 npm init --scope @lookit --workspace packages/<name of new package>
 ```
 
+Giving the default answers to `npm init` seems to work okay. I am sure this will change.
+
 Add build script to new package's `package.json`:
 
 ```json
@@ -71,7 +73,7 @@ npm i @jspsych/config -w @lookit/<name of new package>
 
 We can use npm workspaces to build all packages.
 
-First, install JavaScript packages:
+First, install dependencies:
 
 ```
 npm ci
