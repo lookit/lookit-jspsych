@@ -1,0 +1,5 @@
+---
+"@lookit/anothertestpackage": patch
+---
+
+asdf
