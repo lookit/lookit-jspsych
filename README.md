@@ -6,17 +6,13 @@ Here is the monorepo containing packages developed by Lookit to be used with jsP
 
 Lint and formating is done at the monorepo level.
 
-To lint:
+To auto fix linting/formating issues:
 
 ```
-npm run lint
+npm run fix
 ```
 
-To format:
-
-```
-npm run format
-```
+Unfixable issues will be diplayed as errors. 
 
 ## Create new package
 
@@ -28,11 +24,10 @@ To create a new package, run the following at the root of the project:
 npm init --scope @lookit --workspace packages/<name of new package>
 ```
 
-Add build script to new package `package.json`:
+Add build script to new package's `package.json`:
 
 ```json
   "scripts": {
-    ...,
     "build": "rollup --config"
   },
 ```
