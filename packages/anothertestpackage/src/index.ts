@@ -2,4 +2,8 @@ function add(x, y) {
   return x + y;
 }
 
-export default { add };
+function square(x) {
+  return x * x;
+}
+
+export default { add, square };

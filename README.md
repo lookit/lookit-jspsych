@@ -12,7 +12,7 @@ To auto fix linting/formating issues:
 npm run fix
 ```
 
-Unfixable issues will be diplayed as errors. 
+Unfixable issues will be diplayed as errors.
 
 ## Create new package
 
