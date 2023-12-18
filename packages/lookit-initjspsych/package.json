@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@jspsych/config": "^2.0.0"
+    "@jspsych/config": "^2.0.0",
+    "jspsych": "^7.3.4"
   }
 }

@@ -82,7 +82,7 @@ npm ci
 Build all packages:
 
 ```
-npm run build --workspaces
+npm run build
 ```
 
 ## Deploy NPM
