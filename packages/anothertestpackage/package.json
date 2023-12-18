@@ -1,6 +1,6 @@
 {
-  "name": "lookit-initjspsych",
-  "version": "1.0.0",
+  "name": "@lookit/anothertestpackage",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@jspsych/config": "^2.0.0",
-    "jspsych": "^7.3.4"
+    "@jspsych/config": "^2.0.0"
   }
 }

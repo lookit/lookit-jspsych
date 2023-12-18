@@ -2,7 +2,7 @@
 
 Here is the monorepo containing packages developed by Lookit to be used with jsPsych on the lookit.mit.edu project.
 
-# Linting/Formating
+## Linting/Formating
 
 Lint and formating is done at the monorepo level.
 
@@ -18,14 +18,14 @@ To format:
 npm run format
 ```
 
-# Create new package
+## Create new package
 
 We are using npm workspaces for managing our packages.
 
-To create a new package:
+To create a new package, run the following at the root of the project:
 
 ```
-npm init -w packages/<name of new package>
+npm init --scope @lookit --workspace packages/<name of new package>
 ```
 
 Add build script to new package `package.json`:
@@ -69,10 +69,10 @@ export default makeRollupConfig("<camelcase name of new package>");
 You will need `@jspsych/config` to build your new package:
 
 ```sh
-npm i @jspsych/config -w <name of new package>
+npm i @jspsych/config -w @lookit/<name of new package>
 ```
 
-# Build all packages
+## Build all packages
 
 We can use npm workspaces to build all packages.
 
@@ -87,3 +87,5 @@ Build all packages:
 ```
 npm run build --workspaces
 ```
+
+## Deploy NPM
