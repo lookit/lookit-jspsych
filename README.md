@@ -85,4 +85,12 @@ Build all packages:
 npm run build
 ```
 
-## Deploy NPM
+## Change log
+
+Adding a change log through `changeset` is done with the following command:
+
+```
+npm run changeset
+```
+
+Make sure to add the change log found in the `.changeset` directory to the PR.
