@@ -34,6 +34,16 @@ Add build script to new package's `package.json`:
   },
 ```
 
+And add the following to `package.json`:
+
+```json
+  "unpkg": "dist/index.browser.min.js",
+  "files": [
+    "src",
+    "dist"
+  ],
+```
+
 At the root of the new package run the following commands:
 
 ```sh
