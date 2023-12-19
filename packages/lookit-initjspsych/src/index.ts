@@ -1,4 +1,21 @@
 import { initJsPsych as origInitJsPsych } from "jspsych";
+import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
+import { v4 } from "uuid";
+
+type UUID = typeof v4;
+type ResponseData = {
+  id: UUID;
+  type: "responses";
+  attributes: {
+    exp_data: DataCollection[];
+    completed?: boolean;
+  };
+};
+type UserFunc = (data: DataCollection) => void | undefined;
+type JsPsychOptions = {
+  on_data_update: UserFunc;
+  on_finish: UserFunc;
+};
 
 const controller = new AbortController();
 
@@ -6,13 +23,15 @@ function csrfToken() {
   /**
    * Function to get csrf token from cookies.
    */
-  return document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("csrftoken="))
-    ?.split("=")[1];
+  return (
+    document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("csrftoken="))
+      ?.split("=")[1] ?? ""
+  );
 }
 
-async function get(url) {
+async function get(url: string) {
   /**
    * Function for REST get.
    */
@@ -27,7 +46,7 @@ async function get(url) {
   }
 }
 
-async function patch(url, use_signal, data) {
+async function patch(url: string, use_signal: boolean, data: ResponseData) {
   /**
    * Function for REST patch.
    */
@@ -48,7 +67,7 @@ async function patch(url, use_signal, data) {
   }
 }
 
-function on_data_update(responseApiUrl, id, userFunc) {
+function on_data_update(responseApiUrl: string, id: UUID, userFunc: UserFunc) {
   /**
    * Function that returns a function to be used in place of jsPsych's option
    * "on_data_update".  "userFunc" should be the user's implementation of
@@ -56,7 +75,7 @@ function on_data_update(responseApiUrl, id, userFunc) {
    * trial, this function will get the collected trial data and append the
    * current data point.
    */
-  return async function (data) {
+  return async function (data: DataCollection) {
     const {
       data: {
         attributes: { exp_data },
@@ -78,7 +97,12 @@ function on_data_update(responseApiUrl, id, userFunc) {
   };
 }
 
-function on_finish(responseApiUrl, id, exitUrl, userFunc) {
+function on_finish(
+  responseApiUrl: string,
+  id: UUID,
+  exitUrl: string,
+  userFunc: UserFunc,
+) {
   /**
    * Function that returns a function to be used in place of jsPsych's option
    * "on_finish".  "userFunc" should be the user's implementation of
@@ -87,7 +111,7 @@ function on_finish(responseApiUrl, id, exitUrl, userFunc) {
    * with the full set of collected data.  Once the user function has been
    * ran, this will redirect to the study's exit url.
    */
-  return async function (data) {
+  return async function (data: DataCollection) {
     /**
      * The on_data_update and on_finish functions aren't called as async
      * functions.  This means that each function isn't completed before the
@@ -100,7 +124,7 @@ function on_finish(responseApiUrl, id, exitUrl, userFunc) {
       id,
       type: "responses",
       attributes: {
-        exp_data: data.trials,
+        exp_data: data.values(),
         completed: true,
       },
     });
@@ -114,11 +138,15 @@ function on_finish(responseApiUrl, id, exitUrl, userFunc) {
   };
 }
 
-function lookitInitJsPsych(responseApiUrl, responseUuid, exitUrl) {
+function lookitInitJsPsych(
+  responseApiUrl: string,
+  responseUuid: UUID,
+  exitUrl: string,
+) {
   /**
    * Function that returns a function to replace jsPsych's initJsPsych.
    */
-  return function (opts) {
+  return function (opts: JsPsychOptions) {
     const jsPsych = origInitJsPsych({
       ...opts,
       on_data_update: on_data_update(
