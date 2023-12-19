@@ -1,5 +1,11 @@
 # @lookit/lookit-initjspsych
 
+## 1.0.3
+
+### Patch Changes
+
+- 5af0f98: Add build step to gihub actions
+
 ## 1.0.2
 
 ### Patch Changes
