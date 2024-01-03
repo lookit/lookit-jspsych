@@ -1,4 +1,5 @@
 import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
+
 import { ResponseData, UserFunc } from "./types";
 
 const controller = new AbortController();
