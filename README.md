@@ -26,10 +26,11 @@ npm init --scope @lookit --workspace packages/<name of new package>
 
 Giving the default answers to `npm init` seems to work okay. I am sure this will change.
 
-Add build script to new package's `package.json`:
+Add build and test script to new package's `package.json`:
 
 ```json
   "scripts": {
+    "test": "jest --coverage",
     "build": "rollup --config"
   },
 ```
@@ -49,7 +50,7 @@ At the root of the new package run the following commands:
 ```sh
 mkdir src
 echo "export default {}" > src/index.ts
-touch tsconfig.json rollup.config.mjs
+touch tsconfig.json rollup.config.mjs jest.config.cjs
 cd ../..
 ```
 
@@ -72,6 +73,14 @@ Edit `rollup.config.mjs`:
 import { makeRollupConfig } from "@jspsych/config/rollup";
 
 export default makeRollupConfig("<camelcase name of new package>");
+```
+
+Edit `jest.config.cjs`
+
+```cjs
+const config = require("@jspsych/config/jest").makePackageConfig(__dirname);
+config.moduleNameMapper = {};
+module.exports = config;
 ```
 
 You will need `@jspsych/config` to build your new package:
