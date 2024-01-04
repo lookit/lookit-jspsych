@@ -1,5 +1,12 @@
 # @lookit/lookit-initjspsych
 
+## 1.0.4
+
+### Patch Changes
+
+- 0f0a82d: Update Typescript to strict config
+- 0f0a82d: Add tests
+
 ## 1.0.3
 
 ### Patch Changes
