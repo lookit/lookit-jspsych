@@ -33,3 +33,6 @@ jobs:
 
       - name: Format project
         run: npm run format
+
+      - name: Test project
+        run: npm test
