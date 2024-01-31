@@ -1,5 +1,4 @@
 import { makeRollupConfig } from "@jspsych/config/rollup";
-import livereload from 'rollup-plugin-livereload';
 import serve from 'rollup-plugin-serve';
 
 let rollupConfig = makeRollupConfig("lookitInitJsPsych");
@@ -21,11 +20,7 @@ rollupConfig.plugins = [
             const protocol = this.https ? 'https' : 'http';
             console.log(`Server listening at ${protocol}://${host}:${address.port}/`);
         }
-    }),
-    livereload({
-        watch: content_dir,
-        delay: 300
-      })
+    })
 ];
 
 export default rollupConfig;
