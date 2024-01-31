@@ -114,3 +114,25 @@ npm run changeset
 ```
 
 Make sure to add the change log found in the `.changeset` directory to the PR.
+
+## Local development environment
+
+To run the local services needed to develop a package, you'll first have install a few things:
+
+```
+brew install honcho entr python3
+```
+
+To run honcho to start the python http server and to watch for files changing:
+
+```
+honcho start
+```
+
+You will have to add the following to `web/templates/web/jspsych-study-detail.html` in the `lookit-api` project:
+
+```
+<script src="http://localhost:8080/packages/name_of_package/dist/index.browser.js"></script>
+```
+
+And start the `lookit-api` local dev server.
