@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest --coverage",
-    "build": "rollup --config --watch"
+    "build": "rollup --config",
+    "dev": "rollup --config rollup.config.dev.mjs --watch"
   },
   "author": "",
   "license": "ISC",
