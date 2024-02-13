@@ -1,0 +1,21 @@
+{
+  "name": "@lookit/lookit-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "build": "rollup --config",
+    "schema": "openapi-typescript ../../../lookit-api/openapi-schema.yml -o ./src/schema.d.ts"
+  },
+  "unpkg": "dist/index.browser.min.js",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@jspsych/config": "^2.0.0"
+  }
+}
