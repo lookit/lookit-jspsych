@@ -1,14 +1,24 @@
 import api from "@lookit/lookit-api";
 
-async function child(uuid: string) {
-  const child = await api.retrieveChild(uuid);
-  const { given_name, birthday, age_at_birth, additional_information } =
-    child.attributes;
-  return { given_name, birthday, age_at_birth, additional_information };
+class Helpers {
+  child_uuid: string;
+  response_uuid: string;
+
+  constructor(child_uuid: string, response_uuid: string) {
+    this.child_uuid = child_uuid;
+    this.response_uuid = response_uuid;
+  }
+
+  async child() {
+    const child = await api.retrieveChild(this.child_uuid);
+    const { given_name, birthday, age_at_birth, additional_information } =
+      child.attributes;
+    return { given_name, birthday, age_at_birth, additional_information };
+  }
+
+  async pastSessions() {
+    return await api.retrievePastSessions(this.response_uuid);
+  }
 }
 
-async function pastSessions(response_uuid: string) {
-  return await api.retrievePastSessions(response_uuid);
-}
-
-export default { child, pastSessions };
+export default Helpers;
