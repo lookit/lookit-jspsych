@@ -2,7 +2,7 @@
   "name": "@lookit/lookit-initjspsych",
   "version": "1.0.4",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "jest --coverage",
     "build": "rollup --config"

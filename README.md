@@ -45,6 +45,12 @@ And add the following to `package.json`:
   ],
 ```
 
+Update the following in `package.json`:
+
+```json
+    "main": "dist/index.js",
+```
+
 At the root of the new package run the following commands:
 
 ```sh

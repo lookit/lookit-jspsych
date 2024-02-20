@@ -5,14 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "jest --coverage",
-    "build": "rollup --config",
-    "schema": "openapi-typescript ../../../lookit-api/openapi-schema.yml -o ./src/schema.d.ts"
+    "build": "rollup --config"
   },
-  "unpkg": "dist/index.browser.min.js",
-  "files": [
-    "src",
-    "dist"
-  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
