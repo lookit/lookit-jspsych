@@ -1,17 +1,17 @@
-type Relationship = {
+export type Relationship = {
   links: {
     related: string;
   };
 };
 
-type Attributes = {
+export type Attributes = {
   readonly pk?: number;
   readonly url?: string;
 };
 
-interface Relationships {}
+export interface Relationships {}
 
-interface ChildAttrs extends Attributes {
+export interface ChildAttrs extends Attributes {
   given_name: string;
   birthday: string;
   gender: "m" | "f" | "o" | "na";
@@ -24,7 +24,7 @@ interface ChildAttrs extends Attributes {
   readonly pk?: number;
 }
 
-interface PastSessionAttrs extends Attributes {
+export interface PastSessionAttrs extends Attributes {
   conditions?: Record<string, never>;
   global_event_timings?: Record<string, never>;
   exp_data?: Record<string, never>;
@@ -45,7 +45,7 @@ interface PastSessionAttrs extends Attributes {
   )[];
 }
 
-interface Data<Attributes> {
+export interface Data<Attributes> {
   type: string;
   id: string;
   attributes: Attributes;
