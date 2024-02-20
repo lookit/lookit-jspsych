@@ -5,7 +5,7 @@ import Helpers from "./index";
 
 enableFetchMocks();
 
-test("", async () => {
+test("Show that helpers child method returns expected data", async () => {
   // Use date as given name to show that the data isn't manufactured.
   const child = { attributes: { given_name: new Date().toString() } } as Child;
   const data: ApiResponse<Child> = { data: child };
@@ -23,7 +23,7 @@ test("", async () => {
   }).toStrictEqual(helpersChild);
 });
 
-test("", async () => {
+test("Show that helpers past sessions returns expected data", async () => {
   // Use date as id to show that the data isn't manufactured.
   const pastSessions = [{ id: new Date().toString() }] as PastSession[];
   const data: ApiResponse<PastSession[]> = { data: pastSessions };
