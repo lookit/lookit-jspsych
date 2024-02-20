@@ -15,7 +15,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@jspsych/config": "^2.0.0",
-    "@lookit/lookit-api": "^1.0.0"
+    "@jspsych/config": "^2.0.0"
   }
 }
