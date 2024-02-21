@@ -1,0 +1,15 @@
+{
+  "name": "@lookit/lookit-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "build": "rollup --config"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@jspsych/config": "^2.0.0"
+  }
+}

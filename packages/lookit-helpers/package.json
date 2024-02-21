@@ -1,21 +1,20 @@
 {
-  "name": "@lookit/lookit-initjspsych",
-  "version": "1.0.4",
+  "name": "@lookit/lookit-helpers",
+  "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "test": "jest --coverage",
     "build": "rollup --config"
   },
-  "author": "",
-  "license": "ISC",
   "unpkg": "dist/index.browser.min.js",
   "files": [
     "src",
     "dist"
   ],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@jspsych/config": "^2.0.0",
-    "jspsych": "^7.3.4"
+    "@jspsych/config": "^2.0.0"
   }
 }
