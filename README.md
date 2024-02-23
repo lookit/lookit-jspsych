@@ -56,7 +56,7 @@ At the root of the new package run the following commands:
 ```sh
 mkdir src
 echo "export default {}" > src/index.ts
-touch tsconfig.json rollup.config.mjs jest.config.cjs
+touch tsconfig.json rollup.config.mjs rollup.config.dev.mjs jest.config.cjs
 cd ../..
 ```
 
@@ -79,6 +79,19 @@ Edit `rollup.config.mjs`:
 import { makeRollupConfig } from "@jspsych/config/rollup";
 
 export default makeRollupConfig("<camelcase name of new package>");
+```
+
+Edit `rollup.config.dev.mjs`:
+
+```mjs
+import { makeRollupConfig } from "@jspsych/config/rollup";
+
+import { makeDevConfig } from "../../rollup-dev.mjs";
+
+const rollupConfig = makeRollupConfig("lookitInitJsPsych");
+const port = 10001; // this needs to change for each package
+
+export default makeDevConfig(rollupConfig, port);
 ```
 
 Edit `jest.config.cjs`
