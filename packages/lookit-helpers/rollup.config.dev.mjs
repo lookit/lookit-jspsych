@@ -3,7 +3,7 @@ import serve from "rollup-plugin-serve";
 
 const rollupConfig = makeRollupConfig("lookitInitJsPsych");
 const host = "localhost";
-const port = 10001; // this needs to change for each package
+const port = 10003; // this needs to change for each package
 const content_dir = "dist/";
 
 rollupConfig.plugins = [
