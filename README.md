@@ -2,18 +2,6 @@
 
 Here is the monorepo containing packages developed by Lookit to be used with jsPsych on the lookit.mit.edu project.
 
-## Linting/Formating
-
-Lint and formating is done at the monorepo level.
-
-To auto fix linting/formating issues:
-
-```
-npm run fix
-```
-
-Unfixable issues will be diplayed as errors.
-
 ## Create new package
 
 We are using npm workspaces for managing our packages.
@@ -124,6 +112,18 @@ Build all packages:
 npm run build
 ```
 
+## Linting/Formating
+
+Lint and formating is done at the monorepo level.
+
+To auto fix linting/formating issues:
+
+```
+npm run fix
+```
+
+Unfixable issues will be diplayed as errors.
+
 ## Change log
 
 Adding a change log through `changeset` is done with the following command:
@@ -133,3 +133,13 @@ npm run changeset
 ```
 
 Make sure to add the change log found in the `.changeset` directory to the PR.
+
+## Run Dev Server
+
+To run a development server:
+
+```
+npm run dev -w @lookit/<name of package>
+```
+
+When the server has started, you should see something very similar to `<script src="http://127.0.0.1:10001/index.browser.js"></script>` printed out. Add this html to `web/templates/web/jspsych-study-detail.html` in the Django lookit api project to test the package in your local development environment.
