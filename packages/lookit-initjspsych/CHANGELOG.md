@@ -1,5 +1,11 @@
 # @lookit/lookit-initjspsych
 
+## 1.0.5
+
+### Patch Changes
+
+- f528fb3: Update to package config
+
 ## 1.0.4
 
 ### Patch Changes

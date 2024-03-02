@@ -2,18 +2,6 @@
 
 Here is the monorepo containing packages developed by Lookit to be used with jsPsych on the lookit.mit.edu project.
 
-## Linting/Formating
-
-Lint and formating is done at the monorepo level.
-
-To auto fix linting/formating issues:
-
-```
-npm run fix
-```
-
-Unfixable issues will be diplayed as errors.
-
 ## Create new package
 
 We are using npm workspaces for managing our packages.
@@ -45,12 +33,18 @@ And add the following to `package.json`:
   ],
 ```
 
+Update the following in `package.json`:
+
+```json
+    "main": "dist/index.js",
+```
+
 At the root of the new package run the following commands:
 
 ```sh
 mkdir src
 echo "export default {}" > src/index.ts
-touch tsconfig.json rollup.config.mjs jest.config.cjs
+touch tsconfig.json rollup.config.mjs rollup.config.dev.mjs jest.config.cjs
 cd ../..
 ```
 
@@ -73,6 +67,19 @@ Edit `rollup.config.mjs`:
 import { makeRollupConfig } from "@jspsych/config/rollup";
 
 export default makeRollupConfig("<camelcase name of new package>");
+```
+
+Edit `rollup.config.dev.mjs`:
+
+```mjs
+import { makeRollupConfig } from "@jspsych/config/rollup";
+
+import { makeDevConfig } from "../../rollup-dev.mjs";
+
+const rollupConfig = makeRollupConfig("lookitInitJsPsych");
+const port = 10001; // this needs to change for each package
+
+export default makeDevConfig(rollupConfig, port);
 ```
 
 Edit `jest.config.cjs`
@@ -105,6 +112,18 @@ Build all packages:
 npm run build
 ```
 
+## Linting/Formating
+
+Lint and formating is done at the monorepo level.
+
+To auto fix linting/formating issues:
+
+```
+npm run fix
+```
+
+Unfixable issues will be diplayed as errors.
+
 ## Change log
 
 Adding a change log through `changeset` is done with the following command:
@@ -114,3 +133,13 @@ npm run changeset
 ```
 
 Make sure to add the change log found in the `.changeset` directory to the PR.
+
+## Run Dev Server
+
+To run a development server:
+
+```
+npm run dev -w @lookit/<name of package>
+```
+
+When the server has started, you should see something very similar to `<script src="http://127.0.0.1:10001/index.browser.js"></script>` printed out. Add this html to `web/templates/web/jspsych-study-detail.html` in the Django lookit api project to test the package in your local development environment.
