@@ -7,7 +7,7 @@
     "test": "npm test --workspaces",
     "lint": "eslint ./packages/**/src/**/*.ts --quiet",
     "format": "prettier . -c",
-    "fix": "eslint ./packages/**/src/**/*.ts --fix && prettier . -l --write",
+    "fix": "eslint ./**/*.{ts,mjs} --fix && prettier . -l --write",
     "build": "npm run build --workspaces",
     "changeset": "changeset"
   },
@@ -28,8 +28,8 @@
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "prettier": "^3.1.1",
-    "jest-fetch-mock": "^3.0.3"
+    "jest-fetch-mock": "^3.0.3",
+    "prettier": "^3.1.1"
   },
   "workspaces": [
     "packages/*"

@@ -65,20 +65,16 @@ Edit `rollup.config.mjs`:
 
 ```mjs
 import { makeRollupConfig } from "@jspsych/config/rollup";
-
+// This package name needs to be unique
 export default makeRollupConfig("<camelcase name of new package>");
 ```
 
 Edit `rollup.config.dev.mjs`:
 
 ```mjs
-import { makeRollupConfig } from "@jspsych/config/rollup";
-
 import { makeDevConfig } from "../../rollup-dev.mjs";
-
-const rollupConfig = makeRollupConfig("lookitInitJsPsych");
+import rollupConfig from "./rollup.config.mjs";
 const port = 10001; // this needs to change for each package
-
 export default makeDevConfig(rollupConfig, port);
 ```
 
