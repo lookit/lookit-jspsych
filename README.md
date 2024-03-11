@@ -142,9 +142,9 @@ When the server has started, you should see something very similar to `<script s
 
 ### Serve multiple packages
 
-The above command will serve a single package and wait for changes. If you need to serve multiple packages locally, you can open separate terminals for each package and run the `npm run dev` command in each. Another option is to install [Honcho](https://github.com/nickstenning/honcho) and write a Procfile to serve/watch multiple packages in the same terminal. 
+The above command will serve a single package and wait for changes. If you need to serve multiple packages locally, you can open separate terminals for each package and run the `npm run dev` command in each. Another option is to install [Honcho](https://github.com/nickstenning/honcho) and write a Procfile to serve/watch multiple packages in the same terminal.
 
-Create a file called `Procfile` in the root project directory, and list the `npm run dev` commands for each package that you want to serve, preceded by the label you want to give it (to identify the print statements associated with each package in the terminal). 
+Create a file called `Procfile` in the root project directory, and list the `npm run dev` commands for each package that you want to serve, preceded by the label you want to give it (to identify the print statements associated with each package in the terminal).
 
 ```
 lookit-initjspsych: npm run dev -w @lookit/lookit-initjspsych
