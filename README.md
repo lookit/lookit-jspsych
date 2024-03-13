@@ -52,11 +52,11 @@ Edit `tsconfig.json`:
 
 ```json
 {
-  "extends": "@jspsych/config/tsconfig.core.json",
   "compilerOptions": {
     "strict": true,
     "baseUrl": "."
   },
+  "extends": "@jspsych/config/tsconfig.core.json",
   "include": ["src"]
 }
 ```

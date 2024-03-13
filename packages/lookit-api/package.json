@@ -2,14 +2,14 @@
   "name": "@lookit/lookit-api",
   "version": "1.0.0",
   "description": "",
+  "license": "ISC",
+  "author": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest --coverage",
     "build": "rollup --config",
-    "dev": "rollup --config rollup.config.dev.mjs --watch"
+    "dev": "rollup --config rollup.config.dev.mjs --watch",
+    "test": "jest --coverage"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@jspsych/config": "^2.0.0"
   }

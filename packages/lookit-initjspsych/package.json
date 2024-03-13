@@ -2,19 +2,19 @@
   "name": "@lookit/lookit-initjspsych",
   "version": "1.0.5",
   "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "test": "jest --coverage",
-    "build": "rollup --config",
-    "dev": "rollup --config rollup.config.dev.mjs --watch"
-  },
-  "author": "",
   "license": "ISC",
+  "author": "",
+  "main": "dist/index.js",
   "unpkg": "dist/index.browser.min.js",
   "files": [
     "src",
     "dist"
   ],
+  "scripts": {
+    "build": "rollup --config",
+    "dev": "rollup --config rollup.config.dev.mjs --watch",
+    "test": "jest --coverage"
+  },
   "dependencies": {
     "@jspsych/config": "^2.0.0",
     "jspsych": "^7.3.4"

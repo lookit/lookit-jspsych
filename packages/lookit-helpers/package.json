@@ -2,19 +2,19 @@
   "name": "@lookit/lookit-helpers",
   "version": "1.0.1",
   "description": "",
+  "license": "ISC",
+  "author": "",
   "main": "dist/index.js",
-  "scripts": {
-    "test": "jest --coverage",
-    "build": "rollup --config",
-    "dev": "rollup --config rollup.config.dev.mjs --watch"
-  },
   "unpkg": "dist/index.browser.min.js",
   "files": [
     "src",
     "dist"
   ],
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "build": "rollup --config",
+    "dev": "rollup --config rollup.config.dev.mjs --watch",
+    "test": "jest --coverage"
+  },
   "dependencies": {
     "@jspsych/config": "^2.0.0",
     "@lookit/lookit-api": "^1.0.0"
