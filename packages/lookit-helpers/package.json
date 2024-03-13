@@ -26,7 +26,7 @@
     "test": "jest --coverage"
   },
   "dependencies": {
-    "@lookit/lookit-api": "^1.0.0"
+    "@lookit/lookit-api": "^0.0.1"
   },
   "devDependencies": {
     "@jspsych/config": "^2.0.0"
