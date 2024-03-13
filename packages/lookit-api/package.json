@@ -1,16 +1,30 @@
 {
   "name": "@lookit/lookit-api",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "This is a JS implementation of lookit's RESTful API.",
+  "homepage": "https://github.com/lookit/lookit-jspsych#readme",
+  "bugs": {
+    "url": "https://github.com/lookit/lookit-jspsych/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lookit/lookit-jspsych.git",
+    "directory": "packages/lookit-api"
+  },
   "license": "ISC",
-  "author": "",
+  "author": "Christopher J Green <okaycj@mit.edu> (https://github.com/okaycj)",
   "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "rollup --config",
     "dev": "rollup --config rollup.config.dev.mjs --watch",
     "test": "jest --coverage"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@jspsych/config": "^2.0.0"
+  },
+  "peerDependencies": {
+    "jspsych": "^7.3.4"
   }
 }
