@@ -24,7 +24,8 @@
     "lint": "eslint ./packages/**/src/**/*.ts --quiet",
     "test": "npm test --workspaces"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
@@ -34,9 +35,7 @@
     "prettier": "^3.1.1",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-packagejson": "^2.4.12",
-    "prettier-plugin-sort-json": "^3.1.0"
-  },
-  "devDependencies": {
+    "prettier-plugin-sort-json": "^3.1.0",
     "rollup-plugin-serve": "^1.1.1"
   },
   "engines": {
