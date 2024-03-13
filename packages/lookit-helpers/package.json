@@ -1,11 +1,21 @@
 {
   "name": "@lookit/lookit-helpers",
-  "version": "1.0.1",
-  "description": "",
+  "version": "0.0.1",
+  "description": "This package provides researchers with access to user's data for developing thier studies.",
+  "homepage": "https://github.com/lookit/lookit-jspsych#readme",
+  "bugs": {
+    "url": "https://github.com/lookit/lookit-jspsych/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lookit/lookit-jspsych.git",
+    "directory": "packages/lookit-helpers"
+  },
   "license": "ISC",
-  "author": "",
+  "author": "Christopher J Green <okaycj@mit.edu> (https://github.com/okaycj)",
   "main": "dist/index.js",
   "unpkg": "dist/index.browser.min.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "src",
     "dist"
@@ -16,7 +26,12 @@
     "test": "jest --coverage"
   },
   "dependencies": {
-    "@jspsych/config": "^2.0.0",
     "@lookit/lookit-api": "^1.0.0"
+  },
+  "devDependencies": {
+    "@jspsych/config": "^2.0.0"
+  },
+  "peerDependencies": {
+    "jspsych": "^7.3.4"
   }
 }
