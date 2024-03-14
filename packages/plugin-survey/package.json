@@ -1,0 +1,44 @@
+{
+  "name": "@lookit/plugin-survey",
+  "version": "1.0.0",
+  "description": "A jsPsych plugin for complex surveys using SurveyJS",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./css/survey.css": "./css/survey.css",
+    "./css/survey.scss": "./css/survey.scss"
+  },
+  "files": [
+    "src",
+    "dist",
+    "css"
+  ],
+  "source": "src/index.ts",
+  "scripts": {
+    "test": "jest --coverage",
+    "build:js": "rollup --config",
+    "build:styles": "sass --load-path ./node_modules --load-path ../../node_modules css/survey.scss dist/survey.css",
+    "build": "npm-run-all -p build:js build:styles",
+    "dev": "rollup --config rollup.config.dev.mjs --watch"
+  },
+  "author": "Becky Gilbert",
+  "license": "ISC",
+  "peerDependencies": {
+    "jspsych": ">=7.0.0"
+  },
+  "devDependencies": {
+    "@jspsych/config": "^2.0.0",
+    "@jspsych/test-utils": "^1.1.2",
+    "npm-run-all": "^4.1.5",
+    "sass": "^1.43.5"
+  },
+  "dependencies": {
+    "jquery": "^3.7.1",
+    "survey-core": "^1.9.121",
+    "survey-jquery": "^1.9.122"
+  }
+}
