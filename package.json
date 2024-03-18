@@ -2,42 +2,42 @@
   "name": "lookit-jspsych",
   "version": "1.0.0",
   "description": "JsPsych packages used in the Lookit project. ",
-  "main": "index.js",
-  "scripts": {
-    "test": "npm test --workspaces",
-    "lint": "eslint ./packages/**/src/**/*.ts --quiet",
-    "format": "prettier . -c",
-    "fix": "eslint ./**/*.{ts,mjs} --fix && prettier . -l --write",
-    "build": "npm run build --workspaces",
-    "changeset": "changeset"
+  "homepage": "https://github.com/lookit/lookit-jspsych#readme",
+  "bugs": {
+    "url": "https://github.com/lookit/lookit-jspsych/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lookit/lookit-jspsych.git"
   },
-  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/lookit/lookit-jspsych/issues"
+  "author": "",
+  "main": "index.js",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "changeset": "changeset",
+    "fix": "eslint ./**/*.{ts,mjs} --fix && prettier . -l --write",
+    "format": "prettier . -c",
+    "lint": "eslint ./packages/**/src/**/*.ts --quiet",
+    "test": "npm test --workspaces"
   },
-  "homepage": "https://github.com/lookit/lookit-jspsych#readme",
-  "dependencies": {
+  "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-simple-import-sort": "^10.0.0",
     "jest-fetch-mock": "^3.0.3",
-    "prettier": "^3.1.1"
+    "prettier": "^3.1.1",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "prettier-plugin-packagejson": "^2.4.12",
+    "prettier-plugin-sort-json": "^3.1.0",
+    "rollup-plugin-serve": "^1.1.1"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "engines": {
     "node": ">=18.0.0 <21.0.0"
-  },
-  "devDependencies": {
-    "rollup-plugin-serve": "^1.1.1"
   }
 }

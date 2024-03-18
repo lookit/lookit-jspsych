@@ -1,22 +1,35 @@
 {
   "name": "@lookit/lookit-initjspsych",
-  "version": "1.0.5",
-  "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "test": "jest --coverage",
-    "build": "rollup --config",
-    "dev": "rollup --config rollup.config.dev.mjs --watch"
+  "version": "0.0.1",
+  "description": "This package overloads jsPsych's init function.",
+  "homepage": "https://github.com/lookit/lookit-jspsych#readme",
+  "bugs": {
+    "url": "https://github.com/lookit/lookit-jspsych/issues"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lookit/lookit-jspsych.git",
+    "directory": "packages/lookit-initjspsych"
+  },
   "license": "ISC",
+  "author": "Christopher J Green <okaycj@mit.edu> (https://github.com/okaycj)",
+  "main": "dist/index.js",
   "unpkg": "dist/index.browser.min.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "src",
     "dist"
   ],
-  "dependencies": {
-    "@jspsych/config": "^2.0.0",
+  "scripts": {
+    "build": "rollup --config",
+    "dev": "rollup --config rollup.config.dev.mjs --watch",
+    "test": "jest --coverage"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@jspsych/config": "^2.0.0"
+  },
+  "peerDependencies": {
     "jspsych": "^7.3.4"
   }
 }
