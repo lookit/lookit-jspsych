@@ -1,7 +1,7 @@
 {
   "name": "@lookit/lookit-helpers",
   "version": "0.0.1",
-  "description": "This package provides researchers with access to user's data for developing thier studies.",
+  "description": "This package provides researchers with access to user's data for developing their studies.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
     "url": "https://github.com/lookit/lookit-jspsych/issues"
