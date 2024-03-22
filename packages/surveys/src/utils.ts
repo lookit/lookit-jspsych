@@ -1,7 +1,16 @@
 import Data from "@lookit/data";
+import { Study } from "@lookit/lookit-api/dist/types";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
 import { Model } from "survey-jquery";
+
+declare global {
+  interface Window {
+    lookit: {
+      study: Study;
+    };
+  }
+}
 
 const CONFIG = <const>{
   marked: { async: false },
