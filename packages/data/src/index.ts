@@ -31,7 +31,9 @@ async function load(response_uuid: string) {
       },
     });
     deepFreeze(window.chs);
+    await finish();
   }
+  
 }
 
 export default { load, retrieveResponse, updateResponse, finish };
