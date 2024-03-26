@@ -23,8 +23,14 @@
     "dev": "rollup --config rollup.config.dev.mjs --watch",
     "test": "jest --coverage"
   },
+  "dependencies": {
+    "dompurify": "^3.0.11",
+    "marked": "^12.0.1",
+    "survey-jquery": "^1.9.136"
+  },
   "devDependencies": {
-    "@jspsych/config": "^2.0.0"
+    "@jspsych/config": "^2.0.0",
+    "@types/dompurify": "^3.0.5"
   },
   "peerDependencies": {
     "jspsych": "^7.3.4"
