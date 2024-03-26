@@ -1,5 +1,6 @@
 {
-  "logoPosition": "right",
+  "title": "Exit Survey",
+  "showQuestionNumbers": "off",
   "pages": [
     {
       "name": "page1",
@@ -25,7 +26,7 @@
           "choices": [
             {
               "value": "Item 1",
-              "text": "Private: Video may only be viewed by authorized scientists"
+              "text": "**Private**: Video may only be viewed by authorized scientists"
             },
             {
               "value": "Item 2",
@@ -40,6 +41,5 @@
       ]
     }
   ],
-  "showQuestionNumbers": "off",
-  "title": "Exit Survey"
+  "logoPosition": "right"
 }
