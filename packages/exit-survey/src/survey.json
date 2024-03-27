@@ -17,7 +17,9 @@
           "name": "databraryShare",
           "title": "Would you like to share your video and other data from this session with authorized users of the secure data library Databrary?",
           "description": "Only authorized researchers will have access to information in the library. Researchers who are granted access must agree to maintain confidentiality and not use information for commercial purposes. Data sharing will lead to faster progress in research on human development and behavior. If you have any questions about the data-sharing library, please visit https://nyu.databrary.org/ or email ethics@databrary.org.",
-          "isRequired": true
+          "isRequired": true,
+          "valueTrue": "yes",
+          "valueFalse": "no"
         },
         {
           "type": "radiogroup",
@@ -39,6 +41,20 @@
               "text": "**Publicity**: Please select this option if you'd be excited about seeing your child featured on the Lookit website or in a news article about this study! Your video may be shared for publicity as well as scientific and educational purposes; it will never be used for commercial purposes. Video clips shared may be available online to the general public."
             }
           ]
+        },
+        {
+          "type": "checkbox",
+          "name": "withdrawal",
+          "title": "Withdrawal of video data",
+          "choices": [ "Every video helps us, even if something went wrong! However, if you need your video deleted (your spouse was discussing state secrets in the background, etc.), check here to completely withdraw your video data from this session from the study. Only your consent video will be retained and it may only be viewed by Lookit project staff and researchers working on this study; other video will be deleted without viewing." ],
+          "isRequired": false
+        },
+        {
+          "type": "comment",
+          "name": "feedback",
+          "title": "How did it go? Do you have any suggestions for improving the study?",
+          "rows": 3,
+          "autoGrow": true
         }
       ]
     }
