@@ -19,6 +19,7 @@ Add build and test script to new package's `package.json`:
 ```json
   "scripts": {
     "test": "jest --coverage",
+    "dev": "rollup --config rollup.config.dev.mjs --watch",
     "build": "rollup --config"
   },
 ```
@@ -53,8 +54,8 @@ Edit `tsconfig.json`:
 ```json
 {
   "compilerOptions": {
-    "strict": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "strict": true
   },
   "extends": "@jspsych/config/tsconfig.core.json",
   "include": ["src"]
