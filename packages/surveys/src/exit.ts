@@ -4,16 +4,19 @@ import newJSON from "./new.json";
 import surveyJSON from "./survey.json";
 import { survey_function } from "./utils";
 
-interface Info {
-  name: "exit-survey";
+const info = <const>{
+  name: SurveyPlugin.info.name,
   parameters: {
+    ...SurveyPlugin.info.parameters,
     new_value: {
-      type: ParameterType.STRING;
-      default: "";
-      pretty_name: "Validation function";
-    };
-  };
-}
+      type: ParameterType.STRING,
+      default: "",
+      pretty_name: "Validation function",
+    },
+  },
+};
+
+type Info = typeof info;
 
 function updateQuestions(trial: TrialType<Info>) {
   if (trial.new_value) {
@@ -23,8 +26,8 @@ function updateQuestions(trial: TrialType<Info>) {
 }
 
 export class ExitSurveyPlugin extends SurveyPlugin {
+  static info = info;
   trial(display_element: HTMLElement, trial: TrialType<Info>) {
-    console.log(trial.new_value);
     const survey_json = updateQuestions(trial);
     return super.trial(display_element, {
       ...trial,
