@@ -1,5 +1,5 @@
 {
-  "name": "@lookit/exit-survey",
+  "name": "@lookit/surveys",
   "version": "0.0.1",
   "description": "A survey plugin for lookit studies.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",

@@ -54,8 +54,8 @@ Edit `tsconfig.json`:
 ```json
 {
   "compilerOptions": {
-    "strict": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "strict": true
   },
   "extends": "@jspsych/config/tsconfig.core.json",
   "include": ["src"]
