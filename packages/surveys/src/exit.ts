@@ -80,7 +80,7 @@ function privateLevelOnly(trial: Trial) {
     );
     media_use_element &&
       Object.assign(media_use_element, {
-        value: "private",
+        defaultValue: "private",
         description: "Your video data is private and may only be viewed by authorized scientists.",
         choicesVisibleIf: "false", // this must be a string expression
         isRequired: false
