@@ -104,7 +104,7 @@ export class ExitSurveyPlugin extends SurveyPlugin {
   public trial(display_element: HTMLElement, trial: Trial) {
     super.trial(display_element, {
       ...trial,
-      survey_json: surveyParameters(trial),
+      survey_json: await surveyParameters(trial),
       survey_function,
     });
   }
