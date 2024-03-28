@@ -1,5 +1,7 @@
-import { ApiResponse, Child, PastSession } from "./types";
-import { get } from "./utils";
+import { ApiResponse, Child, PastSession, Study } from "./types";
+import { get, getUuids } from "./utils";
+
+const CONFIG = <const>{ ...getUuids() };
 
 async function retrieveChild(uuid: string) {
   return (await get<ApiResponse<Child>>(`children/${uuid}/`)).data;
@@ -9,4 +11,8 @@ async function retrievePastSessions(uuid: string) {
   return (await get<ApiResponse<PastSession[]>>(`past-sessions/${uuid}/`)).data;
 }
 
-export default { retrieveChild, retrievePastSessions };
+async function retreiveStudy() {
+  return (await get<ApiResponse<Study>>(`studies/${CONFIG.study}/`)).data;
+}
+
+export default { retrieveChild, retrievePastSessions, retreiveStudy };
