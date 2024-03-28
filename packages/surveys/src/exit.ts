@@ -73,10 +73,26 @@ function additionalVideoPrivacyText(trial: Trial) {
     });
 }
 
+function privateLevelOnly(trial: Trial) {
+  if (trial.private_level_only) {
+    const media_use_element = surveyJSON.pages[0].elements.find(
+      (element) => element.name === "useOfMedia",
+    );
+    media_use_element &&
+      Object.assign(media_use_element, {
+        value: "private",
+        description: "Your video data is private and may only be viewed by authorized scientists.",
+        choicesVisibleIf: "false", // this must be a string expression
+        isRequired: false
+      });
+  }
+}
+
 async function surveyParameters(trial: Trial) {
   showDatabraryOptions(trial);
   await includeWithdrawalExample(trial);
   additionalVideoPrivacyText(trial);
+  privateLevelOnly(trial);
   return JSON.stringify(surveyJSON);
 }
 
