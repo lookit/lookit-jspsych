@@ -1,4 +1,4 @@
-const CONFIG = <const>{url_base : "/api/v2/"};
+const CONFIG = <const>{ url_base: "/api/v2/" };
 
 export async function get<T>(url: string) {
   /**
