@@ -17,7 +17,8 @@
           "title": "Would you like to share your video and other data from this session with authorized users of the secure data library Databrary?",
           "type": "boolean",
           "valueFalse": "no",
-          "valueTrue": "yes"
+          "valueTrue": "yes",
+          "enableIf": "(!{withdrawal}) or ({withdrawal} empty)"
         },
         {
           "choices": [
@@ -38,7 +39,8 @@
           "isRequired": true,
           "name": "useOfMedia",
           "title": "Use of video clips and images:",
-          "type": "radiogroup"
+          "type": "radiogroup",
+          "enableIf": "(!{withdrawal}) or ({withdrawal} empty)"
         },
         {
           "choices": [],
