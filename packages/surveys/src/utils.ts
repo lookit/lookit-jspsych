@@ -9,7 +9,7 @@ const CONFIG = <const>{
 
 export function survey_function(survey: Model) {
   survey.onTextMarkdown.add((_sender, options) => {
-    // We can set te type as "string" because async is false above.
+    // We can set the type as "string" because async is false.
     options.html = DOMPurify.sanitize(
       marked.parseInline(options.text, CONFIG.MARKED) as string,
       CONFIG.DOMPURIFY,
