@@ -2,6 +2,15 @@ import Data from "@lookit/data";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
 import { Model } from "survey-jquery";
+import SurveyPlugin from "../../../../jsPsych/packages/plugin-survey/dist";
+
+declare global {
+  interface Window {
+    lookit: {
+      study: Study;
+    };
+  }
+}
 
 const CONFIG = <const>{
   marked: { async: false },
