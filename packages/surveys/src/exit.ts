@@ -1,4 +1,5 @@
 import { ParameterType, TrialType } from "jspsych";
+import { Model } from "survey-jquery";
 import SurveyPlugin from "../../../../jsPsych/packages/plugin-survey/dist";
 import surveyJSON from "./survey.json";
 import { LookitAPISurveyPlugin, survey_function } from "./utils";
@@ -55,7 +56,10 @@ function includeWithdrawalExample(trial: Trial) {
   withdrawal_element &&
     Object.assign(withdrawal_element, {
       choices: [
-        `Every video helps us, even if something went wrong! However, if you need your video deleted${example}, check here to completely withdraw your video data from this session from the study. Only your consent video will be retained and it may only be viewed by Lookit project staff and researchers working with ${study.attributes.contact_info} on the study "${study.attributes.name}"; other video will be deleted without viewing.`,
+        {
+          text: `Every video helps us, even if something went wrong! However, if you need your video deleted${example}, check here to completely withdraw your video data from this session from the study. Only your consent video will be retained and it may only be viewed by Lookit project staff and researchers working with ${study.attributes.contact_info} on the study "${study.attributes.name}"; other video will be deleted without viewing.`,
+          value: true,
+        },
       ],
     });
 }
@@ -96,14 +100,27 @@ function surveyParameters(trial: Trial) {
   return JSON.stringify(surveyJSON);
 }
 
+function exit_survey_function(survey: Model) {
+  survey_function(survey);
+  // For the withdrawal checkbox question, this takes the boolean response value out of an array
+  // and saves it as a single value (since there is always only one checkbox).
+  // We went with the checkbox question type rather than boolean with "renderAs: checkbox" because the
+  // latter doesn't allow both a question title and label next to the checkbox.
+  survey.onComplete.add(function (sender) {
+    const trueFalseValue =
+      sender.getQuestionByName("withdrawal").value.length > 0 ? true : false;
+    sender.setValue("withdrawal", trueFalseValue);
+  });
+}
+
 export class ExitSurveyPlugin extends LookitAPISurveyPlugin {
   static readonly info = info;
-  trial(display_element: HTMLElement, trial: Trial) {
+  async trial(display_element: HTMLElement, trial: Trial) {
     this.lookitData().then(() => {
       super.trial(display_element, {
         ...trial,
         survey_json: surveyParameters(trial),
-        survey_function,
+        survey_function: exit_survey_function,
       });
     });
   }
