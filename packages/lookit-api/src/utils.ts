@@ -15,13 +15,10 @@ export async function get<T>(url: string) {
 }
 
 export function getUuids() {
-  const location = window.location.href;
-  const regexp =
-    /([0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})/i;
-  const matches = regexp.exec(location);
-
-  if (location.includes("exp/studies/j/") && matches && matches.length === 2) {
-    return { study: matches[0], child: matches[1] };
+  const locationHref = window.location.href;
+  const uuids = locationHref.replace("/preview/", "").split("/").slice(-2);
+  if (locationHref.includes("/exp/studies/j/") && uuids && uuids.length === 2) {
+    return { study: uuids[0], child: uuids[1] };
   } else {
     throw Error("URL is different than expected.");
   }

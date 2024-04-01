@@ -19,7 +19,7 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "changeset": "changeset",
-    "fix": "eslint ./**/*.{ts,mjs} --fix && prettier . -l --write",
+    "fix": "prettier . -l --write && eslint ./**/*.{ts,mjs} --fix",
     "format": "prettier . -c",
     "lint": "eslint ./packages/**/src/**/*.ts --quiet",
     "test": "npm test --workspaces"

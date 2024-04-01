@@ -12,7 +12,7 @@ class Helpers {
   }
 
   async child(): Promise<ChildSubSet> {
-    const child = await api.retrieveChild(this.child_uuid);
+    const child = await api.retrieveChild();
     const { given_name, birthday, age_at_birth, additional_information } =
       child.attributes;
     return { given_name, birthday, age_at_birth, additional_information };

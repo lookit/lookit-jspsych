@@ -12,13 +12,13 @@
         },
         {
           "description": "Only authorized researchers will have access to information in the library. Researchers who are granted access must agree to maintain confidentiality and not use information for commercial purposes. Data sharing will lead to faster progress in research on human development and behavior. If you have any questions about the data-sharing library, please visit [Databrary](https://nyu.databrary.org/) or email ethics@databrary.org.",
+          "enableIf": "(!{withdrawal}) or ({withdrawal} empty)",
           "isRequired": true,
           "name": "databraryShare",
           "title": "Would you like to share your video and other data from this session with authorized users of the secure data library Databrary?",
           "type": "boolean",
           "valueFalse": "no",
-          "valueTrue": "yes",
-          "enableIf": "(!{withdrawal}) or ({withdrawal} empty)"
+          "valueTrue": "yes"
         },
         {
           "choices": [
@@ -36,11 +36,11 @@
             }
           ],
           "description": "",
+          "enableIf": "(!{withdrawal}) or ({withdrawal} empty)",
           "isRequired": true,
           "name": "useOfMedia",
           "title": "Use of video clips and images:",
-          "type": "radiogroup",
-          "enableIf": "(!{withdrawal}) or ({withdrawal} empty)"
+          "type": "radiogroup"
         },
         {
           "choices": [],

@@ -3,8 +3,8 @@ import { get, getUuids } from "./utils";
 
 const CONFIG = <const>{ ...getUuids() };
 
-async function retrieveChild(uuid: string) {
-  return (await get<ApiResponse<Child>>(`children/${uuid}/`)).data;
+async function retrieveChild() {
+  return (await get<ApiResponse<Child>>(`children/${CONFIG.child}/`)).data;
 }
 
 async function retrievePastSessions(uuid: string) {
