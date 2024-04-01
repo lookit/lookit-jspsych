@@ -6,6 +6,7 @@
           "description": "We ask again just to check for typos during registration or accidental selection of a different child at the start of the study.",
           "inputType": "date",
           "isRequired": true,
+          "maxValueExpression": "today()",
           "name": "birthDate",
           "title": "Please confirm your child's birthdate.",
           "type": "text"
