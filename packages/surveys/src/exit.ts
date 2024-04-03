@@ -2,7 +2,7 @@ import { ParameterType, TrialType } from "jspsych";
 import { Model } from "survey-jquery";
 import SurveyPlugin from "../../../../jsPsych/packages/plugin-survey/dist";
 import surveyJSON from "./survey.json";
-import { LookitAPISurveyPlugin, survey_function } from "./utils";
+import { survey_function } from "./utils";
 
 const info = <const>{
   ...SurveyPlugin.info,
@@ -45,7 +45,7 @@ function showDatabraryOptions(trial: Trial) {
 }
 
 function includeWithdrawalExample(trial: Trial) {
-  const study = window.lookit.study;
+  const study = window.chs.study;
   const withdrawal_element = surveyJSON.pages[0].elements.find(
     (element) => element.name === "withdrawal",
   );
@@ -113,15 +113,13 @@ function exit_survey_function(survey: Model) {
   });
 }
 
-export class ExitSurveyPlugin extends LookitAPISurveyPlugin {
+export class ExitSurveyPlugin extends SurveyPlugin {
   static readonly info = info;
-  async trial(display_element: HTMLElement, trial: Trial) {
-    this.lookitData().then(() => {
-      super.trial(display_element, {
-        ...trial,
-        survey_json: surveyParameters(trial),
-        survey_function: exit_survey_function,
-      });
+  trial(display_element: HTMLElement, trial: Trial) {
+    super.trial(display_element, {
+      ...trial,
+      survey_json: surveyParameters(trial),
+      survey_function: exit_survey_function,
     });
   }
 }
