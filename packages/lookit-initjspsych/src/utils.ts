@@ -103,7 +103,7 @@ export function on_finish(responseUuid: string, userFunc?: UserFunc) {
      * in on_data_update.  This will cause a reliable error,
      */
     const { exit_url } = window.chs.study.attributes;
-    
+
     controller.abort("Writing final response data.");
 
     await Api.updateResponse(responseUuid, {

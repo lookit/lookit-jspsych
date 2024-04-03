@@ -2,7 +2,6 @@ import { initJsPsych as origInitJsPsych } from "jspsych";
 import { JsPsychOptions } from "./types";
 import { on_data_update, on_finish } from "./utils";
 
-
 function lookitInitJsPsych(responseUuid: string) {
   /**
    * Function that returns a function to replace jsPsych's initJsPsych.
