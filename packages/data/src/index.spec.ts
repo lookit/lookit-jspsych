@@ -1,6 +1,6 @@
 import { enableFetchMocks } from "jest-fetch-mock";
 
-import api from "./index";
+import { retrieveChild, retrievePastSessions } from "./api";
 import { ApiResponse, Child, PastSession } from "./types";
 
 enableFetchMocks();
@@ -12,8 +12,8 @@ test("Show that retrieveChild is responding with expected data", async () => {
 
   fetchMock.mockOnce(JSON.stringify(data));
 
-  const retrieveChild = await api.retrieveChild("some uuid");
-  expect(child).toStrictEqual(retrieveChild);
+  const retrieveChildData = await retrieveChild();
+  expect(child).toStrictEqual(retrieveChildData);
 });
 
 test("Show that retrievePastSessions is responding with expected data", async () => {
@@ -25,6 +25,6 @@ test("Show that retrievePastSessions is responding with expected data", async ()
 
   fetchMock.mockOnce(JSON.stringify(data));
 
-  const retrievePastSessions = await api.retrievePastSessions("some uuid");
-  expect(pastSessions).toStrictEqual(retrievePastSessions);
+  const retrievePastSessionsData = await retrievePastSessions("some uuid");
+  expect(pastSessions).toStrictEqual(retrievePastSessionsData);
 });

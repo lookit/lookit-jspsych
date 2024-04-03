@@ -1,3 +1,5 @@
+import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
+
 export type Relationship = {
   links: {
     related: string;
@@ -57,7 +59,7 @@ export interface ChildAttrs extends Attributes {
 export interface PastSessionAttrs extends Attributes {
   conditions?: Record<string, never>;
   global_event_timings?: Record<string, never>;
-  exp_data?: Record<string, never>;
+  exp_data?: DataCollection[];
   sequence?: string[];
   completed?: boolean;
   completed_consent_frame?: boolean;
@@ -111,4 +113,25 @@ export interface PastSession extends Data<PastSessionAttrs> {
     study: Relationship;
     demographic_snapshot: Relationship;
   };
+}
+
+export interface Response extends Data<PastSessionAttrs> {
+  type: "responses";
+  relationships: {
+    child: Relationship;
+    user: Relationship;
+    study: Relationship;
+    demographic_snapshot: Relationship;
+  };
+}
+
+export interface ResponseUpdate {
+  type: "responses";
+  id: string;
+  attributes: ResponseAttrsUpdate;
+}
+
+export interface ResponseAttrsUpdate {
+  exp_data?: DataCollection[];
+  completed?: boolean;
 }

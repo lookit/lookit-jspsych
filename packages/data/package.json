@@ -1,5 +1,5 @@
 {
-  "name": "@lookit/lookit-api",
+  "name": "@lookit/data",
   "version": "0.0.1",
   "description": "This is a JS implementation of lookit's RESTful API.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
@@ -9,7 +9,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lookit/lookit-jspsych.git",
-    "directory": "packages/lookit-api"
+    "directory": "packages/data"
   },
   "license": "ISC",
   "author": "Christopher J Green <okaycj@mit.edu> (https://github.com/okaycj)",
