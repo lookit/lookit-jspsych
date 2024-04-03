@@ -1,5 +1,5 @@
 import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
-
+import Api from "../../data/dist";
 import { ResponseData, UserFunc } from "./types";
 
 const controller = new AbortController();
@@ -56,11 +56,7 @@ export async function patch(
   }
 }
 
-export function on_data_update(
-  responseApiUrl: string,
-  id: string,
-  userFunc?: UserFunc,
-) {
+export function on_data_update(responseUuid: string, userFunc?: UserFunc) {
   /**
    * Function that returns a function to be used in place of jsPsych's option
    * "on_data_update".  "userFunc" should be the user's implementation of
@@ -69,19 +65,19 @@ export function on_data_update(
    * current data point.
    */
   return async function (data: DataCollection) {
-    const {
-      data: {
-        attributes: { exp_data },
-      },
-    } = await get(responseApiUrl);
+    const response = await Api.retreiveResponse(responseUuid);
+    const exp_data = response.attributes.exp_data
+      ? response.attributes.exp_data
+      : [];
+    response.attributes.exp_data = [...exp_data, data];
 
-    await patch(responseApiUrl, true, {
-      id,
-      type: "responses",
-      attributes: {
+    await Api.updateResponse(
+      responseUuid,
+      {
         exp_data: [...exp_data, data],
       },
-    });
+      controller,
+    );
 
     // Don't call the function if not defined by user.
     if (typeof userFunc === "function") {
@@ -90,12 +86,7 @@ export function on_data_update(
   };
 }
 
-export function on_finish(
-  responseApiUrl: string,
-  id: string,
-  exitUrl: string,
-  userFunc?: UserFunc,
-) {
+export function on_finish(responseUuid: string, userFunc?: UserFunc) {
   /**
    * Function that returns a function to be used in place of jsPsych's option
    * "on_finish".  "userFunc" should be the user's implementation of
@@ -111,15 +102,13 @@ export function on_finish(
      * next is ran. To handle this, we're going to abort the patch function
      * in on_data_update.  This will cause a reliable error,
      */
+    const { exit_url } = window.chs.study.attributes;
+    
     controller.abort("Writing final response data.");
 
-    await patch(responseApiUrl, false, {
-      id,
-      type: "responses",
-      attributes: {
-        exp_data: data.values(),
-        completed: true,
-      },
+    await Api.updateResponse(responseUuid, {
+      exp_data: data.values(),
+      completed: true,
     });
 
     // Don't call the function if not defined by user.
@@ -127,6 +116,6 @@ export function on_finish(
       userFunc(data);
     }
 
-    window.location.replace(exitUrl);
+    exit_url && window.location.replace(exit_url);
   };
 }
