@@ -65,7 +65,7 @@ export function on_data_update(responseUuid: string, userFunc?: UserFunc) {
    * current data point.
    */
   return async function (data: DataCollection) {
-    const response = await Api.retreiveResponse(responseUuid);
+    const response = await Api.retrieveResponse(responseUuid);
     const exp_data = response.attributes.exp_data
       ? response.attributes.exp_data
       : [];

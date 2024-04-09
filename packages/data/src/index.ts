@@ -1,8 +1,8 @@
 import {
-  retreiveResponse,
-  retreiveStudy,
   retrieveChild,
   retrievePastSessions,
+  retrieveResponse,
+  retrieveStudy,
   updateResponse,
 } from "./api";
 import { Child, PastSession, Study } from "./types";
@@ -22,7 +22,7 @@ async function load(response_uuid: string) {
   !window.chs &&
     Object.assign(window, {
       chs: {
-        study: await retreiveStudy(),
+        study: await retrieveStudy(),
         child: await retrieveChild(),
         pastSessions: await retrievePastSessions(response_uuid),
       },
@@ -30,4 +30,4 @@ async function load(response_uuid: string) {
   console.log("Data loaded.");
 }
 
-export default { load, retreiveResponse, updateResponse };
+export default { load, retrieveResponse, updateResponse };

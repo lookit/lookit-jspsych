@@ -1,5 +1,4 @@
 import {
-  ApiResponse,
   Child,
   PastSession,
   Response,
@@ -12,19 +11,19 @@ import { get, getUuids, patch } from "./utils";
 const CONFIG = <const>{ ...getUuids() };
 
 export async function retrieveChild() {
-  return (await get<ApiResponse<Child>>(`children/${CONFIG.child}/`)).data;
+  return await get<Child>(`children/${CONFIG.child}/`);
 }
 
 export async function retrievePastSessions(uuid: string) {
-  return (await get<ApiResponse<PastSession[]>>(`past-sessions/${uuid}/`)).data;
+  return await get<PastSession[]>(`past-sessions/${uuid}/`);
 }
 
-export async function retreiveStudy() {
-  return (await get<ApiResponse<Study>>(`studies/${CONFIG.study}/`)).data;
+export async function retrieveStudy() {
+  return await get<Study>(`studies/${CONFIG.study}/`);
 }
 
-export async function retreiveResponse(uuid: string) {
-  return (await get<ApiResponse<Response>>(`responses/${uuid}/`)).data;
+export async function retrieveResponse(uuid: string) {
+  return await get<Response>(`responses/${uuid}/`);
 }
 
 export async function updateResponse(

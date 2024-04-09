@@ -20,9 +20,9 @@
     "dev": "rollup --config rollup.config.dev.mjs --watch",
     "test": "jest --coverage"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@jspsych/config": "^2.0.0"
+    "@jspsych/config": "^2.0.0",
+    "jest-fetch-mock": "^3.0.3"
   },
   "peerDependencies": {
     "jspsych": "^7.3.4"

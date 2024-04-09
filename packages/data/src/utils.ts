@@ -1,4 +1,12 @@
+import { ApiResponse } from "./types";
+
 const CONFIG = <const>{ url_base: "/api/v2/" };
+
+export async function jsonData<T>(request: Request) {
+  const response = await fetch(request);
+  const json = await (response.json() as Promise<ApiResponse<T>>);
+  return json.data;
+}
 
 export async function get<T>(url: string) {
   /**
@@ -10,8 +18,7 @@ export async function get<T>(url: string) {
     mode: "same-origin",
   });
 
-  const response = await fetch(request);
-  return response.json() as Promise<T>;
+  return jsonData<T>(request);
 }
 
 export async function patch<T, G>(
@@ -33,8 +40,7 @@ export async function patch<T, G>(
     body: JSON.stringify({ data }),
   });
 
-  const response = await fetch(request);
-  return response.json() as Promise<G>;
+  return jsonData<G>(request);
 }
 
 export function csrfToken() {
@@ -51,10 +57,10 @@ export function csrfToken() {
 
 export function getUuids() {
   const locationHref = window.location.href;
-  const uuids = locationHref.replace("/preview/", "").split("/").slice(-2);
+  const uuids = locationHref.replace("preview/", "").split("/").slice(-3, -1);
   if (locationHref.includes("/exp/studies/j/") && uuids && uuids.length === 2) {
     return { study: uuids[0], child: uuids[1] };
   } else {
-    throw Error("URL is different than expected.");
+    throw new Error("URL is different than expected.");
   }
 }
