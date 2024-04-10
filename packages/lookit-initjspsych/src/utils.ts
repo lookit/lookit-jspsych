@@ -35,12 +35,6 @@ export function on_finish(responseUuid: string, userFunc?: UserFunc) {
    * ran, this will redirect to the study's exit url.
    */
   return async function (data: DataCollection) {
-    /**
-     * The on_data_update and on_finish functions aren't called as async
-     * functions.  This means that each function isn't completed before the
-     * next is ran. To handle this, we're going to abort the patch function
-     * in on_data_update.  This will cause a reliable error,
-     */
     const { exit_url } = window.chs.study.attributes;
 
     await Api.finish();
