@@ -21,6 +21,7 @@ export const on_data_update = (responseUuid: string, userFunc?: UserFunc) => {
     await Api.updateResponse(responseUuid, {
       exp_data: [...exp_data, data],
     });
+    await Api.finish();
 
     // Don't call the function if not defined by user.
     if (typeof userFunc === "function") {
