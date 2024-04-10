@@ -1,5 +1,7 @@
 import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
 
+export type Promises = Promise<Data<Attributes> | Data<Attributes>[]>;
+
 export type Relationship = {
   links: {
     related: string;
@@ -134,4 +136,5 @@ export interface ResponseUpdate {
 export interface ResponseAttrsUpdate {
   exp_data?: DataCollection[];
   completed?: boolean;
+  survey_consent?: boolean;
 }

@@ -8,7 +8,7 @@ export async function jsonData<T>(request: Request) {
   return json.data;
 }
 
-export async function get<T>(url: string) {
+export function get<T>(url: string) {
   /**
    * Function for REST get.
    */
@@ -21,11 +21,7 @@ export async function get<T>(url: string) {
   return jsonData<T>(request);
 }
 
-export async function patch<T, G>(
-  url: string,
-  data: T,
-  controller?: AbortController,
-) {
+export function patch<T, G>(url: string, data: T) {
   /**
    * Function for REST patch.
    */
@@ -36,7 +32,6 @@ export async function patch<T, G>(
       "Content-Type": "application/vnd.api+json",
     },
     mode: "same-origin", // Do not send CSRF token to another domain.
-    signal: controller ? controller.signal : undefined,
     body: JSON.stringify({ data }),
   });
 

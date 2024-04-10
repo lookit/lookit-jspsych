@@ -1,6 +1,7 @@
 import {
   Child,
   PastSession,
+  Promises,
   Response,
   ResponseAttrsUpdate,
   ResponseUpdate,
@@ -9,35 +10,39 @@ import {
 import { get, getUuids, patch } from "./utils";
 
 const CONFIG = <const>{ ...getUuids() };
+const promises: Promises[] = [];
 
-export async function retrieveChild() {
-  return await get<Child>(`children/${CONFIG.child}/`);
+function deposit<T extends Promises>(promise: T) {
+  promises.push(promise);
+  return promise;
 }
 
-export async function retrievePastSessions(uuid: string) {
-  return await get<PastSession[]>(`past-sessions/${uuid}/`);
+export function finish() {
+  return Promise.all(promises);
 }
 
-export async function retrieveStudy() {
-  return await get<Study>(`studies/${CONFIG.study}/`);
+export function retrieveChild() {
+  return deposit(get<Child>(`children/${CONFIG.child}/`));
 }
 
-export async function retrieveResponse(uuid: string) {
-  return await get<Response>(`responses/${uuid}/`);
+export function retrievePastSessions(uuid: string) {
+  return deposit(get<PastSession[]>(`past-sessions/${uuid}/`));
 }
 
-export async function updateResponse(
-  uuid: string,
-  data: ResponseAttrsUpdate,
-  controller?: AbortController,
-) {
-  return await patch<ResponseUpdate, Response>(
-    `responses/${uuid}/`,
-    {
+export function retrieveStudy() {
+  return deposit(get<Study>(`studies/${CONFIG.study}/`));
+}
+
+export function retrieveResponse(uuid: string) {
+  return deposit(get<Response>(`responses/${uuid}/`));
+}
+
+export function updateResponse(uuid: string, data: ResponseAttrsUpdate) {
+  return deposit(
+    patch<ResponseUpdate, Response>(`responses/${uuid}/`, {
       id: uuid,
       type: "responses",
       attributes: data,
-    },
-    controller,
+    }),
   );
 }

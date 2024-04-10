@@ -14,7 +14,7 @@ function lookitInitJsPsych(responseUuid: string) {
     });
     const origJsPsychRun = jsPsych.run;
 
-    jsPsych.run = async function (timeline) {
+    jsPsych.run = function (timeline) {
       // check timeline here...
       return origJsPsychRun(timeline);
     };

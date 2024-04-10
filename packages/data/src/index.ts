@@ -1,11 +1,12 @@
 import {
+  finish,
   retrieveChild,
   retrievePastSessions,
   retrieveResponse,
   retrieveStudy,
   updateResponse,
 } from "./api";
-import { Child, PastSession, Study } from "./types";
+import { Child, PastSession, Response, Study } from "./types";
 
 declare global {
   interface Window {
@@ -13,21 +14,22 @@ declare global {
       study: Study;
       child: Child;
       pastSessions: PastSession[];
+      response: Response;
     };
   }
 }
 
 async function load(response_uuid: string) {
-  console.log("Loading data...");
   !window.chs &&
     Object.assign(window, {
       chs: {
         study: await retrieveStudy(),
         child: await retrieveChild(),
         pastSessions: await retrievePastSessions(response_uuid),
+        response: await retrieveResponse(response_uuid),
       },
     });
-  console.log("Data loaded.");
+  await finish();
 }
 
-export default { load, retrieveResponse, updateResponse };
+export default { load, retrieveResponse, updateResponse, finish };

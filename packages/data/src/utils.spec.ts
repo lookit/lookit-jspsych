@@ -31,7 +31,7 @@ test("", async () => {
   expect(await patch("some url", {})).toEqual(child);
 });
 
-test("", async () => {
+test("", () => {
   const data = {
     study: "1647e101-282a-4fde-a32b-4f493d14f57e",
     child: "8a2b2f04-63eb-485a-8e55-7b9362368f19",
@@ -42,7 +42,7 @@ test("", async () => {
   expect(getUuids()).toEqual(data);
 });
 
-test("", async () => {
+test("", () => {
   const data = {
     study: "1647e101-282a-4fde-a32b-4f493d14f57e",
     child: "8a2b2f04-63eb-485a-8e55-7b9362368f19",
@@ -53,7 +53,7 @@ test("", async () => {
   expect(getUuids()).toEqual(data);
 });
 
-test("", async () => {
+test("", () => {
   setLocationHref("https://mit.edu");
   expect(() => {
     getUuids();

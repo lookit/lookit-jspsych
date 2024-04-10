@@ -1,60 +1,6 @@
 import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
 import Api from "../../data/dist";
-import { ResponseData, UserFunc } from "./types";
-
-const controller = new AbortController();
-
-export function csrfToken() {
-  /**
-   * Function to get csrf token from cookies.
-   */
-  return (
-    document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("csrftoken="))
-      ?.split("=")[1] ?? ""
-  );
-}
-
-export async function get(url: string) {
-  /**
-   * Function for REST get.
-   */
-  const request = new Request(url, {
-    method: "GET",
-    mode: "same-origin",
-  });
-
-  const response = await fetch(request);
-  if (response.ok) {
-    return response.json();
-  }
-}
-
-export async function patch(
-  url: string,
-  use_signal: boolean,
-  data: ResponseData,
-) {
-  /**
-   * Function for REST patch.
-   */
-  const request = new Request(url, {
-    method: "PATCH",
-    headers: {
-      "X-CSRFToken": csrfToken(),
-      "Content-Type": "application/vnd.api+json",
-    },
-    mode: "same-origin", // Do not send CSRF token to another domain.
-    signal: use_signal ? controller.signal : undefined,
-    body: JSON.stringify({ data }),
-  });
-
-  const response = await fetch(request);
-  if (response.ok) {
-    return response.json();
-  }
-}
+import { UserFunc } from "./types";
 
 export function on_data_update(responseUuid: string, userFunc?: UserFunc) {
   /**
@@ -65,19 +11,12 @@ export function on_data_update(responseUuid: string, userFunc?: UserFunc) {
    * current data point.
    */
   return async function (data: DataCollection) {
-    const response = await Api.retrieveResponse(responseUuid);
-    const exp_data = response.attributes.exp_data
-      ? response.attributes.exp_data
-      : [];
-    response.attributes.exp_data = [...exp_data, data];
+    const { attributes } = await Api.retrieveResponse(responseUuid);
+    const exp_data = attributes.exp_data ? attributes.exp_data : [];
 
-    await Api.updateResponse(
-      responseUuid,
-      {
-        exp_data: [...exp_data, data],
-      },
-      controller,
-    );
+    await Api.updateResponse(responseUuid, {
+      exp_data: [...exp_data, data],
+    });
 
     // Don't call the function if not defined by user.
     if (typeof userFunc === "function") {
@@ -104,12 +43,12 @@ export function on_finish(responseUuid: string, userFunc?: UserFunc) {
      */
     const { exit_url } = window.chs.study.attributes;
 
-    controller.abort("Writing final response data.");
-
+    await Api.finish();
     await Api.updateResponse(responseUuid, {
       exp_data: data.values(),
       completed: true,
     });
+    await Api.finish();
 
     // Don't call the function if not defined by user.
     if (typeof userFunc === "function") {
