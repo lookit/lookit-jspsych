@@ -96,7 +96,6 @@ test("User function for consent survey function", () => {
   } as unknown as Model;
   const userFn = jest.fn();
   const survey_function = consent_survey_function(userFn);
-
   survey_function(survey);
 
   expect(userFn).toHaveBeenCalledTimes(1);
