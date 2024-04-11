@@ -29,7 +29,6 @@ async function load(response_uuid: string) {
         response: await retrieveResponse(response_uuid),
       },
     });
-  await finish();
 }
 
 export default { load, retrieveResponse, updateResponse, finish };

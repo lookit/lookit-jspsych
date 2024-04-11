@@ -137,5 +137,5 @@ export interface ResponseAttrsUpdate {
   exp_data?: DataCollection[];
   completed?: boolean;
   survey_consent?: boolean;
-  completed_consent_frame?:boolean;
+  completed_consent_frame?: boolean;
 }

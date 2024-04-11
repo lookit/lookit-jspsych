@@ -1,6 +1,6 @@
 import { ParameterType, TrialType } from "jspsych";
 import SurveyPlugin from "../../../../jsPsych/packages/plugin-survey/dist";
-import surveyJSON from "./survey.json";
+import surveyJSON from "./exit.json";
 import { exit_survey_function as survey_function } from "./utils";
 
 const info = <const>{
@@ -105,7 +105,7 @@ export class ExitSurveyPlugin extends SurveyPlugin {
     super.trial(display_element, {
       ...trial,
       survey_json: surveyParameters(trial),
-      survey_function
+      survey_function,
     });
   }
 }

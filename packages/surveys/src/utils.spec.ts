@@ -1,12 +1,21 @@
 import { Model } from "survey-jquery";
-import { exit_survey_function, survey_function } from "./utils";
+import {
+  consent_survey_function,
+  exit_survey_function,
+  text_markdown_survey_function,
+} from "./utils";
+
+jest.mock("@lookit/data", () => ({
+  ...jest.requireActual("@lookit/data"),
+  updateResponse: jest.fn().mockReturnValue("Response"),
+}));
 
 test("", () => {
   const addMock = jest.fn();
   const survey = { onTextMarkdown: { add: addMock } } as unknown as Model;
   const textValue = "some text";
   const options = { text: `**${textValue}**`, html: null };
-  const rtnSurvey = survey_function(survey);
+  const rtnSurvey = text_markdown_survey_function(survey);
   const anonFn = addMock.mock.calls[0][0];
 
   anonFn(null, options);
@@ -16,10 +25,9 @@ test("", () => {
   expect(survey).toBe(rtnSurvey);
 });
 
-test("", () => {
-  const addMock = jest.fn();
+test("Exit survey function", () => {
   const survey = {
-    onComplete: { add: addMock },
+    onComplete: { add: jest.fn() },
     onTextMarkdown: { add: jest.fn() },
   } as unknown as Model;
   const rtnSurvey = exit_survey_function(survey);
@@ -29,7 +37,7 @@ test("", () => {
   expect(survey).toBe(rtnSurvey);
 });
 
-test("", () => {
+test("Anonymous function within exit survey function where withdrawal > 0", () => {
   const addMock = jest.fn();
   const survey = {
     onComplete: { add: addMock },
@@ -48,7 +56,7 @@ test("", () => {
   expect(sender.setValue.mock.calls[0]).toEqual(["withdrawal", true]);
 });
 
-test("", () => {
+test("Anonymous function within exit survey function where withdrawal is 0", () => {
   const addMock = jest.fn();
   const survey = {
     onComplete: { add: addMock },
@@ -66,4 +74,49 @@ test("", () => {
   });
 
   expect(sender.setValue.mock.calls[0]).toEqual(["withdrawal", false]);
+});
+
+test("Consent survey function", () => {
+  const survey = {
+    onComplete: { add: jest.fn() },
+    onTextMarkdown: { add: jest.fn() },
+  } as unknown as Model;
+  const survey_function = consent_survey_function();
+  const rtnSurvey = survey_function(survey);
+
+  expect(survey.onComplete.add).toHaveBeenCalledTimes(1);
+  expect(survey.onTextMarkdown.add).toHaveBeenCalledTimes(1);
+  expect(survey).toBe(rtnSurvey);
+});
+
+test("User function for consent survey function", () => {
+  const survey = {
+    onComplete: { add: jest.fn() },
+    onTextMarkdown: { add: jest.fn() },
+  } as unknown as Model;
+  const userFn = jest.fn();
+  const survey_function = consent_survey_function(userFn);
+  
+  survey_function(survey);
+
+  expect(userFn).toHaveBeenCalledTimes(1);
+});
+
+test("Anonymous function within consent survey function", () => {
+  const addMock = jest.fn();
+  const survey = {
+    onComplete: { add: addMock },
+    onTextMarkdown: { add: jest.fn() },
+  } as unknown as Model;
+
+  consent_survey_function()(survey);
+
+  const anonFn = addMock.mock.calls[0][0];
+
+  Object.assign(window, { chs: { response: { id: "some id" } } });
+
+  anonFn();
+
+  expect(survey.onComplete.add).toHaveBeenCalledTimes(1);
+  expect(survey.onTextMarkdown.add).toHaveBeenCalledTimes(1);
 });

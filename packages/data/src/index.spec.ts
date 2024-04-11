@@ -10,14 +10,16 @@ jest.mock("./api", () => ({
   retrieveStudy: jest.fn().mockReturnValue("Study"),
   retrieveChild: jest.fn().mockReturnValue("Child"),
   retrievePastSessions: jest.fn().mockReturnValue("PastSessions"),
+  retrieveResponse: jest.fn().mockReturnValue("Response"),
 }));
 
-test("", async () => {
+test("Load data for this study into window.chs", async () => {
   expect(Object.hasOwn(window, "chs")).toBeFalsy();
   await Api.load("response uuid");
   expect(window.chs).toEqual({
     study: "Study",
     child: "Child",
     pastSessions: "PastSessions",
+    response: "Response",
   });
 });

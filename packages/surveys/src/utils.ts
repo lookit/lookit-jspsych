@@ -8,7 +8,7 @@ const CONFIG = <const>{
   dompurify: { USE_PROFILES: { html: true } },
 };
 
-function text_markdown_survey_function(survey: Model) {
+export function text_markdown_survey_function(survey: Model) {
   survey.onTextMarkdown.add((_sender, options) => {
     // We can set the type as "string" because async is false.
     options.html = DOMPurify.sanitize(
@@ -40,7 +40,7 @@ export function consent_survey_function(userfn?: (x: Model) => Model) {
     survey.onComplete.add(async () => {
       await Data.updateResponse(window.chs.response.id, {
         survey_consent: true,
-        completed_consent_frame:true
+        completed_consent_frame: true,
       });
     });
 
