@@ -6,7 +6,7 @@ enableFetchMocks();
 
 function setLocationHref(href: string) {
   /**
-   * Helper function for this set of tests.  This will update the current URL to the value 
+   * Helper function for this set of tests.  This will update the current URL to the value
    * provided in argument href.
    */
   delete global.window.location;
