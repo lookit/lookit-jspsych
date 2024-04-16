@@ -45,7 +45,7 @@ test("Get UUIDs from URL", () => {
     child: "8a2b2f04-63eb-485a-8e55-7b9362368f19",
   };
   setLocationHref(
-    `https://localhost:8000/exp/studies/j/${data.study}/${data.child}/`,
+    `https://localhost:8000/studies/j/${data.study}/${data.child}/`,
   );
   expect(getUuids()).toEqual(data);
 });

@@ -53,7 +53,7 @@ export function csrfToken() {
 export function getUuids() {
   const locationHref = window.location.href;
   const uuids = locationHref.replace("preview/", "").split("/").slice(-3, -1);
-  if (locationHref.includes("/exp/studies/j/") && uuids && uuids.length === 2) {
+  if (locationHref.includes("studies/j/") && uuids && uuids.length === 2) {
     return { study: uuids[0], child: uuids[1] };
   } else {
     throw new Error("URL is different than expected.");
