@@ -1,0 +1,31 @@
+{
+  "name": "@lookit/video",
+  "version": "0.0.1",
+  "description": "Video extensions for lookit studies.",
+  "homepage": "https://github.com/lookit/lookit-jspsych#readme",
+  "bugs": {
+    "url": "https://github.com/lookit/lookit-jspsych/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lookit/lookit-jspsych.git"
+  },
+  "license": "ISC",
+  "author": "Christopher J Green <okaycj@mit.edu> (https://github.com/okaycj)",
+  "main": "dist/index.js",
+  "unpkg": "dist/index.browser.min.js",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup --config",
+    "test": "jest --coverage"
+  },
+  "devDependencies": {
+    "@jspsych/config": "^2.0.0"
+  },
+  "peerDependencies": {
+    "jspsych": "^7.3.4"
+  }
+}
