@@ -1,3 +1,4 @@
+import deepFreeze from "deep-freeze-es6";
 import {
   finish,
   retrieveChild,
@@ -20,7 +21,7 @@ declare global {
 }
 
 async function load(response_uuid: string) {
-  !window.chs &&
+  if (!window.chs) {
     Object.assign(window, {
       chs: {
         study: await retrieveStudy(),
@@ -29,6 +30,8 @@ async function load(response_uuid: string) {
         response: await retrieveResponse(response_uuid),
       },
     });
+    deepFreeze(window.chs);
+  }
 }
 
 export default { load, retrieveResponse, updateResponse, finish };
