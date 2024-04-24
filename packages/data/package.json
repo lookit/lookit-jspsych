@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@jspsych/config": "^2.0.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
     "jest-fetch-mock": "^3.0.3"
   },
   "peerDependencies": {
