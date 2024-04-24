@@ -100,8 +100,8 @@ function surveyParameters(trial: Trial) {
 }
 
 export class ExitSurveyPlugin extends SurveyPlugin {
-  static readonly info = info;
-  trial(display_element: HTMLElement, trial: Trial) {
+  public static readonly info = info;
+  public trial(display_element: HTMLElement, trial: Trial) {
     super.trial(display_element, {
       ...trial,
       survey_json: surveyParameters(trial),

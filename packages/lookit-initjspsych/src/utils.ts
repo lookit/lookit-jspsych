@@ -1,5 +1,5 @@
+import Api from "@lookit/data";
 import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
-import Api from "../../data/dist";
 import { UserFunc } from "./types";
 
 export function on_data_update(responseUuid: string, userFunc?: UserFunc) {
