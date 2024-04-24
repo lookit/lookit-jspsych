@@ -139,3 +139,9 @@ export interface ResponseAttrsUpdate {
   survey_consent?: boolean;
   completed_consent_frame?: boolean;
 }
+
+export type Env = {
+  accessKeyId: string;
+  secretAccessKey: string;
+  bucket: string;
+};

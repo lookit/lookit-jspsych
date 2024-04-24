@@ -10,8 +10,8 @@ type Info = typeof info;
 type Trial = TrialType<Info>;
 
 export class ConsentSurveyPlugin extends SurveyPlugin {
-  static readonly info = info;
-  trial(display_element: HTMLElement, trial: Trial) {
+  public static readonly info = info;
+  public trial(display_element: HTMLElement, trial: Trial) {
     super.trial(display_element, {
       ...trial,
       survey_function: survey_function(trial.survey_function),
