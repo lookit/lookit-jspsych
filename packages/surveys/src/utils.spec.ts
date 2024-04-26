@@ -1,8 +1,8 @@
 import { Model } from "survey-jquery";
 import {
-  consent_survey_function,
-  exit_survey_function,
-  text_markdown_survey_function,
+  consentSurveyFunction,
+  exitSurveyFunction,
+  textMarkdownSurveyFunction,
 } from "./utils";
 
 jest.mock("@lookit/data", () => ({
@@ -15,7 +15,7 @@ test("", () => {
   const survey = { onTextMarkdown: { add: addMock } } as unknown as Model;
   const textValue = "some text";
   const options = { text: `**${textValue}**`, html: null };
-  const rtnSurvey = text_markdown_survey_function(survey);
+  const rtnSurvey = textMarkdownSurveyFunction(survey);
   const anonFn = addMock.mock.calls[0][0];
 
   anonFn(null, options);
@@ -30,7 +30,7 @@ test("Exit survey function", () => {
     onComplete: { add: jest.fn() },
     onTextMarkdown: { add: jest.fn() },
   } as unknown as Model;
-  const rtnSurvey = exit_survey_function(survey);
+  const rtnSurvey = exitSurveyFunction(survey);
 
   expect(survey.onComplete.add).toHaveBeenCalledTimes(1);
   expect(survey.onTextMarkdown.add).toHaveBeenCalledTimes(1);
@@ -45,7 +45,7 @@ test("Anonymous function within exit survey function where withdrawal > 0", () =
   } as unknown as Model;
   const sender = { setValue: jest.fn() };
 
-  exit_survey_function(survey);
+  exitSurveyFunction(survey);
 
   const anonFn = addMock.mock.calls[0][0];
 
@@ -64,7 +64,7 @@ test("Anonymous function within exit survey function where withdrawal is 0", () 
   } as unknown as Model;
   const sender = { setValue: jest.fn() };
 
-  exit_survey_function(survey);
+  exitSurveyFunction(survey);
 
   const anonFn = addMock.mock.calls[0][0];
 
@@ -81,7 +81,7 @@ test("Consent survey function", () => {
     onComplete: { add: jest.fn() },
     onTextMarkdown: { add: jest.fn() },
   } as unknown as Model;
-  const survey_function = consent_survey_function();
+  const survey_function = consentSurveyFunction();
   const rtnSurvey = survey_function(survey);
 
   expect(survey.onComplete.add).toHaveBeenCalledTimes(1);
@@ -95,8 +95,8 @@ test("User function for consent survey function", () => {
     onTextMarkdown: { add: jest.fn() },
   } as unknown as Model;
   const userFn = jest.fn();
-  const survey_function = consent_survey_function(userFn);
-  
+  const survey_function = consentSurveyFunction(userFn);
+
   survey_function(survey);
 
   expect(userFn).toHaveBeenCalledTimes(1);
@@ -109,7 +109,7 @@ test("Anonymous function within consent survey function", () => {
     onTextMarkdown: { add: jest.fn() },
   } as unknown as Model;
 
-  consent_survey_function()(survey);
+  consentSurveyFunction()(survey);
 
   const anonFn = addMock.mock.calls[0][0];
 
