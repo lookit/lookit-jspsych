@@ -1,6 +1,7 @@
 import { S3 } from "@aws-sdk/client-s3";
 import { Env } from "./types";
 
+/** Provides functionality to upload videos incremetally to an AWS S3 Bucket. */
 export default class {
   private blobParts: Blob[];
   private promises: Promise<{ PartNumber: number; ETag?: string }>[];
@@ -11,6 +12,12 @@ export default class {
   private env: Env;
   private key: string;
 
+  /**
+   * Provide file name and AWS secrets to upload file to a S3 bucket.
+   *
+   * @param key - Used to identify upload, mostly likely video file name.
+   * @param s3vars - Object with secrets and bucket name.
+   */
   public constructor(key: string, s3vars: Env) {
     this.env = s3vars;
     this.key = key;
@@ -27,16 +34,30 @@ export default class {
     });
   }
 
+  /**
+   * Calculate the current blob size from the list of blob parts.
+   *
+   * @returns Size of collected blobs.
+   */
   private get blobPartsSize() {
     return this.blobParts.reduce((p, c) => {
       return p + c.size;
     }, 0);
   }
 
+  /**
+   * Current upload percent completed.
+   *
+   * @returns Percent uploaded.
+   */
   public get percentUploadComplete() {
     return Math.floor((this.partsUploaded / this.partNumber) * 100);
   }
 
+  /**
+   * Create upload part from list of blob parts and add upload promise to list
+   * of promises.
+   */
   private addUploadPartPromise() {
     this.promises.push(
       this.uploadPart(new Blob(this.blobParts), this.partNumber++),
@@ -44,6 +65,7 @@ export default class {
     this.blobParts = [];
   }
 
+  /** Create a AWS S3 upload. */
   public async createUpload() {
     this.logRecordingEvent(`Creating video upload connection.`);
     const createResponse = await this.s3.createMultipartUpload({
@@ -55,7 +77,15 @@ export default class {
     this.logRecordingEvent(`Connection established.`);
   }
 
-  public async uploadPart(blob: Blob, partNumber: number) {
+  /**
+   * Upload a blob as a part of a whole video. This will retry the partial
+   * upload a few times before returning an error.
+   *
+   * @param blob - Blob representing a part of a whole video.
+   * @param partNumber - Index of upload part.
+   * @returns Object containing part number and etag needed by S3.
+   */
+  private async uploadPart(blob: Blob, partNumber: number) {
     let retry = 0;
     let err;
 
@@ -91,11 +121,15 @@ export default class {
     throw Error(`Upload part failed after 3 attempts.\nError: ${err}`);
   }
 
+  /**
+   * Finalize AWS S3 upload. This is called when all video parts have been
+   * uploaded.
+   */
   public async completeUpload() {
     this.addUploadPartPromise();
 
     if (!this.uploadId) {
-      throw Error("no upload id");
+      throw Error("No upload id");
     }
 
     const resp = await this.s3.completeMultipartUpload({
@@ -110,6 +144,12 @@ export default class {
     this.logRecordingEvent(`Upload complete: ${resp.Location}`);
   }
 
+  /**
+   * This will take provided blob and add it to the list of blob parts. If the
+   * list of blob parts is around 5mb, it will start another partial upload.
+   *
+   * @param blob - Part of a video file.
+   */
   public onDataAvailable(blob: Blob) {
     this.blobParts.push(blob);
 
@@ -118,6 +158,11 @@ export default class {
     }
   }
 
+  /**
+   * Log messages to JS console.
+   *
+   * @param msg - Text to logged.
+   */
   public logRecordingEvent(msg: string) {
     // right now this just prints to the console, but we could also send this info to permanent storage (similar to pipe logs)
     const timestamp = new Date().toISOString();

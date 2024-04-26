@@ -4,6 +4,12 @@ import { get, getUuids, patch } from "./utils";
 
 enableFetchMocks();
 
+/**
+ * Helper function for this set of tests. This will update the current URL to
+ * the value provided in argument href.
+ *
+ * @param href - URL to be set.
+ */
 function setLocationHref(href: string) {
   /**
    * Helper function for this set of tests.  This will update the current URL to the value

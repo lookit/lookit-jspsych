@@ -2,14 +2,18 @@ import Api from "@lookit/data";
 import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
 import { UserFunc } from "./types";
 
+/**
+ * Function that returns a function to be used in place of jsPsych's option
+ * "on_data_update". "userFunc" should be the user's implementation of
+ * "on_data_update". Since this is the data that is returned from each trial,
+ * this function will get the collected trial data and append the current data
+ * point.
+ *
+ * @param responseUuid - Response UUID.
+ * @param userFunc - "on data update" function provided by researcher.
+ * @returns On data update function.
+ */
 export function on_data_update(responseUuid: string, userFunc?: UserFunc) {
-  /**
-   * Function that returns a function to be used in place of jsPsych's option
-   * "on_data_update".  "userFunc" should be the user's implementation of
-   * "on_data_update".  Since this is the data that is returned from each
-   * trial, this function will get the collected trial data and append the
-   * current data point.
-   */
   return async function (data: DataCollection) {
     const { attributes } = await Api.retrieveResponse(responseUuid);
     const exp_data = attributes.exp_data ? attributes.exp_data : [];
@@ -25,15 +29,19 @@ export function on_data_update(responseUuid: string, userFunc?: UserFunc) {
   };
 }
 
+/**
+ * Function that returns a function to be used in place of jsPsych's option
+ * "on_finish". "userFunc" should be the user's implementation of "on_finish".
+ * Since this is point where the experiment has ended, the function will set
+ * "completed" to true and overwrites all experiment data with the full set of
+ * collected data. Once the user function has been ran, this will redirect to
+ * the study's exit url.
+ *
+ * @param responseUuid - Response UUID.
+ * @param userFunc - "on finish" function provided by the researcher.
+ * @returns On finish function.
+ */
 export function on_finish(responseUuid: string, userFunc?: UserFunc) {
-  /**
-   * Function that returns a function to be used in place of jsPsych's option
-   * "on_finish".  "userFunc" should be the user's implementation of
-   * "on_finish".  Since this is point where the experiment has ended, the
-   * function will set "completed" to true and overwrites all experiment data
-   * with the full set of collected data.  Once the user function has been
-   * ran, this will redirect to the study's exit url.
-   */
   return async function (data: DataCollection) {
     const { exit_url } = window.chs.study.attributes;
 

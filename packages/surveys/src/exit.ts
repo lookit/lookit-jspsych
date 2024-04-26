@@ -33,6 +33,11 @@ const info = <const>{
 type Info = typeof info;
 type Trial = TrialType<Info>;
 
+/**
+ * Alter survey to show Databrary options.
+ *
+ * @param trial - Info parameters.
+ */
 function showDatabraryOptions(trial: Trial) {
   if (!trial.show_databrary_options) {
     const survey_elements = surveyJSON.pages[0].elements;
@@ -43,6 +48,11 @@ function showDatabraryOptions(trial: Trial) {
   }
 }
 
+/**
+ * Include paranthetical example in withdrawl language.
+ *
+ * @param trial - Info parameters.
+ */
 function includeWithdrawalExample(trial: Trial) {
   const study = window.chs.study;
   const withdrawal_element = surveyJSON.pages[0].elements.find(
@@ -63,6 +73,11 @@ function includeWithdrawalExample(trial: Trial) {
     });
 }
 
+/**
+ * Alter survey to contain additional video privacy text.
+ *
+ * @param trial - Info parameters.
+ */
 function additionalVideoPrivacyText(trial: Trial) {
   const element = surveyJSON.pages[0].elements.find(
     (element) => element.name === "privacy",
@@ -73,6 +88,11 @@ function additionalVideoPrivacyText(trial: Trial) {
     });
 }
 
+/**
+ * Alter survey to only show "private" on use of media question.
+ *
+ * @param trial - Info parameters.
+ */
 function privateLevelOnly(trial: Trial) {
   if (trial.private_level_only) {
     const media_use_element = surveyJSON.pages[0].elements.find(
@@ -89,6 +109,12 @@ function privateLevelOnly(trial: Trial) {
   }
 }
 
+/**
+ * Process all survey parameter functions.
+ *
+ * @param trial - Info parameters.
+ * @returns Survey JSON string.
+ */
 function surveyParameters(trial: Trial) {
   [
     showDatabraryOptions,
@@ -99,8 +125,16 @@ function surveyParameters(trial: Trial) {
   return surveyJSON;
 }
 
+/** Exit Survey Plugin extending jsPsych's Survey Plugin. */
 export class ExitSurveyPlugin extends SurveyPlugin {
   public static readonly info = info;
+  /**
+   * Extended trial method supplied with parameters necessary for our Exit
+   * Survey.
+   *
+   * @param display_element - Display element.
+   * @param trial - Info parameters.
+   */
   public trial(display_element: HTMLElement, trial: Trial) {
     super.trial(display_element, {
       ...trial,

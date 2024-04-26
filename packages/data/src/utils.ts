@@ -2,17 +2,25 @@ import { ApiResponse } from "./types";
 
 const CONFIG = <const>{ url_base: "/api/v2/" };
 
+/**
+ * Get JSON data from a Request.
+ *
+ * @param request - Request returned by call to API.
+ * @returns Data from API call.
+ */
 export async function jsonData<T>(request: Request) {
   const response = await fetch(request);
   const json = await (response.json() as Promise<ApiResponse<T>>);
   return json.data;
 }
 
+/**
+ * Function for REST get.
+ *
+ * @param url - URL to get.
+ * @returns JSON data from API call.
+ */
 export function get<T>(url: string) {
-  /**
-   * Function for REST get.
-   */
-
   const request = new Request(CONFIG.url_base + url, {
     method: "GET",
     mode: "same-origin",
@@ -21,10 +29,14 @@ export function get<T>(url: string) {
   return jsonData<T>(request);
 }
 
+/**
+ * Function for REST patch.
+ *
+ * @param url - URL to patch.
+ * @param data - JSON data from API call.
+ * @returns JSON data from API call.
+ */
 export function patch<T, G>(url: string, data: T) {
-  /**
-   * Function for REST patch.
-   */
   const request = new Request(CONFIG.url_base + url, {
     method: "PATCH",
     headers: {
@@ -38,10 +50,12 @@ export function patch<T, G>(url: string, data: T) {
   return jsonData<G>(request);
 }
 
+/**
+ * Function to get csrf token from cookies.
+ *
+ * @returns CSRF token.
+ */
 export function csrfToken() {
-  /**
-   * Function to get csrf token from cookies.
-   */
   return (
     document.cookie
       .split("; ")
@@ -50,6 +64,11 @@ export function csrfToken() {
   );
 }
 
+/**
+ * Get Study and Child UUID from URL.
+ *
+ * @returns Object containing UUIDs.
+ */
 export function getUuids() {
   const locationHref = window.location.href;
   const uuids = locationHref.replace("preview/", "").split("/").slice(-3, -1);

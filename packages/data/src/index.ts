@@ -21,6 +21,11 @@ declare global {
   }
 }
 
+/**
+ * Load data from API that would be used by researchers and jsPsych.
+ *
+ * @param response_uuid - Response UUID.
+ */
 async function load(response_uuid: string) {
   if (!window.chs) {
     Object.assign(window, {

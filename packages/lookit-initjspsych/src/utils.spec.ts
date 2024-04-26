@@ -10,6 +10,11 @@ global.window.location = { replace: jest.fn() };
 test("jsPysch's on_data_update", async () => {
   const jsonData = { data: { attributes: { exp_data: [] } } };
   const response = {
+    /**
+     * Mocked json function used in API calls.
+     *
+     * @returns Promise containing mocked json data.
+     */
     json: () => Promise.resolve(jsonData),
     ok: true,
   } as Response;
@@ -28,6 +33,11 @@ test("jsPysch's on_data_update", async () => {
 test("jsPysch's on_data_update", async () => {
   const jsonData = { data: { attributes: { exp_data: undefined } } };
   const response = {
+    /**
+     * Mocked json function used in API calls.
+     *
+     * @returns Promise containing mocked json data.
+     */
     json: () => Promise.resolve(jsonData),
     ok: true,
   } as Response;
@@ -47,8 +57,16 @@ test("jsPsych's on_finish", async () => {
   const jsonData = {
     data: { attributes: { exp_data: {} } },
   };
-  const data = { values: () => {} } as DataCollection;
+  const data = {
+    /** Mocked jsPysch Data Collection. */
+    values: () => {},
+  } as DataCollection;
   const response = {
+    /**
+     * Mocked json function used in API calls.
+     *
+     * @returns Promise containing mocked json data.
+     */
     json: () => Promise.resolve(jsonData),
     ok: true,
   } as Response;
@@ -59,7 +77,7 @@ test("jsPsych's on_finish", async () => {
 
   Object.assign(window, {
     chs: {
-      study: { attributes: { exit_url: "asdf" } } as Study,
+      study: { attributes: { exit_url: "exit url" } } as Study,
       child: {} as Child,
       pastSessions: {} as PastSession[],
     },
