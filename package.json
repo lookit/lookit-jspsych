@@ -22,7 +22,7 @@
     "clean": "find '.' -type d -name 'node_modules' -or -name 'coverage' -or -name 'dist' -exec rm -rf {} \\;",
     "fix": "prettier './' -lw && npm run lint",
     "format": "prettier './' -c",
-    "lint": "eslint './packages/**/src/**/*.ts'",
+    "lint": "eslint './packages/**/src/**/*.ts' --fix",
     "test": "npm test --workspaces"
   },
   "dependencies": {
@@ -33,8 +33,10 @@
     "@eslint/js": "^9.1.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsdoc": "^48.2.3",
     "globals": "^15.0.0",
     "prettier": "^3.2.5",
+    "prettier-plugin-jsdoc": "^1.3.0",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-packagejson": "^2.5.0",
     "prettier-plugin-sort-json": "^4.0.0",
