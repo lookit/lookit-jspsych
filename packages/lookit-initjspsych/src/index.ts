@@ -8,7 +8,7 @@ import { on_data_update, on_finish } from "./utils";
  * @param responseUuid - Response UUID.
  * @returns InitJsPsych function.
  */
-function lookitInitJsPsych(responseUuid: string) {
+const lookitInitJsPsych = (responseUuid: string) => {
   return function (opts: JsPsychOptions) {
     const jsPsych = origInitJsPsych({
       ...opts,
@@ -31,6 +31,6 @@ function lookitInitJsPsych(responseUuid: string) {
 
     return jsPsych;
   };
-}
+};
 
 export default lookitInitJsPsych;

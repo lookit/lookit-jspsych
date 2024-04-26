@@ -13,6 +13,8 @@ export default [
     rules: {
       "require-await": "error",
       "@typescript-eslint/explicit-member-accessibility": "error",
+      "prefer-arrow-callback": ["error", { allowNamedFunctions: true }],
+      "func-style": ["error", "expression", { allowArrowFunctions: true }],
     },
   },
   {

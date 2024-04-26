@@ -8,11 +8,11 @@ const CONFIG = <const>{ url_base: "/api/v2/" };
  * @param request - Request returned by call to API.
  * @returns Data from API call.
  */
-export async function jsonData<T>(request: Request) {
+export const jsonData = async <T>(request: Request) => {
   const response = await fetch(request);
   const json = await (response.json() as Promise<ApiResponse<T>>);
   return json.data;
-}
+};
 
 /**
  * Function for REST get.
@@ -20,14 +20,14 @@ export async function jsonData<T>(request: Request) {
  * @param url - URL to get.
  * @returns JSON data from API call.
  */
-export function get<T>(url: string) {
+export const get = <T>(url: string) => {
   const request = new Request(CONFIG.url_base + url, {
     method: "GET",
     mode: "same-origin",
   });
 
   return jsonData<T>(request);
-}
+};
 
 /**
  * Function for REST patch.
@@ -36,7 +36,7 @@ export function get<T>(url: string) {
  * @param data - JSON data from API call.
  * @returns JSON data from API call.
  */
-export function patch<T, G>(url: string, data: T) {
+export const patch = <T, G>(url: string, data: T) => {
   const request = new Request(CONFIG.url_base + url, {
     method: "PATCH",
     headers: {
@@ -48,28 +48,28 @@ export function patch<T, G>(url: string, data: T) {
   });
 
   return jsonData<G>(request);
-}
+};
 
 /**
  * Function to get csrf token from cookies.
  *
  * @returns CSRF token.
  */
-export function csrfToken() {
+export const csrfToken = () => {
   return (
     document.cookie
       .split("; ")
       .find((row) => row.startsWith("csrftoken="))
       ?.split("=")[1] ?? ""
   );
-}
+};
 
 /**
  * Get Study and Child UUID from URL.
  *
  * @returns Object containing UUIDs.
  */
-export function getUuids() {
+export const getUuids = () => {
   const locationHref = window.location.href;
   const uuids = locationHref.replace("preview/", "").split("/").slice(-3, -1);
   if (locationHref.includes("studies/j/") && uuids && uuids.length === 2) {
@@ -77,4 +77,4 @@ export function getUuids() {
   } else {
     throw new Error("URL is different than expected.");
   }
-}
+};

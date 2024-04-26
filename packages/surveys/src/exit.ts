@@ -38,7 +38,7 @@ type Trial = TrialType<Info>;
  *
  * @param trial - Info parameters.
  */
-function showDatabraryOptions(trial: Trial) {
+const showDatabraryOptions = (trial: Trial) => {
   if (!trial.show_databrary_options) {
     const survey_elements = surveyJSON.pages[0].elements;
     const databrary_share_element_idx = survey_elements.findIndex(
@@ -46,14 +46,14 @@ function showDatabraryOptions(trial: Trial) {
     );
     survey_elements.splice(databrary_share_element_idx, 1);
   }
-}
+};
 
 /**
  * Include paranthetical example in withdrawl language.
  *
  * @param trial - Info parameters.
  */
-function includeWithdrawalExample(trial: Trial) {
+const includeWithdrawalExample = (trial: Trial) => {
   const study = window.chs.study;
   const withdrawal_element = surveyJSON.pages[0].elements.find(
     (element) => element.name === "withdrawal",
@@ -71,14 +71,14 @@ function includeWithdrawalExample(trial: Trial) {
         },
       ],
     });
-}
+};
 
 /**
  * Alter survey to contain additional video privacy text.
  *
  * @param trial - Info parameters.
  */
-function additionalVideoPrivacyText(trial: Trial) {
+const additionalVideoPrivacyText = (trial: Trial) => {
   const element = surveyJSON.pages[0].elements.find(
     (element) => element.name === "privacy",
   );
@@ -86,14 +86,14 @@ function additionalVideoPrivacyText(trial: Trial) {
     Object.assign(element, {
       description: trial.additional_video_privacy_text,
     });
-}
+};
 
 /**
  * Alter survey to only show "private" on use of media question.
  *
  * @param trial - Info parameters.
  */
-function privateLevelOnly(trial: Trial) {
+const privateLevelOnly = (trial: Trial) => {
   if (trial.private_level_only) {
     const media_use_element = surveyJSON.pages[0].elements.find(
       (element) => element.name === "useOfMedia",
@@ -107,7 +107,7 @@ function privateLevelOnly(trial: Trial) {
         isRequired: false,
       });
   }
-}
+};
 
 /**
  * Process all survey parameter functions.
@@ -115,7 +115,7 @@ function privateLevelOnly(trial: Trial) {
  * @param trial - Info parameters.
  * @returns Survey JSON string.
  */
-function surveyParameters(trial: Trial) {
+const surveyParameters = (trial: Trial) => {
   [
     showDatabraryOptions,
     includeWithdrawalExample,

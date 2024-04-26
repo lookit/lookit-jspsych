@@ -14,7 +14,7 @@ const CONFIG = <const>{
  * @param survey - Survey model provided by SurveyJS.
  * @returns Survey model.
  */
-export function textMarkdownSurveyFunction(survey: Model) {
+export const textMarkdownSurveyFunction = (survey: Model) => {
   survey.onTextMarkdown.add((_sender, options) => {
     // We can set the type as "string" because async is false.
     options.html = DOMPurify.sanitize(
@@ -23,7 +23,7 @@ export function textMarkdownSurveyFunction(survey: Model) {
     );
   });
   return survey;
-}
+};
 
 /**
  * Survey function used in exit survey. Adds markdown support through
@@ -36,7 +36,7 @@ export function textMarkdownSurveyFunction(survey: Model) {
  * @param survey - Survey model provided by SurveyJS.
  * @returns Survey model.
  */
-export function exitSurveyFunction(survey: Model) {
+export const exitSurveyFunction = (survey: Model) => {
   textMarkdownSurveyFunction(survey);
 
   survey.onComplete.add((sender) => {
@@ -45,7 +45,7 @@ export function exitSurveyFunction(survey: Model) {
     sender.setValue("withdrawal", trueFalseValue);
   });
   return survey;
-}
+};
 
 /**
  * Survey function used by Consent Survey. Adds markdown support through
@@ -55,7 +55,7 @@ export function exitSurveyFunction(survey: Model) {
  * @param userfn - Survey function provided by user.
  * @returns Survey model.
  */
-export function consentSurveyFunction(userfn?: (x: Model) => Model) {
+export const consentSurveyFunction = (userfn?: (x: Model) => Model) => {
   return function (survey: Model) {
     textMarkdownSurveyFunction(survey);
 
@@ -72,4 +72,4 @@ export function consentSurveyFunction(userfn?: (x: Model) => Model) {
 
     return survey;
   };
-}
+};

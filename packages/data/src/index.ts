@@ -26,7 +26,7 @@ declare global {
  *
  * @param response_uuid - Response UUID.
  */
-async function load(response_uuid: string) {
+const load = async (response_uuid: string) => {
   if (!window.chs) {
     Object.assign(window, {
       chs: {
@@ -39,6 +39,6 @@ async function load(response_uuid: string) {
     deepFreeze(window.chs);
     await finish();
   }
-}
+};
 
 export default { load, retrieveResponse, updateResponse, finish, s3 };

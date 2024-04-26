@@ -13,7 +13,7 @@ import { UserFunc } from "./types";
  * @param userFunc - "on data update" function provided by researcher.
  * @returns On data update function.
  */
-export function on_data_update(responseUuid: string, userFunc?: UserFunc) {
+export const on_data_update = (responseUuid: string, userFunc?: UserFunc) => {
   return async function (data: DataCollection) {
     const { attributes } = await Api.retrieveResponse(responseUuid);
     const exp_data = attributes.exp_data ? attributes.exp_data : [];
@@ -27,7 +27,7 @@ export function on_data_update(responseUuid: string, userFunc?: UserFunc) {
       userFunc(data);
     }
   };
-}
+};
 
 /**
  * Function that returns a function to be used in place of jsPsych's option
@@ -41,7 +41,7 @@ export function on_data_update(responseUuid: string, userFunc?: UserFunc) {
  * @param userFunc - "on finish" function provided by the researcher.
  * @returns On finish function.
  */
-export function on_finish(responseUuid: string, userFunc?: UserFunc) {
+export const on_finish = (responseUuid: string, userFunc?: UserFunc) => {
   return async function (data: DataCollection) {
     const { exit_url } = window.chs.study.attributes;
 
@@ -59,4 +59,4 @@ export function on_finish(responseUuid: string, userFunc?: UserFunc) {
 
     exit_url && window.location.replace(exit_url);
   };
-}
+};
