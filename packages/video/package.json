@@ -20,7 +20,11 @@
   ],
   "scripts": {
     "build": "rollup --config",
+    "dev": "rollup --config rollup.config.dev.mjs --watch",
     "test": "jest --coverage"
+  },
+  "dependencies": {
+    "auto-bind": "^5.0.1"
   },
   "devDependencies": {
     "@jspsych/config": "^2.0.0"
