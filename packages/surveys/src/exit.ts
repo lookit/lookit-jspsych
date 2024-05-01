@@ -1,6 +1,6 @@
 import { ParameterType, TrialType } from "jspsych";
 import SurveyPlugin from "@jspsych/plugin-survey";
-import surveyJSON from "./exit.json";
+import { surveyJSON } from "./exit_json";
 import { exit_survey_function as survey_function } from "./utils";
 
 const info = <const>{
