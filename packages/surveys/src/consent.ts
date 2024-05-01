@@ -1,5 +1,5 @@
 import { TrialType } from "jspsych";
-import SurveyPlugin from "../../../../jsPsych/packages/plugin-survey/dist";
+import SurveyPlugin from "@jspsych/plugin-survey";
 import { consent_survey_function as survey_function } from "./utils";
 
 const info = <const>{

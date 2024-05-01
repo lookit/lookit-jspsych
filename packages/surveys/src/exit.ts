@@ -1,5 +1,5 @@
 import { ParameterType, TrialType } from "jspsych";
-import SurveyPlugin from "../../../../jsPsych/packages/plugin-survey/dist";
+import SurveyPlugin from "@jspsych/plugin-survey";
 import surveyJSON from "./exit.json";
 import { exit_survey_function as survey_function } from "./utils";
 
@@ -96,7 +96,7 @@ function surveyParameters(trial: Trial) {
     additionalVideoPrivacyText,
     privateLevelOnly,
   ].map((fn) => fn(trial));
-  return JSON.stringify(surveyJSON);
+  return surveyJSON;
 }
 
 export class ExitSurveyPlugin extends SurveyPlugin {
