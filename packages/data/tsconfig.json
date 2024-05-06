@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "esModuleInterop": true,
     "strict": true
   },
   "extends": "@jspsych/config/tsconfig.core.json",
