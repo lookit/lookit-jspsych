@@ -49,7 +49,7 @@ const showDatabraryOptions = (trial: Trial) => {
 };
 
 /**
- * Include paranthetical example in withdrawl language.
+ * Include parenthetical example in withdrawal language.
  *
  * @param trial - Info parameters.
  */
@@ -113,7 +113,7 @@ const privateLevelOnly = (trial: Trial) => {
  * Process all survey parameter functions.
  *
  * @param trial - Info parameters.
- * @returns Survey JSON string.
+ * @returns Survey JSON.
  */
 const surveyParameters = (trial: Trial) => {
   [

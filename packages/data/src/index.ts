@@ -22,7 +22,7 @@ declare global {
 }
 
 /**
- * Load data from API that would be used by researchers and jsPsych.
+ * Load data from API that is needed for saving the experiment data, and that might be needed by researchers and jsPsych.
  *
  * @param response_uuid - Response UUID.
  */

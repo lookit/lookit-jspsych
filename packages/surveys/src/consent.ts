@@ -13,8 +13,8 @@ type Trial = TrialType<Info>;
 export class ConsentSurveyPlugin extends SurveyPlugin {
   public static readonly info = info;
   /**
-   * Used custom consent survey function adds functionality before runing user's
-   * survey function.
+   * Custom consent survey function adds functionality before creating a
+   * survey based on the user-defined survey JSON/function.
    *
    * @param display_element - Trial display element.
    * @param trial - Info parameters.
