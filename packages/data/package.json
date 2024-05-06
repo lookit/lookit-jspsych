@@ -21,6 +21,7 @@
     "test": "jest --coverage"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.556.0",
     "deep-freeze-es6": "^3.0.2"
   },
   "devDependencies": {
