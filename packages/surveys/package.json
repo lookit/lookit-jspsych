@@ -1,28 +1,38 @@
 {
-  "name": "@lookit/lookit-api",
+  "name": "@lookit/surveys",
   "version": "0.0.1",
-  "description": "This is a JS implementation of lookit's RESTful API.",
+  "description": "A survey plugin for lookit studies.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
     "url": "https://github.com/lookit/lookit-jspsych/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lookit/lookit-jspsych.git",
-    "directory": "packages/lookit-api"
+    "url": "git+https://github.com/lookit/lookit-jspsych.git"
   },
   "license": "ISC",
   "author": "Christopher J Green <okaycj@mit.edu> (https://github.com/okaycj)",
   "main": "dist/index.js",
-  "types": "./dist/index.d.ts",
+  "unpkg": "dist/index.browser.min.js",
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
     "build": "rollup --config",
     "dev": "rollup --config rollup.config.dev.mjs --watch",
     "test": "jest --coverage"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@jspsych/plugin-survey": "^1.0.0",
+    "@lookit/data": "^0.0.1",
+    "dompurify": "^3.0.11",
+    "marked": "^12.0.1",
+    "survey-jquery": "^1.9.136"
+  },
   "devDependencies": {
-    "@jspsych/config": "^2.0.0"
+    "@jspsych/config": "^2.0.0",
+    "@types/dompurify": "^3.0.5"
   },
   "peerDependencies": {
     "jspsych": "^7.3.4"

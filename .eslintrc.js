@@ -12,4 +12,5 @@ module.exports = {
   },
   plugins: ["@typescript-eslint"],
   ignorePatterns: ["packages/**/dist/*"],
+  rules: { "require-await": "error" },
 };
