@@ -7,7 +7,7 @@ delete global.window.location;
 global.window = Object.create(window);
 global.window.location = { replace: jest.fn() };
 
-test("jsPysch's on_data_update", async () => {
+test("jsPsych's on_data_update", async () => {
   const jsonData = { data: { attributes: { exp_data: [] } } };
   const response = {
     /**
@@ -30,7 +30,7 @@ test("jsPysch's on_data_update", async () => {
   expect(Request).toHaveBeenCalledTimes(2);
 });
 
-test("jsPysch's on_data_update", async () => {
+test("jsPsych's on_data_update", async () => {
   const jsonData = { data: { attributes: { exp_data: undefined } } };
   const response = {
     /**
@@ -58,7 +58,7 @@ test("jsPsych's on_finish", async () => {
     data: { attributes: { exp_data: {} } },
   };
   const data = {
-    /** Mocked jsPysch Data Collection. */
+    /** Mocked jsPsych Data Collection. */
     values: () => {},
   } as DataCollection;
   const response = {

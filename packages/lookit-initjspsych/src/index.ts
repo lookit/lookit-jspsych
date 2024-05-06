@@ -21,7 +21,7 @@ const lookitInitJsPsych = (responseUuid: string) => {
      * Overriding default jsPsych run function. With will allow us to
      * check/alter the timeline before running an experiment.
      *
-     * @param timeline - List of jsPysch trials.
+     * @param timeline - List of jsPsych trials.
      * @returns Original jsPsych run function.
      */
     jsPsych.run = function (timeline) {
