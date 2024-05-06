@@ -2,16 +2,12 @@ import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 
 /**
- *
+ * Video Recorder
  */
 export default class Recorder {
-  private _recorder?: MediaRecorder;
   private blobs: Blob[] = [];
 
-  /**
-   *
-   * @param jsPsych
-   */
+  /** @param jsPsych */
   constructor(private jsPsych: JsPsych) {
     autoBind(this);
   }
@@ -20,26 +16,31 @@ export default class Recorder {
    *
    */
   private get recorder() {
-    if (!this._recorder) {
-      this._recorder = this.jsPsych.pluginAPI.getCameraRecorder();
-      this.recorder.addEventListener("dataavailable", this.handleDataAvailable);
-      this.recorder.addEventListener("stop", this.handleStop);
-    }
-    return this._recorder;
+    return this.jsPsych.pluginAPI.getCameraRecorder();
+  }
+
+  /**
+   *
+   */
+  private get stream() {
+    return this.jsPsych.pluginAPI.getCameraStream();
   }
 
   /**
    *
    */
   public start() {
+    this.recorder.addEventListener("dataavailable", this.handleDataAvailable);
+    this.recorder.addEventListener("stop", this.handleStop);
     this.recorder.start();
   }
+
   /**
    *
    */
   public stop() {
     this.recorder.stop();
-    this.recorder.stream.getTracks().map((t) => t.stop());
+    this.stream.getTracks().map((t: MediaStreamTrack) => t.stop());
   }
 
   /** Handle recorder's stop event. */
@@ -56,14 +57,14 @@ export default class Recorder {
     this.blobs.push(event.data);
   }
 
-  /** Temp method to download data uri. */
+  /** Temp method to download data url. */
   private async download() {
     const data = (await this.bytesToBase64DataUrl(
       new Blob(this.blobs),
     )) as string;
     const link = document.createElement("a");
     link.href = data;
-    link.download = `something_${new Date().getTime()} .webm`;
+    link.download = `something_${new Date().getTime()}.webm`;
     link.click();
   }
 
