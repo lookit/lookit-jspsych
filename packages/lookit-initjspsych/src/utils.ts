@@ -45,17 +45,16 @@ export const on_finish = (responseUuid: string, userFunc?: UserFunc) => {
   return async function (data: DataCollection) {
     const { exit_url } = window.chs.study.attributes;
 
+    // Don't call the function if not defined by user.
+    if (typeof userFunc === "function") {
+      userFunc(data);
+    }
+
     await Api.finish();
     await Api.updateResponse(responseUuid, {
       exp_data: data.values(),
       completed: true,
     });
-    await Api.finish();
-
-    // Don't call the function if not defined by user.
-    if (typeof userFunc === "function") {
-      userFunc(data);
-    }
 
     exit_url && window.location.replace(exit_url);
   };
