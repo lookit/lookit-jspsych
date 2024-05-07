@@ -2,10 +2,13 @@ import { initJsPsych as origInitJsPsych } from "jspsych";
 import { JsPsychOptions } from "./types";
 import { on_data_update, on_finish } from "./utils";
 
-function lookitInitJsPsych(responseUuid: string) {
-  /**
-   * Function that returns a function to replace jsPsych's initJsPsych.
-   */
+/**
+ * Function that returns a function to replace jsPsych's initJsPsych.
+ *
+ * @param responseUuid - Response UUID.
+ * @returns InitJsPsych function.
+ */
+const lookitInitJsPsych = (responseUuid: string) => {
   return function (opts: JsPsychOptions) {
     const jsPsych = origInitJsPsych({
       ...opts,
@@ -14,6 +17,13 @@ function lookitInitJsPsych(responseUuid: string) {
     });
     const origJsPsychRun = jsPsych.run;
 
+    /**
+     * Overriding default jsPsych run function. This will allow us to
+     * check/alter the timeline before running an experiment.
+     *
+     * @param timeline - List of jsPsych trials.
+     * @returns Original jsPsych run function.
+     */
     jsPsych.run = function (timeline) {
       // check timeline here...
       return origJsPsychRun(timeline);
@@ -21,6 +31,6 @@ function lookitInitJsPsych(responseUuid: string) {
 
     return jsPsych;
   };
-}
+};
 
 export default lookitInitJsPsych;
