@@ -50,7 +50,8 @@ export const exitSurveyFunction = (survey: Model) => {
 /**
  * Survey function used by Consent Survey. Adds markdown support through
  * "textMarkdownSurveyFunction". On complete, this will mark in the Response
- * that consent was completed, and that the consent was through a survey (rather than video).
+ * that consent was completed, and that the consent was through a survey (rather
+ * than video).
  *
  * @param userfn - Survey function provided by user.
  * @returns Survey model.

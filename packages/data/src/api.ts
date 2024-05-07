@@ -26,7 +26,8 @@ const deposit = <T extends ApiPromise>(promise: T) => {
 /**
  * Checks to see if all API calls have completed.
  *
- * @returns A Promise that, if/when resolved, confirms that all API calls have completed.
+ * @returns A Promise that, if/when resolved, confirms that all API calls have
+ *   completed.
  */
 export const finish = () => {
   return Promise.all(promises);
@@ -42,7 +43,8 @@ export const retrieveChild = () => {
 };
 
 /**
- * Gets a list of all past Session (response) objects for this Study and Child from the lookit-api.
+ * Gets a list of all past Session (response) objects for this Study and Child
+ * from the lookit-api.
  *
  * @param uuid - Current Response UUID.
  * @returns Promise containing list of all Past Session objects.

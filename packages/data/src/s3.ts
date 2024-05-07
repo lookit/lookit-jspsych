@@ -159,12 +159,12 @@ export default class {
   }
 
   /**
-   * Log messages to JS console.
+   * Log messages to JS console. Right now this just prints to the console, but
+   * we could also send this info to permanent storage (similar to pipe logs).
    *
    * @param msg - Text to logged.
    */
   public logRecordingEvent(msg: string) {
-    // right now this just prints to the console, but we could also send this info to permanent storage (similar to pipe logs)
     const timestamp = new Date().toISOString();
     console.log(`Recording log: ${timestamp}\nFile: ${this.key}\n${msg}\n`);
   }
