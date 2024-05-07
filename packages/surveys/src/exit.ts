@@ -1,7 +1,7 @@
 import SurveyPlugin from "@jspsych/plugin-survey";
 import { ParameterType, TrialType } from "jspsych";
 import { surveyJSON } from "./exit_json";
-import { exit_survey_function as survey_function } from "./utils";
+import { exitSurveyFunction as survey_function } from "./utils";
 
 const info = <const>{
   ...SurveyPlugin.info,
@@ -123,7 +123,7 @@ const surveyParameters = (trial: Trial) => {
     privateLevelOnly,
   ].map((fn) => fn(trial));
   return surveyJSON;
-}
+};
 
 /** Exit Survey Plugin extending jsPsych's Survey Plugin. */
 export class ExitSurveyPlugin extends SurveyPlugin {
@@ -138,7 +138,7 @@ export class ExitSurveyPlugin extends SurveyPlugin {
   public trial(display_element: HTMLElement, trial: Trial) {
     super.trial(display_element, {
       ...trial,
-      survey_json: await surveyParameters(trial),
+      survey_json: surveyParameters(trial),
       survey_function,
     });
   }

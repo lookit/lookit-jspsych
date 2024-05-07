@@ -1,3 +1,4 @@
+import deepFreeze from "deep-freeze-es6";
 import {
   finish,
   retrieveChild,
