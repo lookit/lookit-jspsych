@@ -22,7 +22,13 @@ declare global {
   }
 }
 
-async function load(response_uuid: string) {
+/**
+ * Load data from API that is needed for saving the experiment data, and that
+ * might be needed by researchers and jsPsych.
+ *
+ * @param response_uuid - Response UUID.
+ */
+const load = async (response_uuid: string) => {
   if (!window.chs) {
     Object.assign(window, {
       chs: {
@@ -35,6 +41,6 @@ async function load(response_uuid: string) {
     deepFreeze(window.chs);
     await finish();
   }
-}
+};
 
 export default { load, retrieveResponse, updateResponse, finish, s3 };
