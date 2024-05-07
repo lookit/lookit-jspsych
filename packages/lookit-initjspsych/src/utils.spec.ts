@@ -7,8 +7,8 @@ delete global.window.location;
 global.window = Object.create(window);
 global.window.location = { replace: jest.fn() };
 
-test("jsPsych's on_data_update", async () => {
-  const jsonData = { data: { attributes: { exp_data: [] } } };
+test("jsPsych's on_data_update with some exp_data", async () => {
+  const jsonData = { data: { attributes: { exp_data: ["some data"] } } };
   const response = {
     /**
      * Mocked json function used in API calls.
@@ -30,7 +30,7 @@ test("jsPsych's on_data_update", async () => {
   expect(Request).toHaveBeenCalledTimes(2);
 });
 
-test("jsPsych's on_data_update", async () => {
+test("jsPsych's on_data_update with no exp_data", async () => {
   const jsonData = { data: { attributes: { exp_data: undefined } } };
   const response = {
     /**

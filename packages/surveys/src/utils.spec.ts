@@ -10,7 +10,7 @@ jest.mock("@lookit/data", () => ({
   updateResponse: jest.fn().mockReturnValue("Response"),
 }));
 
-test("", () => {
+test("Markdown to HTML through survey function", () => {
   const addMock = jest.fn();
   const survey = { onTextMarkdown: { add: addMock } } as unknown as Model;
   const textValue = "some text";
