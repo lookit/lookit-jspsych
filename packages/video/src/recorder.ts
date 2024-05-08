@@ -1,43 +1,45 @@
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 
-/**
- * Video Recorder
- */
+/** Recorder handles state of recording and data storage. */
 export default class Recorder {
   private blobs: Blob[] = [];
 
-  /** @param jsPsych */
-  constructor(private jsPsych: JsPsych) {
+  /**
+   * Recorder for online experiments.
+   *
+   * @param jsPsych - Object supplied by jsPsych.
+   */
+  public constructor(private jsPsych: JsPsych) {
     autoBind(this);
   }
 
   /**
+   * Get recorder from jsPsydh plugin API.
    *
+   * @returns MediaRecorder from the plugin API.
    */
   private get recorder() {
     return this.jsPsych.pluginAPI.getCameraRecorder();
   }
 
   /**
+   * Get stream from jsPsydh plugin API.
    *
+   * @returns MediaStream from the plugin API.
    */
   private get stream() {
     return this.jsPsych.pluginAPI.getCameraStream();
   }
 
-  /**
-   *
-   */
+  /** Start recording. Also, adds event listeners for handling data. */
   public start() {
     this.recorder.addEventListener("dataavailable", this.handleDataAvailable);
     this.recorder.addEventListener("stop", this.handleStop);
     this.recorder.start();
   }
 
-  /**
-   *
-   */
+  /** Stop recording and camera. */
   public stop() {
     this.recorder.stop();
     this.stream.getTracks().map((t: MediaStreamTrack) => t.stop());
@@ -92,7 +94,7 @@ export default class Recorder {
          *
          * @returns Error message.
          */
-        onerror: () => reject(reader.error),
+        onerror: () => reject(Error(reader.error?.toString())),
       });
       reader.readAsDataURL(new File([bytes], "", { type }));
     });

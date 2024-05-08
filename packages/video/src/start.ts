@@ -1,28 +1,25 @@
-import { JsPsych, JsPsychPlugin, TrialType } from "jspsych";
+import { JsPsych, JsPsychPlugin } from "jspsych";
 import Recorder from "./recorder";
 
 const info = <const>{ name: "start-record-plugin", parameters: {} };
 type Info = typeof info;
 
-/**
- *
- */
+/** Start recording. Used by researchers who want to record across trials. */
 export default class StartRecordPlugin implements JsPsychPlugin<Info> {
   public static readonly info = info;
-  recorder: Recorder;
-  /** @param jsPsych */
-  constructor(private jsPsych: JsPsych) {
+  private recorder: Recorder;
+
+  /**
+   * Plugin used to start recording.
+   *
+   * @param jsPsych - Object provided by jsPsych.
+   */
+  public constructor(private jsPsych: JsPsych) {
     this.recorder = new Recorder(this.jsPsych);
   }
 
-  /**
-   * @param _display_element
-   * @param _trial
-   */
-  trial(
-    _display_element: HTMLElement,
-    _trial: TrialType<Info>,
-  ): void | Promise<any> {
+  /** Trial function called by jsPsych. */
+  public trial(): void {
     this.recorder.start();
     setTimeout(() => this.jsPsych.finishTrial(), 1000);
   }

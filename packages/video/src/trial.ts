@@ -21,7 +21,7 @@ export default class TrialRecordExtension implements JsPsychExtension {
   }
 
   /** Ran on the initialize step for extensions. */
-  async initialize() {}
+  public async initialize() {}
 
   /** Ran at the start of a trail. */
   public on_start() {}
