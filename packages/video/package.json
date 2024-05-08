@@ -14,13 +14,19 @@
   "author": "Christopher J Green <okaycj@mit.edu> (https://github.com/okaycj)",
   "main": "dist/index.js",
   "unpkg": "dist/index.browser.min.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "src",
     "dist"
   ],
   "scripts": {
     "build": "rollup --config",
+    "dev": "rollup --config rollup.config.dev.mjs --watch",
     "test": "jest --coverage"
+  },
+  "dependencies": {
+    "@lookit/data": "^0.0.1",
+    "auto-bind": "^5.0.1"
   },
   "devDependencies": {
     "@jspsych/config": "^2.0.0"
