@@ -1,7 +1,7 @@
 {
-  "name": "@lookit/video",
+  "name": "@lookit/record",
   "version": "0.0.1",
-  "description": "Video extensions for lookit studies.",
+  "description": "Recording extensions and plugins for CHS studies.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
     "url": "https://github.com/lookit/lookit-jspsych/issues"

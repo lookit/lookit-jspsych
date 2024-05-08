@@ -1,7 +1,8 @@
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
+import { RecorderInitializeError } from "./error";
 
-/** Recorder handles state of recording and data storage. */
+/** Recorder handles the state of recording and data storage. */
 export default class Recorder {
   private blobs: Blob[] = [];
 
@@ -17,41 +18,58 @@ export default class Recorder {
   /**
    * Get recorder from jsPsydh plugin API.
    *
+   * If camera recorder hasn't been initialized, then return the microphone
+   * recorder.
+   *
    * @returns MediaRecorder from the plugin API.
    */
   private get recorder() {
-    return this.jsPsych.pluginAPI.getCameraRecorder();
+    return (
+      this.jsPsych.pluginAPI.getCameraRecorder() ||
+      this.jsPsych.pluginAPI.getMicrophoneRecorder()
+    );
   }
 
   /**
-   * Get stream from jsPsydh plugin API.
+   * Get stream from either recorder.
    *
    * @returns MediaStream from the plugin API.
    */
   private get stream() {
-    return this.jsPsych.pluginAPI.getCameraStream();
+    return this.recorder.stream;
   }
 
-  /** Start recording. Also, adds event listeners for handling data. */
+  /**
+   * Start recording. Also, adds event listeners for handling data and checks
+   * for recorder initialization.
+   */
   public start() {
+    this.initializeCheck();
     this.recorder.addEventListener("dataavailable", this.handleDataAvailable);
     this.recorder.addEventListener("stop", this.handleStop);
     this.recorder.start();
   }
 
-  /** Stop recording and camera. */
+  /** Stop recording and camera/microphone. */
   public stop() {
     this.recorder.stop();
-    this.stream.getTracks().map((t: MediaStreamTrack) => t.stop());
+    this.stream.getTracks().map((t) => t.stop());
   }
 
-  /** Handle recorder's stop event. */
+  /** Throw Error if there isn't a recorder provided by jsPsych. */
+  private initializeCheck() {
+    if (!this.recorder) {
+      throw new RecorderInitializeError();
+    }
+  }
+
+  /** Handle the recorder's stop event. */
   private async handleStop() {
     await this.download();
   }
 
   /**
-   * Function ran at each time slice and when recorder has stopped.
+   * Function ran at each time slice and when the recorder stopped.
    *
    * @param event - Event containing blob data.
    */

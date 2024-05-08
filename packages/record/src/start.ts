@@ -19,7 +19,7 @@ export default class StartRecordPlugin implements JsPsychPlugin<Info> {
   }
 
   /** Trial function called by jsPsych. */
-  public trial(): void {
+  public trial() {
     this.recorder.start();
     setTimeout(() => this.jsPsych.finishTrial(), 1000);
   }
