@@ -1,3 +1,4 @@
-const config = require("@jspsych/config/jest").makePackageConfig(__dirname);
-config.moduleNameMapper = {};
-module.exports = config;
+module.exports = {
+  ...require("../../jest.cjs").makePackageConfig(),
+  transformIgnorePatterns: ["node_modules/(?!auto-bind)"],
+};
