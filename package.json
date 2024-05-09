@@ -26,7 +26,6 @@
     "test": "npm test --workspaces"
   },
   "dependencies": {
-    "npm": "^10.5.2"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
