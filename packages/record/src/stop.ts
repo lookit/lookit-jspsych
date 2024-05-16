@@ -20,6 +20,7 @@ export default class StopRecordPlugin implements JsPsychPlugin<Info> {
 
   /** Trial function called by jsPsych. */
   public trial(): void {
-    setTimeout(() => this.recorder.stop(), 1000);
+    this.recorder.stop();
+    setTimeout(() => this.jsPsych.finishTrial(), 1000);
   }
 }
