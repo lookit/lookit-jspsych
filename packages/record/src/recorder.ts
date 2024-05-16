@@ -1,3 +1,5 @@
+import Data from "@lookit/data";
+import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import { RecorderInitializeError } from "./error";
@@ -5,6 +7,9 @@ import { RecorderInitializeError } from "./error";
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
   private blobs: Blob[] = [];
+  private localDownload: boolean = false;
+  private s3: lookitS3;
+  private filename: string;
 
   /**
    * Recorder for online experiments.
@@ -12,11 +17,15 @@ export default class Recorder {
    * @param jsPsych - Object supplied by jsPsych.
    */
   public constructor(private jsPsych: JsPsych) {
+    this.filename = `lookit_jspsych_${new Date().getTime()}.webm`;
+    if (!this.localDownload) {
+      this.s3 = new Data.LookitS3(this.filename);
+    }
     autoBind(this);
   }
 
   /**
-   * Get recorder from jsPsydh plugin API.
+   * Get recorder from jsPsych plugin API.
    *
    * If camera recorder hasn't been initialized, then return the microphone
    * recorder.
@@ -43,10 +52,13 @@ export default class Recorder {
    * Start recording. Also, adds event listeners for handling data and checks
    * for recorder initialization.
    */
-  public start() {
+  public async start() {
     this.initializeCheck();
     this.recorder.addEventListener("dataavailable", this.handleDataAvailable);
     this.recorder.addEventListener("stop", this.handleStop);
+    if (!this.localDownload) {
+      await this.s3.createUpload();
+    }
     this.recorder.start();
   }
 
@@ -65,7 +77,11 @@ export default class Recorder {
 
   /** Handle the recorder's stop event. */
   private async handleStop() {
-    await this.download();
+    if (this.localDownload) {
+      await this.download();
+    } else {
+      await this.s3.completeUpload();
+    }
   }
 
   /**
@@ -75,6 +91,9 @@ export default class Recorder {
    */
   private handleDataAvailable(event: BlobEvent) {
     this.blobs.push(event.data);
+    if (!this.localDownload) {
+      this.s3.onDataAvailable(event.data);
+    }
   }
 
   /** Temp method to download data url. */
@@ -84,7 +103,7 @@ export default class Recorder {
     )) as string;
     const link = document.createElement("a");
     link.href = data;
-    link.download = `something_${new Date().getTime()}.webm`;
+    link.download = this.filename;
     link.click();
   }
 
