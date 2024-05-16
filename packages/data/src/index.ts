@@ -8,7 +8,7 @@ import {
   updateResponse,
 } from "./api";
 
-import s3 from "./s3";
+import LookitS3 from "./lookitS3";
 import { Child, PastSession, Response, Study } from "./types";
 
 declare global {
@@ -43,4 +43,4 @@ const load = async (response_uuid: string) => {
   }
 };
 
-export default { load, retrieveResponse, updateResponse, finish, s3 };
+export default { load, retrieveResponse, updateResponse, finish, LookitS3 };
