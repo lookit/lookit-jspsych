@@ -1,32 +1,43 @@
-import { S3 } from "@aws-sdk/client-s3";
+import {
+  CompleteMultipartUploadCommand,
+  CreateMultipartUploadCommand,
+  S3Client,
+  UploadPartCommand,
+} from "@aws-sdk/client-s3";
 import { Env } from "./types";
 
 /** Provides functionality to upload videos incremetally to an AWS S3 Bucket. */
-export default class {
+class LookitS3 {
   private blobParts: Blob[];
   private promises: Promise<{ PartNumber: number; ETag?: string }>[];
   private partNumber: number;
   private partsUploaded: number;
-  private s3: S3;
+  private s3: S3Client;
   private uploadId?: string;
   private env: Env;
   private key: string;
 
   /**
-   * Provide file name and AWS secrets to upload file to a S3 bucket.
+   * Provide file name to initiate a new upload to a S3 bucket. The AWS secrets
+   * and bucket name come from environment variables.
    *
    * @param key - Used to identify upload, mostly likely video file name.
-   * @param s3vars - Object with secrets and bucket name.
    */
-  public constructor(key: string, s3vars: Env) {
-    this.env = s3vars;
+  public constructor(key: string) {
+    this.env = {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID,
+      bucket: process.env.S3_BUCKET,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+      region: process.env.S3_REGION,
+    } as Env;
     this.key = key;
     this.blobParts = [];
     this.promises = [];
     this.partNumber = 1;
     this.partsUploaded = 0;
 
-    this.s3 = new S3({
+    this.s3 = new S3Client({
+      region: this.env.region,
       credentials: {
         accessKeyId: this.env.accessKeyId,
         secretAccessKey: this.env.secretAccessKey,
@@ -68,12 +79,13 @@ export default class {
   /** Create a AWS S3 upload. */
   public async createUpload() {
     this.logRecordingEvent(`Creating video upload connection.`);
-    const createResponse = await this.s3.createMultipartUpload({
+    const command = new CreateMultipartUploadCommand({
       Bucket: this.env.bucket,
       Key: this.key,
-      ContentType: "video/webm",
+      ContentType: "video/webm", // TO DO: check browser support for type/codec and set the actual value here
     });
-    this.uploadId = createResponse.UploadId;
+    const response = await this.s3.send(command);
+    this.uploadId = response.UploadId;
     this.logRecordingEvent(`Connection established.`);
   }
 
@@ -95,20 +107,22 @@ export default class {
 
     while (retry < 3) {
       try {
-        const uploadPartResponse = await this.s3.uploadPart({
+        const input = {
           Body: blob,
           Bucket: this.env.bucket,
           Key: this.key,
           PartNumber: partNumber,
           UploadId: this.uploadId,
-        });
+        };
+        const command = new UploadPartCommand(input);
+        const response = await this.s3.send(command);
         this.logRecordingEvent(`Uploaded file part ${partNumber}.`);
 
         this.partsUploaded++;
 
         return {
           PartNumber: partNumber,
-          ETag: uploadPartResponse.ETag,
+          ETag: response.ETag,
         };
       } catch (_err) {
         this.logRecordingEvent(
@@ -132,16 +146,18 @@ export default class {
       throw Error("No upload id");
     }
 
-    const resp = await this.s3.completeMultipartUpload({
+    const input = {
       Bucket: this.env.bucket,
       Key: this.key,
       MultipartUpload: {
         Parts: await Promise.all(this.promises),
       },
       UploadId: this.uploadId,
-    });
+    };
+    const command = new CompleteMultipartUploadCommand(input);
+    const response = await this.s3.send(command);
 
-    this.logRecordingEvent(`Upload complete: ${resp.Location}`);
+    this.logRecordingEvent(`Upload complete: ${response.Location}`);
   }
 
   /**
@@ -169,3 +185,5 @@ export default class {
     console.log(`Recording log: ${timestamp}\nFile: ${this.key}\n${msg}\n`);
   }
 }
+
+export default LookitS3;
