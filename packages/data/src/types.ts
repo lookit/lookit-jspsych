@@ -141,4 +141,5 @@ export type Env = {
   accessKeyId: string;
   secretAccessKey: string;
   bucket: string;
+  region: string;
 };
