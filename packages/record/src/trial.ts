@@ -16,15 +16,16 @@ export default class TrialRecordExtension implements JsPsychExtension {
    * @param jsPsych - JsPsych object passed into extensions.
    */
   public constructor(private jsPsych: JsPsych) {
-    this.recorder = new Recorder(this.jsPsych);
     autoBind(this);
   }
 
-  /** Ran on the initialize step for extensions. */
+  /** Ran on the initialize step for extensions, called when an instance of jsPsych is first initialized through initJsPsych(). */
   public async initialize() {}
 
-  /** Ran at the start of a trail. */
-  public on_start() {}
+  /** Ran at the start of a trial. */
+  public on_start() {
+    this.recorder = new Recorder(this.jsPsych);
+  }
 
   /** Ran when the trial has loaded. */
   public on_load() {
@@ -34,7 +35,7 @@ export default class TrialRecordExtension implements JsPsychExtension {
   /**
    * Ran when trial has finished.
    *
-   * @returns Trail data.
+   * @returns Trial data.
    */
   public on_finish() {
     this.recorder.stop();
