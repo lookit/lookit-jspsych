@@ -1,6 +1,7 @@
 import autoBind from "auto-bind";
 import { JsPsych, JsPsychExtension, JsPsychExtensionInfo } from "jspsych";
 import Recorder from "./recorder";
+import { getFilename } from "./utils";
 
 /** This extension will allow reasearchers to record trials. */
 export default class TrialRecordExtension implements JsPsychExtension {
@@ -9,6 +10,7 @@ export default class TrialRecordExtension implements JsPsychExtension {
   };
 
   private recorder: Recorder;
+  private filename: string;
 
   /**
    * Video recording extension.
@@ -27,7 +29,8 @@ export default class TrialRecordExtension implements JsPsychExtension {
 
   /** Ran at the start of a trial. */
   public on_start() {
-    this.recorder = new Recorder(this.jsPsych);
+    this.filename = getFilename("trial_video");
+    this.recorder = new Recorder(this.jsPsych, this.filename);
   }
 
   /** Ran when the trial has loaded. */

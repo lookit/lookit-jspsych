@@ -3,6 +3,7 @@ import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import { RecorderInitializeError } from "./error";
+import { getFilename } from "./utils";
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
@@ -15,9 +16,16 @@ export default class Recorder {
    * Recorder for online experiments.
    *
    * @param jsPsych - Object supplied by jsPsych.
+   * @param filename - Name for the video recording file (string). Should be
+   *   provided if the Recorder is being instantiated to start a new recording.
+   *   Can be omitted if the Recorder is being instantiated to access an
+   *   existing recording stream.
    */
-  public constructor(private jsPsych: JsPsych) {
-    this.filename = `lookit_jspsych_${new Date().getTime()}.webm`;
+  public constructor(
+    private jsPsych: JsPsych,
+    filename?: string,
+  ) {
+    this.filename = filename || getFilename("null");
     if (!this.localDownload) {
       this.s3 = new Data.LookitS3(this.filename);
     }
