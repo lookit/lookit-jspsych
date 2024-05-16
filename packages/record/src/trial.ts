@@ -19,7 +19,10 @@ export default class TrialRecordExtension implements JsPsychExtension {
     autoBind(this);
   }
 
-  /** Ran on the initialize step for extensions, called when an instance of jsPsych is first initialized through initJsPsych(). */
+  /**
+   * Ran on the initialize step for extensions, called when an instance of
+   * jsPsych is first initialized through initJsPsych().
+   */
   public async initialize() {}
 
   /** Ran at the start of a trial. */
