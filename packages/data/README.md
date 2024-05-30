@@ -8,7 +8,7 @@ This package will do the following:
 
 ## Load
 
-When an experiment begins, some data will be loaded for use during the experiment. This function is called before an experiment is ran and doesn't need to be called again.  
+When an experiment begins, some data will be loaded for use during the experiment. This function is called before an experiment is ran and doesn't need to be called again.
 
 ```javascript
 await chsData.load(responseUuid);
@@ -25,4 +25,4 @@ window.chs = {
 };
 ```
 
-For example, child information can be accessed at `window.chs.child` and can be used within your experiment. 
+For example, child information can be accessed at `window.chs.child` and can be used within your experiment.

@@ -55,7 +55,7 @@ jsPsych.run([initCamera, trialRec]);
 
 ## Session Recording
 
-You might prefer to record across multiple trials in a study session. This can be done by using trials created with the start and stop recording plugins. This gives a bit of flexibility over which of the study trials are recorded. 
+You might prefer to record across multiple trials in a study session. This can be done by using trials created with the start and stop recording plugins. This gives a bit of flexibility over which of the study trials are recorded.
 
 To record a study session, create the start and stop recording trials.
 
