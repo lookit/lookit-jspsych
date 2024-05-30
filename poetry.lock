@@ -201,18 +201,25 @@ platformdirs = ">=2.2.0"
 pyyaml = ">=5.1"
 
 [[package]]
-name = "mkdocs-markdownextradata-plugin"
-version = "0.2.5"
-description = "A MkDocs plugin that injects the mkdocs.yml extra variables into the markdown template"
+name = "mkdocs-macros-plugin"
+version = "1.0.5"
+description = "Unleash the power of MkDocs with macros and variables"
 optional = false
-python-versions = ">=2.7.9,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
+python-versions = ">=3.8"
 files = [
-    {file = "mkdocs-markdownextradata-plugin-0.2.5.tar.gz", hash = "sha256:9c562e8fe375647d5692d11dfe369a7bdd50302174d35995fce2aeca58036ec6"},
+    {file = "mkdocs-macros-plugin-1.0.5.tar.gz", hash = "sha256:fe348d75f01c911f362b6d998c57b3d85b505876dde69db924f2c512c395c328"},
+    {file = "mkdocs_macros_plugin-1.0.5-py3-none-any.whl", hash = "sha256:f60e26f711f5a830ddf1e7980865bf5c0f1180db56109803cdd280073c1a050a"},
 ]
 
 [package.dependencies]
-mkdocs = "*"
+jinja2 = "*"
+mkdocs = ">=0.17"
+python-dateutil = "*"
 pyyaml = "*"
+termcolor = "*"
+
+[package.extras]
+test = ["mkdocs-include-markdown-plugin", "mkdocs-macros-test", "mkdocs-material (>=6.2)"]
 
 [[package]]
 name = "packaging"
@@ -352,6 +359,20 @@ files = [
 ]
 
 [[package]]
+name = "termcolor"
+version = "2.4.0"
+description = "ANSI color formatting for output in terminal"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "termcolor-2.4.0-py3-none-any.whl", hash = "sha256:9297c0df9c99445c2412e832e882a7884038a25617c60cea2ad69488d4040d63"},
+    {file = "termcolor-2.4.0.tar.gz", hash = "sha256:aab9e56047c8ac41ed798fa36d892a37aca6b3e9159f3e0c24bc64a9b3ac7b7a"},
+]
+
+[package.extras]
+tests = ["pytest", "pytest-cov"]
+
+[[package]]
 name = "watchdog"
 version = "4.0.1"
 description = "Filesystem events monitoring"
@@ -398,4 +419,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "0a9187a5fd9ff6183c50a7bd34daf1c7fd30aab684403dfd7f516ddc83239e5d"
+content-hash = "e27af98fb1de2ddbc32d052b9c1fbd0b843c671b4b33f027377683c92e860975"
