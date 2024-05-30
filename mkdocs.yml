@@ -1,12 +1,22 @@
 site_name: CHS jsPsych
 docs_dir: ./packages
+repo_url: https://github.com/lookit/lookit-jspsych
 nav:
   - data/README.md
   - lookit-initjspsych/README.md
   - record/README.md
   - surveys/README.md
+validation:
+  omitted_files: warn
+  absolute_links: warn  
+  unrecognized_links: warn
+  anchors: warn 
+exclude_docs: |
+  node_modules
+  index.md
+  lookit-initjspsych/CHANGELOG.md
 plugins:
-    - search
-    - macros
+  - search
+  - macros
 extra:
   jsPsych: https://www.jspsych.org/7.3/
