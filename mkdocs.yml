@@ -1,0 +1,20 @@
+site_name: CHS jsPsych
+docs_dir: ./packages
+
+nav:
+  - data/README.md
+  - lookit-initjspsych/README.md
+  - record/README.md
+  - surveys/README.md
+plugins:
+    - search
+    - markdownextradata: {}
+extra:
+  jsPsych: https://www.jspsych.org/7.3/
+  survey: plugins/survey/
+  lookit:
+    github: https://github.com/lookit/lookit-jspsych
+  lookitInitJsPsych:
+    npmjs: https://www.npmjs.com/package/@lookit/lookit-initjspsych?activeTab=code
+    github: https://github.com/lookit/lookit-jspsych/tree/main/packages/lookit-initjspsych/src
+    unpkg: https://unpkg.com/browse/@lookit/lookit-initjspsych/src/
