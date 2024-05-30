@@ -2,7 +2,7 @@ serve: poetry
 	poetry run mkdocs serve
 
 build: poetry
-	poetry run mkdocs build
+	poetry run mkdocs build --strict
 
 poetry:
 	poetry install --no-root --sync
