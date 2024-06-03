@@ -9,8 +9,8 @@ export default class TrialRecordExtension implements JsPsychExtension {
     name: "chs-trial-record-extension",
   };
 
-  private recorder: Recorder;
-  private filename: string;
+  private recorder?: Recorder;
+  private filename?: string;
 
   /**
    * Video recording extension.
@@ -35,7 +35,7 @@ export default class TrialRecordExtension implements JsPsychExtension {
 
   /** Ran when the trial has loaded. */
   public on_load() {
-    this.recorder.start();
+    this.recorder?.start();
   }
 
   /**
@@ -44,7 +44,7 @@ export default class TrialRecordExtension implements JsPsychExtension {
    * @returns Trial data.
    */
   public on_finish() {
-    this.recorder.stop();
+    this.recorder?.stop();
     return {};
   }
 }
