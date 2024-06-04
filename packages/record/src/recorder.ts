@@ -3,31 +3,28 @@ import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import { RecorderInitializeError } from "./error";
-import { getFilename } from "./utils";
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
   private blobs: Blob[] = [];
   private localDownload: boolean = false;
   private s3?: lookitS3;
-  private filename: string;
+  private fileNameStr: string;
 
   /**
    * Recorder for online experiments.
    *
    * @param jsPsych - Object supplied by jsPsych.
-   * @param filename - Name for the video recording file (string). Should be
-   *   provided if the Recorder is being instantiated to start a new recording.
-   *   Can be omitted if the Recorder is being instantiated to access an
-   *   existing recording stream.
+   * @param fileNamePrefix - Prefix for the video recording file name (string).
+   *   This is the string that comes before "_<TIMESTAMP>.webm".
    */
   public constructor(
     private jsPsych: JsPsych,
-    filename?: string,
+    fileNamePrefix: string,
   ) {
-    this.filename = filename || getFilename("null");
-    if (!this.localDownload) {
-      this.s3 = new Data.LookitS3(this.filename);
+    this.fileNameStr = this.createFilename(fileNamePrefix);
+    if (!this.localDownload && this.fileNameStr) {
+      this.s3 = new Data.LookitS3(this.fileNameStr);
     }
     autoBind(this);
   }
@@ -46,6 +43,15 @@ export default class Recorder {
       this.jsPsych.pluginAPI.getMicrophoneRecorder()
     );
   }
+
+  /**
+   * Get the video recording filename.
+   *
+   * @returns Filename string for this instance.
+   */
+  public get filename() {
+    return this.fileNameStr;
+  };
 
   /**
    * Get stream from either recorder.
@@ -143,5 +149,15 @@ export default class Recorder {
       });
       reader.readAsDataURL(new File([bytes], "", { type }));
     });
+  }
+
+  /**
+   * Function to create a video recording filename.
+   *
+   * @param prefix - (string): Start of the file name for the video recording.
+   * @returns Filename string, including the prefix, date/time and webm extension.
+   */
+  private createFilename(prefix: string) {
+    return `${prefix}_${new Date().getTime()}.webm`;
   }
 }
