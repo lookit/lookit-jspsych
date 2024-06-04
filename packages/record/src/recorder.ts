@@ -9,7 +9,7 @@ import { getFilename } from "./utils";
 export default class Recorder {
   private blobs: Blob[] = [];
   private localDownload: boolean = false;
-  private s3: lookitS3;
+  private s3?: lookitS3;
   private filename: string;
 
   /**
@@ -65,7 +65,7 @@ export default class Recorder {
     this.recorder.addEventListener("dataavailable", this.handleDataAvailable);
     this.recorder.addEventListener("stop", this.handleStop);
     if (!this.localDownload) {
-      await this.s3.createUpload();
+      await this.s3?.createUpload();
     }
     this.recorder.start();
   }
@@ -88,7 +88,7 @@ export default class Recorder {
     if (this.localDownload) {
       await this.download();
     } else {
-      await this.s3.completeUpload();
+      await this.s3?.completeUpload();
     }
   }
 
@@ -100,7 +100,7 @@ export default class Recorder {
   private handleDataAvailable(event: BlobEvent) {
     this.blobs.push(event.data);
     if (!this.localDownload) {
-      this.s3.onDataAvailable(event.data);
+      this.s3?.onDataAvailable(event.data);
     }
   }
 
