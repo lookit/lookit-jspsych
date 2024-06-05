@@ -1,5 +1,6 @@
 import { JsPsych, JsPsychPlugin } from "jspsych";
 import Recorder from "./recorder";
+import { ExistingRecordingError } from "./error";
 
 const info = <const>{ name: "start-record-plugin", parameters: {} };
 type Info = typeof info;
@@ -16,6 +17,11 @@ export default class StartRecordPlugin implements JsPsychPlugin<Info> {
    */
   public constructor(private jsPsych: JsPsych) {
     this.recorder = new Recorder(this.jsPsych, "session_video");
+    if (!window.chs.sessionRecorder) {
+      window.chs.sessionRecorder = this.recorder;
+    } else {
+      throw new ExistingRecordingError();
+    }
 
   }
 

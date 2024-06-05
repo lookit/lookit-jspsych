@@ -1,5 +1,6 @@
 import { JsPsych, JsPsychPlugin } from "jspsych";
 import Recorder from "./recorder";
+import { NoSessionRecordingError } from "./error";
 
 const info = <const>{ name: "stop-record-plugin", parameters: {} };
 type Info = typeof info;
@@ -15,7 +16,11 @@ export default class StopRecordPlugin implements JsPsychPlugin<Info> {
    * @param jsPsych - Object provided by jsPsych.
    */
   public constructor(private jsPsych: JsPsych) {
-    this.recorder = new Recorder(this.jsPsych);
+    if (window.chs.sessionRecorder) {
+      this.recorder = window.chs.sessionRecorder;
+    } else {
+      throw new NoSessionRecordingError();
+    }
   }
 
   /** Trial function called by jsPsych. */

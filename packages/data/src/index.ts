@@ -1,4 +1,4 @@
-import deepFreeze from "deep-freeze-es6";
+//import deepFreeze from "deep-freeze-es6";
 import {
   finish,
   retrieveChild,
@@ -10,6 +10,7 @@ import {
 
 import LookitS3 from "./lookitS3";
 import { Child, PastSession, Response, Study } from "./types";
+import Recorder from "@lookit/record/src/recorder";
 
 declare global {
   interface Window {
@@ -18,6 +19,7 @@ declare global {
       child: Child;
       pastSessions: PastSession[];
       response: Response;
+      sessionRecorder: Recorder | null;
     };
   }
 }
@@ -36,9 +38,10 @@ const load = async (response_uuid: string) => {
         child: await retrieveChild(),
         pastSessions: await retrievePastSessions(response_uuid),
         response: await retrieveResponse(response_uuid),
+        sessionRecorder: null
       },
     });
-    deepFreeze(window.chs);
+    //deepFreeze(window.chs);
     await finish();
   }
 };
