@@ -64,7 +64,7 @@ const startRec = { type: chsRecord.StartRecordPlugin };
 const stopRec = { type: chsRecord.StopRecordPlugin };
 ```
 
-Next, create the trials that would like to be recorded.
+Next, create the trials that you would like to be recorded.
 
 ```javascript
 const morning = {type: jsPsychHtmlKeyboardResponse, stimulus: "Good morning!"};

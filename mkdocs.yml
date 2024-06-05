@@ -10,9 +10,9 @@ nav:
   - Surveys: surveys/README.md
 validation:
   omitted_files: warn
-  absolute_links: warn  
+  absolute_links: warn
   unrecognized_links: warn
-  anchors: warn 
+  anchors: warn
 exclude_docs: |
   node_modules
   lookit-initjspsych/CHANGELOG.md

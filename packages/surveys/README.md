@@ -31,5 +31,3 @@ const exitSurvey = { type: chsSurveys.exit };
 | include_withdrawal_example    | boolean | true          | Include an example in withdrawal question text.          |
 | private_level_only            | boolean | false         | Only show "private" on use of media question.            |
 | additional_video_privacy_text | string  | ""            | Add custom video privacy text to privacy question.       |
-
-
