@@ -10,7 +10,7 @@ import {
 
 import LookitS3 from "./lookitS3";
 import { Child, PastSession, Response, Study } from "./types";
-import Recorder from "@lookit/record/src/recorder";
+import Recorder from "@lookit/record/dist/recorder";
 
 declare global {
   interface Window {
