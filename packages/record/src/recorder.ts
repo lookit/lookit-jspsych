@@ -10,6 +10,7 @@ export default class Recorder {
   private localDownload: boolean = false;
   private s3?: lookitS3;
   private fileNameStr: string;
+  private stopPromise: Promise<void> | null = null;
 
   /**
    * Recorder for online experiments.
@@ -69,7 +70,11 @@ export default class Recorder {
   public async start() {
     this.initializeCheck();
     this.recorder.addEventListener("dataavailable", this.handleDataAvailable);
-    this.recorder.addEventListener("stop", this.handleStop);
+    // create a stop promise and pass the resolve function as an argument to the stop event callback,
+    // so that the stop event handler can resolve the stop promise
+    this.stopPromise = new Promise((resolve, reject) => {
+      this.recorder.addEventListener("stop", this.handleStop(resolve));
+    })
     if (!this.localDownload) {
       await this.s3?.createUpload();
     }
@@ -77,9 +82,10 @@ export default class Recorder {
   }
 
   /** Stop recording and camera/microphone. */
-  public stop() {
+  public async stop() {
     this.recorder.stop();
     this.stream.getTracks().map((t) => t.stop());
+    return this.stopPromise;
   }
 
   /** Throw Error if there isn't a recorder provided by jsPsych. */
@@ -90,11 +96,14 @@ export default class Recorder {
   }
 
   /** Handle the recorder's stop event. */
-  private async handleStop() {
-    if (this.localDownload) {
-      await this.download();
-    } else {
-      await this.s3?.completeUpload();
+  private handleStop(resolve: { (value: void | PromiseLike<void>): void; }) {
+    return async () => {
+      if (this.localDownload) {
+        await this.download();
+      } else {
+        await this.s3?.completeUpload();
+      }
+      resolve();
     }
   }
 
