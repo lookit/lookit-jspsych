@@ -4,18 +4,20 @@ import {
   S3Client,
   UploadPartCommand,
 } from "@aws-sdk/client-s3";
+import { AWSMissingAttrError, UploadPartError } from "./error";
 import { Env } from "./types";
 
-/** Provides functionality to upload videos incremetally to an AWS S3 Bucket. */
+/** Provides functionality to upload videos incrementally to an AWS S3 Bucket. */
 class LookitS3 {
   private blobParts: Blob[];
-  private promises: Promise<{ PartNumber: number; ETag?: string }>[];
+  private promises: Promise<{ PartNumber: number; ETag: string }>[];
   private partNumber: number;
   private partsUploaded: number;
   private s3: S3Client;
-  private uploadId?: string;
+  private uploadId: string = "";
   private env: Env;
   private key: string;
+  public static readonly minUploadSize: number = 5 * 1024 * 1024;
 
   /**
    * Provide file name to initiate a new upload to a S3 bucket. The AWS secrets
@@ -62,7 +64,7 @@ class LookitS3 {
    * @returns Percent uploaded.
    */
   public get percentUploadComplete() {
-    return Math.floor((this.partsUploaded / this.partNumber) * 100);
+    return Math.floor((this.partsUploaded / this.promises.length) * 100);
   }
 
   /**
@@ -84,7 +86,12 @@ class LookitS3 {
       Key: this.key,
       ContentType: "video/webm", // TO DO: check browser support for type/codec and set the actual value here
     });
+    
     const response = await this.s3.send(command);
+    if (!response.UploadId) {
+      throw new AWSMissingAttrError("UploadId");
+    }
+    
     this.uploadId = response.UploadId;
     this.logRecordingEvent(`Connection established.`);
   }
@@ -99,25 +106,24 @@ class LookitS3 {
    */
   private async uploadPart(blob: Blob, partNumber: number) {
     let retry = 0;
-    let err;
-
-    if (!this.uploadId) {
-      throw Error("no upload id.");
-    }
+    let err: Error | undefined = undefined;
+    const input = {
+      Body: blob,
+      Bucket: this.env.bucket,
+      Key: this.key,
+      PartNumber: partNumber,
+      UploadId: this.uploadId,
+    };
+    const command = new UploadPartCommand(input);
 
     while (retry < 3) {
       try {
-        const input = {
-          Body: blob,
-          Bucket: this.env.bucket,
-          Key: this.key,
-          PartNumber: partNumber,
-          UploadId: this.uploadId,
-        };
-        const command = new UploadPartCommand(input);
         const response = await this.s3.send(command);
-        this.logRecordingEvent(`Uploaded file part ${partNumber}.`);
+        if (!response.ETag) {
+          throw new AWSMissingAttrError("ETag");
+        }
 
+        this.logRecordingEvent(`Uploaded file part ${partNumber}.`);
         this.partsUploaded++;
 
         return {
@@ -128,11 +134,12 @@ class LookitS3 {
         this.logRecordingEvent(
           `Error uploading part ${partNumber}.\nError: ${_err}`,
         );
-        err = _err;
+        err = _err as Error;
         retry += 1;
       }
     }
-    throw Error(`Upload part failed after 3 attempts.\nError: ${err}`);
+
+    throw new UploadPartError(err);
   }
 
   /**
@@ -141,10 +148,6 @@ class LookitS3 {
    */
   public async completeUpload() {
     this.addUploadPartPromise();
-
-    if (!this.uploadId) {
-      throw Error("No upload id");
-    }
 
     const input = {
       Bucket: this.env.bucket,
@@ -169,7 +172,7 @@ class LookitS3 {
   public onDataAvailable(blob: Blob) {
     this.blobParts.push(blob);
 
-    if (this.blobPartsSize > 5 * (1024 * 1024)) {
+    if (this.blobPartsSize > LookitS3.minUploadSize) {
       this.addUploadPartPromise();
     }
   }
