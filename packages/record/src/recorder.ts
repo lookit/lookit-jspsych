@@ -81,7 +81,13 @@ export default class Recorder {
     this.recorder.start();
   }
 
-  /** Stop recording and camera/microphone. */
+  /**
+   * Stop recording and camera/microphone.
+   *
+   * @returns Promise that resolves after the media recorder has stopped and
+   *   final 'dataavailable' event has occurred, when the "stop" event-related
+   *   callback function is called.
+   */
   public stop() {
     this.recorder.stop();
     this.stream.getTracks().map((t) => t.stop());
@@ -95,7 +101,14 @@ export default class Recorder {
     }
   }
 
-  /** Handle the recorder's stop event. */
+  /**
+   * Handle the recorder's stop event. This is a function that takes the stop
+   * promise's 'resolve' as an argument and returns a function that resolves
+   * that stop promise. The function that is returned is used as the recorder's
+   * "stop" event-related callback function.
+   *
+   * @returns Function that is called on the recorder's "stop" event.
+   */
   private handleStop(resolve: { (value: void | PromiseLike<void>): void }) {
     return async () => {
       if (this.localDownload) {

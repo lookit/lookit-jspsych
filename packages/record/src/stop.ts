@@ -29,7 +29,10 @@ export default class StopRecordPlugin implements JsPsychPlugin<Info> {
 
   /**
    * Trial function called by jsPsych.
-   * @param display_element
+   *
+   * @param display_element - DOM element where jsPsych content is being rendered
+   *   (set in initJsPsych and automatically made available to a plugin's trial
+   *   method via jsPsych core).
    */
   public trial(display_element: HTMLElement): void {
     display_element.innerHTML = "<div>Uploading video, please wait...</div>";

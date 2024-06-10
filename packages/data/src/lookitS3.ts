@@ -86,7 +86,7 @@ class LookitS3 {
       Key: this.key,
       ContentType: "video/webm", // TO DO: check browser support for type/codec and set the actual value here
     });
-    
+
     const response = await this.s3.send(command);
     if (!response.UploadId) {
       throw new AWSMissingAttrError("UploadId");
