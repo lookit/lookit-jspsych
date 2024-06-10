@@ -1,6 +1,9 @@
+import { LookitWindow } from "@lookit/data/dist/types";
 import { JsPsych, JsPsychPlugin } from "jspsych";
-import Recorder from "./recorder";
 import { ExistingRecordingError } from "./error";
+import Recorder from "./recorder";
+
+declare let window: LookitWindow;
 
 const info = <const>{ name: "start-record-plugin", parameters: {} };
 type Info = typeof info;
@@ -22,7 +25,6 @@ export default class StartRecordPlugin implements JsPsychPlugin<Info> {
     } else {
       throw new ExistingRecordingError();
     }
-
   }
 
   /** Trial function called by jsPsych. */

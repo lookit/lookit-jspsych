@@ -1,7 +1,10 @@
 import Data from "@lookit/data";
+import { LookitWindow } from "@lookit/data/dist/types";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
 import { Model } from "survey-jquery";
+
+declare let window: LookitWindow;
 
 const CONFIG = <const>{
   marked: { async: false },

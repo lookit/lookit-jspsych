@@ -10,7 +10,7 @@ export default class Recorder {
   private localDownload: boolean = false;
   private s3?: lookitS3;
   private fileNameStr: string;
-  private stopPromise: Promise<void> | null = null;
+  private stopPromise?: Promise<void>;
 
   /**
    * Recorder for online experiments.
@@ -52,7 +52,7 @@ export default class Recorder {
    */
   public get filename() {
     return this.fileNameStr;
-  };
+  }
 
   /**
    * Get stream from either recorder.
@@ -72,9 +72,9 @@ export default class Recorder {
     this.recorder.addEventListener("dataavailable", this.handleDataAvailable);
     // create a stop promise and pass the resolve function as an argument to the stop event callback,
     // so that the stop event handler can resolve the stop promise
-    this.stopPromise = new Promise((resolve, reject) => {
+    this.stopPromise = new Promise((resolve) => {
       this.recorder.addEventListener("stop", this.handleStop(resolve));
-    })
+    });
     if (!this.localDownload) {
       await this.s3?.createUpload();
     }
@@ -82,7 +82,7 @@ export default class Recorder {
   }
 
   /** Stop recording and camera/microphone. */
-  public async stop() {
+  public stop() {
     this.recorder.stop();
     this.stream.getTracks().map((t) => t.stop());
     return this.stopPromise;
@@ -96,7 +96,7 @@ export default class Recorder {
   }
 
   /** Handle the recorder's stop event. */
-  private handleStop(resolve: { (value: void | PromiseLike<void>): void; }) {
+  private handleStop(resolve: { (value: void | PromiseLike<void>): void }) {
     return async () => {
       if (this.localDownload) {
         await this.download();
@@ -104,7 +104,7 @@ export default class Recorder {
         await this.s3?.completeUpload();
       }
       resolve();
-    }
+    };
   }
 
   /**
@@ -164,7 +164,8 @@ export default class Recorder {
    * Function to create a video recording filename.
    *
    * @param prefix - (string): Start of the file name for the video recording.
-   * @returns Filename string, including the prefix, date/time and webm extension.
+   * @returns Filename string, including the prefix, date/time and webm
+   *   extension.
    */
   private createFilename(prefix: string) {
     return `${prefix}_${new Date().getTime()}.webm`;

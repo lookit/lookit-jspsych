@@ -9,20 +9,9 @@ import {
 } from "./api";
 
 import LookitS3 from "./lookitS3";
-import { Child, PastSession, Response, Study } from "./types";
-import Recorder from "@lookit/record/dist/recorder";
+import { LookitWindow } from "./types";
 
-declare global {
-  interface Window {
-    chs: {
-      study: Study;
-      child: Child;
-      pastSessions: PastSession[];
-      response: Response;
-      sessionRecorder: Recorder | null;
-    };
-  }
-}
+declare let window: LookitWindow;
 
 /**
  * Load data from API that is needed for saving the experiment data, and that
@@ -38,7 +27,7 @@ const load = async (response_uuid: string) => {
         child: await retrieveChild(),
         pastSessions: await retrievePastSessions(response_uuid),
         response: await retrieveResponse(response_uuid),
-        sessionRecorder: null
+        sessionRecorder: undefined,
       },
     });
     //deepFreeze(window.chs);

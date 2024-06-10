@@ -91,7 +91,7 @@ class LookitS3 {
     if (!response.UploadId) {
       throw new AWSMissingAttrError("UploadId");
     }
-    
+
     this.uploadId = response.UploadId;
     this.logRecordingEvent(`Connection established.`);
   }

@@ -19,13 +19,12 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "changeset": "changeset",
-    "clean": "find '.' -type d -name 'node_modules' -or -name 'coverage' -or -name 'dist' -exec rm -rf {} \\;",
+    "clean": "trash \"./packages/**/dist\"",
     "fix": "prettier './' -lw && npm run lint",
     "format": "prettier './' -c",
     "lint": "eslint './packages/**/src/**/*.ts' --fix",
     "test": "npm test --workspaces"
   },
-  "dependencies": {},
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@eslint/js": "^9.1.1",
@@ -39,6 +38,7 @@
     "prettier-plugin-packagejson": "^2.5.0",
     "prettier-plugin-sort-json": "^4.0.0",
     "rollup-plugin-serve": "^1.1.1",
+    "trash-cli": "^5.0.0",
     "typescript-eslint": "^7.7.1"
   },
   "engines": {

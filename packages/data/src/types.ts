@@ -143,3 +143,13 @@ export type Env = {
   bucket: string;
   region: string;
 };
+
+export interface LookitWindow extends Window {
+  chs: {
+    study: Study;
+    child: Child;
+    pastSessions: PastSession[];
+    response: Response;
+    sessionRecorder: unknown;
+  };
+}

@@ -1,6 +1,9 @@
 import Api from "@lookit/data";
+import { LookitWindow } from "@lookit/data/dist/types";
 import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
 import { UserFunc } from "./types";
+
+declare let window: LookitWindow;
 
 /**
  * Function that returns a function to be used in place of jsPsych's option
