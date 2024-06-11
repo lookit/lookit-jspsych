@@ -3,6 +3,5 @@
     "baseUrl": ".",
     "strict": true
   },
-  "extends": "@jspsych/config/tsconfig.json",
-  "include": ["src"]
+  "extends": "@jspsych/config/tsconfig.json"
 }

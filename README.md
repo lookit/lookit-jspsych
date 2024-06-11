@@ -57,7 +57,7 @@ Edit `tsconfig.json`:
     "baseUrl": ".",
     "strict": true
   },
-  "extends": "@jspsych/config/tsconfig.core.json",
+  "extends": "@jspsych/config/tsconfig.json",
   "include": ["src"]
 }
 ```
@@ -82,9 +82,7 @@ export default makeDevConfig(rollupConfig, port);
 Edit `jest.config.cjs`
 
 ```cjs
-const config = require("@jspsych/config/jest").makePackageConfig(__dirname);
-config.moduleNameMapper = {};
-module.exports = config;
+module.exports = require("../../jest.cjs").makePackageConfig();
 ```
 
 You will need `@jspsych/config` to build your new package:

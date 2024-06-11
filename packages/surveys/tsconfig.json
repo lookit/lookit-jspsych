@@ -5,6 +5,6 @@
     "resolveJsonModule": true,
     "strict": true
   },
-  "extends": "@jspsych/config/tsconfig.core.json",
+  "extends": "@jspsych/config/tsconfig.json",
   "include": ["src"]
 }

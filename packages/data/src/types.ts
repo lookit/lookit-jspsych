@@ -1,6 +1,6 @@
 import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
 
-export type Promises = Promise<Data<Attributes> | Data<Attributes>[]>;
+export type ApiPromise = Promise<Data<Attributes> | Data<Attributes>[]>;
 
 export type Relationship = {
   links: {
@@ -22,15 +22,12 @@ export interface StudyAttrs extends Attributes {
   criteria: string;
   duration: string;
   contact_info: string;
-  /** Format: binary */
   image?: string | null;
   structure?: Record<string, never>;
   generator?: string;
   use_generator?: boolean;
   display_full_screen?: boolean;
-  /** Format: uri */
   exit_url?: string;
-  /** @enum {string} */
   state?:
     | "created"
     | "submitted"
@@ -138,4 +135,14 @@ export interface ResponseAttrsUpdate {
   completed?: boolean;
   survey_consent?: boolean;
   completed_consent_frame?: boolean;
+}
+
+export interface LookitWindow extends Window {
+  chs: {
+    study: Study;
+    child: Child;
+    pastSessions: PastSession[];
+    response: Response;
+    sessionRecorder: unknown;
+  };
 }

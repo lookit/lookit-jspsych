@@ -4,15 +4,23 @@ import { get, getUuids, patch } from "./utils";
 
 enableFetchMocks();
 
-function setLocationHref(href: string) {
+/**
+ * Helper function for this set of tests. This will update the current URL to
+ * the value provided in argument href.
+ *
+ * @param href - URL to be set.
+ * @returns Supplied URL.
+ */
+const setLocationHref = (href: string) => {
   /**
-   * Helper function for this set of tests.  This will update the current URL to the value
-   * provided in argument href.
+   * Helper function for this set of tests. This will update the current URL to
+   * the value provided in argument href.
    */
   delete global.window.location;
   global.window = Object.create(window);
   global.window.location = { href };
-}
+  return href;
+};
 
 test("Api get function", async () => {
   const child = { id: new Date().toString() } as Child;
