@@ -5,18 +5,18 @@ import {
   UploadPartCommand,
 } from "@aws-sdk/client-s3";
 import { AWSMissingAttrError, UploadPartError } from "./error";
-import { Env } from "./types";
 
 /** Provides functionality to upload videos incrementally to an AWS S3 Bucket. */
 class LookitS3 {
-  private blobParts: Blob[];
-  private promises: Promise<{ PartNumber: number; ETag: string }>[];
-  private partNumber: number;
-  private partsUploaded: number;
+  private blobParts: Blob[] = [];
+  private promises: Promise<{ PartNumber: number; ETag: string }>[] = [];
+  private partNumber: number = 1;
+  private partsUploaded: number = 0;
   private s3: S3Client;
   private uploadId: string = "";
-  private env: Env;
   private key: string;
+  private bucket: string = process.env.S3_BUCKET;
+
   public static readonly minUploadSize: number = 5 * 1024 * 1024;
 
   /**
@@ -26,23 +26,12 @@ class LookitS3 {
    * @param key - Used to identify upload, mostly likely video file name.
    */
   public constructor(key: string) {
-    this.env = {
-      accessKeyId: process.env.S3_ACCESS_KEY_ID,
-      bucket: process.env.S3_BUCKET,
-      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-      region: process.env.S3_REGION,
-    } as Env;
     this.key = key;
-    this.blobParts = [];
-    this.promises = [];
-    this.partNumber = 1;
-    this.partsUploaded = 0;
-
     this.s3 = new S3Client({
-      region: this.env.region,
+      region: process.env.S3_REGION,
       credentials: {
-        accessKeyId: this.env.accessKeyId,
-        secretAccessKey: this.env.secretAccessKey,
+        accessKeyId: process.env.S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
       },
     });
   }
@@ -82,7 +71,7 @@ class LookitS3 {
   public async createUpload() {
     this.logRecordingEvent(`Creating video upload connection.`);
     const command = new CreateMultipartUploadCommand({
-      Bucket: this.env.bucket,
+      Bucket: this.bucket,
       Key: this.key,
       ContentType: "video/webm", // TO DO: check browser support for type/codec and set the actual value here
     });
@@ -109,7 +98,7 @@ class LookitS3 {
     let err: Error | undefined = undefined;
     const input = {
       Body: blob,
-      Bucket: this.env.bucket,
+      Bucket: this.bucket,
       Key: this.key,
       PartNumber: partNumber,
       UploadId: this.uploadId,
@@ -150,7 +139,7 @@ class LookitS3 {
     this.addUploadPartPromise();
 
     const input = {
-      Bucket: this.env.bucket,
+      Bucket: this.bucket,
       Key: this.key,
       MultipartUpload: {
         Parts: await Promise.all(this.promises),

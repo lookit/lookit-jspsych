@@ -11,7 +11,7 @@ import {
 import LookitS3 from "./lookitS3";
 import { LookitWindow } from "./types";
 
-declare let window: LookitWindow;
+declare const window: LookitWindow;
 
 /**
  * Load data from API that is needed for saving the experiment data, and that

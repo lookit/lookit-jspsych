@@ -1,7 +1,7 @@
 import Api from "./index";
 import { LookitWindow } from "./types";
 
-declare let window: LookitWindow;
+declare const window: LookitWindow;
 
 jest.mock("./utils", () => ({
   ...jest.requireActual("./utils"),
