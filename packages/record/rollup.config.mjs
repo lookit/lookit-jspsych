@@ -1,3 +1,13 @@
+import dotenv from "rollup-plugin-dotenv";
 import { makeRollupConfig } from "../../rollup.mjs";
-// This package name needs to be unique
-export default makeRollupConfig("chsRecord");
+
+export default makeRollupConfig("chsRecord").map((config) => {
+  return {
+    ...config,
+    plugins: [
+      // Add support for .env files
+      dotenv(),
+      ...config.plugins,
+    ],
+  };
+});

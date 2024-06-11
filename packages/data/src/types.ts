@@ -137,8 +137,12 @@ export interface ResponseAttrsUpdate {
   completed_consent_frame?: boolean;
 }
 
-export type Env = {
-  accessKeyId: string;
-  secretAccessKey: string;
-  bucket: string;
-};
+export interface LookitWindow extends Window {
+  chs: {
+    study: Study;
+    child: Child;
+    pastSessions: PastSession[];
+    response: Response;
+    sessionRecorder: unknown;
+  };
+}

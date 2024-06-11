@@ -29,7 +29,8 @@
     "auto-bind": "^5.0.1"
   },
   "devDependencies": {
-    "@jspsych/config": "^2.0.0"
+    "@jspsych/config": "^2.0.0",
+    "rollup-plugin-dotenv": "^0.5.1"
   },
   "peerDependencies": {
     "jspsych": "^7.3.4"

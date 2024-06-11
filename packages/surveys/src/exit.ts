@@ -1,7 +1,10 @@
 import SurveyPlugin from "@jspsych/plugin-survey";
+import { LookitWindow } from "@lookit/data/dist/types";
 import { ParameterType, TrialType } from "jspsych";
 import { surveyJSON } from "./exit_json";
 import { exitSurveyFunction as survey_function } from "./utils";
+
+declare let window: LookitWindow;
 
 const info = <const>{
   ...SurveyPlugin.info,
