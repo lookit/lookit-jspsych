@@ -7,7 +7,8 @@ import { RecorderInitializeError } from "./error";
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
   private blobs: Blob[] = [];
-  private localDownload: boolean = false;
+  private localDownload: boolean =
+    process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
   private s3?: lookitS3;
   private fileNameStr: string;
   private stopPromise?: Promise<void>;
