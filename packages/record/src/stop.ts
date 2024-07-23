@@ -1,8 +1,7 @@
+import { LookitWindow } from "@lookit/data/dist/types";
 import { JsPsych, JsPsychPlugin } from "jspsych";
 import { NoSessionRecordingError } from "./error";
 import Recorder from "./recorder";
-
-import { LookitWindow } from "@lookit/data/dist/types";
 
 declare let window: LookitWindow;
 
@@ -36,7 +35,7 @@ export default class StopRecordPlugin implements JsPsychPlugin<Info> {
    */
   public trial(display_element: HTMLElement): void {
     display_element.innerHTML = "<div>Uploading video, please wait...</div>";
-    this.recorder.stop()?.then(() => {
+    this.recorder.stop().then(() => {
       window.chs.sessionRecorder = null;
       display_element.innerHTML = "";
       this.jsPsych.finishTrial();

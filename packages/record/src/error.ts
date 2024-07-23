@@ -45,3 +45,20 @@ export class ExistingRecordingError extends Error {
     this.name = "ExistingRecordingError";
   }
 }
+
+/**
+ * Error thrown when trying to to stop the recorder and the stop promise doesn't
+ * exist.
+ */
+export class NoStopPromiseError extends Error {
+  /**
+   * When attempting to stop a recording but there's no stop promise to ensure
+   * the stop has completed.
+   */
+  public constructor() {
+    const message =
+      "There is no Stop Promise, which means the recorder wasn't started properly.";
+    super(message);
+    this.name = "NoStopPromiseError";
+  }
+}

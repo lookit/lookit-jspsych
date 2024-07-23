@@ -2,7 +2,7 @@ import Data from "@lookit/data";
 import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
-import { RecorderInitializeError } from "./error";
+import { NoStopPromiseError, RecorderInitializeError } from "./error";
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
@@ -10,7 +10,7 @@ export default class Recorder {
   private localDownload: boolean =
     process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
   private s3?: lookitS3;
-  private fileNameStr: string;
+  private filename: string;
   private stopPromise?: Promise<void>;
 
   /**
@@ -24,9 +24,9 @@ export default class Recorder {
     private jsPsych: JsPsych,
     fileNamePrefix: string,
   ) {
-    this.fileNameStr = this.createFilename(fileNamePrefix);
-    if (!this.localDownload && this.fileNameStr) {
-      this.s3 = new Data.LookitS3(this.fileNameStr);
+    this.filename = this.createFilename(fileNamePrefix);
+    if (!this.localDownload) {
+      this.s3 = new Data.LookitS3(this.filename);
     }
     autoBind(this);
   }
@@ -44,15 +44,6 @@ export default class Recorder {
       this.jsPsych.pluginAPI.getCameraRecorder() ||
       this.jsPsych.pluginAPI.getMicrophoneRecorder()
     );
-  }
-
-  /**
-   * Get the video recording filename.
-   *
-   * @returns Filename string for this instance.
-   */
-  public get filename() {
-    return this.fileNameStr;
   }
 
   /**
@@ -92,6 +83,11 @@ export default class Recorder {
   public stop() {
     this.recorder.stop();
     this.stream.getTracks().map((t) => t.stop());
+
+    if (!this.stopPromise) {
+      throw new NoStopPromiseError();
+    }
+
     return this.stopPromise;
   }
 
@@ -155,7 +151,7 @@ export default class Recorder {
     bytes: BlobPart,
     type = "video/webm; codecs=vp8",
   ) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const reader = Object.assign(new FileReader(), {
         /**
          * When promise resolves, it'll return the result.
@@ -163,12 +159,6 @@ export default class Recorder {
          * @returns Result of reading data as url.
          */
         onload: () => resolve(reader.result),
-        /**
-         * On error, promise return reader error.
-         *
-         * @returns Error message.
-         */
-        onerror: () => reject(Error(reader.error?.toString())),
       });
       reader.readAsDataURL(new File([bytes], "", { type }));
     });
