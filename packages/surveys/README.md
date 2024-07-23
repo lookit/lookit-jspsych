@@ -17,7 +17,7 @@ Other than that, the rest of the survey is entirely designed by you. Please refe
 
 ## Exit Survey
 
-Unlike the consent survey, this survey is already designed with a few parameters for you to adjust to suite your study.
+Unlike the consent survey, this survey is already designed with a few parameters for you to adjust to suit your study.
 
 ```javascript
 const exitSurvey = { type: chsSurveys.exit };

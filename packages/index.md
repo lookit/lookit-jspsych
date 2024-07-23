@@ -6,4 +6,4 @@ If you're just starting out, a great place to start would be with [jsPsych's doc
 
 ## Developer Documentation
 
-Documentation for developers can be found in the [REAME](https://github.com/lookit/lookit-jspsych) for the monorepo.
+Documentation for developers can be found in the [README](https://github.com/lookit/lookit-jspsych) for the monorepo.
