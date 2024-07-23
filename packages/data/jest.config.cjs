@@ -1,6 +1,4 @@
-const config = require("@jspsych/config/jest").makePackageConfig(__dirname);
 module.exports = {
-  ...config,
-  moduleNameMapper: {},
+  ...require("../../jest.cjs").makePackageConfig(),
   transformIgnorePatterns: ["node_modules/(?!deep-freeze-es6)"],
 };

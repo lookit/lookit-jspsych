@@ -1,4 +1,4 @@
-import deepFreeze from "deep-freeze-es6";
+//import deepFreeze from "deep-freeze-es6";
 import {
   finish,
   retrieveChild,
@@ -7,20 +7,19 @@ import {
   retrieveStudy,
   updateResponse,
 } from "./api";
-import { Child, PastSession, Response, Study } from "./types";
 
-declare global {
-  interface Window {
-    chs: {
-      study: Study;
-      child: Child;
-      pastSessions: PastSession[];
-      response: Response;
-    };
-  }
-}
+import LookitS3 from "./lookitS3";
+import { LookitWindow } from "./types";
 
-async function load(response_uuid: string) {
+declare const window: LookitWindow;
+
+/**
+ * Load data from API that is needed for saving the experiment data, and that
+ * might be needed by researchers and jsPsych.
+ *
+ * @param response_uuid - Response UUID.
+ */
+const load = async (response_uuid: string) => {
   if (!window.chs) {
     Object.assign(window, {
       chs: {
@@ -28,10 +27,12 @@ async function load(response_uuid: string) {
         child: await retrieveChild(),
         pastSessions: await retrievePastSessions(response_uuid),
         response: await retrieveResponse(response_uuid),
+        sessionRecorder: undefined,
       },
     });
-    deepFreeze(window.chs);
+    //deepFreeze(window.chs);
+    await finish();
   }
-}
+};
 
-export default { load, retrieveResponse, updateResponse, finish };
+export default { load, retrieveResponse, updateResponse, finish, LookitS3 };
