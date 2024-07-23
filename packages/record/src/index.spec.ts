@@ -75,15 +75,19 @@ test("Start Recording", async () => {
 });
 
 test("Stop Recording", async () => {
+  const mockRecStop = jest.spyOn(Recorder.prototype, "stop");
+  const jsPsych = initJsPsych();
+
   setCHSValue({
-    sessionRecorder: { stop: jest.fn().mockReturnValue(Promise.resolve()) },
+    sessionRecorder: new Recorder(jsPsych, "prefix"),
   });
 
-  const jsPsych = initJsPsych();
   const stopRec = new Rec.StopRecordPlugin(jsPsych);
   const display_element = jest
     .fn()
     .mockImplementation() as unknown as HTMLElement;
+
+  mockRecStop.mockImplementation(jest.fn().mockReturnValue(Promise.resolve()));
 
   await stopRec.trial(display_element);
 
@@ -93,7 +97,7 @@ test("Stop Recording", async () => {
 
   setCHSValue();
 
-  expect(() => {
-    new Rec.StopRecordPlugin(jsPsych);
-  }).toThrow(NoSessionRecordingError);
+  expect(async () => await new Rec.StopRecordPlugin(jsPsych)).rejects.toThrow(
+    NoSessionRecordingError,
+  );
 });
