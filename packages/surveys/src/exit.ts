@@ -34,7 +34,7 @@ const info = <const>{
 };
 
 type Info = typeof info;
-type Trial = TrialType<Info>;
+export type Trial = TrialType<Info>;
 
 /**
  * Alter survey to show Databrary options.
@@ -112,25 +112,10 @@ const privateLevelOnly = (trial: Trial) => {
   }
 };
 
-/**
- * Process all survey parameter functions.
- *
- * @param trial - Info parameters.
- * @returns Survey JSON.
- */
-const surveyParameters = (trial: Trial) => {
-  [
-    showDatabraryOptions,
-    includeWithdrawalExample,
-    additionalVideoPrivacyText,
-    privateLevelOnly,
-  ].map((fn) => fn(trial));
-  return surveyJSON;
-};
-
 /** Exit Survey Plugin extending jsPsych's Survey Plugin. */
 export class ExitSurveyPlugin extends SurveyPlugin {
   public static readonly info = info;
+
   /**
    * Extended trial method supplied with parameters necessary for our Exit
    * Survey.
@@ -141,8 +126,24 @@ export class ExitSurveyPlugin extends SurveyPlugin {
   public trial(display_element: HTMLElement, trial: Trial) {
     super.trial(display_element, {
       ...trial,
-      survey_json: surveyParameters(trial),
+      survey_json: this.surveyParameters(trial),
       survey_function,
     });
+  }
+
+  /**
+   * Process all survey parameter functions.
+   *
+   * @param trial - Info parameters.
+   * @returns Survey JSON.
+   */
+  private surveyParameters(trial: Trial) {
+    [
+      showDatabraryOptions,
+      includeWithdrawalExample,
+      additionalVideoPrivacyText,
+      privateLevelOnly,
+    ].map((fn) => fn(trial));
+    return surveyJSON;
   }
 }
