@@ -12,7 +12,7 @@ afterEach(() => {
 test("Recorder filename", () => {
   const prefix = "prefix";
   const rec = new Recorder(initJsPsych(), prefix);
-  expect(rec.filename).toContain(prefix);
+  expect(rec["filename"]).toContain(prefix);
 });
 
 test("Recorder start", async () => {
