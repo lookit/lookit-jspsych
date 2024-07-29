@@ -10,7 +10,7 @@ The Consent Survey will will give you two things out of the box:
 - Support for Markdown will be added.
 
 ```javascript
-const consentSurvey = { type: chsSurveys.consent };
+const consentSurvey = { type: chsSurvey.consent };
 ```
 
 Other than that, the rest of the survey is entirely designed by you. Please refer to [jsPsych's Documentation]({{ jsPsych }}plugins/survey/) for the full explanation on how to use their plugin.
@@ -20,7 +20,7 @@ Other than that, the rest of the survey is entirely designed by you. Please refe
 Unlike the consent survey, this survey is already designed with a few parameters for you to adjust to suit your study.
 
 ```javascript
-const exitSurvey = { type: chsSurveys.exit };
+const exitSurvey = { type: chsSurvey.exit };
 ```
 
 ### Parameters
