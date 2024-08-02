@@ -4,6 +4,12 @@ import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import { NoStopPromiseError, RecorderInitializeError } from "./error";
 
+/**
+ * A valid CSS height/width value, which can be a number, a string containing a number with units, or 'auto'.
+ * @typedef {(number|string)} CSSWidthHeight
+ */
+type CSSWidthHeight = number | `${number}${'px'|'cm'|'mm'|'em'}` | 'auto';
+
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
   private blobs: Blob[] = [];
@@ -52,7 +58,25 @@ export default class Recorder {
    * @returns MediaStream from the plugin API.
    */
   private get stream() {
-    return this.recorder.stream;
+    return this.recorder.stream; // or this.jsPsych.pluginAPI.getCameraStream()?
+  }
+
+  /**
+   * Insert a video element containing the webcam feed onto the page.
+   *
+   * @param {string} element - The HTML div element that should serve as the container for the webcam display.
+   * @param {CSSWidthHeight} [width='auto'] - The width of the video element containing the webcam feed, in CSS units. (Optional)
+   * @param {CSSWidthHeight} [height='auto'] - The height of the video element containing the webcam feed, in CSS units. (Optional)
+   */
+  public insertWebcamFeed(element: HTMLDivElement, width?: CSSWidthHeight, height?: CSSWidthHeight) {
+    const webcam_element_id = 'lookit-jspsych-webcam';
+    element.innerHTML = `
+      <video autoplay playsinline id="${webcam_element_id}" width="${
+        width ? width : "auto"
+      }" height="${height ? height : "auto"}" ></video>
+    `;
+    (element.querySelector(`#${webcam_element_id}`) as HTMLVideoElement).srcObject =
+      this.stream;
   }
 
   /**
