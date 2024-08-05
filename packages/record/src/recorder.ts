@@ -1,3 +1,5 @@
+/* eslint-disable jsdoc/no-types */
+/* eslint-disable jsdoc/no-defaults */
 import Data from "@lookit/data";
 import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
@@ -6,9 +8,8 @@ import { NoStopPromiseError, RecorderInitializeError } from "./error";
 
 /**
  * A valid CSS height/width value, which can be a number, a string containing a number with units, or 'auto'.
- * @typedef {(number|string)} CSSWidthHeight
  */
-type CSSWidthHeight = number | `${number}${'px'|'cm'|'mm'|'em'}` | 'auto';
+type CSSWidthHeight = number | `${number}${'px'|'cm'|'mm'|'em'|'%'}` | 'auto';
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
@@ -65,14 +66,14 @@ export default class Recorder {
    * Insert a video element containing the webcam feed onto the page.
    *
    * @param {string} element - The HTML div element that should serve as the container for the webcam display.
-   * @param {CSSWidthHeight} [width='auto'] - The width of the video element containing the webcam feed, in CSS units. (Optional)
-   * @param {CSSWidthHeight} [height='auto'] - The height of the video element containing the webcam feed, in CSS units. (Optional)
+   * @param {CSSWidthHeight} [width='100%'] - The width of the video element containing the webcam feed, in CSS units (optional).
+   * @param {CSSWidthHeight} [height='auto'] - The height of the video element containing the webcam feed, in CSS units (optional).
    */
-  public insertWebcamFeed(element: HTMLDivElement, width?: CSSWidthHeight, height?: CSSWidthHeight) {
+  public insertWebcamFeed(element: HTMLDivElement, width: CSSWidthHeight = '100%', height: CSSWidthHeight = 'auto') {
     const webcam_element_id = 'lookit-jspsych-webcam';
     element.innerHTML = `
       <video autoplay playsinline id="${webcam_element_id}" width="${
-        width ? width : "auto"
+        width ? width : "100%"
       }" height="${height ? height : "auto"}" ></video>
     `;
     (element.querySelector(`#${webcam_element_id}`) as HTMLVideoElement).srcObject =
