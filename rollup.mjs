@@ -2,7 +2,7 @@ import { makeRollupConfig as jsPsychMakeRollupConfig } from "@jspsych/config/rol
 
 export function makeRollupConfig(iifeName) {
   const dataPackageName = "@lookit/data";
-  const dataPackageIifeName = "chsData"
+  const dataPackageIifeName = "chsData";
   const recordPackageName = "@lookit/record";
   const recordPackageIifeName = "chsRecord";
 
