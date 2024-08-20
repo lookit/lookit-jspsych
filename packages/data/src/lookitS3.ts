@@ -191,14 +191,17 @@ class LookitS3 {
   public async abortUpload() {
     this.blobParts = [];
     this.promises = [];
-    const input = {
-      Bucket: this.bucket,
-      Key: this.key,
-      UploadId: this.uploadId,
-    };
-    const command = new AbortMultipartUploadCommand(input);
-    await this.s3.send(command);
-    this.logRecordingEvent(`Upload aborted: ${this.key}`);
+    if (this.uploadId !== "") {
+      const input = {
+        Bucket: this.bucket,
+        Key: this.key,
+        UploadId: this.uploadId,
+      };
+      const command = new AbortMultipartUploadCommand(input);
+      await this.s3.send(command);
+      this.logRecordingEvent(`Upload aborted: ${this.key}`);
+    }
+    this.s3.destroy();
   }
 }
 
