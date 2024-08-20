@@ -5,6 +5,7 @@ import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import { NoStopPromiseError, RecorderInitializeError } from "./error";
+// import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this
 
 /**
  * A valid CSS height/width value, which can be a number, a string containing a
@@ -23,6 +24,9 @@ export default class Recorder {
   private s3?: lookitS3;
   private filename: string;
   private stopPromise?: Promise<void>;
+  private minVolume: number = 0.1;
+  private processorNode: AudioWorkletNode | null = null;
+  public micChecked: boolean = false;
 
   /**
    * Recorder for online experiments.
@@ -90,6 +94,48 @@ export default class Recorder {
     (
       element.querySelector(`#${webcam_element_id}`) as HTMLVideoElement
     ).srcObject = this.stream;
+  }
+
+  /**
+   * Perform a sound check on the audio input (microphone).
+   *
+   * @param {number} [minVol=this.minVolume] - Minimum mic activity needed to reach the mic check threshold (optional).
+   * @returns {Promise<void>} Promise that resolves when the mic check is complete because the audio stream has reached the required minimum level.
+   */
+  public checkMic(minVol:number = this.minVolume) {
+    if (this.stream) {
+      const audioContext = new AudioContext();
+      const microphone = audioContext.createMediaStreamSource(this.stream);
+      // This currently loads from lookit-api static files.
+      // TO DO: figure out how to load this from package dist.
+      return audioContext.audioWorklet.addModule('/static/js/mic_check.js')
+        .then(() => {
+          return new Promise<void>((resolve) => {
+            this.processorNode = new AudioWorkletNode(audioContext, 'mic-check-processor');
+            microphone.connect(this.processorNode).connect(audioContext.destination);
+            /**
+             * Callback on the microphone's AudioWorkletNode that fires in response to a message event containing the current mic level.
+             * When the mic level reaches the threshold, this callback sets the micChecked property to true and resolves this Promise (via onMicActivityLevel). 
+             *
+             * @param {MessageEvent} event - The message event that was sent from the processor on the audio worklet node.
+             * Contains a 'data' property (object) which contains a 'volume' property (number).
+             */
+            this.processorNode.port.onmessage = (event: MessageEvent) => {
+              // handle message from the processor: event.data
+              if (this.onMicActivityLevel) {
+                if ('data' in event && 'volume' in event.data) {
+                  this.onMicActivityLevel(event.data.volume, minVol, resolve);
+                }
+              }
+            }
+          });
+        })
+        .catch((e) => {
+          throw new Error(`Mic check error: ${e}`);
+        })
+    } else {
+      return Promise.reject(new Error(`Mic check error: no input stream.`));
+    }
   }
 
   /**
@@ -210,5 +256,35 @@ export default class Recorder {
    */
   private createFilename(prefix: string) {
     return `${prefix}_${new Date().getTime()}.webm`;
+  }
+
+  /**
+   * Private helper to handle the mic level messages that are sent via an AudioWorkletProcessor.
+   * This checks the current level against the minimum threshold, and if the threshold is met,
+   * sets the micChecked property to true and resolves the checkMic promise.
+   *
+   * @param {number} currentActivityLevel - Microphone activity level calculated by the processor node.
+   * @param {number} minVolume - Minimum microphone activity level needed to pass the microphone check.
+   * @param {Function} resolve - Resolve callback function for Promise returned by the checkMic method.
+   */
+  private onMicActivityLevel(currentActivityLevel: number, minVolume: number, resolve: () => void) { // eslint-disable-line no-unused-vars
+    if (currentActivityLevel > minVolume) {
+      this.micChecked = true;
+      this.processorNode?.port.postMessage({micChecked: true});
+      resolve();
+    }
+  }
+
+  /**
+   * Check access to webcam/mic stream.
+   *
+   * @returns {boolean} Whether or not the recorder has webcam/mic access.
+   */
+  public camMicAccess(): boolean {
+    if (this.recorder && this.stream) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

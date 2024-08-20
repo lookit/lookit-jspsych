@@ -30,6 +30,8 @@
   },
   "devDependencies": {
     "@jspsych/config": "^2.0.0",
+    "@types/audioworklet": "^0.0.58",
+    "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-dotenv": "^0.5.1"
   },
   "peerDependencies": {
