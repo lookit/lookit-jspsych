@@ -28,13 +28,18 @@ class LookitS3 {
    */
   public constructor(key: string) {
     this.key = key;
-    this.s3 = new S3Client({
-      region: process.env.S3_REGION,
-      credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-      },
-    });
+    try {
+      this.s3 = new S3Client({
+        region: process.env.S3_REGION,
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID,
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+        },
+      });
+    } catch(e) {
+      console.error(`Error setting up S3 client: ${e}`);
+      throw new Error(`${e}`);
+    }
   }
 
   /**
