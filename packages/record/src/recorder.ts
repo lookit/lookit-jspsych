@@ -47,6 +47,21 @@ export default class Recorder {
   }
 
   /**
+   * Request permission to use the webcam and/or microphone.
+   *
+   * @param {boolean} include_audio - Whether or not to include audio (mic). Optional, default is true.
+   * @param {boolean} include_camera - Whether or not to include the webcam (video). Optional, default is true.
+   * @returns Camera/microphone stream.
+   */
+  public async requestPermission(include_audio: boolean = true, include_camera: boolean = true) {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: include_audio,
+      video: include_camera,
+    });
+    return stream;
+  }
+
+  /**
    * Gets the lists of available cameras and mics (via Media Devices 'enumerateDevices').
    * These lists can be used to populate camera/mic selection elements.
    *
