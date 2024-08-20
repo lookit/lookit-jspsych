@@ -20,12 +20,17 @@ type CSSWidthHeight =
 export default class Recorder {
   private blobs: Blob[] = [];
   private localDownload: boolean = process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
-  private s3?: lookitS3;
+  private s3: lookitS3 | null = null;
   private filename: string;
-  private stopPromise?: Promise<void>;
+  private stopPromise: Promise<void> | null = null;
   private minVolume: number = 0.1;
   private processorNode: AudioWorkletNode | null = null;
   public micChecked: boolean = false;
+  /**
+   * Store the reject function for the stop promise so that we can reject it in the
+   * destroy recorder method.
+   */
+  private rejectStopPromise: (reason: string) => void = () => {};
 
   /**
    * Recorder for online experiments.
@@ -197,8 +202,9 @@ export default class Recorder {
     this.recorder.addEventListener("dataavailable", this.handleDataAvailable);
     // create a stop promise and pass the resolve function as an argument to the stop event callback,
     // so that the stop event handler can resolve the stop promise
-    this.stopPromise = new Promise((resolve) => {
+    this.stopPromise = new Promise((resolve, reject) => {
       this.recorder.addEventListener("stop", this.handleStop(resolve));
+      this.rejectStopPromise = reject;
     });
     if (!this.localDownload) {
       await this.s3?.createUpload();
@@ -222,6 +228,30 @@ export default class Recorder {
     }
 
     return this.stopPromise;
+  }
+
+  /**
+   * Destroy the recorder.
+   * When a plugin/extension destroys the recorder, it will set the whole Recorder class instance to null,
+   * so we don't need to reset the Recorder instance variables/states. We just need to abort the S3 upload and
+   * stop any async processes that might continue to run (audio worklet for the mic check, stop promise).
+   *
+   */
+  public async destroy() {
+    this.recorder.ondataavailable = null;
+    // Abort any MPU that might've been created and set S3 to null to clear data
+    await this.s3?.abortUpload();
+    this.s3 = null;
+    // Stop the audio worklet processor if it's running
+    if (this.processorNode !== null) {
+      this.processorNode.port.postMessage({micChecked: true});
+      this.processorNode = null;
+    }
+    // Reject any existing stop promise, in case it is pending.
+    if (this.stopPromise) {
+      this.rejectStopPromise('RecorderDestroyed');
+    }
+    this.stopPromise = null;
   }
 
   /** Throw Error if there isn't a recorder provided by jsPsych. */
