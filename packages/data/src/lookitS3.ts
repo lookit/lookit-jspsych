@@ -1,4 +1,5 @@
 import {
+  AbortMultipartUploadCommand,
   CompleteMultipartUploadCommand,
   CreateMultipartUploadCommand,
   S3Client,
@@ -175,6 +176,24 @@ class LookitS3 {
   public logRecordingEvent(msg: string) {
     const timestamp = new Date().toISOString();
     console.log(`Recording log: ${timestamp}\nFile: ${this.key}\n${msg}\n`);
+  }
+
+  /**
+   * Abort upload and clear data.
+   * When this is used, the recorder will need to set the S3 class instance to null and create a new one,
+   * so there's no need to reset the variables/states to their initial values.
+   */
+  public async abortUpload() {
+    this.blobParts = [];
+    this.promises = [];
+    const input = {
+      Bucket: this.bucket,
+      Key: this.key,
+      UploadId: this.uploadId,
+    };
+    const command = new AbortMultipartUploadCommand(input);
+    await this.s3.send(command);
+    this.logRecordingEvent(`Upload aborted: ${this.key}`);
   }
 }
 
