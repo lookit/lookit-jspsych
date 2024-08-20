@@ -19,8 +19,7 @@ type CSSWidthHeight =
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
   private blobs: Blob[] = [];
-  private localDownload: boolean =
-    process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
+  private localDownload: boolean = process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
   private s3?: lookitS3;
   private filename: string;
   private stopPromise?: Promise<void>;
@@ -45,6 +44,41 @@ export default class Recorder {
       this.s3 = new Data.LookitS3(this.filename);
     }
     autoBind(this);
+  }
+
+  /**
+   * Gets the lists of available cameras and mics (via Media Devices 'enumerateDevices').
+   * These lists can be used to populate camera/mic selection elements.
+   *
+   * @param {boolean} include_audio - Whether or not to include audio capture (mic) devices. Optional, default is true.
+   * @param {boolean} include_camera - Whether or not to include the webcam (video) devices. Optional, default is true.
+   * @returns Promise that resolves with an object with properties 'cameras' and 'mics', containing lists of available devices.
+   */
+  public getDeviceLists(include_audio: boolean = true, include_camera: boolean = true) : Promise<{ cameras: MediaDeviceInfo[]; mics: MediaDeviceInfo[]; }> {
+    return navigator.mediaDevices.enumerateDevices()
+      .then((devices) => {
+        let unique_cameras: Array<MediaDeviceInfo> = [];
+        let unique_mics: Array<MediaDeviceInfo> = [];
+        if (include_camera) {
+          const cams = devices.filter(
+            (d) =>
+              d.kind === "videoinput" && d.deviceId !== "default" && d.deviceId !== "communications"
+          );
+          unique_cameras = cams.filter(
+            (cam, index, arr) => arr.findIndex((v) => v.groupId == cam.groupId) == index
+          );
+        }
+        if (include_audio) {
+          const mics = devices.filter(
+            (d) =>
+              d.kind === "audioinput" && d.deviceId !== "default" && d.deviceId !== "communications"
+          );
+          unique_mics = mics.filter(
+            (mic, index, arr) => arr.findIndex((v) => v.groupId == mic.groupId) == index
+          );
+        }
+        return {cameras: unique_cameras, mics: unique_mics};
+      });
   }
 
   /**
