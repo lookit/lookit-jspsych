@@ -32,7 +32,7 @@
     "@jspsych/config": "^2.0.0"
   },
   "peerDependencies": {
-    "jspsych": "^7.3.4"
+    "jspsych": "^8.0.2"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-arm64-gnu": "^4.14.1",

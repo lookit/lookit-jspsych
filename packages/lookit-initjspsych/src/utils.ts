@@ -1,6 +1,6 @@
 import Api from "@lookit/data";
 import { LookitWindow } from "@lookit/data/dist/types";
-import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
+import { DataCollection } from "jspsych";
 import { UserFunc } from "./types";
 
 declare let window: LookitWindow;

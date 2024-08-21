@@ -1,4 +1,4 @@
-import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
+import { DataCollection } from "jspsych";
 
 export type ApiPromise = Promise<Data<Attributes> | Data<Attributes>[]>;
 
