@@ -36,7 +36,7 @@ class LookitS3 {
           secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
         },
       });
-    } catch(e) {
+    } catch (e) {
       console.error(`Error setting up S3 client: ${e}`);
       throw new Error(`${e}`);
     }
@@ -184,9 +184,9 @@ class LookitS3 {
   }
 
   /**
-   * Abort upload and clear data.
-   * When this is used, the recorder will need to set the S3 class instance to null and create a new one,
-   * so there's no need to reset the variables/states to their initial values.
+   * Abort upload and clear data. When this is used, the recorder will need to
+   * set the S3 class instance to null and create a new one, so there's no need
+   * to reset the variables/states to their initial values.
    */
   public async abortUpload() {
     this.blobParts = [];

@@ -19,7 +19,8 @@ type CSSWidthHeight =
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
   private blobs: Blob[] = [];
-  private localDownload: boolean = process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
+  private localDownload: boolean =
+    process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
   private s3: lookitS3 | null = null;
   private filename: string;
   private stopPromise: Promise<void> | null = null;
@@ -27,8 +28,8 @@ export default class Recorder {
   private processorNode: AudioWorkletNode | null = null;
   public micChecked: boolean = false;
   /**
-   * Store the reject function for the stop promise so that we can reject it in the
-   * destroy recorder method.
+   * Store the reject function for the stop promise so that we can reject it in
+   * the destroy recorder method.
    */
   private rejectStopPromise: (reason: string) => void = () => {};
 
@@ -54,11 +55,16 @@ export default class Recorder {
   /**
    * Request permission to use the webcam and/or microphone.
    *
-   * @param {boolean} include_audio - Whether or not to include audio (mic). Optional, default is true.
-   * @param {boolean} include_camera - Whether or not to include the webcam (video). Optional, default is true.
+   * @param {boolean} include_audio - Whether or not to include audio (mic).
+   *   Optional, default is true.
+   * @param {boolean} include_camera - Whether or not to include the webcam
+   *   (video). Optional, default is true.
    * @returns Camera/microphone stream.
    */
-  public async requestPermission(include_audio: boolean = true, include_camera: boolean = true) {
+  public async requestPermission(
+    include_audio: boolean = true,
+    include_camera: boolean = true,
+  ) {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: include_audio,
       video: include_camera,
@@ -67,38 +73,50 @@ export default class Recorder {
   }
 
   /**
-   * Gets the lists of available cameras and mics (via Media Devices 'enumerateDevices').
-   * These lists can be used to populate camera/mic selection elements.
+   * Gets the lists of available cameras and mics (via Media Devices
+   * 'enumerateDevices'). These lists can be used to populate camera/mic
+   * selection elements.
    *
-   * @param {boolean} include_audio - Whether or not to include audio capture (mic) devices. Optional, default is true.
-   * @param {boolean} include_camera - Whether or not to include the webcam (video) devices. Optional, default is true.
-   * @returns Promise that resolves with an object with properties 'cameras' and 'mics', containing lists of available devices.
+   * @param {boolean} include_audio - Whether or not to include audio capture
+   *   (mic) devices. Optional, default is true.
+   * @param {boolean} include_camera - Whether or not to include the webcam
+   *   (video) devices. Optional, default is true.
+   * @returns Promise that resolves with an object with properties 'cameras' and
+   *   'mics', containing lists of available devices.
    */
-  public getDeviceLists(include_audio: boolean = true, include_camera: boolean = true) : Promise<{ cameras: MediaDeviceInfo[]; mics: MediaDeviceInfo[]; }> {
-    return navigator.mediaDevices.enumerateDevices()
-      .then((devices) => {
-        let unique_cameras: Array<MediaDeviceInfo> = [];
-        let unique_mics: Array<MediaDeviceInfo> = [];
-        if (include_camera) {
-          const cams = devices.filter(
-            (d) =>
-              d.kind === "videoinput" && d.deviceId !== "default" && d.deviceId !== "communications"
-          );
-          unique_cameras = cams.filter(
-            (cam, index, arr) => arr.findIndex((v) => v.groupId == cam.groupId) == index
-          );
-        }
-        if (include_audio) {
-          const mics = devices.filter(
-            (d) =>
-              d.kind === "audioinput" && d.deviceId !== "default" && d.deviceId !== "communications"
-          );
-          unique_mics = mics.filter(
-            (mic, index, arr) => arr.findIndex((v) => v.groupId == mic.groupId) == index
-          );
-        }
-        return {cameras: unique_cameras, mics: unique_mics};
-      });
+  public getDeviceLists(
+    include_audio: boolean = true,
+    include_camera: boolean = true,
+  ): Promise<{ cameras: MediaDeviceInfo[]; mics: MediaDeviceInfo[] }> {
+    return navigator.mediaDevices.enumerateDevices().then((devices) => {
+      let unique_cameras: Array<MediaDeviceInfo> = [];
+      let unique_mics: Array<MediaDeviceInfo> = [];
+      if (include_camera) {
+        const cams = devices.filter(
+          (d) =>
+            d.kind === "videoinput" &&
+            d.deviceId !== "default" &&
+            d.deviceId !== "communications",
+        );
+        unique_cameras = cams.filter(
+          (cam, index, arr) =>
+            arr.findIndex((v) => v.groupId == cam.groupId) == index,
+        );
+      }
+      if (include_audio) {
+        const mics = devices.filter(
+          (d) =>
+            d.kind === "audioinput" &&
+            d.deviceId !== "default" &&
+            d.deviceId !== "communications",
+        );
+        unique_mics = mics.filter(
+          (mic, index, arr) =>
+            arr.findIndex((v) => v.groupId == mic.groupId) == index,
+        );
+      }
+      return { cameras: unique_cameras, mics: unique_mics };
+    });
   }
 
   /**
@@ -154,40 +172,53 @@ export default class Recorder {
   /**
    * Perform a sound check on the audio input (microphone).
    *
-   * @param {number} [minVol=this.minVolume] - Minimum mic activity needed to reach the mic check threshold (optional).
-   * @returns {Promise<void>} Promise that resolves when the mic check is complete because the audio stream has reached the required minimum level.
+   * @param {number} [minVol=this.minVolume] - Minimum mic activity needed to
+   *   reach the mic check threshold (optional). Default is `this.minVolume`.
+   * @returns {Promise<void>} Promise that resolves when the mic check is
+   *   complete because the audio stream has reached the required minimum
+   *   level.
    */
-  public checkMic(minVol:number = this.minVolume) {
+  public checkMic(minVol: number = this.minVolume) {
     if (this.stream) {
       const audioContext = new AudioContext();
       const microphone = audioContext.createMediaStreamSource(this.stream);
       // This currently loads from lookit-api static files.
       // TO DO: figure out how to load this from package dist.
-      return audioContext.audioWorklet.addModule('/static/js/mic_check.js')
+      return audioContext.audioWorklet
+        .addModule("/static/js/mic_check.js")
         .then(() => {
           return new Promise<void>((resolve) => {
-            this.processorNode = new AudioWorkletNode(audioContext, 'mic-check-processor');
-            microphone.connect(this.processorNode).connect(audioContext.destination);
+            this.processorNode = new AudioWorkletNode(
+              audioContext,
+              "mic-check-processor",
+            );
+            microphone
+              .connect(this.processorNode)
+              .connect(audioContext.destination);
             /**
-             * Callback on the microphone's AudioWorkletNode that fires in response to a message event containing the current mic level.
-             * When the mic level reaches the threshold, this callback sets the micChecked property to true and resolves this Promise (via onMicActivityLevel). 
+             * Callback on the microphone's AudioWorkletNode that fires in
+             * response to a message event containing the current mic level.
+             * When the mic level reaches the threshold, this callback sets the
+             * micChecked property to true and resolves this Promise (via
+             * onMicActivityLevel).
              *
-             * @param {MessageEvent} event - The message event that was sent from the processor on the audio worklet node.
-             * Contains a 'data' property (object) which contains a 'volume' property (number).
+             * @param {MessageEvent} event - The message event that was sent
+             *   from the processor on the audio worklet node. Contains a 'data'
+             *   property (object) which contains a 'volume' property (number).
              */
             this.processorNode.port.onmessage = (event: MessageEvent) => {
               // handle message from the processor: event.data
               if (this.onMicActivityLevel) {
-                if ('data' in event && 'volume' in event.data) {
+                if ("data" in event && "volume" in event.data) {
                   this.onMicActivityLevel(event.data.volume, minVol, resolve);
                 }
               }
-            }
+            };
           });
         })
         .catch((e) => {
           throw new Error(`Mic check error: ${e}`);
-        })
+        });
     } else {
       return Promise.reject(new Error(`Mic check error: no input stream.`));
     }
@@ -231,11 +262,11 @@ export default class Recorder {
   }
 
   /**
-   * Destroy the recorder.
-   * When a plugin/extension destroys the recorder, it will set the whole Recorder class instance to null,
-   * so we don't need to reset the Recorder instance variables/states. We just need to abort the S3 upload and
-   * stop any async processes that might continue to run (audio worklet for the mic check, stop promise).
-   *
+   * Destroy the recorder. When a plugin/extension destroys the recorder, it
+   * will set the whole Recorder class instance to null, so we don't need to
+   * reset the Recorder instance variables/states. We just need to abort the S3
+   * upload and stop any async processes that might continue to run (audio
+   * worklet for the mic check, stop promise).
    */
   public async destroy() {
     this.recorder.ondataavailable = null;
@@ -244,12 +275,12 @@ export default class Recorder {
     this.s3 = null;
     // Stop the audio worklet processor if it's running
     if (this.processorNode !== null) {
-      this.processorNode.port.postMessage({micChecked: true});
+      this.processorNode.port.postMessage({ micChecked: true });
       this.processorNode = null;
     }
     // Reject any existing stop promise, in case it is pending.
     if (this.stopPromise) {
-      this.rejectStopPromise('RecorderDestroyed');
+      this.rejectStopPromise("RecorderDestroyed");
     }
     this.stopPromise = null;
   }
@@ -339,18 +370,27 @@ export default class Recorder {
   }
 
   /**
-   * Private helper to handle the mic level messages that are sent via an AudioWorkletProcessor.
-   * This checks the current level against the minimum threshold, and if the threshold is met,
-   * sets the micChecked property to true and resolves the checkMic promise.
+   * Private helper to handle the mic level messages that are sent via an
+   * AudioWorkletProcessor. This checks the current level against the minimum
+   * threshold, and if the threshold is met, sets the micChecked property to
+   * true and resolves the checkMic promise.
    *
-   * @param {number} currentActivityLevel - Microphone activity level calculated by the processor node.
-   * @param {number} minVolume - Minimum microphone activity level needed to pass the microphone check.
-   * @param {Function} resolve - Resolve callback function for Promise returned by the checkMic method.
+   * @param {number} currentActivityLevel - Microphone activity level calculated
+   *   by the processor node.
+   * @param {number} minVolume - Minimum microphone activity level needed to
+   *   pass the microphone check.
+   * @param {Function} resolve - Resolve callback function for Promise returned
+   *   by the checkMic method.
    */
-  private onMicActivityLevel(currentActivityLevel: number, minVolume: number, resolve: () => void) { // eslint-disable-line no-unused-vars
+  private onMicActivityLevel(
+    currentActivityLevel: number,
+    minVolume: number,
+    resolve: () => void,
+  ) {
+    // eslint-disable-line no-unused-vars
     if (currentActivityLevel > minVolume) {
       this.micChecked = true;
-      this.processorNode?.port.postMessage({micChecked: true});
+      this.processorNode?.port.postMessage({ micChecked: true });
       resolve();
     }
   }
