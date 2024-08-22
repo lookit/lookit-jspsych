@@ -160,7 +160,7 @@ export default class Recorder {
   ) {
     const webcam_element_id = "lookit-jspsych-webcam";
     element.innerHTML = `
-      <video autoplay playsinline id="${webcam_element_id}" width="${
+      <video autoplay playsinline muted id="${webcam_element_id}" width="${
         width ? width : "100%"
       }" height="${height ? height : "auto"}" ></video>
     `;
