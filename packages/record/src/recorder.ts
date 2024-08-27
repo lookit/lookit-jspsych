@@ -54,12 +54,22 @@ export default class Recorder {
   }
 
   /**
-   * Request permission to use the webcam and/or microphone. This can be used with and without specific device selection (and other constraints).
+   * Request permission to use the webcam and/or microphone. This can be used
+   * with and without specific device selection (and other constraints).
    *
-   * @param {object} constraints - Media stream constraints object with 'video' and 'audio' properties, whose values can be boolean or a MediaTrackConstraints object or undefined.
-   * @param {boolean | MediaTrackConstraints | undefined } constraints.video - If false, do not include video. If true, use the default webcam device. If a media track constraints object is passed, then it can contain the properties of all media tracks and video tracks: https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints.
-   * @param {boolean | MediaTrackConstraints | undefined } constraints.audio - If false, do not include audio. If true, use the default mic device. If a media track constraints object is passed, then it can contain the properties of all media tracks and audio tracks: https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints.
-   *
+   * @param {object} constraints - Media stream constraints object with 'video'
+   *   and 'audio' properties, whose values can be boolean or a
+   *   MediaTrackConstraints object or undefined.
+   * @param {boolean | MediaTrackConstraints | undefined} constraints.video - If
+   *   false, do not include video. If true, use the default webcam device. If a
+   *   media track constraints object is passed, then it can contain the
+   *   properties of all media tracks and video tracks:
+   *   https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints.
+   * @param {boolean | MediaTrackConstraints | undefined} constraints.audio - If
+   *   false, do not include audio. If true, use the default mic device. If a
+   *   media track constraints object is passed, then it can contain the
+   *   properties of all media tracks and audio tracks:
+   *   https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints.
    * @returns Camera/microphone stream.
    */
   public async requestPermission(constraints: MediaStreamConstraints) {
@@ -117,7 +127,8 @@ export default class Recorder {
   /**
    * Initialize recorder using the jsPsych plugin API.
    *
-   * @param stream - Media stream returned from getUserMedia that should be used to set up the jsPsych recorder.
+   * @param stream - Media stream returned from getUserMedia that should be used
+   *   to set up the jsPsych recorder.
    * @param opts - Media recorder options to use when setting up the recorder.
    */
   public intializeRecorder(stream: MediaStream, opts?: MediaRecorderOptions) {
@@ -248,8 +259,10 @@ export default class Recorder {
   }
 
   /**
-   * Stop all streams/tracks. This stops any in-progress recordings and releases the media devices.
-   * This is can be called when recording is not in progress, e.g. To end the camera/mic access when the experiment is displaying the camera feed but not recording (e.g. Video-config).
+   * Stop all streams/tracks. This stops any in-progress recordings and releases
+   * the media devices. This is can be called when recording is not in progress,
+   * e.g. To end the camera/mic access when the experiment is displaying the
+   * camera feed but not recording (e.g. Video-config).
    */
   private stopTracks() {
     this.recorder.stop();
@@ -266,7 +279,9 @@ export default class Recorder {
   public stop() {
     this.stopTracks();
     // Clear the webcam feed display if there is one.
-    const webcam_feed_element = document.querySelector(`#${this.webcam_element_id}`) as HTMLVideoElement;
+    const webcam_feed_element = document.querySelector(
+      `#${this.webcam_element_id}`,
+    ) as HTMLVideoElement;
     if (webcam_feed_element) {
       webcam_feed_element.remove();
     }
@@ -280,10 +295,10 @@ export default class Recorder {
   /**
    * Destroy the recorder. When a plugin/extension destroys the recorder, it
    * will set the whole Recorder class instance to null, so we don't need to
-   * reset the Recorder instance variables/states.
-   * We need to abort the S3 upload and stop any async processes that might continue to run (audio
-   * worklet for the mic check, stop promise). We also need to stop the tracks to release
-   * the media devices (even if they're not recording).
+   * reset the Recorder instance variables/states. We need to abort the S3
+   * upload and stop any async processes that might continue to run (audio
+   * worklet for the mic check, stop promise). We also need to stop the tracks
+   * to release the media devices (even if they're not recording).
    */
   public async destroy() {
     this.recorder.ondataavailable = null;
