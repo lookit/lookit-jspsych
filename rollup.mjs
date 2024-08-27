@@ -8,19 +8,16 @@ export function makeRollupConfig(iifeName) {
       ...config,
       // Add data package as external dependency
       external: [...config.external, dataPackageName],
-      output: config.output
-        // Only build iife bundles
-        .filter((output) => output.format === "iife")
-        .map((output) => {
-          return {
-            ...output,
-            globals: {
-              ...output.globals,
-              // Explicitly state data's iife name
-              [dataPackageName]: iifeNameData,
-            },
-          };
-        }),
+      output: config.output.map((output) => {
+        return {
+          ...output,
+          globals: {
+            ...output.globals,
+            // Explicitly state data's iife name
+            [dataPackageName]: iifeNameData,
+          },
+        };
+      }),
     };
   });
 }

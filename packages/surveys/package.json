@@ -36,6 +36,6 @@
     "@types/dompurify": "^3.0.5"
   },
   "peerDependencies": {
-    "jspsych": "^7.3.4"
+    "jspsych": "^8.0.2"
   }
 }

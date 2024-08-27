@@ -33,6 +33,6 @@
     "rollup-plugin-dotenv": "^0.5.1"
   },
   "peerDependencies": {
-    "jspsych": "^7.3.4"
+    "jspsych": "^8.0.2"
   }
 }

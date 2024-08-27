@@ -1,4 +1,4 @@
-import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
+import { DataCollection } from "jspsych";
 
 export type UserFunc = (data: DataCollection) => void;
 
