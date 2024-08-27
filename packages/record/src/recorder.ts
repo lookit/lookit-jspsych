@@ -26,6 +26,7 @@ export default class Recorder {
   private stopPromise: Promise<void> | null = null;
   private minVolume: number = 0.1;
   private processorNode: AudioWorkletNode | null = null;
+  private webcam_element_id = "lookit-jspsych-webcam";
   public micChecked: boolean = false;
   /**
    * Store the reject function for the stop promise so that we can reject it in
@@ -158,14 +159,13 @@ export default class Recorder {
     width: CSSWidthHeight = "100%",
     height: CSSWidthHeight = "auto",
   ) {
-    const webcam_element_id = "lookit-jspsych-webcam";
     element.innerHTML = `
-      <video autoplay playsinline muted id="${webcam_element_id}" width="${
+      <video autoplay playsinline muted id="${this.webcam_element_id}" width="${
         width ? width : "100%"
-      }" height="${height ? height : "auto"}" ></video>
+      }" height="${height ? height : "auto"}" style="display:inline-block;"></video>
     `;
     (
-      element.querySelector(`#${webcam_element_id}`) as HTMLVideoElement
+      element.querySelector(`#${this.webcam_element_id}`) as HTMLVideoElement
     ).srcObject = this.stream;
   }
 
@@ -253,7 +253,11 @@ export default class Recorder {
   public stop() {
     this.recorder.stop();
     this.stream.getTracks().map((t) => t.stop());
-
+    // Clear the webcam feed display if there is one.
+    const webcam_feed_element = document.querySelector(`#${this.webcam_element_id}`) as HTMLVideoElement;
+    if (webcam_feed_element) {
+      webcam_feed_element.remove();
+    }
     if (!this.stopPromise) {
       throw new NoStopPromiseError();
     }
