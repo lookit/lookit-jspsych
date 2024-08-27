@@ -433,7 +433,7 @@ export default class Recorder {
    * @returns {boolean} Whether or not the recorder has webcam/mic access.
    */
   public camMicAccess(): boolean {
-    if (this.recorder && this.stream) {
+    if (this.recorder && this.stream?.active) {
       return true;
     } else {
       return false;
