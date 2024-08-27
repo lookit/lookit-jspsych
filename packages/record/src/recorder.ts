@@ -54,22 +54,16 @@ export default class Recorder {
   }
 
   /**
-   * Request permission to use the webcam and/or microphone.
+   * Request permission to use the webcam and/or microphone. This can be used with and without specific device selection (and other constraints).
    *
-   * @param {boolean} include_audio - Whether or not to include audio (mic).
-   *   Optional, default is true.
-   * @param {boolean} include_camera - Whether or not to include the webcam
-   *   (video). Optional, default is true.
+   * @param {object} constraints - Media stream constraints object with 'video' and 'audio' properties, whose values can be boolean or a MediaTrackConstraints object or undefined.
+   * @param {boolean | MediaTrackConstraints | undefined } constraints.video - If false, do not include video. If true, use the default webcam device. If a media track constraints object is passed, then it can contain the properties of all media tracks and video tracks: https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints.
+   * @param {boolean | MediaTrackConstraints | undefined } constraints.audio - If false, do not include audio. If true, use the default mic device. If a media track constraints object is passed, then it can contain the properties of all media tracks and audio tracks: https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints.
+   *
    * @returns Camera/microphone stream.
    */
-  public async requestPermission(
-    include_audio: boolean = true,
-    include_camera: boolean = true,
-  ) {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: include_audio,
-      video: include_camera,
-    });
+  public async requestPermission(constraints: MediaStreamConstraints) {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
     return stream;
   }
 
