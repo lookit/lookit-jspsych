@@ -248,6 +248,15 @@ export default class Recorder {
   }
 
   /**
+   * Stop all streams/tracks. This stops any in-progress recordings and releases the media devices.
+   * This is can be called when recording is not in progress, e.g. To end the camera/mic access when the experiment is displaying the camera feed but not recording (e.g. Video-config).
+   */
+  private stopTracks() {
+    this.recorder.stop();
+    this.stream.getTracks().map((t) => t.stop());
+  }
+
+  /**
    * Stop recording and camera/microphone.
    *
    * @returns Promise that resolves after the media recorder has stopped and
@@ -255,8 +264,7 @@ export default class Recorder {
    *   callback function is called.
    */
   public stop() {
-    this.recorder.stop();
-    this.stream.getTracks().map((t) => t.stop());
+    this.stopTracks();
     // Clear the webcam feed display if there is one.
     const webcam_feed_element = document.querySelector(`#${this.webcam_element_id}`) as HTMLVideoElement;
     if (webcam_feed_element) {
@@ -272,12 +280,14 @@ export default class Recorder {
   /**
    * Destroy the recorder. When a plugin/extension destroys the recorder, it
    * will set the whole Recorder class instance to null, so we don't need to
-   * reset the Recorder instance variables/states. We just need to abort the S3
-   * upload and stop any async processes that might continue to run (audio
-   * worklet for the mic check, stop promise).
+   * reset the Recorder instance variables/states.
+   * We need to abort the S3 upload and stop any async processes that might continue to run (audio
+   * worklet for the mic check, stop promise). We also need to stop the tracks to release
+   * the media devices (even if they're not recording).
    */
   public async destroy() {
     this.recorder.ondataavailable = null;
+    this.stopTracks();
     // Abort any MPU that might've been created and set S3 to null to clear data
     await this.s3?.abortUpload();
     this.s3 = null;
