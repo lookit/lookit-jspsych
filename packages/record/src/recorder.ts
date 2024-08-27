@@ -115,6 +115,16 @@ export default class Recorder {
   }
 
   /**
+   * Initialize recorder using the jsPsych plugin API.
+   *
+   * @param stream - Media stream returned from getUserMedia that should be used to set up the jsPsych recorder.
+   * @param opts - Media recorder options to use when setting up the recorder.
+   */
+  public intializeRecorder(stream: MediaStream, opts?: MediaRecorderOptions) {
+    this.jsPsych.pluginAPI.initializeCameraRecorder(stream, opts);
+  }
+
+  /**
    * Get recorder from jsPsych plugin API.
    *
    * If camera recorder hasn't been initialized, then return the microphone
