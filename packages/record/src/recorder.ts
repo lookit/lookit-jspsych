@@ -405,7 +405,6 @@ export default class Recorder {
     minVolume: number,
     resolve: () => void,
   ) {
-    // eslint-disable-line no-unused-vars
     if (currentActivityLevel > minVolume) {
       this.micChecked = true;
       this.processorNode?.port.postMessage({ micChecked: true });
