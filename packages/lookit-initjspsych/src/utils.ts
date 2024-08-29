@@ -1,7 +1,7 @@
 import Api from "@lookit/data";
-import { LookitWindow } from "@lookit/data/dist/types";
+import { JsPsychExpData, LookitWindow } from "@lookit/data/dist/types";
 import { DataCollection } from "jspsych";
-import { UserFunc } from "./types";
+import { UserFuncOnDataUpdate, UserFuncOnFinish } from "./types";
 
 declare let window: LookitWindow;
 
@@ -16,13 +16,18 @@ declare let window: LookitWindow;
  * @param userFunc - "on data update" function provided by researcher.
  * @returns On data update function.
  */
-export const on_data_update = (responseUuid: string, userFunc?: UserFunc) => {
-  return async function (data: DataCollection) {
+export const on_data_update = (
+  responseUuid: string,
+  userFunc?: UserFuncOnDataUpdate,
+) => {
+  return async function (data: JsPsychExpData) {
     const { attributes } = await Api.retrieveResponse(responseUuid);
     const exp_data = attributes.exp_data ? attributes.exp_data : [];
+    const sequence = attributes.sequence ? attributes.sequence : [];
 
     await Api.updateResponse(responseUuid, {
       exp_data: [...exp_data, data],
+      sequence: [...sequence, `${data.trial_index}-${data.trial_type}`],
     });
     await Api.finish();
 
@@ -45,7 +50,10 @@ export const on_data_update = (responseUuid: string, userFunc?: UserFunc) => {
  * @param userFunc - "on finish" function provided by the researcher.
  * @returns On finish function.
  */
-export const on_finish = (responseUuid: string, userFunc?: UserFunc) => {
+export const on_finish = (
+  responseUuid: string,
+  userFunc?: UserFuncOnFinish,
+) => {
   return async function (data: DataCollection) {
     const { exit_url } = window.chs.study.attributes;
 
@@ -56,7 +64,7 @@ export const on_finish = (responseUuid: string, userFunc?: UserFunc) => {
 
     await Api.finish();
     await Api.updateResponse(responseUuid, {
-      exp_data: data.values(),
+      exp_data: data.values() as JsPsychExpData[],
       completed: true,
     });
 
