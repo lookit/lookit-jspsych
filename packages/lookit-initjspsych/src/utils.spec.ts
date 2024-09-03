@@ -1,4 +1,4 @@
-import { DataCollection } from "jspsych/dist/modules/data/DataCollection";
+import { DataCollection } from "jspsych";
 
 import { Child, PastSession, Study } from "@lookit/data/dist/types";
 import { on_data_update, on_finish } from "./utils";

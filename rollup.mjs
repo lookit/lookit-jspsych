@@ -9,22 +9,19 @@ export function makeRollupConfig(iifeName) {
   return jsPsychMakeRollupConfig(iifeName).map((config) => {
     return {
       ...config,
-      // Add data package as external dependency
+      // Add data and record packages as external dependencys
       external: [...config.external, dataPackageName, recordPackageName],
-      output: config.output
-        // Only build iife bundles
-        .filter((output) => output.format === "iife")
-        .map((output) => {
-          return {
-            ...output,
-            globals: {
-              ...output.globals,
-              // Explicitly state data's iife name
-              [dataPackageName]: dataPackageIifeName,
-              [recordPackageName]: recordPackageIifeName,
-            },
-          };
-        }),
+      output: config.output.map((output) => {
+        return {
+          ...output,
+          globals: {
+            ...output.globals,
+            // Explicitly state iife names
+            [dataPackageName]: dataPackageIifeName,
+            [recordPackageName]: recordPackageIifeName,
+          },
+        };
+      }),
     };
   });
 }
