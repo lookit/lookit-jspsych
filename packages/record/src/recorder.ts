@@ -165,9 +165,9 @@ export default class Recorder {
    * @param {string} element - The HTML div element that should serve as the
    *   container for the webcam display.
    * @param {CSSWidthHeight} [width='100%'] - The width of the video element
-   *   containing the webcam feed, in CSS units (optional). Default is `'100%'`.
+   *   containing the webcam feed, in CSS units (optional). Default is `'100%'`
    * @param {CSSWidthHeight} [height='auto'] - The height of the video element
-   *   containing the webcam feed, in CSS units (optional). Default is `'auto'`.
+   *   containing the webcam feed, in CSS units (optional). Default is `'auto'`
    */
   public insertWebcamFeed(
     element: HTMLDivElement,
@@ -188,7 +188,7 @@ export default class Recorder {
    * Perform a sound check on the audio input (microphone).
    *
    * @param {number} [minVol=this.minVolume] - Minimum mic activity needed to
-   *   reach the mic check threshold (optional). Default is `this.minVolume`.
+   *   reach the mic check threshold (optional). Default is `this.minVolume`
    * @returns {Promise<void>} Promise that resolves when the mic check is
    *   complete because the audio stream has reached the required minimum
    *   level.

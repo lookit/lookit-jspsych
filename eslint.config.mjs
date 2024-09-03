@@ -23,7 +23,6 @@ export default [
     },
     rules: {
       "jsdoc/tag-lines": "off",
-      "jsdoc/require-description-complete-sentence": "error",
       "jsdoc/require-description": "error",
       "jsdoc/require-hyphen-before-param-description": "error",
       "jsdoc/require-jsdoc": [
