@@ -4,7 +4,7 @@ import {
   S3Client,
   UploadPartCommand,
 } from "@aws-sdk/client-s3";
-import { AWSMissingAttrError, UploadPartError } from "./error";
+import { AWSMissingAttrError, UploadPartError } from "./errors";
 
 /** Provides functionality to upload videos incrementally to an AWS S3 Bucket. */
 class LookitS3 {

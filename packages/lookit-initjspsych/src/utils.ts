@@ -1,6 +1,7 @@
 import Api from "@lookit/data";
 import { JsPsychExpData, LookitWindow } from "@lookit/data/dist/types";
 import { DataCollection } from "jspsych";
+import { SequenceExpDataError } from "./errors";
 import { UserFuncOnDataUpdate, UserFuncOnFinish } from "./types";
 
 declare let window: LookitWindow;
@@ -55,7 +56,18 @@ export const on_finish = (
   userFunc?: UserFuncOnFinish,
 ) => {
   return async function (data: DataCollection) {
+    const {
+      attributes: { sequence },
+    } = await Api.retrieveResponse(responseUuid);
+
+    const exp_data: JsPsychExpData[] = data.values();
+
+    if (!sequence || sequence.length === 0 || exp_data.length === 0) {
+      throw new SequenceExpDataError();
+    }
+
     const { exit_url } = window.chs.study.attributes;
+    const last_exp = exp_data[exp_data.length - 1];
 
     // Don't call the function if not defined by user.
     if (typeof userFunc === "function") {
@@ -64,7 +76,8 @@ export const on_finish = (
 
     await Api.finish();
     await Api.updateResponse(responseUuid, {
-      exp_data: data.values() as JsPsychExpData[],
+      exp_data,
+      sequence: [...sequence, `${last_exp.trial_index}-${last_exp.trial_type}`],
       completed: true,
     });
 
