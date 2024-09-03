@@ -1,6 +1,6 @@
 import { DataCollection } from "jspsych";
 
-import { Child, PastSession, Study } from "@lookit/data/dist/types";
+import { Child, JsPsychExpData, Study } from "@lookit/data/dist/types";
 import { on_data_update, on_finish } from "./utils";
 
 delete global.window.location;
@@ -8,7 +8,11 @@ global.window = Object.create(window);
 global.window.location = { replace: jest.fn() };
 
 test("jsPsych's on_data_update with some exp_data", async () => {
-  const jsonData = { data: { attributes: { exp_data: ["some data"] } } };
+  const jsonData = {
+    data: {
+      attributes: { exp_data: ["some data"], sequence: ["0-first-trial"] },
+    },
+  };
   const response = {
     /**
      * Mocked json function used in API calls.
@@ -18,7 +22,7 @@ test("jsPsych's on_data_update with some exp_data", async () => {
     json: () => Promise.resolve(jsonData),
     ok: true,
   } as Response;
-  const data = {} as DataCollection;
+  const data = {} as JsPsychExpData;
 
   const userFn = jest.fn();
   global.fetch = jest.fn(() => Promise.resolve(response));
@@ -31,7 +35,9 @@ test("jsPsych's on_data_update with some exp_data", async () => {
 });
 
 test("jsPsych's on_data_update with no exp_data", async () => {
-  const jsonData = { data: { attributes: { exp_data: undefined } } };
+  const jsonData = {
+    data: { attributes: { exp_data: undefined, sequence: undefined } },
+  };
   const response = {
     /**
      * Mocked json function used in API calls.
@@ -79,7 +85,7 @@ test("jsPsych's on_finish", async () => {
     chs: {
       study: { attributes: { exit_url: "exit url" } } as Study,
       child: {} as Child,
-      pastSessions: {} as PastSession[],
+      pastSessions: {} as Response[],
     },
   });
 
