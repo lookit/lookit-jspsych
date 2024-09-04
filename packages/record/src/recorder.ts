@@ -303,7 +303,9 @@ export default class Recorder {
     this.recorder.ondataavailable = null;
     this.stopTracks();
     // Complete any MPU that might've been created and set S3 to null to clear data
-    await this.s3?.completeUpload();
+    if (this.s3?.uploadInProgress) {
+      await this.s3?.completeUpload();
+    }
     this.s3 = null;
     // Stop the audio worklet processor if it's running
     if (this.processorNode !== null) {
