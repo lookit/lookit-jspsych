@@ -5,7 +5,7 @@ import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import { NoStopPromiseError, RecorderInitializeError } from "./error";
-// import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this
+// import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
 /**
  * A valid CSS height/width value, which can be a number, a string containing a
@@ -45,7 +45,6 @@ export default class Recorder {
     private jsPsych: JsPsych,
     fileNamePrefix: string,
   ) {
-    this.jsPsych = jsPsych;
     this.filename = this.createFilename(fileNamePrefix);
     if (!this.localDownload) {
       this.s3 = new Data.LookitS3(this.filename);
@@ -156,7 +155,7 @@ export default class Recorder {
    * @returns MediaStream from the plugin API.
    */
   private get stream() {
-    return this.recorder.stream; // or this.jsPsych.pluginAPI.getCameraStream()?
+    return this.recorder.stream;
   }
 
   /**
@@ -198,7 +197,7 @@ export default class Recorder {
       const audioContext = new AudioContext();
       const microphone = audioContext.createMediaStreamSource(this.stream);
       // This currently loads from lookit-api static files.
-      // TO DO: figure out how to load this from package dist.
+      // TO DO: load mic_check.js from dist or a URL? See https://github.com/lookit/lookit-jspsych/issues/44
       return audioContext.audioWorklet
         .addModule("/static/js/mic_check.js")
         .then(() => {
@@ -303,8 +302,8 @@ export default class Recorder {
   public async destroy() {
     this.recorder.ondataavailable = null;
     this.stopTracks();
-    // Abort any MPU that might've been created and set S3 to null to clear data
-    await this.s3?.abortUpload();
+    // Complete any MPU that might've been created and set S3 to null to clear data
+    await this.s3?.completeUpload();
     this.s3 = null;
     // Stop the audio worklet processor if it's running
     if (this.processorNode !== null) {
