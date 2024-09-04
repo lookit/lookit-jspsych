@@ -295,10 +295,11 @@ export default class Recorder {
   /**
    * Destroy the recorder. When a plugin/extension destroys the recorder, it
    * will set the whole Recorder class instance to null, so we don't need to
-   * reset the Recorder instance variables/states. We need to abort the S3
+   * reset the Recorder instance variables/states. We should complete the S3
    * upload and stop any async processes that might continue to run (audio
    * worklet for the mic check, stop promise). We also need to stop the tracks
-   * to release the media devices (even if they're not recording).
+   * to release the media devices (even if they're not recording). Setting S3 to
+   * null should release the video blob data from memory.
    */
   public async destroy() {
     this.recorder.ondataavailable = null;
