@@ -21,13 +21,14 @@ export default class Recorder {
   private blobs: Blob[] = [];
   private localDownload: boolean =
     process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
-  private s3: lookitS3 | null = null;
   private filename: string;
-  private stopPromise: Promise<void> | null = null;
+  private stopPromise: Promise<void> | undefined;
   private minVolume: number = 0.1;
-  private processorNode: AudioWorkletNode | null = null;
   private webcam_element_id = "lookit-jspsych-webcam";
   public micChecked: boolean = false;
+  /** Use null rather than undefined so that we can set these back to null when destroying. */
+  private processorNode: AudioWorkletNode | null = null;
+  private s3: lookitS3 | null = null;
   /**
    * Store the reject function for the stop promise so that we can reject it in
    * the destroy recorder method.
@@ -316,7 +317,6 @@ export default class Recorder {
     if (this.stopPromise) {
       this.rejectStopPromise("RecorderDestroyed");
     }
-    this.stopPromise = null;
   }
 
   /** Throw Error if there isn't a recorder provided by jsPsych. */
