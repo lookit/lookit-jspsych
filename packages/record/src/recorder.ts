@@ -155,7 +155,7 @@ export default class Recorder {
    * @returns MediaStream from the plugin API.
    */
   private get stream() {
-    return this.recorder.stream; // or this.jsPsych.pluginAPI.getCameraStream()?
+    return this.recorder.stream;
   }
 
   /**
