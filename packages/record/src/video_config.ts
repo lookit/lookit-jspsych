@@ -2,9 +2,7 @@
 /* eslint-disable jsdoc/no-types */
 /* eslint-disable jsdoc/no-defaults */
 import { JsPsych, JsPsychPlugin, TrialType } from "jspsych";
-
-import Record from "@lookit/record";
-import Recorder from "@lookit/record/dist/recorder";
+import Recorder from "./recorder";
 
 const info = <const>{
   name: "video-config-plugin",
@@ -348,7 +346,7 @@ class VideoConfigPlugin implements JsPsychPlugin<Info> {
       updateInstructions(1, false);
       updateInstructions(3, false);
       updateErrors(waiting_for_access_msg);
-      this.recorder = new Record.Recorder(this.jsPsych, "video_config");
+      this.recorder = new Recorder(this.jsPsych, "video_config");
       return this.recorder
         .requestPermission({ video: true, audio: true })
         .then(() => {
