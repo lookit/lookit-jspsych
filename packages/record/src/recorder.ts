@@ -45,7 +45,6 @@ export default class Recorder {
     private jsPsych: JsPsych,
     fileNamePrefix: string,
   ) {
-    this.jsPsych = jsPsych;
     this.filename = this.createFilename(fileNamePrefix);
     if (!this.localDownload) {
       this.s3 = new Data.LookitS3(this.filename);
