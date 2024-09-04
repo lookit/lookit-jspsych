@@ -16,6 +16,7 @@ class LookitS3 {
   private uploadId: string = "";
   private key: string;
   private bucket: string = process.env.S3_BUCKET;
+  private complete: boolean = false;
 
   public static readonly minUploadSize: number = 5 * 1024 * 1024;
 
@@ -153,6 +154,7 @@ class LookitS3 {
     };
     const command = new CompleteMultipartUploadCommand(input);
     const response = await this.s3.send(command);
+    this.complete = true;
 
     this.logRecordingEvent(`Upload complete: ${response.Location}`);
   }
@@ -180,6 +182,15 @@ class LookitS3 {
   public logRecordingEvent(msg: string) {
     const timestamp = new Date().toISOString();
     console.log(`Recording log: ${timestamp}\nFile: ${this.key}\n${msg}\n`);
+  }
+
+  /**
+   * Whether or not an upload is in progress (created and not yet completed).
+   *
+   * @returns Boolean indicating whether or not an upload has been created but not yet completed.
+   */
+  public get uploadInProgress():boolean {
+    return this.uploadId !== "" && this.complete == false;
   }
 
 }
