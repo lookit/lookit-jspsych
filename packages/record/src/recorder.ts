@@ -5,7 +5,7 @@ import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import { NoStopPromiseError, RecorderInitializeError } from "./error";
-// import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this
+// import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
 /**
  * A valid CSS height/width value, which can be a number, a string containing a
@@ -197,7 +197,7 @@ export default class Recorder {
       const audioContext = new AudioContext();
       const microphone = audioContext.createMediaStreamSource(this.stream);
       // This currently loads from lookit-api static files.
-      // TO DO: figure out how to load this from package dist.
+      // TO DO: load mic_check.js from dist or a URL? See https://github.com/lookit/lookit-jspsych/issues/44
       return audioContext.audioWorklet
         .addModule("/static/js/mic_check.js")
         .then(() => {
