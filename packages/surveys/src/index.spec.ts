@@ -67,7 +67,8 @@ test("Exit Survey private level only", () => {
     survey_json: jest.fn(),
     private_level_only: true,
   } as unknown as ExitTrial;
-  exit.trial(display_element, trialInfo);
+  expect(exit.trial(display_element, trialInfo)).toBeUndefined();
+  expect(SurveyPlugin.prototype.trial).toHaveBeenCalledTimes(1);
 });
 
 test("Exit Survey include withdrawal example", () => {
@@ -78,5 +79,6 @@ test("Exit Survey include withdrawal example", () => {
     survey_json: jest.fn(),
     include_withdrawal_example: true,
   } as unknown as ExitTrial;
-  exit.trial(display_element, trialInfo);
+  expect(exit.trial(display_element, trialInfo)).toBeUndefined();
+  expect(SurveyPlugin.prototype.trial).toHaveBeenCalledTimes(1);
 });
