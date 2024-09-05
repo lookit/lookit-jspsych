@@ -425,6 +425,7 @@ export default class Recorder {
     if (currentActivityLevel > minVolume) {
       this.micChecked = true;
       this.processorNode?.port.postMessage({ micChecked: true });
+      this.processorNode = null;
       resolve();
     }
   }
