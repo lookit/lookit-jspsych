@@ -1,24 +1,21 @@
 import { makeRollupConfig as jsPsychMakeRollupConfig } from "@jspsych/config/rollup";
+import { iifeNameData } from "./packages/data/rollup.config.mjs";
 
 export function makeRollupConfig(iifeName) {
   const dataPackageName = "@lookit/data";
-  const dataPackageIifeName = "chsData";
-  const recordPackageName = "@lookit/record";
-  const recordPackageIifeName = "chsRecord";
 
   return jsPsychMakeRollupConfig(iifeName).map((config) => {
     return {
       ...config,
-      // Add data and record packages as external dependencys
-      external: [...config.external, dataPackageName, recordPackageName],
+      // Add data package as external dependency
+      external: [...config.external, dataPackageName],
       output: config.output.map((output) => {
         return {
           ...output,
           globals: {
             ...output.globals,
-            // Explicitly state iife names
-            [dataPackageName]: dataPackageIifeName,
-            [recordPackageName]: recordPackageIifeName,
+            // Explicitly state data's iife name
+            [dataPackageName]: iifeNameData,
           },
         };
       }),

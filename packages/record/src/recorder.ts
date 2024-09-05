@@ -1,20 +1,14 @@
-/* eslint-disable jsdoc/no-types */
-/* eslint-disable jsdoc/no-defaults */
 import Data from "@lookit/data";
 import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
+import Mustache from "mustache";
 import { NoStopPromiseError, RecorderInitializeError } from "./error";
+import webcamFeed from "./templates/webcam-feed.mustache";
+import { CSSWidthHeight } from "./types";
+
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
-/**
- * A valid CSS height/width value, which can be a number, a string containing a
- * number with units, or 'auto'.
- */
-type CSSWidthHeight =
-  | number
-  | `${number}${"px" | "cm" | "mm" | "em" | "%"}`
-  | "auto";
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
@@ -26,7 +20,10 @@ export default class Recorder {
   private minVolume: number = 0.1;
   private webcam_element_id = "lookit-jspsych-webcam";
   public micChecked: boolean = false;
-  /** Use null rather than undefined so that we can set these back to null when destroying. */
+  /**
+   * Use null rather than undefined so that we can set these back to null when
+   * destroying.
+   */
   private processorNode: AudioWorkletNode | null = null;
   private s3: lookitS3 | null = null;
   /**
@@ -57,18 +54,16 @@ export default class Recorder {
    * Request permission to use the webcam and/or microphone. This can be used
    * with and without specific device selection (and other constraints).
    *
-   * @param {object} constraints - Media stream constraints object with 'video'
-   *   and 'audio' properties, whose values can be boolean or a
+   * @param constraints - Media stream constraints object with 'video' and
+   *   'audio' properties, whose values can be boolean or a
    *   MediaTrackConstraints object or undefined.
-   * @param {boolean | MediaTrackConstraints | undefined} constraints.video - If
-   *   false, do not include video. If true, use the default webcam device. If a
-   *   media track constraints object is passed, then it can contain the
-   *   properties of all media tracks and video tracks:
+   * @param constraints.video - If false, do not include video. If true, use the
+   *   default webcam device. If a media track constraints object is passed,
+   *   then it can contain the properties of all media tracks and video tracks:
    *   https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints.
-   * @param {boolean | MediaTrackConstraints | undefined} constraints.audio - If
-   *   false, do not include audio. If true, use the default mic device. If a
-   *   media track constraints object is passed, then it can contain the
-   *   properties of all media tracks and audio tracks:
+   * @param constraints.audio - If false, do not include audio. If true, use the
+   *   default mic device. If a media track constraints object is passed, then
+   *   it can contain the properties of all media tracks and audio tracks:
    *   https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints.
    * @returns Camera/microphone stream.
    */
@@ -82,10 +77,10 @@ export default class Recorder {
    * 'enumerateDevices'). These lists can be used to populate camera/mic
    * selection elements.
    *
-   * @param {boolean} include_audio - Whether or not to include audio capture
-   *   (mic) devices. Optional, default is true.
-   * @param {boolean} include_camera - Whether or not to include the webcam
-   *   (video) devices. Optional, default is true.
+   * @param include_audio - Whether or not to include audio capture (mic)
+   *   devices. Optional, default is true.
+   * @param include_camera - Whether or not to include the webcam (video)
+   *   devices. Optional, default is true.
    * @returns Promise that resolves with an object with properties 'cameras' and
    *   'mics', containing lists of available devices.
    */
@@ -162,36 +157,33 @@ export default class Recorder {
   /**
    * Insert a video element containing the webcam feed onto the page.
    *
-   * @param {string} element - The HTML div element that should serve as the
-   *   container for the webcam display.
-   * @param {CSSWidthHeight} [width='100%'] - The width of the video element
-   *   containing the webcam feed, in CSS units (optional). Default is `'100%'`
-   * @param {CSSWidthHeight} [height='auto'] - The height of the video element
-   *   containing the webcam feed, in CSS units (optional). Default is `'auto'`
+   * @param element - The HTML div element that should serve as the container
+   *   for the webcam display.
+   * @param width - The width of the video element containing the webcam feed,
+   *   in CSS units (optional). Default is `'100%'`
+   * @param height - The height of the video element containing the webcam feed,
+   *   in CSS units (optional). Default is `'auto'`
    */
   public insertWebcamFeed(
     element: HTMLDivElement,
     width: CSSWidthHeight = "100%",
     height: CSSWidthHeight = "auto",
   ) {
-    element.innerHTML = `
-      <video autoplay playsinline muted id="${this.webcam_element_id}" width="${
-        width ? width : "100%"
-      }" height="${height ? height : "auto"}" style="display:inline-block;"></video>
-    `;
-    (
-      element.querySelector(`#${this.webcam_element_id}`) as HTMLVideoElement
-    ).srcObject = this.stream;
+    const { webcam_element_id, stream } = this;
+    const view = { height, width, webcam_element_id };
+    element.innerHTML = Mustache.render(webcamFeed, view);
+    element.querySelector<HTMLVideoElement>(
+      `#${webcam_element_id}`,
+    )!.srcObject = stream;
   }
 
   /**
    * Perform a sound check on the audio input (microphone).
    *
-   * @param {number} [minVol=this.minVolume] - Minimum mic activity needed to
-   *   reach the mic check threshold (optional). Default is `this.minVolume`
-   * @returns {Promise<void>} Promise that resolves when the mic check is
-   *   complete because the audio stream has reached the required minimum
-   *   level.
+   * @param minVol - Minimum mic activity needed to reach the mic check
+   *   threshold (optional). Default is `this.minVolume`
+   * @returns Promise that resolves when the mic check is complete because the
+   *   audio stream has reached the required minimum level.
    */
   public checkMic(minVol: number = this.minVolume) {
     if (this.stream) {
@@ -217,9 +209,9 @@ export default class Recorder {
              * micChecked property to true and resolves this Promise (via
              * onMicActivityLevel).
              *
-             * @param {MessageEvent} event - The message event that was sent
-             *   from the processor on the audio worklet node. Contains a 'data'
-             *   property (object) which contains a 'volume' property (number).
+             * @param event - The message event that was sent from the processor
+             *   on the audio worklet node. Contains a 'data' property (object)
+             *   which contains a 'volume' property (number).
              */
             this.processorNode.port.onmessage = (event: MessageEvent) => {
               // handle message from the processor: event.data
@@ -295,10 +287,11 @@ export default class Recorder {
   /**
    * Destroy the recorder. When a plugin/extension destroys the recorder, it
    * will set the whole Recorder class instance to null, so we don't need to
-   * reset the Recorder instance variables/states. We need to abort the S3
+   * reset the Recorder instance variables/states. We should complete the S3
    * upload and stop any async processes that might continue to run (audio
    * worklet for the mic check, stop promise). We also need to stop the tracks
-   * to release the media devices (even if they're not recording).
+   * to release the media devices (even if they're not recording). Setting S3 to
+   * null should release the video blob data from memory.
    */
   public async destroy() {
     this.recorder.ondataavailable = null;
@@ -334,7 +327,10 @@ export default class Recorder {
    *
    * @returns Function that is called on the recorder's "stop" event.
    */
-  private handleStop(resolve: { (value: void | PromiseLike<void>): void }) {
+  private handleStop(resolve: {
+    (value: void | PromiseLike<void>): void;
+    (): void;
+  }) {
     return async () => {
       if (this.localDownload) {
         await this.download();
@@ -409,12 +405,12 @@ export default class Recorder {
    * threshold, and if the threshold is met, sets the micChecked property to
    * true and resolves the checkMic promise.
    *
-   * @param {number} currentActivityLevel - Microphone activity level calculated
-   *   by the processor node.
-   * @param {number} minVolume - Minimum microphone activity level needed to
-   *   pass the microphone check.
-   * @param {Function} resolve - Resolve callback function for Promise returned
-   *   by the checkMic method.
+   * @param currentActivityLevel - Microphone activity level calculated by the
+   *   processor node.
+   * @param minVolume - Minimum microphone activity level needed to pass the
+   *   microphone check.
+   * @param resolve - Resolve callback function for Promise returned by the
+   *   checkMic method.
    */
   private onMicActivityLevel(
     currentActivityLevel: number,
@@ -424,6 +420,7 @@ export default class Recorder {
     if (currentActivityLevel > minVolume) {
       this.micChecked = true;
       this.processorNode?.port.postMessage({ micChecked: true });
+      this.processorNode = null;
       resolve();
     }
   }
@@ -431,13 +428,9 @@ export default class Recorder {
   /**
    * Check access to webcam/mic stream.
    *
-   * @returns {boolean} Whether or not the recorder has webcam/mic access.
+   * @returns Whether or not the recorder has webcam/mic access.
    */
   public camMicAccess(): boolean {
-    if (this.recorder && this.stream?.active) {
-      return true;
-    } else {
-      return false;
-    }
+    return this.recorder && this.stream?.active;
   }
 }
