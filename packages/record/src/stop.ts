@@ -1,7 +1,9 @@
 import { LookitWindow } from "@lookit/data/dist/types";
 import { JsPsych, JsPsychPlugin } from "jspsych";
+import Mustache from "mustache";
 import { NoSessionRecordingError } from "./error";
 import Recorder from "./recorder";
+import uploadingVideo from "./templates/uploading-video.mustache";
 
 declare let window: LookitWindow;
 
@@ -34,7 +36,7 @@ export default class StopRecordPlugin implements JsPsychPlugin<Info> {
    *   plugin's trial method via jsPsych core).
    */
   public trial(display_element: HTMLElement): void {
-    display_element.innerHTML = "<div>Uploading video, please wait...</div>";
+    display_element.innerHTML = Mustache.render(uploadingVideo, {});
     this.recorder.stop().then(() => {
       window.chs.sessionRecorder = null;
       display_element.innerHTML = "";
