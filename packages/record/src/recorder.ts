@@ -5,17 +5,10 @@ import { JsPsych } from "jspsych";
 import Mustache from "mustache";
 import { NoStopPromiseError, RecorderInitializeError } from "./error";
 import webcamFeed from "./templates/webcam-feed.mustache";
+import { CSSWidthHeight } from "./types";
 
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
-/**
- * A valid CSS height/width value, which can be a number, a string containing a
- * number with units, or 'auto'.
- */
-type CSSWidthHeight =
-  | number
-  | `${number}${"px" | "cm" | "mm" | "em" | "%"}`
-  | "auto";
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
