@@ -187,12 +187,12 @@ class LookitS3 {
   /**
    * Whether or not an upload is in progress (created and not yet completed).
    *
-   * @returns Boolean indicating whether or not an upload has been created but not yet completed.
+   * @returns Boolean indicating whether or not an upload has been created but
+   *   not yet completed.
    */
-  public get uploadInProgress():boolean {
+  public get uploadInProgress(): boolean {
     return this.uploadId !== "" && this.complete == false;
   }
-
 }
 
 export default LookitS3;

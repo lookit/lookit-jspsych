@@ -5,5 +5,5 @@ import TrialRecordExtension from "./trial";
 export default {
   TrialRecordExtension,
   StartRecordPlugin,
-  StopRecordPlugin
+  StopRecordPlugin,
 };

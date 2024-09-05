@@ -26,7 +26,10 @@ export default class Recorder {
   private minVolume: number = 0.1;
   private webcam_element_id = "lookit-jspsych-webcam";
   public micChecked: boolean = false;
-  /** Use null rather than undefined so that we can set these back to null when destroying. */
+  /**
+   * Use null rather than undefined so that we can set these back to null when
+   * destroying.
+   */
   private processorNode: AudioWorkletNode | null = null;
   private s3: lookitS3 | null = null;
   /**
