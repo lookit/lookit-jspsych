@@ -1,8 +1,8 @@
 import Data from "@lookit/data";
 import { initJsPsych } from "jspsych";
+import Mustache from "mustache";
 import { NoStopPromiseError, RecorderInitializeError } from "./error";
 import Recorder from "./recorder";
-import Mustache from "mustache";
 import webcamFeed from "./templates/webcam-feed.mustache";
 import { CSSWidthHeight } from "./types";
 
@@ -126,7 +126,9 @@ test("Recorder insert webcam display without height/width", () => {
   // Add webcam container to document body.
   const webcam_container_id = "webcam-container";
   document.body.innerHTML = `<div id="${webcam_container_id}"></div>`;
-  const webcam_div = document.getElementById(webcam_container_id) as HTMLDivElement;
+  const webcam_div = document.getElementById(
+    webcam_container_id,
+  ) as HTMLDivElement;
 
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych, "prefix");
@@ -147,10 +149,13 @@ test("Recorder insert webcam display without height/width", () => {
   let rendered_webcam_html = Mustache.render(webcamFeed, params);
 
   // Remove new lines, indents (tabs or spaces), and empty HTML property values.
-  rendered_webcam_html = rendered_webcam_html.replace(/(\r\n|\n|\r|\t|    )/gm, "");
+  rendered_webcam_html = rendered_webcam_html.replace(
+    /(\r\n|\n|\r|\t| {4})/gm,
+    "",
+  );
   let displayed_html = document.body.innerHTML;
-  displayed_html = displayed_html.replace(/(\r\n|\n|\r|\t|    )/gm, "");
-  displayed_html = displayed_html.replace(/(=\"\")/gm, "");
+  displayed_html = displayed_html.replace(/(\r\n|\n|\r|\t| {4})/gm, "");
+  displayed_html = displayed_html.replace(/(="")/gm, "");
 
   expect(displayed_html).toContain(rendered_webcam_html);
 
@@ -162,7 +167,9 @@ test("Recorder insert webcam display with height/width", () => {
   // Add webcam container to document body.
   const webcam_container_id = "webcam-container";
   document.body.innerHTML = `<div id="${webcam_container_id}"></div>`;
-  const webcam_div = document.getElementById(webcam_container_id) as HTMLDivElement;
+  const webcam_div = document.getElementById(
+    webcam_container_id,
+  ) as HTMLDivElement;
 
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych, "prefix");
@@ -184,10 +191,13 @@ test("Recorder insert webcam display with height/width", () => {
   let rendered_webcam_html = Mustache.render(webcamFeed, params);
 
   // Remove new lines, indents (tabs or spaces), and empty HTML property values.
-  rendered_webcam_html = rendered_webcam_html.replace(/(\r\n|\n|\r|\t|    )/gm, "");
+  rendered_webcam_html = rendered_webcam_html.replace(
+    /(\r\n|\n|\r|\t| {4})/gm,
+    "",
+  );
   let displayed_html = document.body.innerHTML;
-  displayed_html = displayed_html.replace(/(\r\n|\n|\r|\t|    )/gm, "");
-  displayed_html = displayed_html.replace(/(=\"\")/gm, "");
+  displayed_html = displayed_html.replace(/(\r\n|\n|\r|\t| {4})/gm, "");
+  displayed_html = displayed_html.replace(/(="")/gm, "");
 
   expect(displayed_html).toContain(rendered_webcam_html);
 
@@ -199,7 +209,9 @@ test("Webcam feed is removed when stream access stops", async () => {
   // Add webcam container to document body.
   const webcam_container_id = "webcam-container";
   document.body.innerHTML = `<div id="${webcam_container_id}"></div>`;
-  const webcam_div = document.getElementById(webcam_container_id) as HTMLDivElement;
+  const webcam_div = document.getElementById(
+    webcam_container_id,
+  ) as HTMLDivElement;
 
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych, "prefix");

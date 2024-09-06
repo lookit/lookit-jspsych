@@ -9,7 +9,6 @@ import { CSSWidthHeight } from "./types";
 
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
-
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
   private blobs: Blob[] = [];
