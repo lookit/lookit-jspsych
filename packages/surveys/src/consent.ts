@@ -29,6 +29,6 @@ export class ConsentSurveyPlugin extends SurveyPlugin {
    * @returns Object containing CHS type.
    */
   public static chsData() {
-    return { chsType: "consent" };
+    return { chs_type: "consent" };
   }
 }
