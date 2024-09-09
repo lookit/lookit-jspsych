@@ -38,11 +38,11 @@ class LookitS3 {
       });
     } catch (e) {
       console.error(`Error setting up S3 client: ${e}`);
+      let err_msg = "";
       if (e instanceof Error) {
-        throw new AWSConfigError(e.message);
-      } else {
-        throw new AWSConfigError();
+        err_msg = e.message;
       }
+      throw new AWSConfigError(err_msg);
     }
   }
 

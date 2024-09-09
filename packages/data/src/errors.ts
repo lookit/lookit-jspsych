@@ -32,7 +32,7 @@ export class AWSConfigError extends Error {
    *
    * @param errorMsg - Message property of error object from the AWS response.
    */
-  public constructor(errorMsg?: string) {
+  public constructor(errorMsg: string) {
     super(`AWS configuration error: ${errorMsg}`);
     this.name = "AWSConfigError";
   }
