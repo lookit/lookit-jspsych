@@ -1,6 +1,19 @@
 import { initJsPsych as origInitJsPsych } from "jspsych";
-import { JsPsychOptions } from "./types";
+import { JsPsychOptions, Timeline } from "./types";
 import { on_data_update, on_finish } from "./utils";
+
+/**
+ * Search timeline object for the method "chsData". When found, add to timeline
+ * data parameter. This will inject values into the experiment to be parsed chs
+ * after experiment has completed.
+ *
+ * @param t - Timeline object.
+ */
+const addChsData = (t: Timeline) => {
+  if (t.type.chsData) {
+    t.data = { ...t.data, ...t.type.chsData() };
+  }
+};
 
 /**
  * Function that returns a function to replace jsPsych's initJsPsych.
@@ -26,6 +39,10 @@ const lookitInitJsPsych = (responseUuid: string) => {
      */
     jsPsych.run = function (timeline) {
       // check timeline here...
+      timeline.map((t: Timeline) => {
+        addChsData(t);
+      });
+
       return origJsPsychRun(timeline);
     };
 
