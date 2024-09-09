@@ -126,3 +126,7 @@ test("Is the withdrawal example included?", () => {
 
   expect(withdrawal?.choices[0].text).toContain("state secrets");
 });
+
+test("Does exit survey return chsData correctly?", () => {
+  expect(ExitSurveyPlugin.chsData()).toMatchObject({ chs_type: "exit" });
+});

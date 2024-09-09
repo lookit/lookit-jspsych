@@ -47,7 +47,7 @@ export class ExitSurveyPlugin extends SurveyPlugin {
    * @param display_element - Display element.
    * @param trial - Info parameters.
    */
-  public trial(display_element: HTMLElement, trial: Trial) {
+  public trial(display_element: HTMLElement, trial: TrialType<Info>) {
     super.trial(display_element, {
       ...trial,
       survey_json: this.surveyParameters(trial),
@@ -145,5 +145,16 @@ export class ExitSurveyPlugin extends SurveyPlugin {
           },
         ],
       });
+  }
+
+  /**
+   * Add CHS type to experiment data. This will enable Lookit API to run the
+   * "exit" Frame Action Dispatcher method after the experiment has completed.
+   * It looks like jsPsych uses snake case for these data.
+   *
+   * @returns Object containing CHS type.
+   */
+  public static chsData() {
+    return { chs_type: "exit" };
   }
 }

@@ -1,7 +1,6 @@
 import {
   ApiPromise,
   Child,
-  PastSession,
   Response,
   ResponseAttrsUpdate,
   ResponseUpdate,
@@ -50,7 +49,7 @@ export const retrieveChild = () => {
  * @returns Promise containing list of all Past Session objects.
  */
 export const retrievePastSessions = (uuid: string) => {
-  return deposit(get<PastSession[]>(`past-sessions/${uuid}/`));
+  return deposit(get<Response[]>(`past-sessions/${uuid}/`));
 };
 
 /**
