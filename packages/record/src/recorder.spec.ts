@@ -348,6 +348,25 @@ test("Recorder camMicAccess", () => {
   expect(rec.camMicAccess()).toBe(true);
 });
 
+test("Recorder requestPermission", async () => {
+  const stream = { fake: "stream" } as unknown as MediaStream;
+  const mockGetUserMedia = jest.fn( async () => new Promise<MediaStream>(resolve => { resolve(stream); }) );
+  Object.defineProperty(global.navigator, 'mediaDevices', {
+    writable: true,
+    value: {
+      getUserMedia: mockGetUserMedia,
+    },
+  });
+
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych, "prefix");
+  const constraints = { video: true, audio: true };
+
+  const returnedStream = await rec.requestPermission(constraints);
+  expect(returnedStream).toStrictEqual(stream);
+  expect(global.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(constraints);
+});
+
 test("Recorder download", async () => {
   const click = jest.fn();
 
