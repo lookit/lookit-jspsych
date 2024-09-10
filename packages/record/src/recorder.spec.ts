@@ -314,6 +314,40 @@ test("Recorder destroy with webcam display", async () => {
   expect(document.body.innerHTML).not.toContain("<video");
 });
 
+test("Recorder camMicAccess", () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych, "prefix");
+
+  // No recorder initialized
+  expect(rec.camMicAccess()).toBe(false);
+
+  // Recorder initialized but stream is not active
+  const stream_active_undefined = {
+    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) }
+  };
+  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(stream_active_undefined);
+  expect(rec.camMicAccess()).toBe(false);
+  const stream_inactive = {
+    stream: {
+      active: false,
+      getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }])
+    }
+  };
+  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(stream_inactive);
+  expect(rec.camMicAccess()).toBe(false);
+
+  // Recorder exists with active stream
+  const stream_active = {
+    stop: jest.fn(),
+    stream: {
+      active: true,
+      getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }])
+    }
+  };
+  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(stream_active);
+  expect(rec.camMicAccess()).toBe(true);
+});
+
 test("Recorder download", async () => {
   const click = jest.fn();
 
