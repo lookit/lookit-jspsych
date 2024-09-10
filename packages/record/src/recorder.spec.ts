@@ -381,6 +381,77 @@ test("Recorder requestPermission", async () => {
   );
 });
 
+test("Recorder getDeviceLists", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych, "prefix");
+
+  const mic1 = {
+    deviceId: "mic1",
+    kind: "audioinput",
+    label: "",
+    groupId: "default",
+  } as MediaDeviceInfo;
+  const cam1 = {
+    deviceId: "cam1",
+    kind: "videoinput",
+    label: "",
+    groupId: "default",
+  } as MediaDeviceInfo;
+  const mic2 = {
+    deviceId: "mic2",
+    kind: "audioinput",
+    label: "",
+    groupId: "other",
+  } as MediaDeviceInfo;
+  const cam2 = {
+    deviceId: "cam2",
+    kind: "videoinput",
+    label: "",
+    groupId: "other",
+  } as MediaDeviceInfo;
+
+  // Returns the mic/cam devices from navigator.mediaDevices.enumerateDevices as an object with 'cameras' and 'mics' (arrays of media device info objects).
+  const devices = [mic1, mic2, cam1, cam2];
+  Object.defineProperty(global.navigator, "mediaDevices", {
+    writable: true,
+    value: {
+      enumerateDevices: jest.fn(
+        () =>
+          new Promise<MediaDeviceInfo[]>((resolve) => {
+            resolve(devices);
+          }),
+      ),
+    },
+  });
+
+  const returnedDevices = await rec.getDeviceLists();
+  expect(global.navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(
+    1,
+  );
+  expect(returnedDevices).toHaveProperty("cameras");
+  expect(returnedDevices).toHaveProperty("mics");
+  expect(returnedDevices.cameras.sort()).toStrictEqual([cam1, cam2].sort());
+  expect(returnedDevices.mics.sort()).toStrictEqual([mic1, mic2].sort());
+
+  // Removes duplicate devices and handles empty device categories.
+  const devices_duplicate = [mic1, mic1, mic1];
+  Object.defineProperty(global.navigator, "mediaDevices", {
+    writable: true,
+    value: {
+      enumerateDevices: jest.fn(
+        () =>
+          new Promise<MediaDeviceInfo[]>((resolve) => {
+            resolve(devices_duplicate);
+          }),
+      ),
+    },
+  });
+
+  const returnedDevicesDuplicates = await rec.getDeviceLists();
+  expect(returnedDevicesDuplicates.cameras).toStrictEqual([]);
+  expect(returnedDevicesDuplicates.mics).toStrictEqual([mic1]);
+});
+
 test("Recorder download", async () => {
   const click = jest.fn();
 
