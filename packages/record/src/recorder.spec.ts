@@ -452,6 +452,40 @@ test("Recorder getDeviceLists", async () => {
   expect(returnedDevicesDuplicates.mics).toStrictEqual([mic1]);
 });
 
+test("Recorder initializeRecorder", () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych, "prefix");
+
+  // MediaRecorder is not available in Jest/jsDom, so mock the implementation of jsPsych.pluginAPI.initializeCameraRecorder (which calls new MediaRecorder) and jsPsych.pluginAPI.getCameraRecorder (which gets the private recorder that was created via jsPsych's initializeCameraRecorder).
+  const stream = { fake: "stream" } as unknown as MediaStream;
+  const recorder = jest.fn((stream: MediaStream) => {
+    return {
+      stream: stream,
+      start: jest.fn(),
+      ondataavailable: jest.fn(),
+      onerror: jest.fn(),
+      state: "",
+      stop: jest.fn(),
+      pause: jest.fn(),
+      resume: jest.fn()
+    }
+  });
+  jsPsych.pluginAPI.initializeCameraRecorder = jest.fn().mockImplementation((stream: MediaStream) => {
+    return recorder(stream);
+  });
+  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockImplementation(() => {
+    return jsPsych.pluginAPI.initializeCameraRecorder(stream);
+  });
+
+  rec.intializeRecorder(stream);
+
+  expect(jsPsych.pluginAPI.initializeCameraRecorder).toHaveBeenCalled();
+  expect(rec.recorder).toBeDefined();
+  expect(rec.recorder).not.toBeNull();
+  expect(rec.stream).toStrictEqual(stream);
+
+});
+
 test("Recorder download", async () => {
   const click = jest.fn();
 
