@@ -224,11 +224,9 @@ test("Webcam feed is removed when stream access stops", async () => {
   jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
 
   rec.insertWebcamFeed(webcam_div);
-
   expect(document.body.innerHTML).toContain("<video");
 
   await rec.stop();
-
   expect(document.body.innerHTML).not.toContain("<video");
 });
 
@@ -244,13 +242,76 @@ test("Recorder destroy", async () => {
   };
   jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
 
-  // No in-progress upload, mic check, or stop promise.
+  // Destroy with no in-progress upload or mic check.
   // This should just stop the tracks and set s3 to null.
   await rec.destroy();
 
   expect(media.stop).toHaveBeenCalledTimes(1);
   expect(media.stream.getTracks).toHaveBeenCalledTimes(1);
   expect(rec.s3).toBe(null);
+  expect(Data.LookitS3.prototype.completeUpload).not.toHaveBeenCalled();
+});
+
+test("Recorder destroy with in-progress upload", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych, "prefix");
+  const media = {
+    addEventListener: jest.fn(),
+    start: jest.fn(),
+    stop: jest.fn(),
+    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) }
+  };
+  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
+
+  await rec.start();
+  expect(media.start).toHaveBeenCalledTimes(1);
+
+  const stopPromise = Promise.resolve();
+  rec["stopPromise"] = stopPromise;
+
+  Object.defineProperty(rec.s3, 'uploadInProgress', {
+    /**
+     * Overwrite the getter method for S3's uploadInProgress.
+     * @returns boolean.
+     */
+    get: () => true
+  });
+
+  // Destroy with in-progress upload.
+  // This should call stop on the recorder and complete the upload.
+  await rec.destroy();
+  expect(media.stop).toHaveBeenCalledTimes(1);
+  expect(media.stream.getTracks).toHaveBeenCalledTimes(1);
+  expect(rec.s3).toBe(null);
+  expect(Data.LookitS3.prototype.completeUpload).toHaveBeenCalledTimes(1);
+});
+
+test("Recorder destroy with webcam display", async () => {
+  // Add webcam container to document body.
+  const webcam_container_id = "webcam-container";
+  document.body.innerHTML = `<div id="${webcam_container_id}"></div>`;
+  const webcam_div = document.getElementById(
+    webcam_container_id,
+  ) as HTMLDivElement;
+
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych, "prefix");
+  const media = {
+    stop: jest.fn(),
+    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) },
+  };
+  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
+
+  rec.insertWebcamFeed(webcam_div);
+  expect(document.body.innerHTML).toContain("<video");
+
+  // Destroy with webcam display.
+  // This should call stop on the recorder and remove the video element.
+  await rec.destroy();
+  expect(media.stop).toHaveBeenCalledTimes(1);
+  expect(media.stream.getTracks).toHaveBeenCalledTimes(1);
+  expect(rec.s3).toBe(null);
+  expect(document.body.innerHTML).not.toContain("<video");
 });
 
 test("Recorder download", async () => {
