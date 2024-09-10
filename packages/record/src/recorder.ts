@@ -150,7 +150,7 @@ export default class Recorder {
    * @returns MediaStream from the plugin API.
    */
   private get stream() {
-    return this.recorder.stream;
+    return this.recorder?.stream;
   }
 
   /**
