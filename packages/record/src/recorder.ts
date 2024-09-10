@@ -261,7 +261,9 @@ export default class Recorder {
   }
 
   /**
-   * Stop recording and camera/microphone. This will stop accessing all media tracks, clear the webcam feed element (if there is one), and return the stop promise.
+   * Stop recording and camera/microphone. This will stop accessing all media
+   * tracks, clear the webcam feed element (if there is one), and return the
+   * stop promise.
    *
    * @returns Promise that resolves after the media recorder has stopped and
    *   final 'dataavailable' event has occurred, when the "stop" event-related
@@ -427,9 +429,7 @@ export default class Recorder {
     return !!this.recorder && !!this.stream?.active;
   }
 
-  /**
-   * Private helper to clear the webcam feed, if there is one.
-   */
+  /** Private helper to clear the webcam feed, if there is one. */
   private clearWebcamFeed() {
     const webcam_feed_element = document.querySelector(
       `#${this.webcam_element_id}`,

@@ -259,7 +259,7 @@ test("Recorder destroy with in-progress upload", async () => {
     addEventListener: jest.fn(),
     start: jest.fn(),
     stop: jest.fn(),
-    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) }
+    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) },
   };
   jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
 
@@ -269,12 +269,13 @@ test("Recorder destroy with in-progress upload", async () => {
   const stopPromise = Promise.resolve();
   rec["stopPromise"] = stopPromise;
 
-  Object.defineProperty(rec.s3, 'uploadInProgress', {
+  Object.defineProperty(rec.s3, "uploadInProgress", {
     /**
      * Overwrite the getter method for S3's uploadInProgress.
-     * @returns boolean.
+     *
+     * @returns Boolean.
      */
-    get: () => true
+    get: () => true,
   });
 
   // Destroy with in-progress upload.
@@ -323,17 +324,21 @@ test("Recorder camMicAccess", () => {
 
   // Recorder initialized but stream is not active
   const stream_active_undefined = {
-    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) }
+    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) },
   };
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(stream_active_undefined);
+  jsPsych.pluginAPI.getCameraRecorder = jest
+    .fn()
+    .mockReturnValue(stream_active_undefined);
   expect(rec.camMicAccess()).toBe(false);
   const stream_inactive = {
     stream: {
       active: false,
-      getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }])
-    }
+      getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]),
+    },
   };
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(stream_inactive);
+  jsPsych.pluginAPI.getCameraRecorder = jest
+    .fn()
+    .mockReturnValue(stream_inactive);
   expect(rec.camMicAccess()).toBe(false);
 
   // Recorder exists with active stream
@@ -341,17 +346,24 @@ test("Recorder camMicAccess", () => {
     stop: jest.fn(),
     stream: {
       active: true,
-      getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }])
-    }
+      getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]),
+    },
   };
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(stream_active);
+  jsPsych.pluginAPI.getCameraRecorder = jest
+    .fn()
+    .mockReturnValue(stream_active);
   expect(rec.camMicAccess()).toBe(true);
 });
 
 test("Recorder requestPermission", async () => {
   const stream = { fake: "stream" } as unknown as MediaStream;
-  const mockGetUserMedia = jest.fn( async () => new Promise<MediaStream>(resolve => { resolve(stream); }) );
-  Object.defineProperty(global.navigator, 'mediaDevices', {
+  const mockGetUserMedia = jest.fn(
+    () =>
+      new Promise<MediaStream>((resolve) => {
+        resolve(stream);
+      }),
+  );
+  Object.defineProperty(global.navigator, "mediaDevices", {
     writable: true,
     value: {
       getUserMedia: mockGetUserMedia,
@@ -364,7 +376,9 @@ test("Recorder requestPermission", async () => {
 
   const returnedStream = await rec.requestPermission(constraints);
   expect(returnedStream).toStrictEqual(stream);
-  expect(global.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(constraints);
+  expect(global.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
+    constraints,
+  );
 });
 
 test("Recorder download", async () => {
