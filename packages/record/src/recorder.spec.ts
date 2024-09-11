@@ -467,12 +467,14 @@ test("Recorder initializeRecorder", () => {
       state: "",
       stop: jest.fn(),
       pause: jest.fn(),
-      resume: jest.fn()
-    }
+      resume: jest.fn(),
+    };
   });
-  jsPsych.pluginAPI.initializeCameraRecorder = jest.fn().mockImplementation((stream: MediaStream) => {
-    return recorder(stream);
-  });
+  jsPsych.pluginAPI.initializeCameraRecorder = jest
+    .fn()
+    .mockImplementation((stream: MediaStream) => {
+      return recorder(stream);
+    });
   jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockImplementation(() => {
     return jsPsych.pluginAPI.initializeCameraRecorder(stream);
   });
@@ -483,7 +485,6 @@ test("Recorder initializeRecorder", () => {
   expect(rec.recorder).toBeDefined();
   expect(rec.recorder).not.toBeNull();
   expect(rec.stream).toStrictEqual(stream);
-
 });
 
 test("Recorder download", async () => {
