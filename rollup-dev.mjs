@@ -18,9 +18,15 @@ export function makeDevConfig(rollupConfig, port) {
             ? "localhost"
             : address.address;
         const protocol = this.https ? "https" : "http";
-        console.log(
-          `<script src="${protocol}://${host}:${address.port}/index.browser.js"></script>`,
-        );
+        if (port !== 10005) {
+          console.log(
+            `<script src="${protocol}://${host}:${address.port}/index.browser.js"></script>`,
+          );
+        } else {
+          console.log(
+            `<script src="${protocol}://${host}:${address.port}/index.css"></script>`,
+          );
+        }
       },
     }),
   ];
