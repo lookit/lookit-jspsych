@@ -152,3 +152,23 @@ lookit-helpers: npm run dev -w @lookit/lookit-helpers
 ```
 
 This method is optional (Honcho should not be added to the project dependencies, and Procfile has been added to our gitignore).
+
+## Documentation
+
+To run documentation development server you will need to have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed. To start the local development server:
+
+```
+make serve
+```
+
+To build the documentation to static HTML files:
+
+```
+make build
+```
+
+### Structure
+
+The root MD file is at `packages/index.md` and each packages MD file is located at the root of the packaged. (e.g. Data's md file is located at `packages/data/README.md`.) The structure is defined in `mkdocs.yml`.
+
+The location of each README file might seem odd. We would like to bundle the README file into each package and have `npmjs.com` should use the README file for each package's landing page.
