@@ -24,7 +24,7 @@ export function makeDevConfig(rollupConfig, port) {
           );
         } else {
           console.log(
-            `<script src="${protocol}://${host}:${address.port}/index.css"></script>`,
+            `<link rel="stylesheet" href="${protocol}://${host}:${address.port}/index.css">`,
           );
         }
       },
