@@ -1,7 +1,11 @@
 import Data from "@lookit/data";
 import { initJsPsych } from "jspsych";
 import Mustache from "mustache";
-import { NoStopPromiseError, RecorderInitializeError } from "./error";
+import {
+  NoStopPromiseError,
+  NoStreamError,
+  RecorderInitializeError,
+} from "./error";
 import Recorder from "./recorder";
 import webcamFeed from "./templates/webcam-feed.mustache";
 import { CSSWidthHeight } from "./types";
@@ -485,6 +489,55 @@ test("Recorder initializeRecorder", () => {
   expect(rec.recorder).toBeDefined();
   expect(rec.recorder).not.toBeNull();
   expect(rec.stream).toStrictEqual(stream);
+});
+
+test("Recorder onMicActivityLevel", () => {
+  const rec = new Recorder(initJsPsych(), "prefix");
+
+  type micEventType = {
+    currentActivityLevel: number;
+    minVolume: number;
+    resolve: () => void;
+  };
+  const event_fail = {
+    currentActivityLevel: 0.0001,
+    minVolume: rec.minVolume,
+    resolve: jest.fn(),
+  } as micEventType;
+
+  expect(rec.micChecked).toBe(false);
+  rec.onMicActivityLevel(
+    event_fail.currentActivityLevel,
+    event_fail.minVolume,
+    event_fail.resolve,
+  );
+  expect(rec.micChecked).toBe(false);
+  expect(event_fail.resolve).not.toHaveBeenCalled();
+
+  const event_pass = {
+    currentActivityLevel: 0.2,
+    minVolume: rec.minVolume,
+    resolve: jest.fn(),
+  } as micEventType;
+
+  expect(rec.micChecked).toBe(false);
+  rec.onMicActivityLevel(
+    event_pass.currentActivityLevel,
+    event_pass.minVolume,
+    event_pass.resolve,
+  );
+  expect(rec.micChecked).toBe(true);
+  expect(event_pass.resolve).toHaveBeenCalled();
+});
+
+test("Recorder mic check throws error if no stream", () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych, "prefix");
+  const media = {};
+  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
+  expect(async () => {
+    await rec.checkMic();
+  }).rejects.toThrow(NoStreamError);
 });
 
 test("Recorder download", async () => {

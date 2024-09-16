@@ -62,3 +62,41 @@ export class NoStopPromiseError extends Error {
     this.name = "NoStopPromiseError";
   }
 }
+
+/**
+ * Error thrown when attempting an action that relies on an input stream, such
+ * as the mic volume check, but no such stream is found.
+ */
+export class NoStreamError extends Error {
+  /**
+   * When attempting an action that requires an input stream, such as the mic
+   * check, but no stream is found.
+   */
+  public constructor() {
+    const message =
+      "No input stream found. Maybe the recorder was not initialized with intializeRecorder.";
+    super(message);
+    this.name = "NoStreamError";
+  }
+}
+
+/**
+ * Error thrown if there's a problem setting up the microphone input level
+ * check.
+ */
+export class MicCheckError extends Error {
+  /**
+   * Occurs if there's a problem setting up the mic check, including setting up
+   * the audio context and stream source, loading the audio worklet processor
+   * script, setting up the port message event handler, and resolving the
+   * promise chain via message events passed to onMicActivityLevel.
+   *
+   * @param err - Error passed into this error that is thrown in the catch
+   *   block, if any.
+   */
+  public constructor(err: Error) {
+    const message = `There was a problem setting up and running the microphone check. ${err.message}`;
+    super(message);
+    this.name = "MicCheckError";
+  }
+}
