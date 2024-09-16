@@ -20,9 +20,9 @@
     "build": "npm run build --workspaces",
     "changeset": "changeset",
     "clean": "trash \"./packages/**/dist\" \"./packages/**/coverage\" \"./packages/**/node_modules\" \"./node_modules\"",
-    "fix": "prettier './' -lw && npm run lint",
+    "fix": "prettier './' -lw && eslint './packages/**/src/**/*.ts' --fix",
     "format": "prettier './' -c",
-    "lint": "eslint './packages/**/src/**/*.ts' --fix",
+    "lint": "eslint './packages/**/src/**/*.ts'",
     "test": "npm test --workspaces"
   },
   "devDependencies": {

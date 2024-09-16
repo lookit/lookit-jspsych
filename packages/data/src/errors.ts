@@ -23,3 +23,17 @@ export class UploadPartError extends Error {
     this.name = "UploadPartError";
   }
 }
+
+/** Error for when the AWS config fails */
+export class AWSConfigError extends Error {
+  /**
+   * AWS cofiguration error. This could be due to incorrect credentials, bucket
+   * name, and/or region.
+   *
+   * @param errorMsg - Message property of error object from the AWS response.
+   */
+  public constructor(errorMsg: string) {
+    super(`AWS configuration error: ${errorMsg}`);
+    this.name = "AWSConfigError";
+  }
+}

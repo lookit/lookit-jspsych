@@ -4,7 +4,7 @@ import {
   S3Client,
   UploadPartCommand,
 } from "@aws-sdk/client-s3";
-import { AWSMissingAttrError, UploadPartError } from "./errors";
+import { AWSConfigError, AWSMissingAttrError, UploadPartError } from "./errors";
 
 /** Provides functionality to upload videos incrementally to an AWS S3 Bucket. */
 class LookitS3 {
@@ -16,6 +16,7 @@ class LookitS3 {
   private uploadId: string = "";
   private key: string;
   private bucket: string = process.env.S3_BUCKET;
+  private complete: boolean = false;
 
   public static readonly minUploadSize: number = 5 * 1024 * 1024;
 
@@ -27,13 +28,22 @@ class LookitS3 {
    */
   public constructor(key: string) {
     this.key = key;
-    this.s3 = new S3Client({
-      region: process.env.S3_REGION,
-      credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-      },
-    });
+    try {
+      this.s3 = new S3Client({
+        region: process.env.S3_REGION,
+        credentials: {
+          accessKeyId: process.env.S3_ACCESS_KEY_ID,
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+        },
+      });
+    } catch (e) {
+      console.error(`Error setting up S3 client: ${e}`);
+      let err_msg = "";
+      if (e instanceof Error) {
+        err_msg = e.message;
+      }
+      throw new AWSConfigError(err_msg);
+    }
   }
 
   /**
@@ -148,6 +158,7 @@ class LookitS3 {
     };
     const command = new CompleteMultipartUploadCommand(input);
     const response = await this.s3.send(command);
+    this.complete = true;
 
     this.logRecordingEvent(`Upload complete: ${response.Location}`);
   }
@@ -175,6 +186,16 @@ class LookitS3 {
   public logRecordingEvent(msg: string) {
     const timestamp = new Date().toISOString();
     console.log(`Recording log: ${timestamp}\nFile: ${this.key}\n${msg}\n`);
+  }
+
+  /**
+   * Whether or not an upload is in progress (created and not yet completed).
+   *
+   * @returns Boolean indicating whether or not an upload has been created but
+   *   not yet completed.
+   */
+  public get uploadInProgress(): boolean {
+    return this.uploadId !== "" && !this.complete;
   }
 }
 
