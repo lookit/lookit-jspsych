@@ -171,6 +171,6 @@ This will create/update a "site" directory in the project root, containing all o
 
 ### Structure
 
-The root MD file is at `packages/index.md` and each packages MD file is located at the root of the packaged. (e.g. Data's md file is located at `packages/data/README.md`.) The structure is defined in `mkdocs.yml`.
+The documentation pages are generated from the README markdown files in the project root directory and the individual package directories. The main project documentation page comes from the root markdown file at `packages/index.md` and the documentation for each package comes from the README markdown files in each package root (e.g. `packages/data/README.md` for the `Data` package.) This documentation structure is defined in `mkdocs.yml`.
 
-The location of each README file might seem odd. We would like to bundle the README file into each package and have `npmjs.com` should use the README file for each package's landing page.
+The reason for having the documentation pages in these different locations throughout the repository is so that they can be re-used as the package's landing page on NPM. This way, the documentation is bundled into each package, and the NPM site `npmjs.com` will automatically use the README.md file as the package's landing page.
