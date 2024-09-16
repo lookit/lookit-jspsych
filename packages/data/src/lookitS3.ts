@@ -195,7 +195,7 @@ class LookitS3 {
    *   not yet completed.
    */
   public get uploadInProgress(): boolean {
-    return this.uploadId !== "" && this.complete == false;
+    return this.uploadId !== "" && !this.complete;
   }
 }
 
