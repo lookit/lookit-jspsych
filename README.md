@@ -161,11 +161,13 @@ To run documentation development server you will need to have Python 3.12 and [P
 make serve
 ```
 
-To build the documentation to static HTML files:
+To build the documentation:
 
 ```
 make build
 ```
+
+This will create/update a "site" directory in the project root, containing all of the static files.
 
 ### Structure
 
