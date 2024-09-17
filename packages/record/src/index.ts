@@ -7,5 +7,5 @@ export default {
   TrialRecordExtension,
   StartRecordPlugin,
   StopRecordPlugin,
-  VideoConfigPlugin
+  VideoConfigPlugin,
 };

@@ -1,0 +1,127 @@
+<style>
+  /* Increase the default text size for buttons. */
+  button.lookit-jspsych-btn {
+    font-size: 18px;
+  }
+
+  /* Container */
+  #lookit-jspsych-video-config {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  /* Webcam column */
+  #lookit-jspsych-video-config-webcam-column {
+    flex-basis: 40%;
+    margin: 5px;
+    min-width: 300px;
+    margin-bottom: 1.6em;
+  }
+
+  /* Webcam container */
+  #lookit-jspsych-webcam-container {
+    width: 100%;
+    margin-bottom: 5px;
+    min-width: 300px;
+    min-height: 225px;
+  }
+
+  /* Container for elements displayed below the webcam feed (reload and device selection) */
+  #lookit-jspsych-webcam-buttons {
+    display: flex;
+    flex-direction: row;
+  }
+
+  /* Webcam reload button container */
+  #lookit-jspsych-webcam-reload-container {
+    flex: none;
+  }
+
+  /* Webcam/mic device selection container */
+  #lookit-jspsych-device-selection-container {
+    flex: auto;
+  }
+
+  /* Device selection elements */
+  .lookit-jspsych-device-selection {
+    font-size:14px;
+    font-family: 'Open Sans', 'Arial', sans-serif;
+    padding: 4px;
+  }
+
+  #lookit-jspsych-video-config-instructions-column {
+    flex-basis: 40%;
+    margin: 5px;
+    text-align: left;
+  }
+
+  /* Error/info message div */
+  #lookit-jspsych-video-config-errors {
+    min-height: 1.6em;
+    line-height: 1.6em;
+    margin-top: -1.6em;
+    text-align: center;
+    font-weight: bold;
+    color: red;
+  }
+
+  /* Instructions */
+  #lookit-jspsych-video-config-instructions {
+    margin-top:0;
+  }
+
+  /* Next button container */
+  #lookit-jspsych-next-container {
+    padding:10px 0px;
+  }
+
+  /* Instruction step complete class */
+  .lookit-jspsych-step-complete {
+    font-weight: bold;
+    background-color: lightgreen;
+  }
+</style>
+<div id="lookit-jspsych-video-config">
+  <div id="lookit-jspsych-video-config-webcam-column">
+    <div id="{{webcam_container_id}}"></div>
+    <div id="lookit-jspsych-webcam-buttons">
+      <div id="lookit-jspsych-webcam-reload-container">
+        <div><button type="button" id="{{reload_button_id_cam}}" class="jspsych-btn lookit-jspsych-btn">Reload</button></div>
+      </div>
+      <div id="lookit-jspsych-device-selection-container">
+        <div id="lookit-jspsych-webcam-selection">
+          <select name="lookit-jspsych-webcam" id="{{camera_selection_id}}" class="lookit-jspsych-device-selection"></select>
+        </div>
+        <div id="lookit-jspsych-mic-selection">
+          <select name="lookit-jspsych-mic" id="{{mic_selection_id}}" class="lookit-jspsych-device-selection"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="lookit-jspsych-video-config-instructions-column">
+    <div id="lookit-jspsych-video-config-errors"></div>
+    <ol id="lookit-jspsych-video-config-instructions">
+      <li id="{{step1_id}}">
+        <strong>Make sure you can see yourself to the left!</strong> 
+        <span id="{{step1_id}}-span" style="visibility:hidden;" class="{{step_complete_class}}">{{step_complete_text}}</span>
+        <p id="{{step1_id}}-paragraph">You may need to click "Allow" so that we can access your webcam and microphone. On Firefox, make sure to also check "Remember this decision"!</p>
+      </li>
+      <li id="{{step2_id}}">
+        <strong>Make sure your webcam settings got saved by clicking <button id="{{reload_button_id_text}}" class="jspsych-btn lookit-jspsych-btn">this button</button>.</strong> 
+        <span id="{{step2_id}}-span" style="visibility:hidden;" class="{{step_complete_class}}">{{step_complete_text}}</span>
+        <p id="{{step2_id}}-paragraph">Your webcam should re-appear WITHOUT you having to allow access again (if you do see a dialogue, click "Remember this decision" or "Always allow" and try again!).</p>
+      </li>
+      <li id="{{step3_id}}">
+        <strong>Make sure we'll be able to hear you!</strong> 
+        <span id="{{step3_id}}-span" style="visibility:hidden;" class="{{step_complete_class}}">{{step_complete_text}}</span>
+        <p id="{{step3_id}}-paragraph">Try clapping or saying hi.</p>
+      </li>
+    </ol>
+  </div>
+</div>
+<div id="lookit-jspsych-next-container" class="jspsych-instructions-nav">
+  <button id="{{next_button_id}}" class="jspsych-btn lookit-jspsych-btn" style="margin-left:5px;" disabled>Next &gt;</button>
+</div>
