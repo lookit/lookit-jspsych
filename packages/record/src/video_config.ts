@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-member-accessibility */
-/* eslint-disable jsdoc/no-types */
-/* eslint-disable jsdoc/no-defaults */
 import { JsPsych, JsPsychPlugin, TrialType } from "jspsych";
 import Recorder from "./recorder";
 
@@ -28,8 +25,8 @@ interface MediaDeviceInfo {
  * @author Becky Gilbert
  * @see {@link https://github.com/lookit/lookit-jspsych/blob/main/packages/video-config/README.md video-config plugin documentation on Github}
  */
-class VideoConfigPlugin implements JsPsychPlugin<Info> {
-  static info = info;
+export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
+  public static info = info;
   private recorder!: Recorder | null;
   private hasCamMicAccess: boolean = false;
   private hasReloaded: boolean = false;
@@ -42,8 +39,7 @@ class VideoConfigPlugin implements JsPsychPlugin<Info> {
    *
    * @param jsPsych - JsPsych object automatically passed into the constructor.
    */
-  constructor(private jsPsych: JsPsych) {
-    this.jsPsych = jsPsych;
+  public constructor(private jsPsych: JsPsych) {
   }
 
   /**
@@ -53,7 +49,7 @@ class VideoConfigPlugin implements JsPsychPlugin<Info> {
    * @param trial - Trial object with parameters/values.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For the unused trial argument
-  trial(display_element: HTMLElement, trial: TrialType<Info>) {
+  public trial(display_element: HTMLElement, trial: TrialType<Info>) {
     const webcam_container_id = "lookit-jspsych-webcam-container";
     const reload_button_id_text = "lookit-jspsych-reload-webcam";
     const reload_button_id_cam = "lookit-jspsych-reload-cam-mic";
@@ -90,7 +86,7 @@ class VideoConfigPlugin implements JsPsychPlugin<Info> {
      * Function to update the errors/messages div with information for the user
      * about the camera/mic checks.
      *
-     * @param {string} errorMsg - Message to display in the error message div.
+     * @param errorMsg - Message to display in the error message div.
      *   Pass an empty string to clear any existing errors/messages.
      */
     const updateErrors = (errorMsg: string) => {
@@ -104,9 +100,9 @@ class VideoConfigPlugin implements JsPsychPlugin<Info> {
      * Update the instructions for a given step, based on whether or not the
      * check has passed for that step.
      *
-     * @param {number} step - Which instructions step to update. 1 = stream
+     * @param step - Which instructions step to update. 1 = stream
      *   access, 2 = reload complete, 3 = mic level check.
-     * @param {boolean} checkPassed - Whether or not the mic check has passed.
+     * @param checkPassed - Whether or not the mic check has passed.
      */
     const updateInstructions = (step: number, checkPassed: boolean) => {
       // Get the IDs for the elements we need to update.
@@ -528,7 +524,7 @@ class VideoConfigPlugin implements JsPsychPlugin<Info> {
     /**
      * Function to toggle the next button disable property.
      *
-     * @param {boolean} enable - Whether to enable (true) or disable (false) the
+     * @param enable - Whether to enable (true) or disable (false) the
      *   next button.
      */
     const enable_next = (enable: boolean) => {
@@ -548,5 +544,3 @@ class VideoConfigPlugin implements JsPsychPlugin<Info> {
     const start_time = performance.now();
   }
 }
-
-export default VideoConfigPlugin;
