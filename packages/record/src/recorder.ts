@@ -3,12 +3,15 @@ import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import Mustache from "mustache";
-import { NoStopPromiseError, RecorderInitializeError } from "./error";
+import {
+  MicCheckError,
+  NoStopPromiseError,
+  NoStreamError,
+  RecorderInitializeError,
+} from "./error";
 import webcamFeed from "./templates/webcam-feed.mustache";
 import { CSSWidthHeight } from "./types";
-
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
-
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
@@ -193,41 +196,13 @@ export default class Recorder {
       // TO DO: load mic_check.js from dist or a URL? See https://github.com/lookit/lookit-jspsych/issues/44
       return audioContext.audioWorklet
         .addModule("/static/js/mic_check.js")
-        .then(() => {
-          return new Promise<void>((resolve) => {
-            this.processorNode = new AudioWorkletNode(
-              audioContext,
-              "mic-check-processor",
-            );
-            microphone
-              .connect(this.processorNode)
-              .connect(audioContext.destination);
-            /**
-             * Callback on the microphone's AudioWorkletNode that fires in
-             * response to a message event containing the current mic level.
-             * When the mic level reaches the threshold, this callback sets the
-             * micChecked property to true and resolves this Promise (via
-             * onMicActivityLevel).
-             *
-             * @param event - The message event that was sent from the processor
-             *   on the audio worklet node. Contains a 'data' property (object)
-             *   which contains a 'volume' property (number).
-             */
-            this.processorNode.port.onmessage = (event: MessageEvent) => {
-              // handle message from the processor: event.data
-              if (this.onMicActivityLevel) {
-                if ("data" in event && "volume" in event.data) {
-                  this.onMicActivityLevel(event.data.volume, minVol, resolve);
-                }
-              }
-            };
-          });
-        })
-        .catch((e) => {
-          throw new Error(`Mic check error: ${e}`);
+        .then(() => this.createConnectProcessor(audioContext, microphone))
+        .then(() => this.setupPortOnMessage(minVol))
+        .catch((err) => {
+          return Promise.reject(new MicCheckError(err));
         });
     } else {
-      return Promise.reject(new Error(`Mic check error: no input stream.`));
+      return Promise.reject(new NoStreamError());
     }
   }
 
@@ -289,6 +264,11 @@ export default class Recorder {
    * video blob data from memory.
    */
   public async destroy() {
+    // Stop the audio worklet processor if it's running
+    if (this.processorNode !== null) {
+      this.processorNode.port.postMessage({ micChecked: true });
+      this.processorNode = null;
+    }
     if (this.stopPromise) {
       await this.stop();
       // Complete any MPU that might've been created
@@ -414,6 +394,65 @@ export default class Recorder {
       this.processorNode = null;
       resolve();
     }
+  }
+
+  /**
+   * Private helper that takes the audio context and microphone, creates the
+   * processor node for the mic check input level processing, and connects the
+   * microphone to the processor node.
+   *
+   * @param audioContext - Audio context that was created in checkMic. This is
+   *   used to create the processor node.
+   * @param microphone - Microphone audio stream source, created in checkMic.
+   *   The processor node will be connected to this source.
+   * @returns Promise that resolves after the processor node has been created,
+   *   and the microphone audio stream source is connected to the processor node
+   *   and audio context destination.
+   */
+  private createConnectProcessor(
+    audioContext: AudioContext,
+    microphone: MediaStreamAudioSourceNode,
+  ) {
+    return new Promise<void>((resolve) => {
+      this.processorNode = new AudioWorkletNode(
+        audioContext,
+        "mic-check-processor",
+      );
+      microphone.connect(this.processorNode).connect(audioContext.destination);
+      resolve();
+    });
+  }
+
+  /**
+   * Private helper to setup the port's on message event handler for the mic
+   * check processor node. This adds the event related callback, which calls
+   * onMicActivityLevel with the event data.
+   *
+   * @param minVol - Minimum volume level (RMS amplitude) passed from checkMic.
+   * @returns Promise that resolves from inside the onMicActivityLevel callback,
+   *   when the mic stream input level has reached the threshold.
+   */
+  private setupPortOnMessage(minVol: number) {
+    return new Promise<void>((resolve) => {
+      /**
+       * Callback on the microphone's AudioWorkletNode that fires in response to
+       * a message event containing the current mic level. When the mic level
+       * reaches the threshold, this callback sets the micChecked property to
+       * true and resolves this Promise (via onMicActivityLevel).
+       *
+       * @param event - The message event that was sent from the processor on
+       *   the audio worklet node. Contains a 'data' property (object) which
+       *   contains a 'volume' property (number).
+       */
+      this.processorNode!.port.onmessage = (event: MessageEvent) => {
+        // handle message from the processor: event.data
+        if (this.onMicActivityLevel) {
+          if ("data" in event && "volume" in event.data) {
+            this.onMicActivityLevel(event.data.volume, minVol, resolve);
+          }
+        }
+      };
+    });
   }
 
   /**

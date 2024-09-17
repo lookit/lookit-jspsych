@@ -3,7 +3,6 @@ import { iifeNameData } from "./packages/data/rollup.config.mjs";
 
 export function makeRollupConfig(iifeName) {
   const dataPackageName = "@lookit/data";
-
   return jsPsychMakeRollupConfig(iifeName).map((config) => {
     return {
       ...config,
