@@ -3,13 +3,13 @@ import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import Mustache from "mustache";
+import webcamFeed from "../templates/webcam-feed.mustache";
 import {
   MicCheckError,
   NoStopPromiseError,
   NoStreamError,
   RecorderInitializeError,
 } from "./error";
-import webcamFeed from "../templates/webcam-feed.mustache";
 import { CSSWidthHeight } from "./types";
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
