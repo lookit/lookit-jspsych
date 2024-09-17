@@ -41,8 +41,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    *
    * @param jsPsych - JsPsych object automatically passed into the constructor.
    */
-  public constructor(private jsPsych: JsPsych) {
-  }
+  public constructor(private jsPsych: JsPsych) {}
 
   /**
    * Trial method.
@@ -67,8 +66,10 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     // info/error messages
     const waiting_for_access_msg = "Waiting for camera/mic access...";
     const checking_mic_msg = "Checking mic input...";
-    const access_problem_msg = "There was a problem accessing your media devices.";
-    const setup_problem_msg = "There was a problem setting up your camera and mic.";
+    const access_problem_msg =
+      "There was a problem accessing your media devices.";
+    const setup_problem_msg =
+      "There was a problem setting up your camera and mic.";
 
     /**
      * Function to collect trial data and end the trial. JsPsych.finishTrial
@@ -88,8 +89,8 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
      * Function to update the errors/messages div with information for the user
      * about the camera/mic checks.
      *
-     * @param errorMsg - Message to display in the error message div.
-     *   Pass an empty string to clear any existing errors/messages.
+     * @param errorMsg - Message to display in the error message div. Pass an
+     *   empty string to clear any existing errors/messages.
      */
     const updateErrors = (errorMsg: string) => {
       const error_msg_div = display_element.querySelector(
@@ -102,8 +103,8 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
      * Update the instructions for a given step, based on whether or not the
      * check has passed for that step.
      *
-     * @param step - Which instructions step to update. 1 = stream
-     *   access, 2 = reload complete, 3 = mic level check.
+     * @param step - Which instructions step to update. 1 = stream access, 2 =
+     *   reload complete, 3 = mic level check.
      * @param checkPassed - Whether or not the mic check has passed.
      */
     const updateInstructions = (step: number, checkPassed: boolean) => {
@@ -140,9 +141,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
       }
     };
 
-    /**
-     * Function to handle the next button click event.
-     */
+    /** Function to handle the next button click event. */
     const nextButtonClick = () => {
       // Calculate RT and end the trial.
       const end_time = performance.now();
@@ -151,9 +150,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
       endTrial();
     };
 
-    /** 
-     * Function to handle the reload recorder button click event. 
-     */
+    /** Function to handle the reload recorder button click event. */
     const reloadButtonClick = () => {
       this.hasReloaded = true;
       updateInstructions(2, true);
@@ -366,7 +363,19 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
         .then(runStreamChecks);
     };
 
-    const html_params = { webcam_container_id, reload_button_id_cam, camera_selection_id, mic_selection_id, step1_id, step2_id, step3_id, step_complete_class, step_complete_text, reload_button_id_text, next_button_id };
+    const html_params = {
+      webcam_container_id,
+      reload_button_id_cam,
+      camera_selection_id,
+      mic_selection_id,
+      step1_id,
+      step2_id,
+      step3_id,
+      step_complete_class,
+      step_complete_text,
+      reload_button_id_text,
+      next_button_id,
+    };
     display_element.innerHTML = Mustache.render(video_config, html_params);
 
     // Add event listeners after elements have been added to the page.
@@ -399,8 +408,8 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     /**
      * Function to toggle the next button disable property.
      *
-     * @param enable - Whether to enable (true) or disable (false) the
-     *   next button.
+     * @param enable - Whether to enable (true) or disable (false) the next
+     *   button.
      */
     const enable_next = (enable: boolean) => {
       if (enable) {
