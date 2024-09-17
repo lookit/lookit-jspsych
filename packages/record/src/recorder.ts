@@ -9,7 +9,7 @@ import {
   NoStreamError,
   RecorderInitializeError,
 } from "./error";
-import webcamFeed from "./templates/webcam-feed.mustache";
+import webcamFeed from "../templates/webcam-feed.mustache";
 import { CSSWidthHeight } from "./types";
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
