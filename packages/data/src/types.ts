@@ -1,5 +1,3 @@
-import { DataCollection } from "jspsych";
-
 export type ApiPromise = Promise<Data<Attributes> | Data<Attributes>[]>;
 
 export type Relationship = {
@@ -55,10 +53,15 @@ export interface ChildAttrs extends Attributes {
   readonly pk?: number;
 }
 
-export interface PastSessionAttrs extends Attributes {
+export interface JsPsychExpData {
+  trial_index: number;
+  trial_type: string;
+}
+
+export interface ResponseAttrs extends Attributes {
   conditions?: Record<string, never>;
   global_event_timings?: Record<string, never>;
-  exp_data?: DataCollection[];
+  exp_data?: JsPsychExpData[];
   sequence?: string[];
   completed?: boolean;
   completed_consent_frame?: boolean;
@@ -104,17 +107,7 @@ export interface Child extends Data<ChildAttrs> {
   };
 }
 
-export interface PastSession extends Data<PastSessionAttrs> {
-  type: "past_sessions";
-  relationships: {
-    child: Relationship;
-    user: Relationship;
-    study: Relationship;
-    demographic_snapshot: Relationship;
-  };
-}
-
-export interface Response extends Data<PastSessionAttrs> {
+export interface Response extends Data<ResponseAttrs> {
   type: "responses";
   relationships: {
     child: Relationship;
@@ -131,17 +124,18 @@ export interface ResponseUpdate {
 }
 
 export interface ResponseAttrsUpdate {
-  exp_data?: DataCollection[];
+  exp_data?: JsPsychExpData[];
   completed?: boolean;
   survey_consent?: boolean;
   completed_consent_frame?: boolean;
+  sequence?: string[];
 }
 
 export interface LookitWindow extends Window {
   chs: {
     study: Study;
     child: Child;
-    pastSessions: PastSession[];
+    pastSessions: Response[];
     response: Response;
     sessionRecorder: unknown;
   };

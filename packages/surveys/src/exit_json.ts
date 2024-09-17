@@ -1,3 +1,11 @@
+export const names = <const>{
+  birthDate: "birthDate",
+  databraryShare: "databraryShare",
+  useOfMedia: "useOfMedia",
+  withdrawal: "withdrawal",
+  feedback: "feedback",
+};
+
 export const surveyJSON = {
   pages: [
     {
@@ -8,7 +16,7 @@ export const surveyJSON = {
           inputType: "date",
           isRequired: true,
           maxValueExpression: "today()",
-          name: "birthDate",
+          name: names.birthDate,
           title: "Please confirm your child's birthdate.",
           type: "text",
         },
@@ -17,7 +25,7 @@ export const surveyJSON = {
             "Only authorized researchers will have access to information in the library. Researchers who are granted access must agree to maintain confidentiality and not use information for commercial purposes. Data sharing will lead to faster progress in research on human development and behavior. If you have any questions about the data-sharing library, please visit [Databrary](https://nyu.databrary.org/) or email ethics@databrary.org.",
           enableIf: "({withdrawal} empty) or ({withdrawal.length} = 0)",
           isRequired: true,
-          name: "databraryShare",
+          name: names.databraryShare,
           title:
             "Would you like to share your video and other data from this session with authorized users of the secure data library Databrary?",
           type: "boolean",
@@ -42,7 +50,7 @@ export const surveyJSON = {
           description: "",
           enableIf: "({withdrawal} empty) or ({withdrawal.length} = 0)",
           isRequired: true,
-          name: "useOfMedia",
+          name: names.useOfMedia,
           title: "Use of video clips and images:",
           type: "radiogroup",
         },
@@ -50,13 +58,13 @@ export const surveyJSON = {
           choices: [],
           defaultValue: [],
           isRequired: false,
-          name: "withdrawal",
+          name: names.withdrawal,
           title: "Withdrawal of video data",
           type: "checkbox",
         },
         {
           autoGrow: true,
-          name: "feedback",
+          name: names.feedback,
           rows: 3,
           title:
             "How did it go? Do you have any suggestions for improving the study?",

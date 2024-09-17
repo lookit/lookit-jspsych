@@ -151,7 +151,7 @@ export default class Recorder {
    * @returns MediaStream from the plugin API.
    */
   private get stream() {
-    return this.recorder.stream;
+    return this.recorder?.stream;
   }
 
   /**
@@ -262,7 +262,9 @@ export default class Recorder {
   }
 
   /**
-   * Stop recording and camera/microphone.
+   * Stop recording and camera/microphone. This will stop accessing all media
+   * tracks, clear the webcam feed element (if there is one), and return the
+   * stop promise.
    *
    * @returns Promise that resolves after the media recorder has stopped and
    *   final 'dataavailable' event has occurred, when the "stop" event-related
@@ -270,17 +272,10 @@ export default class Recorder {
    */
   public stop() {
     this.stopTracks();
-    // Clear the webcam feed display if there is one.
-    const webcam_feed_element = document.querySelector(
-      `#${this.webcam_element_id}`,
-    ) as HTMLVideoElement;
-    if (webcam_feed_element) {
-      webcam_feed_element.remove();
-    }
+    this.clearWebcamFeed();
     if (!this.stopPromise) {
       throw new NoStopPromiseError();
     }
-
     return this.stopPromise;
   }
 
@@ -288,28 +283,24 @@ export default class Recorder {
    * Destroy the recorder. When a plugin/extension destroys the recorder, it
    * will set the whole Recorder class instance to null, so we don't need to
    * reset the Recorder instance variables/states. We should complete the S3
-   * upload and stop any async processes that might continue to run (audio
-   * worklet for the mic check, stop promise). We also need to stop the tracks
-   * to release the media devices (even if they're not recording). Setting S3 to
-   * null should release the video blob data from memory.
+   * upload and stop any async processes that might continue to run (stop
+   * promise). We also need to stop the tracks to release the media devices
+   * (even if they're not recording). Setting S3 to null should release the
+   * video blob data from memory.
    */
   public async destroy() {
-    this.recorder.ondataavailable = null;
-    this.stopTracks();
-    // Complete any MPU that might've been created and set S3 to null to clear data
-    if (this.s3?.uploadInProgress) {
-      await this.s3?.completeUpload();
-    }
-    this.s3 = null;
-    // Stop the audio worklet processor if it's running
-    if (this.processorNode !== null) {
-      this.processorNode.port.postMessage({ micChecked: true });
-      this.processorNode = null;
-    }
-    // Reject any existing stop promise, in case it is pending.
     if (this.stopPromise) {
-      this.rejectStopPromise("RecorderDestroyed");
+      await this.stop();
+      // Complete any MPU that might've been created
+      if (this.s3?.uploadInProgress) {
+        await this.s3?.completeUpload();
+      }
+    } else {
+      this.stopTracks();
+      this.clearWebcamFeed();
     }
+    // Clear any blob data
+    this.s3 = null;
   }
 
   /** Throw Error if there isn't a recorder provided by jsPsych. */
@@ -431,6 +422,16 @@ export default class Recorder {
    * @returns Whether or not the recorder has webcam/mic access.
    */
   public camMicAccess(): boolean {
-    return this.recorder && this.stream?.active;
+    return !!this.recorder && !!this.stream?.active;
+  }
+
+  /** Private helper to clear the webcam feed, if there is one. */
+  private clearWebcamFeed() {
+    const webcam_feed_element = document.querySelector(
+      `#${this.webcam_element_id}`,
+    ) as HTMLVideoElement;
+    if (webcam_feed_element) {
+      webcam_feed_element.remove();
+    }
   }
 }

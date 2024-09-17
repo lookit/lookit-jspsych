@@ -90,3 +90,15 @@ test("Upload to S3 missing Etag", async () => {
   expect(CreateMultipartUploadCommand).toHaveBeenCalledTimes(1);
   expect(CompleteMultipartUploadCommand).toHaveBeenCalledTimes(0);
 });
+
+test("Upload in progress", async () => {
+  mockSendRtn = { UploadId: "upload id", ETag: "etag" };
+  const s3 = new LookitS3("key value");
+
+  expect(s3.uploadInProgress).toBe(false);
+  await s3.createUpload();
+  expect(s3.uploadInProgress).toBe(true);
+  s3.onDataAvailable(largeBlob);
+  await s3.completeUpload();
+  expect(s3.uploadInProgress).toBe(false);
+});

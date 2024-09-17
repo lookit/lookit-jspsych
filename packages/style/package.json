@@ -1,0 +1,26 @@
+{
+  "name": "@lookit/style",
+  "version": "0.0.1",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "main": "css/index.scss",
+  "unpkg": "css/index.css",
+  "files": [
+    "dist",
+    "src",
+    "scss"
+  ],
+  "scripts": {
+    "build": "rollup --config && trash **/*.js **/*.map",
+    "dev": "rollup --config rollup.config.dev.mjs --watch",
+    "test": ""
+  },
+  "devDependencies": {
+    "@jspsych/config": "^3.0.0",
+    "@lookit/surveys": "^0.0.1",
+    "rollup-plugin-scss": "^4.0.0",
+    "sass": "^1.78.0",
+    "trash-cli": "^5.0.0"
+  }
+}
