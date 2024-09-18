@@ -141,23 +141,14 @@ test("checkMic should process microphone input and handle messages", () => {
 
   const onMicActivityLevelSpy = jest.spyOn(rec, "onMicActivityLevel" as never);
 
-  // Setup everything in the checkMic promise chain, up to the mic activity event handler
+  expect(rec.processorNode).toBe(null);
+
+  // Setup the processor node.
   const audioContext = new AudioContext();
   rec.processorNode = new AudioWorkletNode(audioContext, "mic-check-processor");
-  /**
-   * Processor node port's on message event handler. Copied from recorder.ts.
-   *
-   * @param event - Message event.
-   */
-  rec.processorNode.port.onmessage = (event: MessageEvent) => {
-    // handle message from the processor: event.data
-    if (rec.onMicActivityLevel) {
-      if ("data" in event && "volume" in event.data) {
-        rec.onMicActivityLevel(event.data.volume, rec.minVolume, jest.fn());
-      }
-    }
-  };
-  // rec[]
+  expect(rec.processorNode).toBeTruthy();
+  rec.setupPortOnMessage(rec.minVolume);
+  expect(rec.processorNode.port.onmessage).toBeTruthy();
 
   expect(rec.micChecked).toBe(false);
 
@@ -202,23 +193,9 @@ test("Destroy method should set processorNode to null", async () => {
   // Setup the processor node.
   const audioContext = new AudioContext();
   rec.processorNode = new AudioWorkletNode(audioContext, "mic-check-processor");
-  /**
-   * Processor node port's on message event handler. Copied from recorder.ts.
-   *
-   * @param event - Message event.
-   */
-  rec.processorNode.port.onmessage = (event: MessageEvent) => {
-    // handle message from the processor: event.data
-    if (rec.onMicActivityLevel) {
-      if ("data" in event && "volume" in event.data) {
-        rec.onMicActivityLevel(
-          event.data.volume,
-          rec.minVolume,
-          expect.any(Function),
-        );
-      }
-    }
-  };
+  expect(rec.processorNode).toBeTruthy();
+  rec.setupPortOnMessage(rec.minVolume);
+  expect(rec.processorNode.port.onmessage).toBeTruthy();
 
   expect(rec.processorNode).toBeTruthy();
   await rec.destroy();
