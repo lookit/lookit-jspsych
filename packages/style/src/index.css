@@ -8903,3 +8903,78 @@ div#sv-nav-complete.sv-action.sv-action--hidden {
 .jspsych-row-multiple > div {
   min-width: unset !important;
 }
+
+div#lookit-jspsych-video-config {
+  /* Container */
+  /* Webcam column */
+  /* Webcam container */
+  /* Container for elements displayed below the webcam feed (reload and device selection) */
+  /* Webcam reload button container */
+  /* Webcam/mic device selection container */
+  /* Device selection elements */
+  /* Error/info message div */
+  /* Instructions */
+  /* Next button container */
+  /* Instruction step complete class */
+}
+div#lookit-jspsych-video-config button.lookit-jspsych-btn {
+  font-size: 18px;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-video-config-column-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-video-config-webcam-column {
+  flex-basis: 40%;
+  margin: 5px;
+  min-width: 300px;
+  margin-bottom: 1.6em;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-webcam-container {
+  width: 100%;
+  margin-bottom: 5px;
+  min-width: 300px;
+  min-height: 225px;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-webcam-buttons {
+  display: flex;
+  flex-direction: row;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-webcam-reload-container {
+  flex: none;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-device-selection-container {
+  flex: auto;
+}
+div#lookit-jspsych-video-config .lookit-jspsych-device-selection {
+  font-size: 14px;
+  font-family: "Open Sans", "Arial", sans-serif;
+  padding: 4px;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-video-config-instructions-column {
+  flex-basis: 40%;
+  margin: 5px;
+  text-align: left;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-video-config-errors {
+  min-height: 1.6em;
+  line-height: 1.6em;
+  margin-top: -1.6em;
+  text-align: center;
+  font-weight: bold;
+  color: red;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-video-config-instructions {
+  width: 60%;
+  margin-top: 0;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-next-container {
+  padding: 10px 0px;
+}
+div#lookit-jspsych-video-config .lookit-jspsych-step-complete {
+  background-color: lightgreen;
+  font-weight: bold;
+}

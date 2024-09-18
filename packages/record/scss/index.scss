@@ -1,0 +1,88 @@
+div#lookit-jspsych-video-config {
+
+  button.lookit-jspsych-btn {
+    font-size: 18px;
+  }
+
+  /* Container */
+  #lookit-jspsych-video-config-column-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  /* Webcam column */
+  #lookit-jspsych-video-config-webcam-column {
+    flex-basis: 40%;
+    margin: 5px;
+    min-width: 300px;
+    margin-bottom: 1.6em;
+  }
+
+  /* Webcam container */
+  #lookit-jspsych-webcam-container {
+    width: 100%;
+    margin-bottom: 5px;
+    min-width: 300px;
+    min-height: 225px;
+  }
+
+  /* Container for elements displayed below the webcam feed (reload and device selection) */
+  #lookit-jspsych-webcam-buttons {
+    display: flex;
+    flex-direction: row;
+  }
+
+  /* Webcam reload button container */
+  #lookit-jspsych-webcam-reload-container {
+    flex: none;
+  }
+
+  /* Webcam/mic device selection container */
+  #lookit-jspsych-device-selection-container {
+    flex: auto;
+  }
+
+  /* Device selection elements */
+  .lookit-jspsych-device-selection {
+    font-size: 14px;
+    font-family: "Open Sans", "Arial", sans-serif;
+    padding: 4px;
+  }
+
+  #lookit-jspsych-video-config-instructions-column {
+    flex-basis: 40%;
+    margin: 5px;
+    text-align: left;
+  }
+
+  /* Error/info message div */
+  #lookit-jspsych-video-config-errors {
+    min-height: 1.6em;
+    line-height: 1.6em;
+    margin-top: -1.6em;
+    text-align: center;
+    font-weight: bold;
+    color: red;
+  }
+
+  /* Instructions */
+  #lookit-jspsych-video-config-instructions {
+    width: 60%; // remove?
+    margin-top: 0;
+  }
+
+  /* Next button container */
+  #lookit-jspsych-next-container {
+    padding: 10px 0px;
+  }
+
+  /* Instruction step complete class */
+  .lookit-jspsych-step-complete {
+    background-color: lightgreen;
+    font-weight: bold;
+  }
+
+}
