@@ -96,7 +96,7 @@ test("Throws MicCheckError with addModule error", () => {
   expect(async () => await rec.checkMic()).resolves;
 
   const mockError = jest.fn(() => {
-    const promise = new Promise(() => {
+    const promise = new Promise<void>(() => {
       throw "Error";
     });
     promise.catch(() => null); // Prevent an uncaught error here so that it propogates to the catch block.
