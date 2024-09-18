@@ -142,19 +142,21 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     };
 
     /** Function to handle the next button click event. */
-    const nextButtonClick = () => {
-      // Calculate RT and end the trial.
+    const nextButtonClick = async () => {
+      // Calculate RT, destroy recorder, and end the trial.
       const end_time = performance.now();
       const rt = Math.round(end_time - start_time);
       this.response.rt = rt;
+      await destroyRecorder();
       endTrial();
     };
 
     /** Function to handle the reload recorder button click event. */
-    const reloadButtonClick = () => {
+    const reloadButtonClick = async () => {
       this.hasReloaded = true;
       updateInstructions(2, true);
-      destroyRecorder()?.then(setupRecorder);
+      await destroyRecorder();
+      setupRecorder();
     };
 
     /**
@@ -261,14 +263,13 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
      * @returns Promise that resolves when the recorder has been destroyed and
      *   variables reset to initial values.
      */
-    const destroyRecorder = () => {
-      return this.recorder?.destroy().then(() => {
-        this.recorder = null;
-        this.hasCamMicAccess = false;
-        enable_next(false);
-        updateInstructions(3, false);
-        updateInstructions(1, false);
-      });
+    const destroyRecorder = async () => {
+      await this.recorder?.destroy();
+      this.recorder = null;
+      this.hasCamMicAccess = false;
+      enable_next(false);
+      updateInstructions(3, false);
+      updateInstructions(1, false);
     };
 
     /**
