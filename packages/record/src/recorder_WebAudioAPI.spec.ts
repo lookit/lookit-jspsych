@@ -42,7 +42,7 @@ test("Recorder check mic", async () => {
 
   const expectedAudioContext = new AudioContext();
   const expectedMicrophone = expectedAudioContext.createMediaStreamSource(
-    rec.stream,
+    rec["stream"],
   );
 
   await rec.checkMic();
@@ -53,7 +53,7 @@ test("Recorder check mic", async () => {
     expectedAudioContext,
     expectedMicrophone,
   );
-  expect(rec["setupPortOnMessage"]).toHaveBeenCalledWith(rec.minVolume);
+  expect(rec["setupPortOnMessage"]).toHaveBeenCalledWith(rec["minVolume"]);
 });
 
 test("Throws MicCheckError with createConnectProcessor error", () => {
@@ -141,26 +141,26 @@ test("checkMic should process microphone input and handle messages", () => {
 
   const onMicActivityLevelSpy = jest.spyOn(rec, "onMicActivityLevel" as never);
 
-  expect(rec.processorNode).toBe(null);
+  expect(rec["processorNode"]).toBe(null);
 
   // Setup the processor node.
   const audioContext = new AudioContext();
-  rec.processorNode = new AudioWorkletNode(audioContext, "mic-check-processor");
-  expect(rec.processorNode).toBeTruthy();
-  rec.setupPortOnMessage(rec.minVolume);
-  expect(rec.processorNode.port.onmessage).toBeTruthy();
+  rec["processorNode"] = new AudioWorkletNode(audioContext, "mic-check-processor");
+  expect(rec["processorNode"]).toBeTruthy();
+  rec.setupPortOnMessage(rec["minVolume"]);
+  expect(rec["processorNode"].port.onmessage).toBeTruthy();
 
   expect(rec.micChecked).toBe(false);
 
   // Simulate a failing event
   const failVol = 0.0001;
   const mockEventFail = { data: { volume: failVol } } as MessageEvent;
-  rec.processorNode.port.onmessage(mockEventFail);
+  rec["processorNode"].port.onmessage(mockEventFail);
 
   // Verify onMicActivityLevel is called with params and micChecked is still false.
   expect(onMicActivityLevelSpy).toHaveBeenCalledWith(
     failVol,
-    rec.minVolume,
+    rec["minVolume"],
     expect.any(Function),
   );
   expect(rec.micChecked).toBe(false);
@@ -168,12 +168,12 @@ test("checkMic should process microphone input and handle messages", () => {
   // Simulate a passing event
   const passVol = 0.6;
   const mockEventPass = { data: { volume: passVol } } as MessageEvent;
-  rec.processorNode.port.onmessage(mockEventPass);
+  rec["processorNode"].port.onmessage(mockEventPass);
 
   // Verify onMicActivityLevel is called with params and micChecked is set to true.
   expect(onMicActivityLevelSpy).toHaveBeenCalledWith(
     passVol,
-    rec.minVolume,
+    rec["minVolume"],
     expect.any(Function),
   );
   expect(rec.micChecked).toBe(true);
@@ -188,18 +188,18 @@ test("Destroy method should set processorNode to null", async () => {
   };
   jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
 
-  expect(rec.processorNode).toBe(null);
+  expect(rec["processorNode"]).toBe(null);
 
   // Setup the processor node.
   const audioContext = new AudioContext();
-  rec.processorNode = new AudioWorkletNode(audioContext, "mic-check-processor");
-  expect(rec.processorNode).toBeTruthy();
-  rec.setupPortOnMessage(rec.minVolume);
-  expect(rec.processorNode.port.onmessage).toBeTruthy();
+  rec["processorNode"] = new AudioWorkletNode(audioContext, "mic-check-processor");
+  expect(rec["processorNode"]).toBeTruthy();
+  rec.setupPortOnMessage(rec["minVolume"]);
+  expect(rec["processorNode"].port.onmessage).toBeTruthy();
 
-  expect(rec.processorNode).toBeTruthy();
+  expect(rec["processorNode"]).toBeTruthy();
   await rec.destroy();
-  expect(rec.processorNode).toBe(null);
+  expect(rec["processorNode"]).toBe(null);
 });
 
 test("Recorder setupPortOnMessage should setup port's on message callback", () => {
@@ -211,27 +211,27 @@ test("Recorder setupPortOnMessage should setup port's on message callback", () =
   };
   jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
 
-  expect(rec.processorNode).toBe(null);
+  expect(rec["processorNode"]).toBe(null);
 
   // Setup the processor node.
   const audioContext = new AudioContext();
-  rec.processorNode = new AudioWorkletNode(audioContext, "mic-check-processor");
-  expect(rec.processorNode).toBeTruthy();
+  rec["processorNode"] = new AudioWorkletNode(audioContext, "mic-check-processor");
+  expect(rec["processorNode"]).toBeTruthy();
 
-  rec.onMicActivityLevel = jest.fn();
+  rec["onMicActivityLevel"] = jest.fn();
 
-  rec.setupPortOnMessage(rec.minVolume);
-  expect(rec.processorNode.port.onmessage).toBeTruthy();
+  rec.setupPortOnMessage(rec["minVolume"]);
+  expect(rec["processorNode"].port.onmessage).toBeTruthy();
 
   // Simulate a message event to test the message event callback.
   const passVol = 0.6;
   const mockEventPass = { data: { volume: passVol } } as MessageEvent;
-  rec.processorNode.port.onmessage(mockEventPass);
+  rec["processorNode"].port.onmessage(mockEventPass);
 
   // The port message event should trigger onMicActivityLevel.
-  expect(rec.onMicActivityLevel).toHaveBeenCalledWith(
+  expect(rec["onMicActivityLevel"]).toHaveBeenCalledWith(
     passVol,
-    rec.minVolume,
+    rec["minVolume"],
     expect.any(Function),
   );
 });
