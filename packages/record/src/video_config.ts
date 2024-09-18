@@ -1,7 +1,7 @@
 import { JsPsych, JsPsychPlugin, TrialType } from "jspsych";
 import Mustache from "mustache";
 import Recorder from "./recorder";
-import video_config from "./templates/video-config.mustache";
+import video_config from "../templates/video-config.mustache";
 
 const info = <const>{
   name: "video-config-plugin",

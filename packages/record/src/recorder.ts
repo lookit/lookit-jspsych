@@ -3,13 +3,13 @@ import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import Mustache from "mustache";
+import webcamFeed from "../templates/webcam-feed.mustache";
 import {
   MicCheckError,
   NoStopPromiseError,
   NoStreamError,
   RecorderInitializeError,
 } from "./error";
-import webcamFeed from "./templates/webcam-feed.mustache";
 import { CSSWidthHeight } from "./types";
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
@@ -258,10 +258,10 @@ export default class Recorder {
    * Destroy the recorder. When a plugin/extension destroys the recorder, it
    * will set the whole Recorder class instance to null, so we don't need to
    * reset the Recorder instance variables/states. We should complete the S3
-   * upload and stop any async processes that might continue to run (stop
-   * promise). We also need to stop the tracks to release the media devices
-   * (even if they're not recording). Setting S3 to null should release the
-   * video blob data from memory.
+   * upload and stop any async processes that might continue to run (audio
+   * worklet for the mic check, stop promise). We also need to stop the tracks
+   * to release the media devices (even if they're not recording). Setting S3 to
+   * null should release the video blob data from memory.
    */
   public async destroy() {
     // Stop the audio worklet processor if it's running

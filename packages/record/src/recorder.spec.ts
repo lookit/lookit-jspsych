@@ -1,13 +1,13 @@
 import Data from "@lookit/data";
 import { initJsPsych } from "jspsych";
 import Mustache from "mustache";
+import webcamFeed from "../templates/webcam-feed.mustache";
 import {
   NoStopPromiseError,
   NoStreamError,
   RecorderInitializeError,
 } from "./error";
 import Recorder from "./recorder";
-import webcamFeed from "./templates/webcam-feed.mustache";
 import { CSSWidthHeight } from "./types";
 
 jest.mock("@lookit/data");
