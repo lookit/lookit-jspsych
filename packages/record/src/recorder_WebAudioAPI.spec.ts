@@ -149,7 +149,7 @@ test("checkMic should process microphone input and handle messages", () => {
     audioContext,
     "mic-check-processor",
   );
-  expect(rec["processorNode"]).toBeTruthy();
+  expect(rec["processorNode"]).not.toBeNull();
   rec["setupPortOnMessage"](rec["minVolume"]);
   expect(rec["processorNode"].port.onmessage).toBeTruthy();
 
@@ -158,7 +158,13 @@ test("checkMic should process microphone input and handle messages", () => {
   // Simulate a failing event
   const failVol = 0.0001;
   const mockEventFail = { data: { volume: failVol } } as MessageEvent;
-  rec["processorNode"].port.onmessage(mockEventFail);
+  if (
+    rec["processorNode"] &&
+    rec["processorNode"].port &&
+    rec["processorNode"].port.onmessage
+  ) {
+    rec["processorNode"].port.onmessage(mockEventFail);
+  }
 
   // Verify onMicActivityLevel is called with params and micChecked is still false.
   expect(onMicActivityLevelSpy).toHaveBeenCalledWith(
@@ -171,7 +177,13 @@ test("checkMic should process microphone input and handle messages", () => {
   // Simulate a passing event
   const passVol = 0.6;
   const mockEventPass = { data: { volume: passVol } } as MessageEvent;
-  rec["processorNode"].port.onmessage(mockEventPass);
+  if (
+    rec["processorNode"] &&
+    rec["processorNode"].port &&
+    rec["processorNode"].port.onmessage
+  ) {
+    rec["processorNode"].port.onmessage(mockEventPass);
+  }
 
   // Verify onMicActivityLevel is called with params and micChecked is set to true.
   expect(onMicActivityLevelSpy).toHaveBeenCalledWith(
@@ -235,7 +247,13 @@ test("Recorder setupPortOnMessage should setup port's on message callback", () =
   // Simulate a message event to test the message event callback.
   const passVol = 0.6;
   const mockEventPass = { data: { volume: passVol } } as MessageEvent;
-  rec["processorNode"].port.onmessage(mockEventPass);
+  if (
+    rec["processorNode"] &&
+    rec["processorNode"].port &&
+    rec["processorNode"].port.onmessage
+  ) {
+    rec["processorNode"].port.onmessage(mockEventPass);
+  }
 
   // The port message event should trigger onMicActivityLevel.
   expect(rec["onMicActivityLevel"]).toHaveBeenCalledWith(
