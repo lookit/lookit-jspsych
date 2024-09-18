@@ -148,7 +148,7 @@ test("checkMic should process microphone input and handle messages", () => {
   const audioContext = new AudioContext();
   rec["processorNode"] = new AudioWorkletNode(audioContext, "mic-check-processor");
   expect(rec["processorNode"]).toBeTruthy();
-  rec.setupPortOnMessage(rec["minVolume"]);
+  rec["setupPortOnMessage"](rec["minVolume"]);
   expect(rec["processorNode"].port.onmessage).toBeTruthy();
 
   expect(rec.micChecked).toBe(false);
@@ -195,7 +195,7 @@ test("Destroy method should set processorNode to null", async () => {
   const audioContext = new AudioContext();
   rec["processorNode"] = new AudioWorkletNode(audioContext, "mic-check-processor");
   expect(rec["processorNode"]).toBeTruthy();
-  rec.setupPortOnMessage(rec["minVolume"]);
+  rec["setupPortOnMessage"](rec["minVolume"]);
   expect(rec["processorNode"].port.onmessage).toBeTruthy();
 
   expect(rec["processorNode"]).toBeTruthy();
@@ -221,7 +221,7 @@ test("Recorder setupPortOnMessage should setup port's on message callback", () =
 
   rec["onMicActivityLevel"] = jest.fn();
 
-  rec.setupPortOnMessage(rec["minVolume"]);
+  rec["setupPortOnMessage"](rec["minVolume"]);
   expect(rec["processorNode"].port.onmessage).toBeTruthy();
 
   // Simulate a message event to test the message event callback.

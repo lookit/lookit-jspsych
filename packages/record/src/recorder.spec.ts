@@ -506,7 +506,7 @@ test("Recorder onMicActivityLevel", () => {
   } as micEventType;
 
   expect(rec.micChecked).toBe(false);
-  rec.onMicActivityLevel(
+  rec["onMicActivityLevel"](
     event_fail.currentActivityLevel,
     event_fail.minVolume,
     event_fail.resolve,
@@ -521,7 +521,7 @@ test("Recorder onMicActivityLevel", () => {
   } as micEventType;
 
   expect(rec.micChecked).toBe(false);
-  rec.onMicActivityLevel(
+  rec["onMicActivityLevel"](
     event_pass.currentActivityLevel,
     event_pass.minVolume,
     event_pass.resolve,
