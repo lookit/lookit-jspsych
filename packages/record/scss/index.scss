@@ -38,6 +38,7 @@ div#lookit-jspsych-video-config {
   /* Webcam reload button container */
   #lookit-jspsych-webcam-reload-container {
     flex: none;
+    align-content: center;
   }
 
   /* Webcam/mic device selection container */
@@ -83,6 +84,14 @@ div#lookit-jspsych-video-config {
   .lookit-jspsych-step-complete {
     background-color: lightgreen;
     font-weight: bold;
+  }
+
+  /** Help text, such as that about browser compatibility */
+  .lookit-jspsych-help-text {
+    font-size: .8em;
+    line-height: 1.5em;
+    text-align: left;
+    margin-top: 10px;
   }
 
 }

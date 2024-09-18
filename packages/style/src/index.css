@@ -8945,6 +8945,7 @@ div#lookit-jspsych-video-config #lookit-jspsych-webcam-buttons {
 }
 div#lookit-jspsych-video-config #lookit-jspsych-webcam-reload-container {
   flex: none;
+  align-content: center;
 }
 div#lookit-jspsych-video-config #lookit-jspsych-device-selection-container {
   flex: auto;
@@ -8977,4 +8978,10 @@ div#lookit-jspsych-video-config #lookit-jspsych-next-container {
 div#lookit-jspsych-video-config .lookit-jspsych-step-complete {
   background-color: lightgreen;
   font-weight: bold;
+}
+div#lookit-jspsych-video-config .lookit-jspsych-help-text {
+  font-size: 0.8em;
+  line-height: 1.5em;
+  text-align: left;
+  margin-top: 10px;
 }
