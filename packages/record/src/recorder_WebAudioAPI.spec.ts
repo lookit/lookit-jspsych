@@ -3,7 +3,6 @@ import { initJsPsych } from "jspsych";
 import {
   audioContextMock,
   AudioWorkletNodeMock,
-  MediaStreamAudioSourceNodeMock,
 } from "../fixtures/MockWebAudioAPI";
 import { MicCheckError } from "./error";
 import Recorder from "./recorder";
@@ -146,7 +145,10 @@ test("checkMic should process microphone input and handle messages", () => {
 
   // Setup the processor node.
   const audioContext = new AudioContext();
-  rec["processorNode"] = new AudioWorkletNode(audioContext, "mic-check-processor");
+  rec["processorNode"] = new AudioWorkletNode(
+    audioContext,
+    "mic-check-processor",
+  );
   expect(rec["processorNode"]).toBeTruthy();
   rec["setupPortOnMessage"](rec["minVolume"]);
   expect(rec["processorNode"].port.onmessage).toBeTruthy();
@@ -193,7 +195,10 @@ test("Destroy method should set processorNode to null", async () => {
 
   // Setup the processor node.
   const audioContext = new AudioContext();
-  rec["processorNode"] = new AudioWorkletNode(audioContext, "mic-check-processor");
+  rec["processorNode"] = new AudioWorkletNode(
+    audioContext,
+    "mic-check-processor",
+  );
   expect(rec["processorNode"]).toBeTruthy();
   rec["setupPortOnMessage"](rec["minVolume"]);
   expect(rec["processorNode"].port.onmessage).toBeTruthy();
@@ -216,7 +221,10 @@ test("Recorder setupPortOnMessage should setup port's on message callback", () =
 
   // Setup the processor node.
   const audioContext = new AudioContext();
-  rec["processorNode"] = new AudioWorkletNode(audioContext, "mic-check-processor");
+  rec["processorNode"] = new AudioWorkletNode(
+    audioContext,
+    "mic-check-processor",
+  );
   expect(rec["processorNode"]).toBeTruthy();
 
   rec["onMicActivityLevel"] = jest.fn();
