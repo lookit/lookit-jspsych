@@ -238,7 +238,7 @@ test("Recorder destroy", async () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych, "prefix");
 
-  expect(rec.s3).not.toBe(null);
+  expect(rec["s3"]).not.toBe(null);
 
   const media = {
     stop: jest.fn(),
@@ -252,7 +252,7 @@ test("Recorder destroy", async () => {
 
   expect(media.stop).toHaveBeenCalledTimes(1);
   expect(media.stream.getTracks).toHaveBeenCalledTimes(1);
-  expect(rec.s3).toBe(null);
+  expect(rec["s3"]).toBe(null);
   expect(Data.LookitS3.prototype.completeUpload).not.toHaveBeenCalled();
 });
 
@@ -273,7 +273,7 @@ test("Recorder destroy with in-progress upload", async () => {
   const stopPromise = Promise.resolve();
   rec["stopPromise"] = stopPromise;
 
-  Object.defineProperty(rec.s3, "uploadInProgress", {
+  Object.defineProperty(rec["s3"], "uploadInProgress", {
     /**
      * Overwrite the getter method for S3's uploadInProgress.
      *
@@ -287,7 +287,7 @@ test("Recorder destroy with in-progress upload", async () => {
   await rec.destroy();
   expect(media.stop).toHaveBeenCalledTimes(1);
   expect(media.stream.getTracks).toHaveBeenCalledTimes(1);
-  expect(rec.s3).toBe(null);
+  expect(rec["s3"]).toBe(null);
   expect(Data.LookitS3.prototype.completeUpload).toHaveBeenCalledTimes(1);
 });
 
@@ -315,7 +315,7 @@ test("Recorder destroy with webcam display", async () => {
   await rec.destroy();
   expect(media.stop).toHaveBeenCalledTimes(1);
   expect(media.stream.getTracks).toHaveBeenCalledTimes(1);
-  expect(rec.s3).toBe(null);
+  expect(rec["s3"]).toBe(null);
   expect(document.body.innerHTML).not.toContain("<video");
 });
 
@@ -486,9 +486,9 @@ test("Recorder initializeRecorder", () => {
   rec.intializeRecorder(stream);
 
   expect(jsPsych.pluginAPI.initializeCameraRecorder).toHaveBeenCalled();
-  expect(rec.recorder).toBeDefined();
-  expect(rec.recorder).not.toBeNull();
-  expect(rec.stream).toStrictEqual(stream);
+  expect(rec["recorder"]).toBeDefined();
+  expect(rec["recorder"]).not.toBeNull();
+  expect(rec["stream"]).toStrictEqual(stream);
 });
 
 test("Recorder onMicActivityLevel", () => {
@@ -501,12 +501,12 @@ test("Recorder onMicActivityLevel", () => {
   };
   const event_fail = {
     currentActivityLevel: 0.0001,
-    minVolume: rec.minVolume,
+    minVolume: rec["minVolume"],
     resolve: jest.fn(),
   } as micEventType;
 
   expect(rec.micChecked).toBe(false);
-  rec.onMicActivityLevel(
+  rec["onMicActivityLevel"](
     event_fail.currentActivityLevel,
     event_fail.minVolume,
     event_fail.resolve,
@@ -516,12 +516,12 @@ test("Recorder onMicActivityLevel", () => {
 
   const event_pass = {
     currentActivityLevel: 0.2,
-    minVolume: rec.minVolume,
+    minVolume: rec["minVolume"],
     resolve: jest.fn(),
   } as micEventType;
 
   expect(rec.micChecked).toBe(false);
-  rec.onMicActivityLevel(
+  rec["onMicActivityLevel"](
     event_pass.currentActivityLevel,
     event_pass.minVolume,
     event_pass.resolve,
