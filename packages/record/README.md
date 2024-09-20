@@ -4,12 +4,27 @@ This package contains the plugins and extensions to record audio and/or video of
 
 ## Video Configuration
 
-To record any video during an experiment, including a consent video, you will have to add a video configuration trial that allows the user to give permissions and select the correct camera and microphone. This trial also does some basic checks on the webcam and mic inputs, so that the participant can fix common problems before the experiment starts.
+To record _any_ video during an experiment, including a consent video, you must add a video configuration trial. This trial allows the user to give permissions and select the correct camera and microphone. This trial also does some basic checks on the webcam and mic inputs, so that the participant can fix common problems before the experiment starts.
 
 Create a video configuration trial and put it in your experiment timeline prior to any other trials that use the participant's webcam/microphone. The trial type is `chsRecord.VideoConfigPlugin`.
 
 ```javascript
 const videoConfig = { type: chsRecord.VideoConfigPlugin };
+```
+
+### Parameters
+
+| Parameter                     | Type        | Default Value | Description                                              |
+| ----------------------------- | ----------- | ------------- | -------------------------------------------------------- |
+| troubleshooting_intro         | HTML string | ""            | Optional text to add at the start of the "Setup tips and troubleshooting" section. This string allows HTML formatting (e.g. "<strong></strong>" for bold, "<em></em>" for italics). |
+
+### Examples
+
+```javascript
+const videoConfig = {
+  type: chsRecord.VideoConfigPlugin,
+  troubleshooting_intro: "If you're having any trouble getting your webcam set up, please feel free to call the XYZ lab at (123) 456-7890 and we'd be glad to help you out!"
+};
 ```
 
 ## Trial Recording
