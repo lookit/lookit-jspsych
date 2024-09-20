@@ -1,4 +1,6 @@
 div#lookit-jspsych-video-config {
+  margin-top: 10%;
+  margin-bottom: 10%;
 
   button.lookit-jspsych-btn {
     font-size: 18px;
@@ -71,7 +73,6 @@ div#lookit-jspsych-video-config {
 
   /* Instructions */
   #lookit-jspsych-video-config-instructions {
-    width: 60%; // remove?
     margin-top: 0;
   }
 
@@ -88,10 +89,82 @@ div#lookit-jspsych-video-config {
 
   /** Help text, such as that about browser compatibility */
   .lookit-jspsych-help-text {
-    font-size: .8em;
+    font-size: 0.8em;
     line-height: 1.5em;
     text-align: left;
     margin-top: 10px;
   }
 
+  #lookit-jspsych-config-troubleshooting-column-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10%;
+    max-width: 90%;
+  }
+
+  div#lookit-jspsych-accordion-header-container {
+    text-align: center;
+    width: 100%;
+  }
+
+  div#lookit-jspsych-accordion-container {
+    text-align: left;
+  }
+
+  p#lookit-jspsych-troubleshooting-intro {
+    text-align: left;
+    padding: 0 18px;
+  }
+
+  /* Accordion section titles (buttons) for opening/closing the accordion panel content. */
+  button.lookit-jspsych-accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    text-align: left;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+    float: left;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+
+  /* Background color for the accordion section (button) when "active" (selected) and on hover */
+  .active,
+  button.lookit-jspsych-accordion:hover {
+    background-color: #ccc;
+  }
+
+  /* Content within each accordion button. */
+  div.lookit-jspsych-accordion-panel {
+    padding: 0 18px;
+    background-color: white;
+    display: none;
+    overflow: hidden;
+  }
+
+  button.lookit-jspsych-accordion:after {
+    content: "\02795"; /* Unicode character for "plus" sign (+) */
+    font-size: 13px;
+    color: #777;
+    float: right;
+    margin-left: 5px;
+  }
+
+  .active:after {
+    content: "\2796"; /* Unicode character for "minus" sign (-) */
+  }
+
+  .lookit-jspsych-screenshot {
+    display: block;
+    margin: auto;
+  }
 }

@@ -43,4 +43,81 @@
   <div id="lookit-jspsych-next-container" class="jspsych-instructions-nav">
     <button id="{{next_button_id}}" class="jspsych-btn lookit-jspsych-btn" style="margin-left:5px;" disabled>Next &gt;</button>
   </div>
+  <div id="lookit-jspsych-config-troubleshooting-column-container">
+    <div id="lookit-jspsych-accordion-header-container">
+      <h2>Setup tips and troubleshooting</h2>
+      <hr>
+      <p id="lookit-jspsych-troubleshooting-intro">{{troubleshooting_intro}}</p>
+    </div>
+      <div id="lookit-jspsych-accordion-container">
+        <button class="lookit-jspsych-accordion">Check your device and browser</button>
+        <div class="lookit-jspsych-accordion-panel">
+          <ol>
+            <li>
+              Are you using a phone or tablet? Lookit only works on computers so far - we're hoping to support mobile devices soon! Please visit again from a computer.
+            </li>
+            <li>
+              Are you using a web browser other than Chrome or Firefox (like Internet Explorer or Safari)? If so, please try again using Chrome or Firefox. These are the only browsers Lookit currently supports.
+            </li>
+          </ol>
+        </div>
+        <button class="lookit-jspsych-accordion">Camera setup instructions for Chrome</button>
+        <div class="lookit-jspsych-accordion-panel">
+          <ol>
+            <li>
+              When you load this page for the first time, you should see a prompt like the one below. Click "Allow" to let CHS access the webcam and microphone.
+            </li>
+            <li>
+              If you didn't see that prompt, or if you clicked "Block", you can change the settings by clicking on the camera icon next to the URL. Set Camera and Microphone (and Sound if it's shown) all to "Allow".
+             
+            </li>
+            <li>
+              You can check the permissions for camera and microphone separately by clicking each one in the prompt above. This will show you whether or not that specific device is allowed. Make sure that the box is checked for "Allow on every visit".
+              
+            </li>
+            <li>
+              <em>Having trouble passing the sound check?</em> Chrome may be using the wrong input device - unfortunately it doesn't let you pick which microphone when you click "Allow". You can select the correct microphone at chrome://settings/content/microphone (copy and paste that as a URL).
+            </li>
+            <li>
+              <em>Seeing the wrong camera view</em> - like your built-in laptop camera instead of a USB webcam? You can select the correct camera at chrome://settings/content/camera (copy and paste that as a URL).
+            </li>
+            <li>
+              You can also refer to <a href="https://support.google.com/chrome/answer/2693767?hl=en" target="_blank" rel="noopener noreferrer"> these directions from Chrome </a>.
+            </li>
+          </ol>
+        </div>
+        <button class="lookit-jspsych-accordion">Camera setup instructions for Firefox</button>
+        <div class="lookit-jspsych-accordion-panel">
+          <ol>
+            <li>
+              When you load this page for the first time, you should see a prompt like the one below. If you have multiple camera and/or microphones available, then you'll be able to select the ones you want to use. Check the "Remember this decision" box, and click "Allow".
+            </li>
+            <li>
+              If you didn't see that prompt, or if you clicked "Don't Allow" at first, you can change the settings by clicking on the crossed-out camera and/or microphone next to the URL. Click the "X" next to the "Blocked" message to allow each device.
+            </li>
+            <li>
+              Even after you've checked "Remember my decision" and clicked "Allow", Firefox might show you another pop-up requesting permissions for a specific device. This can happen if you change the devices that are available to your computer and/or change your device selections using the dropdown camera/microphone menus on the page. If you see a dropdown menu in the permissions prompt, make sure you're selecting the device(s) that you want to use. Once you've selected "Remember this decision" and "Allow" for the specific devices you want to use, then you shouldn't see another permissions prompt again.
+            </li>
+          </ol>
+        </div>
+        <button class="lookit-jspsych-accordion">It's just not working - what else can I try?</button>
+        <div class="lookit-jspsych-accordion-panel">
+          <p> First, you are a very dedicated citizen scientist and we're grateful for your help! We're sorry you're having trouble. </p>
+          <ol>
+            <li>
+              Make sure you're able to view your webcam video outside of Lookit. (For example, on a Mac, try Photobooth.)
+            </li>
+            <li>
+              The easiest approach is to try a different web browser if you have one installed anyway. For instance, if you're using Firefox, switch to Chrome, or vice versa. Also, update the browser if you're not using the latest version. You can check by going to "Chrome" -> "About Chrome" or "Firefox" -> "About Firefox" in the menu bar. (This is a good idea to make sure you've gotten any security updates anyway.)
+            </li>
+            <li>
+              Using Chrome? Make sure you're not using an Incognito window - you won't be able to save and use settings throughout the study.
+            </li>
+            <li>
+              If you're stumped, it's our fault. Please let us know so we can improve the site! Email us at lookit-tech@mit.edu with a short description of what's happening. Please include the web browser you're using (Firefox, Chrome, IE, Safari, etc.), what steps you've tried, and this session ID {{session.id}}
+            </li>
+          </ol>
+        </div>
+      </div>
+  </div>
 </div>

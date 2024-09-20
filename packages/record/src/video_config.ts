@@ -1,11 +1,21 @@
-import { JsPsych, JsPsychPlugin, TrialType } from "jspsych";
+import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import Mustache from "mustache";
-import Recorder from "./recorder";
 import video_config from "../templates/video-config.mustache";
+import Recorder from "./recorder";
 
 const info = <const>{
   name: "video-config-plugin",
-  parameters: {},
+  parameters: {
+    troubleshooting_intro: {
+      /**
+       * Optional string to appear at the start of the "Setup tips and
+       * troubleshooting" section.
+       */
+      type: ParameterType.HTML_STRING,
+      default: "",
+      pretty_name: "Troubleshooting Intro",
+    },
+  },
 };
 
 type Info = typeof info;
@@ -376,6 +386,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
       step_complete_text,
       reload_button_id_text,
       next_button_id,
+      troubleshooting_intro: trial.troubleshooting_intro,
     };
     display_element.innerHTML = Mustache.render(video_config, html_params);
 
@@ -405,6 +416,22 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
         setDevices().then(runStreamChecks);
       });
     });
+
+    // Accordion section (Setup tips and troubleshooting)
+    const accButtons = document.getElementsByClassName(
+      "lookit-jspsych-accordion",
+    ) as HTMLCollectionOf<HTMLButtonElement>;
+    for (let i = 0; i < accButtons.length; i++) {
+      accButtons[i].addEventListener("click", function () {
+        this.classList.toggle("active");
+        const panel = this.nextElementSibling as HTMLDivElement;
+        if (panel.style.display === "block") {
+          panel.style.display = "none";
+        } else {
+          panel.style.display = "block";
+        }
+      });
+    }
 
     /**
      * Function to toggle the next button disable property.

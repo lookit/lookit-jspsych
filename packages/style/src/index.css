@@ -8905,6 +8905,8 @@ div#sv-nav-complete.sv-action.sv-action--hidden {
 }
 
 div#lookit-jspsych-video-config {
+  margin-top: 10%;
+  margin-bottom: 10%;
   /* Container */
   /* Webcam column */
   /* Webcam container */
@@ -8916,6 +8918,10 @@ div#lookit-jspsych-video-config {
   /* Instructions */
   /* Next button container */
   /* Instruction step complete class */
+  /** Help text, such as that about browser compatibility */
+  /* Accordion section titles (buttons) for opening/closing the accordion panel content. */
+  /* Background color for the accordion section (button) when "active" (selected) and on hover */
+  /* Content within each accordion button. */
 }
 div#lookit-jspsych-video-config button.lookit-jspsych-btn {
   font-size: 18px;
@@ -8969,7 +8975,6 @@ div#lookit-jspsych-video-config #lookit-jspsych-video-config-errors {
   color: red;
 }
 div#lookit-jspsych-video-config #lookit-jspsych-video-config-instructions {
-  width: 60%;
   margin-top: 0;
 }
 div#lookit-jspsych-video-config #lookit-jspsych-next-container {
@@ -8984,4 +8989,64 @@ div#lookit-jspsych-video-config .lookit-jspsych-help-text {
   line-height: 1.5em;
   text-align: left;
   margin-top: 10px;
+}
+div#lookit-jspsych-video-config #lookit-jspsych-config-troubleshooting-column-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10%;
+  max-width: 90%;
+}
+div#lookit-jspsych-video-config div#lookit-jspsych-accordion-header-container {
+  text-align: center;
+  width: 100%;
+}
+div#lookit-jspsych-video-config div#lookit-jspsych-accordion-container {
+  text-align: left;
+}
+div#lookit-jspsych-video-config p#lookit-jspsych-troubleshooting-intro {
+  text-align: left;
+  padding: 0 18px;
+}
+div#lookit-jspsych-video-config button.lookit-jspsych-accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+  float: left;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+div#lookit-jspsych-video-config .active,
+div#lookit-jspsych-video-config button.lookit-jspsych-accordion:hover {
+  background-color: #ccc;
+}
+div#lookit-jspsych-video-config div.lookit-jspsych-accordion-panel {
+  padding: 0 18px;
+  background-color: white;
+  display: none;
+  overflow: hidden;
+}
+div#lookit-jspsych-video-config button.lookit-jspsych-accordion:after {
+  content: "➕"; /* Unicode character for "plus" sign (+) */
+  font-size: 13px;
+  color: #777;
+  float: right;
+  margin-left: 5px;
+}
+div#lookit-jspsych-video-config .active:after {
+  content: "➖"; /* Unicode character for "minus" sign (-) */
+}
+div#lookit-jspsych-video-config .lookit-jspsych-screenshot {
+  display: block;
+  margin: auto;
 }
