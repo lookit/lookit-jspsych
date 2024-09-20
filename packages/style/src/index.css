@@ -9048,5 +9048,6 @@ div#lookit-jspsych-video-config .active:after {
 }
 div#lookit-jspsych-video-config .lookit-jspsych-screenshot {
   display: block;
-  margin: auto;
+  margin: 15px auto;
+  max-width: 50%;
 }

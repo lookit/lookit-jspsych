@@ -66,14 +66,15 @@
           <ol>
             <li>
               When you load this page for the first time, you should see a prompt like the one below. Click "Allow" to let CHS access the webcam and microphone.
+               <img class="lookit-jspsych-screenshot" src="{{chromeInitialPrompt}}" alt="Chrome permissions prompt">
             </li>
             <li>
               If you didn't see that prompt, or if you clicked "Block", you can change the settings by clicking on the camera icon next to the URL. Set Camera and Microphone (and Sound if it's shown) all to "Allow".
-             
+              <img class="lookit-jspsych-screenshot" src="{{chromePermissions}}" alt="Editing microphone and camera permissions in Chrome, step 1">
             </li>
             <li>
               You can check the permissions for camera and microphone separately by clicking each one in the prompt above. This will show you whether or not that specific device is allowed. Make sure that the box is checked for "Allow on every visit".
-              
+              <img class="lookit-jspsych-screenshot" src="{{chromeAlwaysAllow}}" alt="Editing microphone and camera permissions separately in Chrome, step 1">
             </li>
             <li>
               <em>Having trouble passing the sound check?</em> Chrome may be using the wrong input device - unfortunately it doesn't let you pick which microphone when you click "Allow". You can select the correct microphone at chrome://settings/content/microphone (copy and paste that as a URL).
@@ -91,12 +92,15 @@
           <ol>
             <li>
               When you load this page for the first time, you should see a prompt like the one below. If you have multiple camera and/or microphones available, then you'll be able to select the ones you want to use. Check the "Remember this decision" box, and click "Allow".
+              <img class="lookit-jspsych-screenshot" src="{{firefoxInitialPrompt}}" alt="Firefox permissions prompt">
             </li>
             <li>
-              If you didn't see that prompt, or if you clicked "Don't Allow" at first, you can change the settings by clicking on the crossed-out camera and/or microphone next to the URL. Click the "X" next to the "Blocked" message to allow each device.
+              If you didn't see that prompt, or if you clicked "Block" at first, you can change the settings by clicking on the crossed-out camera and/or microphone next to the URL. Click the "X" next to the "Blocked" message to allow each device.
+              <img class="lookit-jspsych-screenshot" src="{{firefoxDevicesBlocked}}" alt="Blocked microphone and camera permissions in Firefox">
             </li>
             <li>
               Even after you've checked "Remember my decision" and clicked "Allow", Firefox might show you another pop-up requesting permissions for a specific device. This can happen if you change the devices that are available to your computer and/or change your device selections using the dropdown camera/microphone menus on the page. If you see a dropdown menu in the permissions prompt, make sure you're selecting the device(s) that you want to use. Once you've selected "Remember this decision" and "Allow" for the specific devices you want to use, then you shouldn't see another permissions prompt again.
+              <img class="lookit-jspsych-screenshot" src="{{firefoxChooseDevice}}" alt="Permissions for specific devices in Firefox">
             </li>
           </ol>
         </div>
