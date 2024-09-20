@@ -1,13 +1,13 @@
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import Mustache from "mustache";
 import video_config from "../templates/video-config.mustache";
-import Recorder from "./recorder";
 import chromeInitialPrompt from "./img/chrome_initialprompt.png";
 import chromeAlwaysAllow from "./img/chrome_step1_alwaysallow.png";
 import chromePermissions from "./img/chrome_step1_permissions.png";
 import firefoxInitialPrompt from "./img/firefox_initialprompt.png";
 import firefoxChooseDevice from "./img/firefox_prompt_choose_device.png";
 import firefoxDevicesBlocked from "./img/firefox_prompt_devices_blocked.png";
+import Recorder from "./recorder";
 
 const info = <const>{
   name: "video-config-plugin",

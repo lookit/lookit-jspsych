@@ -1,8 +1,8 @@
 //import copy from "rollup-plugin-copy";
+import image from "@rollup/plugin-image";
 import dotenv from "rollup-plugin-dotenv";
 import { importAsString } from "rollup-plugin-string-import";
 import { makeRollupConfig } from "../../rollup.mjs";
-import image from '@rollup/plugin-image';
 
 export default makeRollupConfig("chsRecord").map((config) => {
   return {

@@ -14,16 +14,17 @@ const videoConfig = { type: chsRecord.VideoConfigPlugin };
 
 ### Parameters
 
-| Parameter                     | Type        | Default Value | Description                                              |
-| ----------------------------- | ----------- | ------------- | -------------------------------------------------------- |
-| troubleshooting_intro         | HTML string | ""            | Optional text to add at the start of the "Setup tips and troubleshooting" section. This string allows HTML formatting (e.g. "<strong></strong>" for bold, "<em></em>" for italics). |
+| Parameter             | Type        | Default Value | Description                                                                                                                                                                         |
+| --------------------- | ----------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| troubleshooting_intro | HTML string | ""            | Optional text to add at the start of the "Setup tips and troubleshooting" section. This string allows HTML formatting (e.g. "<strong></strong>" for bold, "<em></em>" for italics). |
 
 ### Examples
 
 ```javascript
 const videoConfig = {
   type: chsRecord.VideoConfigPlugin,
-  troubleshooting_intro: "If you're having any trouble getting your webcam set up, please feel free to call the XYZ lab at (123) 456-7890 and we'd be glad to help you out!"
+  troubleshooting_intro:
+    "If you're having any trouble getting your webcam set up, please feel free to call the XYZ lab at (123) 456-7890 and we'd be glad to help you out!",
 };
 ```
 
