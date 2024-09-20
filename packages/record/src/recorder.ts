@@ -3,9 +3,15 @@ import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import Mustache from "mustache";
-import { NoStopPromiseError, RecorderInitializeError } from "./error";
-import webcamFeed from "./templates/webcam-feed.mustache";
+import webcamFeed from "../templates/webcam-feed.mustache";
+import {
+  MicCheckError,
+  NoStopPromiseError,
+  NoStreamError,
+  RecorderInitializeError,
+} from "./error";
 import { CSSWidthHeight } from "./types";
+// import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
@@ -14,11 +20,14 @@ export default class Recorder {
     process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
   private filename: string;
   private stopPromise: Promise<void> | undefined;
+  private minVolume: number = 0.1;
   private webcam_element_id = "lookit-jspsych-webcam";
+  public micChecked: boolean = false;
   /**
    * Use null rather than undefined so that we can set these back to null when
    * destroying.
    */
+  private processorNode: AudioWorkletNode | null = null;
   private s3: lookitS3 | null = null;
   /**
    * Store the reject function for the stop promise so that we can reject it in
@@ -172,6 +181,32 @@ export default class Recorder {
   }
 
   /**
+   * Perform a sound check on the audio input (microphone).
+   *
+   * @param minVol - Minimum mic activity needed to reach the mic check
+   *   threshold (optional). Default is `this.minVolume`
+   * @returns Promise that resolves when the mic check is complete because the
+   *   audio stream has reached the required minimum level.
+   */
+  public checkMic(minVol: number = this.minVolume) {
+    if (this.stream) {
+      const audioContext = new AudioContext();
+      const microphone = audioContext.createMediaStreamSource(this.stream);
+      // This currently loads from lookit-api static files.
+      // TO DO: load mic_check.js from dist or a URL? See https://github.com/lookit/lookit-jspsych/issues/44
+      return audioContext.audioWorklet
+        .addModule("/static/js/mic_check.js")
+        .then(() => this.createConnectProcessor(audioContext, microphone))
+        .then(() => this.setupPortOnMessage(minVol))
+        .catch((err) => {
+          return Promise.reject(new MicCheckError(err));
+        });
+    } else {
+      return Promise.reject(new NoStreamError());
+    }
+  }
+
+  /**
    * Start recording. Also, adds event listeners for handling data and checks
    * for recorder initialization.
    */
@@ -223,12 +258,17 @@ export default class Recorder {
    * Destroy the recorder. When a plugin/extension destroys the recorder, it
    * will set the whole Recorder class instance to null, so we don't need to
    * reset the Recorder instance variables/states. We should complete the S3
-   * upload and stop any async processes that might continue to run (stop
-   * promise). We also need to stop the tracks to release the media devices
-   * (even if they're not recording). Setting S3 to null should release the
-   * video blob data from memory.
+   * upload and stop any async processes that might continue to run (audio
+   * worklet for the mic check, stop promise). We also need to stop the tracks
+   * to release the media devices (even if they're not recording). Setting S3 to
+   * null should release the video blob data from memory.
    */
   public async destroy() {
+    // Stop the audio worklet processor if it's running
+    if (this.processorNode !== null) {
+      this.processorNode.port.postMessage({ micChecked: true });
+      this.processorNode = null;
+    }
     if (this.stopPromise) {
       await this.stop();
       // Complete any MPU that might've been created
@@ -328,6 +368,91 @@ export default class Recorder {
    */
   private createFilename(prefix: string) {
     return `${prefix}_${new Date().getTime()}.webm`;
+  }
+
+  /**
+   * Private helper to handle the mic level messages that are sent via an
+   * AudioWorkletProcessor. This checks the current level against the minimum
+   * threshold, and if the threshold is met, sets the micChecked property to
+   * true and resolves the checkMic promise.
+   *
+   * @param currentActivityLevel - Microphone activity level calculated by the
+   *   processor node.
+   * @param minVolume - Minimum microphone activity level needed to pass the
+   *   microphone check.
+   * @param resolve - Resolve callback function for Promise returned by the
+   *   checkMic method.
+   */
+  private onMicActivityLevel(
+    currentActivityLevel: number,
+    minVolume: number,
+    resolve: () => void,
+  ) {
+    if (currentActivityLevel > minVolume) {
+      this.micChecked = true;
+      this.processorNode?.port.postMessage({ micChecked: true });
+      this.processorNode = null;
+      resolve();
+    }
+  }
+
+  /**
+   * Private helper that takes the audio context and microphone, creates the
+   * processor node for the mic check input level processing, and connects the
+   * microphone to the processor node.
+   *
+   * @param audioContext - Audio context that was created in checkMic. This is
+   *   used to create the processor node.
+   * @param microphone - Microphone audio stream source, created in checkMic.
+   *   The processor node will be connected to this source.
+   * @returns Promise that resolves after the processor node has been created,
+   *   and the microphone audio stream source is connected to the processor node
+   *   and audio context destination.
+   */
+  private createConnectProcessor(
+    audioContext: AudioContext,
+    microphone: MediaStreamAudioSourceNode,
+  ) {
+    return new Promise<void>((resolve) => {
+      this.processorNode = new AudioWorkletNode(
+        audioContext,
+        "mic-check-processor",
+      );
+      microphone.connect(this.processorNode).connect(audioContext.destination);
+      resolve();
+    });
+  }
+
+  /**
+   * Private helper to setup the port's on message event handler for the mic
+   * check processor node. This adds the event related callback, which calls
+   * onMicActivityLevel with the event data.
+   *
+   * @param minVol - Minimum volume level (RMS amplitude) passed from checkMic.
+   * @returns Promise that resolves from inside the onMicActivityLevel callback,
+   *   when the mic stream input level has reached the threshold.
+   */
+  private setupPortOnMessage(minVol: number) {
+    return new Promise<void>((resolve) => {
+      /**
+       * Callback on the microphone's AudioWorkletNode that fires in response to
+       * a message event containing the current mic level. When the mic level
+       * reaches the threshold, this callback sets the micChecked property to
+       * true and resolves this Promise (via onMicActivityLevel).
+       *
+       * @param event - The message event that was sent from the processor on
+       *   the audio worklet node. Contains a 'data' property (object) which
+       *   contains a 'volume' property (number).
+       */
+      this.processorNode!.port.onmessage = (event: MessageEvent) => {
+        // handle message from the processor: event.data
+        if (this.onMicActivityLevel) {
+          if ("data" in event && "volume" in event.data) {
+            this.onMicActivityLevel(event.data.volume, minVol, resolve);
+          }
+        }
+      };
+    });
   }
 
   /**

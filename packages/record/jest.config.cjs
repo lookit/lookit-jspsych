@@ -1,6 +1,7 @@
 const config = require("../../jest.cjs").makePackageConfig();
 module.exports = {
   ...config,
+  coveragePathIgnorePatterns: ["fixtures"],
   transformIgnorePatterns: ["node_modules/(?!auto-bind)"],
   testEnvironmentOptions: {
     ...config.testEnvironmentOptions,
