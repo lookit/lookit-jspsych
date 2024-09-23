@@ -3,32 +3,39 @@ import lookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import Mustache from "mustache";
+import playbackFeed from "../templates/playback-feed.mustache";
 import webcamFeed from "../templates/webcam-feed.mustache";
 import {
   MicCheckError,
   NoStopPromiseError,
   NoStreamError,
   RecorderInitializeError,
-} from "./error";
+} from "./errors";
 import { CSSWidthHeight } from "./types";
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
+  public url?: string;
+
   private blobs: Blob[] = [];
   private localDownload: boolean =
     process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
-  private filename: string;
-  private stopPromise: Promise<void> | undefined;
+  private filename?: string;
   private minVolume: number = 0.1;
-  private webcam_element_id = "lookit-jspsych-webcam";
   public micChecked: boolean = false;
+
   /**
    * Use null rather than undefined so that we can set these back to null when
    * destroying.
    */
   private processorNode: AudioWorkletNode | null = null;
-  private s3: lookitS3 | null = null;
+
+  private stopPromise?: Promise<void>;
+  private webcam_element_id = "lookit-jspsych-webcam";
+  private playback_element_id = "lookit-jspsych-playback";
+  private s3?: lookitS3;
+  private streamClone: MediaStream;
   /**
    * Store the reject function for the stop promise so that we can reject it in
    * the destroy recorder method.
@@ -39,18 +46,34 @@ export default class Recorder {
    * Recorder for online experiments.
    *
    * @param jsPsych - Object supplied by jsPsych.
-   * @param fileNamePrefix - Prefix for the video recording file name (string).
-   *   This is the string that comes before "_<TIMESTAMP>.webm".
    */
-  public constructor(
-    private jsPsych: JsPsych,
-    fileNamePrefix: string,
-  ) {
-    this.filename = this.createFilename(fileNamePrefix);
-    if (!this.localDownload) {
-      this.s3 = new Data.LookitS3(this.filename);
-    }
+  public constructor(private jsPsych: JsPsych) {
+    this.streamClone = this.stream.clone();
     autoBind(this);
+  }
+
+  /**
+   * Get recorder from jsPsych plugin API.
+   *
+   * If camera recorder hasn't been initialized, then return the microphone
+   * recorder.
+   *
+   * @returns MediaRecorder from the plugin API.
+   */
+  private get recorder() {
+    return (
+      this.jsPsych.pluginAPI.getCameraRecorder() ||
+      this.jsPsych.pluginAPI.getMicrophoneRecorder()
+    );
+  }
+
+  /**
+   * Get stream from either recorder.
+   *
+   * @returns MediaStream from the plugin API.
+   */
+  private get stream() {
+    return this.recorder.stream;
   }
 
   /**
@@ -133,28 +156,13 @@ export default class Recorder {
     this.jsPsych.pluginAPI.initializeCameraRecorder(stream, opts);
   }
 
-  /**
-   * Get recorder from jsPsych plugin API.
-   *
-   * If camera recorder hasn't been initialized, then return the microphone
-   * recorder.
-   *
-   * @returns MediaRecorder from the plugin API.
-   */
-  private get recorder() {
-    return (
-      this.jsPsych.pluginAPI.getCameraRecorder() ||
-      this.jsPsych.pluginAPI.getMicrophoneRecorder()
-    );
-  }
-
-  /**
-   * Get stream from either recorder.
-   *
-   * @returns MediaStream from the plugin API.
-   */
-  private get stream() {
-    return this.recorder?.stream;
+  /** Reset the recorder to be used again. */
+  public reset() {
+    if (this.stream.active) {
+      throw new Error("Won't reset recorder. Stream is still active.");
+    }
+    this.intializeRecorder(this.streamClone.clone());
+    this.blobs = [];
   }
 
   /**
@@ -175,9 +183,58 @@ export default class Recorder {
     const { webcam_element_id, stream } = this;
     const view = { height, width, webcam_element_id };
     element.innerHTML = Mustache.render(webcamFeed, view);
-    element.querySelector<HTMLVideoElement>(
+    const webcam = element.querySelector<HTMLVideoElement>(
       `#${webcam_element_id}`,
-    )!.srcObject = stream;
+    );
+
+    if (!webcam) {
+      throw new Error("There's no webcam element.");
+    }
+
+    webcam.srcObject = stream;
+  }
+
+  /**
+   * Insert video playback feed into supplied element.
+   *
+   * @param element - The HTML div element that should serve as the container
+   *   for the webcam display.
+   * @param on_ended - Callback function called when playing video ends.
+   * @param width - The width of the video element containing the webcam feed,
+   *   in CSS units (optional). Default is `'100%'`
+   * @param height - The height of the video element containing the webcam feed,
+   *   in CSS units (optional). Default is `'auto'`
+   */
+  public insertPlaybackFeed(
+    element: HTMLDivElement,
+    on_ended: (this: HTMLVideoElement, e: Event) => void,
+    width: CSSWidthHeight = "100%",
+    height: CSSWidthHeight = "auto",
+  ) {
+    const { playback_element_id } = this;
+
+    this.clearWebcamFeed();
+
+    element.insertAdjacentHTML(
+      "afterbegin",
+      Mustache.render(playbackFeed, {
+        src: this.url,
+        width,
+        height,
+        playback_element_id,
+        attrs: ["controls"],
+      }),
+    );
+
+    const playbackElement = element.querySelector<HTMLVideoElement>(
+      `video#${this.playback_element_id}`,
+    );
+
+    if (!playbackElement) {
+      throw new Error("no playback element");
+    }
+
+    playbackElement.addEventListener("ended", on_ended, { once: true });
   }
 
   /**
@@ -209,19 +266,34 @@ export default class Recorder {
   /**
    * Start recording. Also, adds event listeners for handling data and checks
    * for recorder initialization.
+   *
+   * @param prefix - Prefix for the video recording file name (string). This is
+   *   the string that comes before "_<TIMESTAMP>.webm".
    */
-  public async start() {
+  public async start(prefix: string) {
     this.initializeCheck();
+
+    // Set filename
+    this.filename = `${prefix}_${new Date().getTime()}.webm`;
+
+    // Instantiate s3 object
+    if (!this.localDownload) {
+      this.s3 = new Data.LookitS3(this.filename);
+    }
+
     this.recorder.addEventListener("dataavailable", this.handleDataAvailable);
+
     // create a stop promise and pass the resolve function as an argument to the stop event callback,
     // so that the stop event handler can resolve the stop promise
     this.stopPromise = new Promise((resolve, reject) => {
       this.recorder.addEventListener("stop", this.handleStop(resolve));
       this.rejectStopPromise = reject;
     });
+
     if (!this.localDownload) {
       await this.s3?.createUpload();
     }
+
     this.recorder.start();
   }
 
@@ -248,6 +320,7 @@ export default class Recorder {
   public stop() {
     this.stopTracks();
     this.clearWebcamFeed();
+
     if (!this.stopPromise) {
       throw new NoStopPromiseError();
     }
@@ -255,38 +328,23 @@ export default class Recorder {
   }
 
   /**
-   * Destroy the recorder. When a plugin/extension destroys the recorder, it
-   * will set the whole Recorder class instance to null, so we don't need to
-   * reset the Recorder instance variables/states. We should complete the S3
-   * upload and stop any async processes that might continue to run (audio
-   * worklet for the mic check, stop promise). We also need to stop the tracks
-   * to release the media devices (even if they're not recording). Setting S3 to
-   * null should release the video blob data from memory.
+   * Check access to webcam/mic stream.
+   *
+   * @returns Whether or not the recorder has webcam/mic access.
    */
-  public async destroy() {
-    // Stop the audio worklet processor if it's running
-    if (this.processorNode !== null) {
-      this.processorNode.port.postMessage({ micChecked: true });
-      this.processorNode = null;
-    }
-    if (this.stopPromise) {
-      await this.stop();
-      // Complete any MPU that might've been created
-      if (this.s3?.uploadInProgress) {
-        await this.s3?.completeUpload();
-      }
-    } else {
-      this.stopTracks();
-      this.clearWebcamFeed();
-    }
-    // Clear any blob data
-    this.s3 = null;
+  public camMicAccess(): boolean {
+    return this.recorder && this.stream.active;
   }
 
   /** Throw Error if there isn't a recorder provided by jsPsych. */
   private initializeCheck() {
     if (!this.recorder) {
       throw new RecorderInitializeError();
+    }
+    if (!this.stream.active || this.blobs.length !== 0) {
+      throw new Error(
+        "Recorder is not in initial state.  It may need to be reset.",
+      );
     }
   }
 
@@ -296,18 +354,22 @@ export default class Recorder {
    * that stop promise. The function that is returned is used as the recorder's
    * "stop" event-related callback function.
    *
+   * @param resolve - Promise resolve function.
    * @returns Function that is called on the recorder's "stop" event.
    */
-  private handleStop(resolve: {
-    (value: void | PromiseLike<void>): void;
-    (): void;
-  }) {
+  private handleStop(resolve: () => void) {
     return async () => {
+      if (this.blobs.length === 0) {
+        throw new Error("No data to create url from");
+      }
+      this.url = URL.createObjectURL(new Blob(this.blobs));
+
       if (this.localDownload) {
-        await this.download();
+        this.download();
       } else {
         await this.s3?.completeUpload();
       }
+
       resolve();
     };
   }
@@ -322,52 +384,6 @@ export default class Recorder {
     if (!this.localDownload) {
       this.s3?.onDataAvailable(event.data);
     }
-  }
-
-  /** Temp method to download data url. */
-  private async download() {
-    const data = (await this.bytesToBase64DataUrl(
-      new Blob(this.blobs),
-    )) as string;
-    const link = document.createElement("a");
-    link.href = data;
-    link.download = this.filename;
-    link.click();
-  }
-
-  /**
-   * Temp method to convert blobs to a data url.
-   *
-   * @param bytes - Bytes or blobs.
-   * @param type - Mimetype.
-   * @returns Result of reading data as url.
-   */
-  private bytesToBase64DataUrl(
-    bytes: BlobPart,
-    type = "video/webm; codecs=vp8",
-  ) {
-    return new Promise((resolve) => {
-      const reader = Object.assign(new FileReader(), {
-        /**
-         * When promise resolves, it'll return the result.
-         *
-         * @returns Result of reading data as url.
-         */
-        onload: () => resolve(reader.result),
-      });
-      reader.readAsDataURL(new File([bytes], "", { type }));
-    });
-  }
-
-  /**
-   * Function to create a video recording filename.
-   *
-   * @param prefix - (string): Start of the file name for the video recording.
-   * @returns Filename string, including the prefix, date/time and webm
-   *   extension.
-   */
-  private createFilename(prefix: string) {
-    return `${prefix}_${new Date().getTime()}.webm`;
   }
 
   /**
@@ -455,13 +471,14 @@ export default class Recorder {
     });
   }
 
-  /**
-   * Check access to webcam/mic stream.
-   *
-   * @returns Whether or not the recorder has webcam/mic access.
-   */
-  public camMicAccess(): boolean {
-    return !!this.recorder && !!this.stream?.active;
+  /** Download data url used in local development. */
+  private download() {
+    if (this.filename && this.url) {
+      const link = document.createElement("a");
+      link.href = this.url;
+      link.download = this.filename;
+      link.click();
+    }
   }
 
   /** Private helper to clear the webcam feed, if there is one. */
