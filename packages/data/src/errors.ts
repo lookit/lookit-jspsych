@@ -37,3 +37,11 @@ export class AWSConfigError extends Error {
     this.name = "AWSConfigError";
   }
 }
+/** Error for when URL from Django API is not formatted as expected. */
+export class URLWrongError extends Error {
+  /** Throw error when URL is not formatted correctly. */
+  public constructor() {
+    super("URL is different than expected.");
+    this.name = "URLWrongError";
+  }
+}

@@ -2,6 +2,11 @@ import { JsPsych, JsPsychPlugin } from "jspsych";
 import Mustache from "mustache";
 import { version } from "../package.json";
 import consentVideo from "../templates/consent-video-trial.mustache";
+import {
+  ButtonNotFoundError,
+  ImageNotFoundError,
+  VideoContainerNotFoundError,
+} from "./errors";
 import Recorder from "./recorder";
 
 const info = <const>{
@@ -62,7 +67,7 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
     );
 
     if (!videoContainer) {
-      throw new Error("No vids my man.");
+      throw new VideoContainerNotFoundError();
     }
 
     return videoContainer;
@@ -117,7 +122,7 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
   private getButton(display: HTMLElement, id: string) {
     const btn = display.querySelector<HTMLButtonElement>(`button#${id}`);
     if (!btn) {
-      throw new Error(`"${id}" button not found.`);
+      throw new ButtonNotFoundError(id);
     }
     return btn;
   }
@@ -133,7 +138,7 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
     const svg = display.querySelector<SVGImageElement>("svg#record-icon");
 
     if (!svg) {
-      throw new Error(`"${id}" SVG not found.`);
+      throw new ImageNotFoundError(id);
     }
 
     return svg;

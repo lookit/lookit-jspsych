@@ -1,15 +1,25 @@
 import Data from "@lookit/data";
-import lookitS3 from "@lookit/data/dist/lookitS3";
+import {
+  default as lookitS3,
+  default as LookitS3,
+} from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import Mustache from "mustache";
 import playbackFeed from "../templates/playback-feed.mustache";
 import webcamFeed from "../templates/webcam-feed.mustache";
 import {
+  CreateURLError,
   MicCheckError,
+  NoPlayBackElementError,
   NoStopPromiseError,
   NoStreamError,
+  NoWebCamElementError,
   RecorderInitializeError,
+  S3UndefinedError,
+  StreamActiveOnResetError,
+  StreamDataInitializeError,
+  StreamInactiveInitializeError,
 } from "./errors";
 import { CSSWidthHeight } from "./types";
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
@@ -17,6 +27,8 @@ import { CSSWidthHeight } from "./types";
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
   public url?: string;
+
+  private _s3?: lookitS3;
 
   private blobs: Blob[] = [];
   private localDownload: boolean =
@@ -34,7 +46,7 @@ export default class Recorder {
   private stopPromise?: Promise<void>;
   private webcam_element_id = "lookit-jspsych-webcam";
   private playback_element_id = "lookit-jspsych-playback";
-  private s3?: lookitS3;
+
   private streamClone: MediaStream;
   /**
    * Store the reject function for the stop promise so that we can reject it in
@@ -74,6 +86,23 @@ export default class Recorder {
    */
   private get stream() {
     return this.recorder.stream;
+  }
+
+  /**
+   * Get s3 class variable. Throw error if doesn't exist.
+   *
+   * @returns - S3 object.
+   */
+  private get s3() {
+    if (!this._s3) {
+      throw new S3UndefinedError();
+    }
+    return this._s3;
+  }
+
+  /** Set s3 class variable. */
+  private set s3(value: LookitS3) {
+    this._s3 = value;
   }
 
   /**
@@ -159,7 +188,7 @@ export default class Recorder {
   /** Reset the recorder to be used again. */
   public reset() {
     if (this.stream.active) {
-      throw new Error("Won't reset recorder. Stream is still active.");
+      throw new StreamActiveOnResetError();
     }
     this.intializeRecorder(this.streamClone.clone());
     this.blobs = [];
@@ -188,7 +217,7 @@ export default class Recorder {
     );
 
     if (!webcam) {
-      throw new Error("There's no webcam element.");
+      throw new NoWebCamElementError();
     }
 
     webcam.srcObject = stream;
@@ -231,7 +260,7 @@ export default class Recorder {
     );
 
     if (!playbackElement) {
-      throw new Error("no playback element");
+      throw new NoPlayBackElementError();
     }
 
     playbackElement.addEventListener("ended", on_ended, { once: true });
@@ -291,7 +320,7 @@ export default class Recorder {
     });
 
     if (!this.localDownload) {
-      await this.s3?.createUpload();
+      await this.s3.createUpload();
     }
 
     this.recorder.start();
@@ -341,10 +370,13 @@ export default class Recorder {
     if (!this.recorder) {
       throw new RecorderInitializeError();
     }
-    if (!this.stream.active || this.blobs.length !== 0) {
-      throw new Error(
-        "Recorder is not in initial state.  It may need to be reset.",
-      );
+
+    if (!this.stream.active) {
+      throw new StreamInactiveInitializeError();
+    }
+
+    if (this.blobs.length !== 0) {
+      throw new StreamDataInitializeError();
     }
   }
 
@@ -360,14 +392,14 @@ export default class Recorder {
   private handleStop(resolve: () => void) {
     return async () => {
       if (this.blobs.length === 0) {
-        throw new Error("No data to create url from");
+        throw new CreateURLError();
       }
       this.url = URL.createObjectURL(new Blob(this.blobs));
 
       if (this.localDownload) {
         this.download();
       } else {
-        await this.s3?.completeUpload();
+        await this.s3.completeUpload();
       }
 
       resolve();
@@ -382,7 +414,7 @@ export default class Recorder {
   private handleDataAvailable(event: BlobEvent) {
     this.blobs.push(event.data);
     if (!this.localDownload) {
-      this.s3?.onDataAvailable(event.data);
+      this.s3.onDataAvailable(event.data);
     }
   }
 
