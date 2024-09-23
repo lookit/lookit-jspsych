@@ -182,7 +182,6 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
    */
   private playButton(display: HTMLElement) {
     const play = this.getButton(display, "play");
-
     play.addEventListener("click", () => {
       play.disabled = true;
       this.playbackFeed(display);
