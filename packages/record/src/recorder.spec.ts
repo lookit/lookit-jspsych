@@ -6,7 +6,7 @@ import {
   NoStopPromiseError,
   NoStreamError,
   RecorderInitializeError,
-} from "./error";
+} from "./errors";
 import Recorder from "./recorder";
 import { CSSWidthHeight } from "./types";
 
