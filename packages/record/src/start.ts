@@ -1,6 +1,6 @@
 import { LookitWindow } from "@lookit/data/dist/types";
 import { JsPsych, JsPsychPlugin } from "jspsych";
-import { ExistingRecordingError } from "./error";
+import { ExistingRecordingError } from "./errors";
 import Recorder from "./recorder";
 
 declare let window: LookitWindow;
@@ -19,7 +19,7 @@ export default class StartRecordPlugin implements JsPsychPlugin<Info> {
    * @param jsPsych - Object provided by jsPsych.
    */
   public constructor(private jsPsych: JsPsych) {
-    this.recorder = new Recorder(this.jsPsych, "session_video");
+    this.recorder = new Recorder(this.jsPsych);
     if (!window.chs.sessionRecorder) {
       window.chs.sessionRecorder = this.recorder;
     } else {
@@ -29,7 +29,7 @@ export default class StartRecordPlugin implements JsPsychPlugin<Info> {
 
   /** Trial function called by jsPsych. */
   public trial() {
-    this.recorder.start().then(() => {
+    this.recorder.start("session_video").then(() => {
       this.jsPsych.finishTrial();
     });
   }
