@@ -107,8 +107,10 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
   private onEnded(display: HTMLElement) {
     return () => {
       const next = this.getButton(display, "next");
-      next.disabled = false;
+      const play = this.getButton(display, "play");
       this.webcamFeed(display);
+      next.disabled = false;
+      play.disabled = false;
     };
   }
 
@@ -119,7 +121,10 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
    * @param id - Element id
    * @returns Button element
    */
-  private getButton(display: HTMLElement, id: string) {
+  private getButton(
+    display: HTMLElement,
+    id: "play" | "next" | "stop" | "record",
+  ) {
     const btn = display.querySelector<HTMLButtonElement>(`button#${id}`);
     if (!btn) {
       throw new ButtonNotFoundError(id);
@@ -135,7 +140,7 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
    * @returns SVG Image Element
    */
   private getSVG(display: HTMLElement, id: string) {
-    const svg = display.querySelector<SVGImageElement>("svg#record-icon");
+    const svg = display.querySelector<SVGImageElement>(`svg#${id}`);
 
     if (!svg) {
       throw new ImageNotFoundError(id);
@@ -160,7 +165,7 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
       stop.disabled = false;
       play.disabled = true;
       next.disabled = true;
-      this.getSVG(display, "svg#record-icon").style.visibility = "visible";
+      this.getSVG(display, "record-icon").style.visibility = "visible";
       await this.recorder.start("consent");
     });
   }
@@ -172,6 +177,7 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
    */
   private playButton(display: HTMLElement) {
     const play = this.getButton(display, "play");
+
     play.addEventListener("click", () => {
       play.disabled = true;
       this.playbackFeed(display);
