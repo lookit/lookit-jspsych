@@ -1,0 +1,21 @@
+svg {
+    top: 7px;
+    left: 7px;
+    height: 25px;
+    position: absolute;
+    stroke: black;
+    stroke-width: 0.5px;
+  }
+  
+  svg#play-icon {
+    fill: white;
+  }
+  
+  svg#record-icon {
+    fill: red;
+  }
+  
+  div#lookit-jspsych-video-container {
+    position: relative;
+    width: min-content;
+  }
