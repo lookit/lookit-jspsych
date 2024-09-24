@@ -6,6 +6,8 @@ import {
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import Mustache from "mustache";
+import play_icon from "../img/play-icon.svg";
+import record_icon from "../img/record-icon.svg";
 import playbackFeed from "../templates/playback-feed.mustache";
 import webcamFeed from "../templates/webcam-feed.mustache";
 import {
@@ -210,7 +212,7 @@ export default class Recorder {
     height: CSSWidthHeight = "auto",
   ) {
     const { webcam_element_id, stream } = this;
-    const view = { height, width, webcam_element_id };
+    const view = { height, width, webcam_element_id, record_icon };
     element.innerHTML = Mustache.render(webcamFeed, view);
     const webcam = element.querySelector<HTMLVideoElement>(
       `#${webcam_element_id}`,
@@ -251,6 +253,7 @@ export default class Recorder {
         width,
         height,
         playback_element_id,
+        play_icon,
         attrs: ["controls"],
       }),
     );

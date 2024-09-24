@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@jspsych/config": "^2.0.0",
+    "@rollup/plugin-image": "^3.0.3",
     "@types/audioworklet": "^0.0.60",
     "@types/mustache": "^4.2.5",
     "rollup-plugin-dotenv": "^0.5.1",

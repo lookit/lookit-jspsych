@@ -8,6 +8,7 @@ import {
   VideoContainerNotFoundError,
 } from "./errors";
 import Recorder from "./recorder";
+import { CSSWidthHeight } from "./types";
 
 const info = <const>{
   name: "consent-video",
@@ -24,6 +25,9 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
 
   // Template variables
   private video_container_id = "lookit-jspsych-video-container";
+
+  // Style variables
+  private videoWidth: CSSWidthHeight = "300px";
 
   /**
    * Instantiate video consent plugin.
@@ -80,7 +84,8 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
    */
   private webcamFeed(display: HTMLElement) {
     const videoContainer = this.getVideoContainer(display);
-    this.recorder.insertWebcamFeed(videoContainer, "300px");
+    this.recorder.insertWebcamFeed(videoContainer, this.videoWidth);
+    this.getImg(display, "record-icon").style.visibility = "hidden";
   }
 
   /**
@@ -93,7 +98,7 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
     this.recorder.insertPlaybackFeed(
       videoContainer,
       this.onEnded(display),
-      "300px",
+      this.videoWidth,
     );
   }
 
@@ -133,20 +138,20 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
   }
 
   /**
-   * Select and return the SVG element.
+   * Select and return the image element.
    *
    * @param display - HTML element for experiment.
-   * @param id - ID string of SVG element
-   * @returns SVG Image Element
+   * @param id - ID string of Image element
+   * @returns Image Element
    */
-  private getSVG(display: HTMLElement, id: string) {
-    const svg = display.querySelector<SVGImageElement>(`svg#${id}`);
+  private getImg(display: HTMLElement, id: string) {
+    const img = display.querySelector<HTMLImageElement>(`img#${id}`);
 
-    if (!svg) {
+    if (!img) {
       throw new ImageNotFoundError(id);
     }
 
-    return svg;
+    return img;
   }
 
   /**
@@ -165,7 +170,7 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
       stop.disabled = false;
       play.disabled = true;
       next.disabled = true;
-      this.getSVG(display, "record-icon").style.visibility = "visible";
+      this.getImg(display, "record-icon").style.visibility = "visible";
       await this.recorder.start("consent");
     });
   }
