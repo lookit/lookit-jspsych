@@ -2,7 +2,7 @@ import { initJsPsych } from "jspsych";
 import Mustache from "mustache";
 import consentVideoTrial from "../templates/consent-video-trial.mustache";
 import webcamFeed from "../templates/webcam-feed.mustache";
-import { ConsentVideoPlugin } from "./consentVideo";
+import { VideoConsentPlugin } from "./consentVideo";
 import {
   ButtonNotFoundError,
   ImageNotFoundError,
@@ -14,14 +14,14 @@ jest.mock("./recorder");
 
 test("Instantiate recorder", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
 
   expect(plugin["recorder"]).toBeDefined();
 });
 
 test("Trial", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   // const display = { insertAdjacentHTML: jest.fn() } as unknown as HTMLElement;
   const display = document.createElement("div");
 
@@ -42,7 +42,7 @@ test("Trial", () => {
 
 test("GetVideoContainer error when no container", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   expect(() =>
     plugin["getVideoContainer"](document.createElement("div")),
   ).toThrow(VideoContainerNotFoundError);
@@ -50,7 +50,7 @@ test("GetVideoContainer error when no container", () => {
 
 test("GetVideoContainer", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
   display.innerHTML = `<div id="${plugin["video_container_id"]}"></div>`;
@@ -61,7 +61,7 @@ test("GetVideoContainer", () => {
 
 test("webcamFeed", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
   display.innerHTML = `<div id="${plugin["video_container_id"]}"><img id="record-icon"></div>`;
@@ -76,7 +76,7 @@ test("webcamFeed", () => {
 
 test("playbackFeed", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
   const vidContainer = "some video container";
 
@@ -93,7 +93,7 @@ test("playbackFeed", () => {
 
 test("onEnded", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
   const play = document.createElement("button");
   const next = document.createElement("button");
@@ -120,7 +120,7 @@ test("onEnded", () => {
 
 test("getButton", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
   display.innerHTML = Mustache.render(consentVideoTrial, {});
@@ -130,7 +130,7 @@ test("getButton", () => {
 
 test("getButton error when button not found", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
   expect(() => plugin["getButton"](display, "next")).toThrow(
@@ -140,7 +140,7 @@ test("getButton error when button not found", () => {
 
 test("getImg error when image not found", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
   expect(() => plugin["getImg"](display, "record-icon")).toThrow(
     ImageNotFoundError,
@@ -149,7 +149,7 @@ test("getImg error when image not found", () => {
 
 test("recordButton", async () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
   display.innerHTML =
@@ -192,7 +192,7 @@ test("recordButton", async () => {
 
 test("playButton", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
   plugin["playbackFeed"] = jest.fn();
@@ -212,7 +212,7 @@ test("playButton", () => {
 
 test("stopButton", async () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
   display.innerHTML =
@@ -238,7 +238,7 @@ test("stopButton", async () => {
 
 test("nextButton", () => {
   const jsPsych = initJsPsych();
-  const plugin = new ConsentVideoPlugin(jsPsych);
+  const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
   display.innerHTML = Mustache.render(consentVideoTrial, {});

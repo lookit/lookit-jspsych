@@ -19,7 +19,7 @@ const info = <const>{
 type Info = typeof info;
 
 /** The video consent plugin. */
-export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
+export class VideoConsentPlugin implements JsPsychPlugin<Info> {
   public static readonly info = info;
   private recorder: Recorder;
 
