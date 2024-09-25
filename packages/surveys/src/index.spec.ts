@@ -53,26 +53,26 @@ test("Exit Survey", () => {
   });
 });
 
-// test("Exit Survey private level only", () => {
-//   const exit = new Surveys.exit(initJsPsych());
-//   const display_element = jest.fn() as unknown as HTMLElement;
-//   const trialInfo = {
-//     survey_function: jest.fn(),
-//     survey_json: jest.fn(),
-//     private_level_only: true,
-//   } as unknown as ExitTrial;
-//   expect(exit.trial(display_element, trialInfo)).toBeUndefined();
-//   expect(SurveyPlugin.prototype.trial).toHaveBeenCalledTimes(1);
-// });
+test("Exit Survey private level only", () => {
+  const exit = new Surveys.ExitSurveyPlugin(initJsPsych());
+  const display_element = jest.fn() as unknown as HTMLElement;
+  const trialInfo = {
+    survey_function: jest.fn(),
+    survey_json: jest.fn(),
+    private_level_only: true,
+  } as unknown as ExitTrial;
+  expect(exit.trial(display_element, trialInfo)).toBeUndefined();
+  expect(SurveyPlugin.prototype.trial).toHaveBeenCalledTimes(1);
+});
 
-// test("Exit Survey include withdrawal example", () => {
-//   const exit = new Surveys.exit(initJsPsych());
-//   const display_element = jest.fn() as unknown as HTMLElement;
-//   const trialInfo = {
-//     survey_function: jest.fn(),
-//     survey_json: jest.fn(),
-//     include_withdrawal_example: true,
-//   } as unknown as ExitTrial;
-//   expect(exit.trial(display_element, trialInfo)).toBeUndefined();
-//   expect(SurveyPlugin.prototype.trial).toHaveBeenCalledTimes(1);
-// });
+test("Exit Survey include withdrawal example", () => {
+  const exit = new Surveys.ExitSurveyPlugin(initJsPsych());
+  const display_element = jest.fn() as unknown as HTMLElement;
+  const trialInfo = {
+    survey_function: jest.fn(),
+    survey_json: jest.fn(),
+    include_withdrawal_example: true,
+  } as unknown as ExitTrial;
+  expect(exit.trial(display_element, trialInfo)).toBeUndefined();
+  expect(SurveyPlugin.prototype.trial).toHaveBeenCalledTimes(1);
+});
