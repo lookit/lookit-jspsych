@@ -3,7 +3,7 @@ import { TrialType } from "jspsych";
 import { consentSurveyFunction } from "./utils";
 
 type Info = typeof SurveyPlugin.info;
-type Trial = TrialType<Info>;
+export type Trial = TrialType<Info>;
 
 /** Consent Survey plugin extends jsPsych's Survey Plugin. */
 export class ConsentSurveyPlugin extends SurveyPlugin {

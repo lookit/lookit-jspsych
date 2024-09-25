@@ -26,12 +26,12 @@
     "test": "jest --coverage"
   },
   "dependencies": {
-    "@lookit/data": "^0.0.1",
     "auto-bind": "^5.0.1",
     "mustache": "^4.2.0"
   },
   "devDependencies": {
     "@jspsych/config": "^2.0.0",
+    "@rollup/plugin-image": "^3.0.3",
     "@types/audioworklet": "^0.0.60",
     "@types/mustache": "^4.2.5",
     "rollup-plugin-dotenv": "^0.5.1",
@@ -39,6 +39,7 @@
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
+    "@lookit/data": "^0.0.1",
     "jspsych": "^8.0.2"
   }
 }

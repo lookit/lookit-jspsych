@@ -1,0 +1,12 @@
+img#record-icon,
+img#play-icon {
+  top: 7px;
+  left: 7px;
+  height: 25px;
+  position: absolute;
+}
+
+div#lookit-jspsych-video-container {
+  position: relative;
+  width: min-content;
+}

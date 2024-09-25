@@ -5,6 +5,7 @@ module.exports.makePackageConfig = () => {
     transform: {
       ...config.transform,
       "^.+\\.mustache$": "<rootDir>/../../jest.text.loader.js",
+      "^.+\\.svg$": "<rootDir>/../../jest.text.loader.js",
     },
     moduleNameMapper: { "@lookit/data": "<rootDir>/../../packages/data/src" },
     coverageThreshold: {

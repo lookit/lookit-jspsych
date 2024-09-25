@@ -2,7 +2,7 @@ import { LookitWindow } from "@lookit/data/dist/types";
 import { JsPsych, JsPsychPlugin } from "jspsych";
 import Mustache from "mustache";
 import uploadingVideo from "../templates/uploading-video.mustache";
-import { NoSessionRecordingError } from "./error";
+import { NoSessionRecordingError } from "./errors";
 import Recorder from "./recorder";
 
 declare let window: LookitWindow;
