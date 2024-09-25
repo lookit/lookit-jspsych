@@ -144,7 +144,7 @@ export class ConsentVideoPlugin implements JsPsychPlugin<Info> {
    * @param id - ID string of Image element
    * @returns Image Element
    */
-  private getImg(display: HTMLElement, id: string) {
+  private getImg(display: HTMLElement, id: "record-icon") {
     const img = display.querySelector<HTMLImageElement>(`img#${id}`);
 
     if (!img) {

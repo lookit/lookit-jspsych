@@ -8904,7 +8904,8 @@ div#sv-nav-complete.sv-action.sv-action--hidden {
   min-width: unset !important;
 }
 
-img#record-icon, img#play-icon {
+img#record-icon,
+img#play-icon {
   top: 7px;
   left: 7px;
   height: 25px;

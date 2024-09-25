@@ -28,8 +28,7 @@ import { CSSWidthHeight } from "./types";
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
-  public url?: string;
-
+  private url?: string;
   private _s3?: lookitS3;
 
   private blobs: Blob[] = [];
@@ -50,11 +49,6 @@ export default class Recorder {
   private playback_element_id = "lookit-jspsych-playback";
 
   private streamClone: MediaStream;
-  /**
-   * Store the reject function for the stop promise so that we can reject it in
-   * the destroy recorder method.
-   */
-  private rejectStopPromise: (reason: string) => void = () => {};
 
   /**
    * Recorder for online experiments.
@@ -243,19 +237,19 @@ export default class Recorder {
     height: CSSWidthHeight = "auto",
   ) {
     const { playback_element_id } = this;
+    const view = {
+      src: this.url,
+      width,
+      height,
+      playback_element_id,
+      play_icon,
+    };
 
     this.clearWebcamFeed();
 
     element.insertAdjacentHTML(
       "afterbegin",
-      Mustache.render(playbackFeed, {
-        src: this.url,
-        width,
-        height,
-        playback_element_id,
-        play_icon,
-        attrs: ["controls"],
-      }),
+      Mustache.render(playbackFeed, view),
     );
 
     const playbackElement = element.querySelector<HTMLVideoElement>(
@@ -302,7 +296,7 @@ export default class Recorder {
    * @param prefix - Prefix for the video recording file name (string). This is
    *   the string that comes before "_<TIMESTAMP>.webm".
    */
-  public async start(prefix: string) {
+  public async start(prefix: "consent" | "session_video" | "trial_video") {
     this.initializeCheck();
 
     // Set filename
@@ -317,9 +311,8 @@ export default class Recorder {
 
     // create a stop promise and pass the resolve function as an argument to the stop event callback,
     // so that the stop event handler can resolve the stop promise
-    this.stopPromise = new Promise((resolve, reject) => {
+    this.stopPromise = new Promise((resolve) => {
       this.recorder.addEventListener("stop", this.handleStop(resolve));
-      this.rejectStopPromise = reject;
     });
 
     if (!this.localDownload) {
@@ -365,7 +358,7 @@ export default class Recorder {
    * @returns Whether or not the recorder has webcam/mic access.
    */
   public camMicAccess(): boolean {
-    return this.recorder && this.stream.active;
+    return !!this.recorder && this.stream.active;
   }
 
   /** Throw Error if there isn't a recorder provided by jsPsych. */
