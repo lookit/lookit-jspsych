@@ -1,8 +1,5 @@
 import Data from "@lookit/data";
-import {
-  default as lookitS3,
-  default as LookitS3,
-} from "@lookit/data/dist/lookitS3";
+import LookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import { JsPsych } from "jspsych";
 import Mustache from "mustache";
@@ -29,7 +26,7 @@ import { CSSWidthHeight } from "./types";
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
   private url?: string;
-  private _s3?: lookitS3;
+  private _s3?: LookitS3;
 
   private blobs: Blob[] = [];
   private localDownload: boolean =
