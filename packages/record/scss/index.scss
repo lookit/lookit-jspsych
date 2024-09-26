@@ -1,18 +1,25 @@
 div#lookit-jspsych-video-config {
-  margin-top: 10%;
+  margin-top: 5%;
   margin-bottom: 10%;
 
   button.lookit-jspsych-btn {
     font-size: 18px;
   }
 
-  /* Container */
-  #lookit-jspsych-video-config-column-container {
+  /* Webcam/instructions row container */
+  #lookit-jspsych-video-config-row-container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: center;
+  }
+
+  /* Title container */
+  #lookit-jspsych-video-config-title-row {
+    text-align: left;
+    margin-bottom: 10px;
+    margin-left: 10%;
   }
 
   /* Webcam column */
@@ -63,9 +70,8 @@ div#lookit-jspsych-video-config {
 
   /* Error/info message div */
   #lookit-jspsych-video-config-errors {
-    min-height: 1.6em;
-    line-height: 1.6em;
-    margin-top: -1.6em;
+    min-height: 3em;
+    margin-top: -3em;
     text-align: center;
     font-weight: bold;
     color: red;
@@ -166,6 +172,6 @@ div#lookit-jspsych-video-config {
   .lookit-jspsych-screenshot {
     display: block;
     margin: 15px auto;
-    max-width: 50%;
+    max-width: 30%;
   }
 }
