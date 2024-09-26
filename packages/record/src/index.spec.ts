@@ -9,6 +9,7 @@ declare const window: LookitWindow;
 jest.mock("./recorder");
 jest.mock("@lookit/data");
 jest.mock("jspsych", () => ({
+  ...jest.requireActual("jspsych"),
   initJsPsych: jest
     .fn()
     .mockReturnValue({ finishTrial: jest.fn().mockImplementation() }),
