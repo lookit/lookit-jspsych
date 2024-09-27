@@ -655,9 +655,6 @@ test("Video config setDevices", async () => {
     audio: { deviceId: devicesObj.mic2.deviceId },
   });
   // Calls recorder.initializeRecorder with the returned stream
-  // TO DO:
-  // - check for cam/mic info/IDs rather than pluginAPI stream?
-  // - shouldn't this also call jsPsych.pluginAPI.initializeCameraRecorder?
   expect(initializeRecorderMock).toHaveBeenCalledWith(
     jsPsych.pluginAPI.getCameraRecorder().stream,
   );
