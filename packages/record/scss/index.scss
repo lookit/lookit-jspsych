@@ -165,7 +165,7 @@ div#lookit-jspsych-video-config {
     margin-left: 5px;
   }
 
-  .active:after {
+  button.lookit-jspsych-accordion.active:after {
     content: "\2796"; /* Unicode character for "minus" sign (-) */
   }
 

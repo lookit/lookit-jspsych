@@ -9048,7 +9048,7 @@ div#lookit-jspsych-video-config button.lookit-jspsych-accordion:after {
   float: right;
   margin-left: 5px;
 }
-div#lookit-jspsych-video-config .active:after {
+div#lookit-jspsych-video-config button.lookit-jspsych-accordion.active:after {
   content: "➖"; /* Unicode character for "minus" sign (-) */
 }
 div#lookit-jspsych-video-config .lookit-jspsych-screenshot {
