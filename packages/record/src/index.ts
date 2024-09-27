@@ -1,3 +1,4 @@
+import { VideoConsentPlugin } from "./consentVideo";
 import StartRecordPlugin from "./start";
 import StopRecordPlugin from "./stop";
 import TrialRecordExtension from "./trial";
@@ -8,4 +9,5 @@ export default {
   StartRecordPlugin,
   StopRecordPlugin,
   VideoConfigPlugin,
+  VideoConsentPlugin,
 };

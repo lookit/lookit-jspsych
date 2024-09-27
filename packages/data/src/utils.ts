@@ -1,3 +1,4 @@
+import { URLWrongError } from "./errors";
 import { ApiResponse } from "./types";
 
 const CONFIG = <const>{ url_base: "/api/v2/" };
@@ -75,6 +76,6 @@ export const getUuids = () => {
   if (locationHref.includes("studies/j/") && uuids && uuids.length === 2) {
     return { study: uuids[0], child: uuids[1] };
   } else {
-    throw new Error("URL is different than expected.");
+    throw new URLWrongError();
   }
 };

@@ -1,6 +1,6 @@
 import { LookitWindow } from "@lookit/data/dist/types";
 import { initJsPsych } from "jspsych";
-import { ExistingRecordingError, NoSessionRecordingError } from "./error";
+import { ExistingRecordingError, NoSessionRecordingError } from "./errors";
 import Rec from "./index";
 import Recorder from "./recorder";
 
@@ -80,7 +80,7 @@ test("Stop Recording", async () => {
   const jsPsych = initJsPsych();
 
   setCHSValue({
-    sessionRecorder: new Recorder(jsPsych, "prefix"),
+    sessionRecorder: new Recorder(jsPsych),
   });
 
   const stopRec = new Rec.StopRecordPlugin(jsPsych);

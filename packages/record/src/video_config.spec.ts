@@ -603,7 +603,7 @@ test("Video config setDevices", async () => {
   const next_button_el = video_config["display_el"]?.querySelector(
     `#${video_config["next_button_id"]}`,
   ) as HTMLButtonElement;
-  video_config["recorder"] = new Recorder(jsPsych, "video_config");
+  video_config["recorder"] = new Recorder(jsPsych);
 
   // Populate the selection elements with device options.
   video_config["updateDeviceSelection"]({
@@ -674,7 +674,7 @@ test("Video config setDevices", async () => {
 
 test("Video config runStreamChecks throws NoStreamAccess", () => {
   video_config["addHtmlContent"]("");
-  video_config["recorder"] = new Recorder(jsPsych, "video_config");
+  video_config["recorder"] = new Recorder(jsPsych);
   jest
     .spyOn(Recorder.prototype, "camMicAccess")
     .mockImplementationOnce(() => false);
@@ -685,7 +685,7 @@ test("Video config runStreamChecks throws NoStreamAccess", () => {
 
 test("Video config runStreamChecks throws Mic Check error", async () => {
   video_config["addHtmlContent"]("");
-  video_config["recorder"] = new Recorder(jsPsych, "video_config");
+  video_config["recorder"] = new Recorder(jsPsych);
   jest
     .spyOn(Recorder.prototype, "camMicAccess")
     .mockImplementationOnce(() => true);
@@ -722,7 +722,7 @@ test("Video config runStreamChecks throws Mic Check error", async () => {
 
 test("Video config runStreamChecks", async () => {
   video_config["addHtmlContent"]("");
-  video_config["recorder"] = new Recorder(jsPsych, "video_config");
+  video_config["recorder"] = new Recorder(jsPsych);
   jest
     .spyOn(Recorder.prototype, "camMicAccess")
     .mockImplementationOnce(() => true);
@@ -759,7 +759,7 @@ test("Video config runStreamChecks", async () => {
 
 test("Video config runStreamChecks enables next button when all checks have passed", async () => {
   video_config["addHtmlContent"]("");
-  video_config["recorder"] = new Recorder(jsPsych, "video_config");
+  video_config["recorder"] = new Recorder(jsPsych);
   jest
     .spyOn(Recorder.prototype, "camMicAccess")
     .mockImplementationOnce(() => true);
@@ -782,7 +782,7 @@ test("Video config runStreamChecks enables next button when all checks have pass
 });
 
 test("Video config onDeviceChange event listener", async () => {
-  video_config["recorder"] = new Recorder(jsPsych, "video_config");
+  video_config["recorder"] = new Recorder(jsPsych);
   // Mock the MediaDevices API
   const mockMediaDevices = {
     ondevicechange: null as ((this: MediaDevices, ev: Event) => void) | null,

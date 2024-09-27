@@ -177,7 +177,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     this.updateInstructions(1, false);
     this.updateInstructions(3, false);
     this.updateErrors(this.waiting_for_access_msg);
-    this.recorder = new Recorder(this.jsPsych, "video_config");
+    this.recorder = new Recorder(this.jsPsych);
     return this.recorder
       .requestPermission({ video: true, audio: true })
       .then(() => {
@@ -244,14 +244,9 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     this.jsPsych.finishTrial(trial_data);
   };
 
-  /**
-   * Destroy the recorder.
-   *
-   * @returns Promise that resolves when the recorder has been destroyed and
-   *   variables reset to initial values.
-   */
-  private destroyRecorder = async () => {
-    await this.recorder?.destroy();
+  /** Destroy the recorder. */
+  private destroyRecorder = () => {
+    this.recorder?.reset();
     this.recorder = null;
     this.hasCamMicAccess = false;
     this.enable_next(false);
@@ -260,19 +255,19 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   };
 
   /** Function to handle the next button click event. */
-  private nextButtonClick = async () => {
+  private nextButtonClick = () => {
     const end_time = performance.now();
     const rt = this.start_time ? Math.round(end_time - this.start_time) : null;
     this.response.rt = rt;
-    await this.destroyRecorder();
+    this.destroyRecorder();
     this.endTrial();
   };
 
   /** Function to handle the reload recorder button click event. */
-  private reloadButtonClick = async () => {
+  private reloadButtonClick = () => {
     this.hasReloaded = true;
     this.updateInstructions(2, true);
-    await this.destroyRecorder();
+    this.destroyRecorder();
     this.setupRecorder();
   };
 

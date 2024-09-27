@@ -4,7 +4,7 @@ import {
   audioContextMock,
   AudioWorkletNodeMock,
 } from "../fixtures/MockWebAudioAPI";
-import { MicCheckError } from "./error";
+import { MicCheckError } from "./errors";
 import Recorder from "./recorder";
 
 // Some of the recorder's methods rely on the WebAudio API, which is not available in Node/Jest/jsdom, so we'll mock it here.
@@ -16,19 +16,32 @@ global.AudioWorkletNode = AudioWorkletNodeMock as any;
 /** Add mock registerProcessor to the global scope. */
 global.registerProcessor = () => {};
 
+jest.mock("jspsych", () => ({
+  ...jest.requireActual("jspsych"),
+  initJsPsych: jest.fn().mockReturnValue({
+    pluginAPI: {
+      getCameraRecorder: jest.fn().mockReturnValue({
+        addEventListener: jest.fn(),
+        start: jest.fn(),
+        stop: jest.fn(),
+        stream: {
+          active: true,
+          clone: jest.fn(),
+          getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]),
+        },
+      }),
+    },
+  }),
+}));
+
 afterEach(() => {
   jest.clearAllMocks();
 });
 
 test("Recorder check mic", async () => {
   const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych, "prefix");
-  const media = {
-    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) },
-  };
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
+  const rec = new Recorder(jsPsych);
 
-  // Mock the resolution of the last promise in checkMic so that it resolves and we can check the mocks/spies.
   rec["setupPortOnMessage"] = jest
     .fn()
     .mockReturnValue(() => Promise.resolve());
@@ -47,7 +60,9 @@ test("Recorder check mic", async () => {
 
   await rec.checkMic();
 
-  expect(createMediaStreamSourceSpy).toHaveBeenCalledWith(media.stream);
+  expect(createMediaStreamSourceSpy).toHaveBeenCalledWith(
+    jsPsych.pluginAPI.getCameraRecorder().stream,
+  );
   expect(addModuleSpy).toHaveBeenCalledWith("/static/js/mic_check.js");
   expect(createConnectProcessorSpy).toHaveBeenCalledWith(
     expectedAudioContext,
@@ -58,11 +73,7 @@ test("Recorder check mic", async () => {
 
 test("Throws MicCheckError with createConnectProcessor error", () => {
   const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych, "prefix");
-  const media = {
-    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) },
-  };
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
+  const rec = new Recorder(jsPsych);
 
   // Mock the resolution of the last promise in checkMic to make sure that the rejection/error occurs before this point.
   rec["setupPortOnMessage"] = jest
@@ -83,11 +94,7 @@ test("Throws MicCheckError with createConnectProcessor error", () => {
 
 test("Throws MicCheckError with addModule error", () => {
   const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych, "prefix");
-  const media = {
-    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) },
-  };
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
+  const rec = new Recorder(jsPsych);
 
   // Mock the resolution of the last promise in checkMic to make sure that the rejection/error occurs before this point.
   rec["setupPortOnMessage"] = jest
@@ -108,11 +115,7 @@ test("Throws MicCheckError with addModule error", () => {
 
 test("Throws MicCheckError with setupPortOnMessage error", () => {
   const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych, "prefix");
-  const media = {
-    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) },
-  };
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
+  const rec = new Recorder(jsPsych);
 
   // Mock the resolution of the last promise in checkMic to make sure that the rejection/error occurs before this point.
   rec["setupPortOnMessage"] = jest
@@ -133,11 +136,7 @@ test("Throws MicCheckError with setupPortOnMessage error", () => {
 
 test("checkMic should process microphone input and handle messages", () => {
   const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych, "prefix");
-  const media = {
-    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) },
-  };
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
+  const rec = new Recorder(jsPsych);
 
   const onMicActivityLevelSpy = jest.spyOn(rec, "onMicActivityLevel" as never);
 
@@ -194,40 +193,9 @@ test("checkMic should process microphone input and handle messages", () => {
   expect(rec.micChecked).toBe(true);
 });
 
-test("Destroy method should set processorNode to null", async () => {
-  const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych, "prefix");
-  const media = {
-    stop: jest.fn(),
-    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) },
-  };
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
-
-  expect(rec["processorNode"]).toBe(null);
-
-  // Setup the processor node.
-  const audioContext = new AudioContext();
-  rec["processorNode"] = new AudioWorkletNode(
-    audioContext,
-    "mic-check-processor",
-  );
-  expect(rec["processorNode"]).toBeTruthy();
-  rec["setupPortOnMessage"](rec["minVolume"]);
-  expect(rec["processorNode"].port.onmessage).toBeTruthy();
-
-  expect(rec["processorNode"]).toBeTruthy();
-  await rec.destroy();
-  expect(rec["processorNode"]).toBe(null);
-});
-
 test("Recorder setupPortOnMessage should setup port's on message callback", () => {
   const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych, "prefix");
-  const media = {
-    stop: jest.fn(),
-    stream: { getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]) },
-  };
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(media);
+  const rec = new Recorder(jsPsych);
 
   expect(rec["processorNode"]).toBe(null);
 

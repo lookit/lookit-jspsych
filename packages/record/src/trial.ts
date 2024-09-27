@@ -27,12 +27,12 @@ export default class TrialRecordExtension implements JsPsychExtension {
 
   /** Ran at the start of a trial. */
   public on_start() {
-    this.recorder = new Recorder(this.jsPsych, "trial_video");
+    this.recorder = new Recorder(this.jsPsych);
   }
 
   /** Ran when the trial has loaded. */
   public on_load() {
-    this.recorder?.start();
+    this.recorder?.start("trial_video");
   }
 
   /**

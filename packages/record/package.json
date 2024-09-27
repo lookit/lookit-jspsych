@@ -26,7 +26,6 @@
     "test": "jest --coverage"
   },
   "dependencies": {
-    "@lookit/data": "^0.0.1",
     "auto-bind": "^5.0.1",
     "mustache": "^4.2.0"
   },
@@ -41,6 +40,7 @@
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
+    "@lookit/data": "^0.0.1",
     "jspsych": "^8.0.2"
   }
 }
