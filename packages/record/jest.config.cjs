@@ -9,5 +9,5 @@ module.exports = {
   },
   moduleNameMapper: {
     "\\.(png)$": "../fixtures/fileMock.ts",
-  }
+  },
 };

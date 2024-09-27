@@ -1,6 +1,7 @@
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import Mustache from "mustache";
 import video_config from "../templates/video-config.mustache";
+import { NoStreamError } from "./error";
 import chromeInitialPrompt from "./img/chrome_initialprompt.png";
 import chromeAlwaysAllow from "./img/chrome_step1_alwaysallow.png";
 import chromePermissions from "./img/chrome_step1_permissions.png";
@@ -8,7 +9,6 @@ import firefoxInitialPrompt from "./img/firefox_initialprompt.png";
 import firefoxChooseDevice from "./img/firefox_prompt_choose_device.png";
 import firefoxDevicesBlocked from "./img/firefox_prompt_devices_blocked.png";
 import Recorder from "./recorder";
-import { NoStreamError } from "./error";
 
 const info = <const>{
   name: "video-config-plugin",
@@ -63,7 +63,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   private camera_selection_id: string = "lookit-jspsych-which-webcam";
   private mic_selection_id: string = "lookit-jspsych-which-mic";
   private next_button_id: string = "lookit-jspsych-next";
-  private error_msg_div_id: string= "lookit-jspsych-video-config-errors";
+  private error_msg_div_id: string = "lookit-jspsych-video-config-errors";
   private step1_id: string = "lookit-jspsych-step1";
   private step2_id: string = "lookit-jspsych-step2";
   private step3_id: string = "lookit-jspsych-step3";
@@ -92,7 +92,6 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For the unused trial argument
   public trial(display_element: HTMLElement, trial: VideoConsentTrialType) {
-
     this.display_el = display_element;
 
     // Set up the event listener for device changes.
@@ -117,10 +116,10 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    *
    * @param devices - Object with properti es 'cameras' and 'mics', which are
    *   arrays containing lists of available devices.
-   * @param devices.cameras - Array of MediaDeviceInfo objects for
-   *   webcam/video input devices.
-   * @param devices.mics - Array of MediaDeviceInfo objects for mic/audio
+   * @param devices.cameras - Array of MediaDeviceInfo objects for webcam/video
    *   input devices.
+   * @param devices.mics - Array of MediaDeviceInfo objects for mic/audio input
+   *   devices.
    */
   private updateDeviceSelection = (devices: {
     cameras: MediaDeviceInfo[];
@@ -158,14 +157,13 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   };
 
   /**
-   * Function to setup the Recorder and run the permissions/mic checks. This
-   * is run when the trial first loads and anytime the user clicks the reload
+   * Function to setup the Recorder and run the permissions/mic checks. This is
+   * run when the trial first loads and anytime the user clicks the reload
    * recorder button.
    *
    * 1. Setup a new recorder instance.
    * 2. Request permissions, if necessary.
-   * 3. Enumerate devices and populate the device selection elements with
-   *    options.
+   * 3. Enumerate devices and populate the device selection elements with options.
    * 4. Setup the recorder with the current/selected devices.
    * 5. Run the stream checks. (If completed successfully, this will clear any
    *    error messages and enable the next button).
@@ -187,10 +185,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
         return this.recorder!.getDeviceLists();
       })
       .then(
-        (devices: {
-          cameras: MediaDeviceInfo[];
-          mics: MediaDeviceInfo[];
-        }) => {
+        (devices: { cameras: MediaDeviceInfo[]; mics: MediaDeviceInfo[] }) => {
           // Update the device choices listed in the selection elements
           this.updateDeviceSelection(devices);
           // Get the stream with the selected devices
@@ -202,13 +197,13 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   };
 
   /**
-   * Takes the selected device IDs from the camera/mic selection elements,
-   * gets the streams for these devices, and sets these as the input devices
-   * via jsPsych.pluginAPI.initializeMicrophoneRecorder and
+   * Takes the selected device IDs from the camera/mic selection elements, gets
+   * the streams for these devices, and sets these as the input devices via
+   * jsPsych.pluginAPI.initializeMicrophoneRecorder and
    * jsPsych.pluginAPI.initializeCameraRecorder.
    *
-   * @returns Promise that resolves with the stream for the selected camera
-   *   and mic.
+   * @returns Promise that resolves with the stream for the selected camera and
+   *   mic.
    */
   private setDevices = () => {
     this.enable_next(false);
@@ -236,9 +231,9 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   };
 
   /**
-   * Function to collect trial data and end the trial. JsPsych.finishTrial
-   * takes the plugin's trial data as an argument, ends the trial, and moves
-   * on to the next trial in the experiment timeline.
+   * Function to collect trial data and end the trial. JsPsych.finishTrial takes
+   * the plugin's trial data as an argument, ends the trial, and moves on to the
+   * next trial in the experiment timeline.
    */
   private endTrial = () => {
     const trial_data = {
@@ -267,11 +262,11 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   /** Function to handle the next button click event. */
   private nextButtonClick = async () => {
     const end_time = performance.now();
-    const rt = (this.start_time) ? Math.round(end_time - this.start_time): null;
+    const rt = this.start_time ? Math.round(end_time - this.start_time) : null;
     this.response.rt = rt;
     await this.destroyRecorder();
     this.endTrial();
-  }
+  };
 
   /** Function to handle the reload recorder button click event. */
   private reloadButtonClick = async () => {
@@ -279,11 +274,13 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     this.updateInstructions(2, true);
     await this.destroyRecorder();
     this.setupRecorder();
-  }
+  };
 
-  /** 
+  /**
    * Private helper to add initial HTML content to the page.
-   * @param troubleshooting_intro - Troubleshooting intro parameter from the Trial object.
+   *
+   * @param troubleshooting_intro - Troubleshooting intro parameter from the
+   *   Trial object.
    */
   private addHtmlContent(troubleshooting_intro: string) {
     const html_params = {
@@ -304,14 +301,12 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
       firefoxInitialPrompt,
       firefoxChooseDevice,
       firefoxDevicesBlocked,
-      troubleshooting_intro
+      troubleshooting_intro,
     };
     this.display_el!.innerHTML = Mustache.render(video_config, html_params);
   }
 
-  /** 
-   * Add event listeners to elements after they've been added to the page.
-   */
+  /** Add event listeners to elements after they've been added to the page. */
   private addEventListeners() {
     // Next button.
     const next_button_el = this.display_el?.querySelector(
@@ -382,18 +377,15 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    * minimum microphone input level (when audio is included), and (3) media
    * permissions (via recorder destroy/reload). This runs the stream checks,
    * updates the info/error messages, enables the next button, and handles
-   * errors. This is factored out of the set up process (setupRecorder)
-   * because it is also triggered by a change in the cam/mic device
-   * selection.
+   * errors. This is factored out of the set up process (setupRecorder) because
+   * it is also triggered by a change in the cam/mic device selection.
    *
    * @returns Promise that resolves when the stream checks have finished
    *   successfully, the next button has been enabled, info/error messages
    *   updated, and errors handled.
    */
   private runStreamChecks = () => {
-    this.hasCamMicAccess = this.recorder
-      ? this.recorder.camMicAccess()
-      : false;
+    this.hasCamMicAccess = this.recorder ? this.recorder.camMicAccess() : false;
     if (this.hasCamMicAccess) {
       this.recorder!.insertWebcamFeed(
         this.display_el?.querySelector(
@@ -418,13 +410,13 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
         });
     } else {
       this.updateErrors(this.access_problem_msg);
-      throw new NoStreamError;
+      throw new NoStreamError();
     }
   };
 
   /**
-   * Update the instructions for a given step, based on whether or not the
-   * check has passed for that step.
+   * Update the instructions for a given step, based on whether or not the check
+   * has passed for that step.
    *
    * @param step - Which instructions step to update. 1 = stream access, 2 =
    *   reload complete, 3 = mic level check.
@@ -478,20 +470,16 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     error_msg_div.innerHTML = errorMsg;
   };
 
-
   /**
-   * If there is a change to the available devices, then we need to: (1) get
-   * the updated device lists, and (2) update the select elements with these list
+   * If there is a change to the available devices, then we need to: (1) get the
+   * updated device lists, and (2) update the select elements with these list
    * elements.
    */
   private onDeviceChange = () => {
     this.recorder
       ?.getDeviceLists()
       .then(
-        (devices: {
-          cameras: MediaDeviceInfo[];
-          mics: MediaDeviceInfo[];
-        }) => {
+        (devices: { cameras: MediaDeviceInfo[]; mics: MediaDeviceInfo[] }) => {
           this.updateDeviceSelection(devices);
         },
       );
