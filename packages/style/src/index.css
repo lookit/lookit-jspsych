@@ -9065,6 +9065,10 @@ img#play-icon {
   position: absolute;
 }
 
+img#record-icon {
+  visibility: "hidden";
+}
+
 div#lookit-jspsych-video-container {
   position: relative;
   width: min-content;
