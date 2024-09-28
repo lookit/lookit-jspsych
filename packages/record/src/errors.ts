@@ -102,7 +102,7 @@ export class NoStreamError extends Error {
    */
   public constructor() {
     const message =
-      "No input stream found. Maybe the recorder was not initialized with intializeRecorder.";
+      "No input stream found. Maybe the recorder was not initialized with initializeRecorder.";
     super(message);
     this.name = "NoStreamError";
   }
