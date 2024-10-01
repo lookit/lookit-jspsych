@@ -254,6 +254,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   private destroyRecorder = () => {
     if (this.recorder) {
       this.recorder.stopTracks();
+      this.recorder.reset();
       this.recorder = null;
     }
     this.enable_next(false);
