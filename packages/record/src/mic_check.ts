@@ -62,10 +62,13 @@ export default class MicCheckProcessor extends AudioWorkletProcessor {
     } else {
       const input = inputs[0];
       const samples = input[0];
-      const sumSquare = samples.reduce((p, c) => p + c * c, 0);
-      const rms = Math.sqrt(sumSquare / (samples.length || 1)) * SCALING_FACTOR;
-      this._volume = Math.max(rms, this._volume * SMOOTHING_FACTOR);
-      this.port.postMessage({ volume: this._volume });
+      if (samples) {
+        const sumSquare = samples.reduce((p, c) => p + c * c, 0);
+        const rms =
+          Math.sqrt(sumSquare / (samples.length || 1)) * SCALING_FACTOR;
+        this._volume = Math.max(rms, this._volume * SMOOTHING_FACTOR);
+        this.port.postMessage({ volume: this._volume });
+      }
       return true;
     }
   }
