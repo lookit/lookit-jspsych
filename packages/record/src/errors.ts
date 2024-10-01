@@ -120,10 +120,20 @@ export class MicCheckError extends Error {
    * promise chain via message events passed to onMicActivityLevel.
    *
    * @param err - Error passed into this error that is thrown in the catch
-   *   block, if any.
+   *   block, if any. Errors passed to catch blocks must have type unknown.
    */
-  public constructor(err: Error) {
-    const message = `There was a problem setting up and running the microphone check. ${err.message}`;
+  public constructor(err: unknown) {
+    let message = `There was a problem setting up and running the microphone check.`;
+    if (
+      err instanceof Object &&
+      "message" in err &&
+      typeof err.message === "string"
+    ) {
+      message+=` ${err.message}`;
+    }
+    if (typeof err === "string") {
+      message+=` ${err}`;
+    }
     super(message);
     this.name = "MicCheckError";
   }
