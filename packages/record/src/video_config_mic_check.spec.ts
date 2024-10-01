@@ -74,7 +74,7 @@ test("Video config check mic", async () => {
     jsPsych.pluginAPI.getCameraStream(),
   );
 
-  await video_config.checkMic();
+  await video_config["checkMic"]();
 
   expect(createMediaStreamSourceSpy).toHaveBeenCalledWith(
     jsPsych.pluginAPI.getCameraStream(),
@@ -94,8 +94,9 @@ test("Throws MicCheckError with createConnectProcessor error", () => {
   video_config["setupPortOnMessage"] = jest
     .fn()
     .mockReturnValue(() => Promise.resolve());
-  expect(async () => await video_config.checkMic()).resolves;
+  expect(async () => await video_config["checkMic"]()).resolves;
 
+  // No error message
   const mockError = jest.fn(() => {
     const promise = new Promise<void>(() => {
       throw "Error";
@@ -104,7 +105,19 @@ test("Throws MicCheckError with createConnectProcessor error", () => {
     return promise;
   });
   video_config["createConnectProcessor"] = mockError;
-  expect(async () => await video_config.checkMic()).rejects.toThrow(
+  expect(async () => await video_config["checkMic"]()).rejects.toThrow(
+    MicCheckError,
+  );
+
+  const mockErrorMsg = jest.fn(() => {
+    const promise = new Promise<void>(() => {
+      throw new Error("This is an error message");
+    });
+    promise.catch(() => null); // Prevent an uncaught error here so that it propogates to the catch block.
+    return promise;
+  });
+  video_config["createConnectProcessor"] = mockErrorMsg;
+  expect(async () => await video_config["checkMic"]()).rejects.toThrow(
     MicCheckError,
   );
 });
@@ -114,7 +127,7 @@ test("Throws MicCheckError with addModule error", () => {
   video_config["setupPortOnMessage"] = jest
     .fn()
     .mockReturnValue(() => Promise.resolve());
-  expect(async () => await video_config.checkMic()).resolves;
+  expect(async () => await video_config["checkMic"]()).resolves;
 
   const mockError = jest.fn(() => {
     const promise = new Promise<void>(() => {
@@ -124,7 +137,7 @@ test("Throws MicCheckError with addModule error", () => {
     return promise;
   });
   audioContextMock.audioWorklet.addModule = mockError;
-  expect(async () => await video_config.checkMic()).rejects.toThrow(
+  expect(async () => await video_config["checkMic"]()).rejects.toThrow(
     MicCheckError,
   );
 });
@@ -144,7 +157,7 @@ test("Throws MicCheckError with setupPortOnMessage error", () => {
     return promise;
   });
   video_config["setupPortOnMessage"] = mockError;
-  expect(async () => await video_config.checkMic()).rejects.toThrow(
+  expect(async () => await video_config["checkMic"]()).rejects.toThrow(
     MicCheckError,
   );
 });
@@ -249,7 +262,7 @@ test("Video config mic check throws error if no stream", () => {
     .mockImplementation(jest.fn().mockReturnValue(null));
 
   expect(async () => {
-    await video_config.checkMic();
+    await video_config["checkMic"]();
   }).rejects.toThrow(NoStreamError);
   expect(getCameraStreamSpy).toHaveBeenCalledTimes(1);
 });
