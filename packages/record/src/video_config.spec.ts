@@ -2,7 +2,7 @@ import { clickTarget } from "@jspsych/test-utils";
 import { initJsPsych, JsPsych } from "jspsych";
 import Mustache from "mustache";
 import videoConfig from "../templates/video-config.mustache";
-import { NoStreamError } from "./error";
+import { NoStreamError } from "./errors";
 import Recorder from "./recorder";
 
 import chromeInitialPrompt from "./img/chrome_initialprompt.png";
@@ -21,6 +21,11 @@ jest.mock("jspsych", () => ({
     finishTrial: jest.fn().mockImplementation(),
     pluginAPI: {
       initializeCameraRecorder: jest.fn(),
+      getCameraStream: jest.fn().mockReturnValue({
+        active: true,
+        clone: jest.fn(),
+        getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]),
+      }),
       getCameraRecorder: jest.fn().mockReturnValue({
         addEventListener: jest.fn(),
         start: jest.fn(),
@@ -122,7 +127,7 @@ beforeEach(() => {
     },
   });
 
-  // Object format for devices returned from Recorder.getDeviceLists
+  // Object format for devices returned from getDeviceLists
   returnedDeviceLists = {
     cameras: [devicesObj.cam1, devicesObj.cam2],
     mics: [devicesObj.mic1, devicesObj.mic2],
@@ -536,14 +541,13 @@ test("Video config setupRecorder", async () => {
     .spyOn(video_config, "updateErrors")
     .mockImplementation(jest.fn());
   const requestPermissionMock = jest
-    .spyOn(Recorder.prototype, "requestPermission")
+    .spyOn(video_config, "requestPermission")
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .mockImplementation((constraints: MediaStreamConstraints) =>
       Promise.resolve(jsPsych.pluginAPI.getCameraRecorder().stream),
     );
   const getDeviceListsMock = jest
-    .spyOn(Recorder.prototype, "getDeviceLists")
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .spyOn(video_config, "getDeviceLists")
     .mockImplementation(
       (
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -623,14 +627,14 @@ test("Video config setDevices", async () => {
     .spyOn(video_config, "updateInstructions")
     .mockImplementation(jest.fn());
   const requestPermissionMock = jest
-    .spyOn(Recorder.prototype, "requestPermission")
+    .spyOn(video_config, "requestPermission")
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .mockImplementation((constraints: MediaStreamConstraints) =>
       Promise.resolve(jsPsych.pluginAPI.getCameraRecorder().stream),
     );
-  const initializeRecorderMock = jest.spyOn(
-    Recorder.prototype,
-    "intializeRecorder",
+  const createInitializeRecorderMock = jest.spyOn(
+    video_config,
+    "initializeAndCreateRecorder",
   );
 
   expect(next_button_el.disabled).toBe(true);
@@ -654,8 +658,8 @@ test("Video config setDevices", async () => {
     video: { deviceId: devicesObj.cam2.deviceId },
     audio: { deviceId: devicesObj.mic2.deviceId },
   });
-  // Calls recorder.initializeRecorder with the returned stream
-  expect(initializeRecorderMock).toHaveBeenCalledWith(
+  // Calls initializeAndCreateRecorder with the returned stream
+  expect(createInitializeRecorderMock).toHaveBeenCalledWith(
     jsPsych.pluginAPI.getCameraRecorder().stream,
   );
 
@@ -674,10 +678,20 @@ test("Video config setDevices", async () => {
 
 test("Video config runStreamChecks throws NoStreamAccess", () => {
   video_config["addHtmlContent"]("");
-  video_config["recorder"] = new Recorder(jsPsych);
+  video_config["recorder"] = new Recorder(initJsPsych());
   jest
-    .spyOn(Recorder.prototype, "camMicAccess")
-    .mockImplementationOnce(() => false);
+    .spyOn(jsPsych.pluginAPI, "getCameraRecorder")
+    // @ts-expect-error - jsPsych says the return value should be MediaRecorder, but in fact it's MediaRecorder or null.
+    .mockImplementationOnce(() => null);
+  // When the recorder has not been initialized with jsPsych.
+  expect(async () => await video_config["runStreamChecks"]()).rejects.toThrow(
+    NoStreamError,
+  );
+
+  expect(jsPsych.pluginAPI.getCameraRecorder).toBeTruthy();
+
+  // When the Recorder has not been created.
+  video_config["recorder"] = null;
   expect(async () => await video_config["runStreamChecks"]()).rejects.toThrow(
     NoStreamError,
   );
@@ -686,9 +700,6 @@ test("Video config runStreamChecks throws NoStreamAccess", () => {
 test("Video config runStreamChecks throws Mic Check error", async () => {
   video_config["addHtmlContent"]("");
   video_config["recorder"] = new Recorder(jsPsych);
-  jest
-    .spyOn(Recorder.prototype, "camMicAccess")
-    .mockImplementationOnce(() => true);
 
   // Setup upstream mocks.
   Recorder.prototype.insertWebcamFeed = jest.fn();
@@ -696,7 +707,7 @@ test("Video config runStreamChecks throws Mic Check error", async () => {
   const updateErrorsMock = jest
     .spyOn(video_config, "updateErrors")
     .mockImplementation(jest.fn());
-
+  // Mock an error during the mic check setup.
   const mockError = jest.fn(() => {
     const promise = new Promise<void>(() => {
       throw "Mic check problem";
@@ -704,7 +715,7 @@ test("Video config runStreamChecks throws Mic Check error", async () => {
     promise.catch(() => null); // Prevent an uncaught error here so that it propogates to the catch block.
     return promise;
   });
-  video_config["recorder"]["checkMic"] = mockError;
+  video_config["checkMic"] = mockError;
 
   await expect(video_config["runStreamChecks"]()).rejects.toThrow(
     "Mic check problem",
@@ -723,9 +734,6 @@ test("Video config runStreamChecks throws Mic Check error", async () => {
 test("Video config runStreamChecks", async () => {
   video_config["addHtmlContent"]("");
   video_config["recorder"] = new Recorder(jsPsych);
-  jest
-    .spyOn(Recorder.prototype, "camMicAccess")
-    .mockImplementationOnce(() => true);
 
   // Setup upstream mocks.
   const insertWebcamMock = jest
@@ -738,7 +746,7 @@ test("Video config runStreamChecks", async () => {
     .spyOn(video_config, "updateErrors")
     .mockImplementation(jest.fn());
   const checkMicMock = jest
-    .spyOn(Recorder.prototype, "checkMic")
+    .spyOn(video_config, "checkMic")
     .mockImplementation(jest.fn(() => Promise.resolve()));
 
   await video_config["runStreamChecks"]();
@@ -760,15 +768,12 @@ test("Video config runStreamChecks", async () => {
 test("Video config runStreamChecks enables next button when all checks have passed", async () => {
   video_config["addHtmlContent"]("");
   video_config["recorder"] = new Recorder(jsPsych);
-  jest
-    .spyOn(Recorder.prototype, "camMicAccess")
-    .mockImplementationOnce(() => true);
 
   // Setup upstream mocks.
   Recorder.prototype.insertWebcamFeed = jest.fn();
   video_config["updateInstructions"] = jest.fn();
   video_config["updateErrors"] = jest.fn();
-  Recorder.prototype.checkMic = jest.fn(() => Promise.resolve());
+  video_config["checkMic"] = jest.fn(() => Promise.resolve());
   const enableNextMock = jest
     .spyOn(video_config, "enable_next")
     .mockImplementation(jest.fn());
@@ -797,7 +802,7 @@ test("Video config onDeviceChange event listener", async () => {
 
   // Setup upstream mocks for functions called inside onDeviceChange.
   const getDeviceListsMock = jest
-    .spyOn(Recorder.prototype, "getDeviceLists")
+    .spyOn(video_config, "getDeviceLists")
     .mockImplementation(
       (
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -880,4 +885,223 @@ test("Video config next button click", async () => {
   expect(video_config["response"]["rt"]).toBe(4);
   expect(destroyMock).toHaveBeenCalledTimes(1);
   expect(endMock.mock.calls).toHaveLength(1);
+
+  video_config["start_time"] = null;
+
+  await video_config["nextButtonClick"]();
+
+  expect(video_config["response"]).toHaveProperty("rt");
+  expect(video_config["response"]["rt"]).toBeNull();
+});
+
+test("Video config destroyRecorder", () => {
+  const recorderStopTracksSpy = jest.spyOn(Recorder.prototype, "stopTracks");
+  video_config["recorder"] = new Recorder(jsPsych);
+  const enableNextMock = jest
+    .spyOn(video_config, "enable_next")
+    .mockImplementation(jest.fn());
+  const updateInstructionsMock = jest
+    .spyOn(video_config, "updateInstructions")
+    .mockImplementation(jest.fn());
+
+  expect(video_config["recorder"]).not.toBeNull();
+
+  video_config["destroyRecorder"]();
+
+  // Should stop the tracks, set the recorder to null, disable the next button,
+  // and update the instructions (checks 1/3 not passed).
+  expect(recorderStopTracksSpy).toHaveBeenCalledTimes(1);
+  expect(video_config["recorder"]).toBeNull();
+  expect(enableNextMock).toHaveBeenCalledTimes(1);
+  expect(enableNextMock).toHaveBeenCalledWith(false);
+  expect(updateInstructionsMock).toHaveBeenCalledTimes(2);
+  expect(updateInstructionsMock.mock.calls[0]).toStrictEqual([3, false]);
+  expect(updateInstructionsMock.mock.calls[1]).toStrictEqual([1, false]);
+});
+
+test("Video config destroyRecorder with no recorder", () => {
+  const recorderStopTracksSpy = jest.spyOn(Recorder.prototype, "stopTracks");
+  const enableNextMock = jest
+    .spyOn(video_config, "enable_next")
+    .mockImplementation(jest.fn());
+  const updateInstructionsMock = jest
+    .spyOn(video_config, "updateInstructions")
+    .mockImplementation(jest.fn());
+
+  expect(video_config["recorder"]).toBeNull();
+
+  video_config["destroyRecorder"]();
+
+  expect(recorderStopTracksSpy).not.toHaveBeenCalled();
+  expect(video_config["recorder"]).toBeNull();
+  expect(enableNextMock).toHaveBeenCalledTimes(1);
+  expect(enableNextMock).toHaveBeenCalledWith(false);
+  expect(updateInstructionsMock).toHaveBeenCalledTimes(2);
+  expect(updateInstructionsMock.mock.calls[0]).toStrictEqual([3, false]);
+  expect(updateInstructionsMock.mock.calls[1]).toStrictEqual([1, false]);
+});
+
+test("Video config requestPermission", async () => {
+  const stream = { fake: "stream" } as unknown as MediaStream;
+  const mockGetUserMedia = jest.fn(
+    () =>
+      new Promise<MediaStream>((resolve) => {
+        resolve(stream);
+      }),
+  );
+  Object.defineProperty(global.navigator, "mediaDevices", {
+    writable: true,
+    value: {
+      getUserMedia: mockGetUserMedia,
+    },
+  });
+  const constraints = { video: true, audio: true };
+
+  const returnedStream = await video_config.requestPermission(constraints);
+  expect(returnedStream).toStrictEqual(stream);
+  expect(global.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
+    constraints,
+  );
+});
+
+test("Video config getDeviceLists", async () => {
+  const mic1 = {
+    deviceId: "mic1",
+    kind: "audioinput",
+    label: "",
+    groupId: "default",
+  } as MediaDeviceInfo;
+  const cam1 = {
+    deviceId: "cam1",
+    kind: "videoinput",
+    label: "",
+    groupId: "default",
+  } as MediaDeviceInfo;
+  const mic2 = {
+    deviceId: "mic2",
+    kind: "audioinput",
+    label: "",
+    groupId: "other",
+  } as MediaDeviceInfo;
+  const cam2 = {
+    deviceId: "cam2",
+    kind: "videoinput",
+    label: "",
+    groupId: "other",
+  } as MediaDeviceInfo;
+
+  // Returns the mic/cam devices from navigator.mediaDevices.enumerateDevices as an object with 'cameras' and 'mics' (arrays of media device info objects).
+  const devices = [mic1, mic2, cam1, cam2];
+  Object.defineProperty(global.navigator, "mediaDevices", {
+    writable: true,
+    value: {
+      enumerateDevices: jest.fn(
+        () =>
+          new Promise<MediaDeviceInfo[]>((resolve) => {
+            resolve(devices);
+          }),
+      ),
+    },
+  });
+
+  const returnedDevices = await video_config.getDeviceLists();
+  expect(global.navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(
+    1,
+  );
+  expect(returnedDevices).toHaveProperty("cameras");
+  expect(returnedDevices).toHaveProperty("mics");
+  expect(returnedDevices.cameras.sort()).toStrictEqual([cam1, cam2].sort());
+  expect(returnedDevices.mics.sort()).toStrictEqual([mic1, mic2].sort());
+
+  // Removes duplicate devices and handles empty device categories.
+  const devices_duplicate = [mic1, mic1, mic1];
+  Object.defineProperty(global.navigator, "mediaDevices", {
+    writable: true,
+    value: {
+      enumerateDevices: jest.fn(
+        () =>
+          new Promise<MediaDeviceInfo[]>((resolve) => {
+            resolve(devices_duplicate);
+          }),
+      ),
+    },
+  });
+
+  const returnedDevicesDuplicates = await video_config.getDeviceLists();
+  expect(returnedDevicesDuplicates.cameras).toStrictEqual([]);
+  expect(returnedDevicesDuplicates.mics).toStrictEqual([mic1]);
+});
+
+test("Video config onMicActivityLevel", () => {
+  type micEventType = {
+    currentActivityLevel: number;
+    minVolume: number;
+    resolve: () => void;
+  };
+  const event_fail = {
+    currentActivityLevel: 0.0001,
+    minVolume: video_config["minVolume"],
+    resolve: jest.fn(),
+  } as micEventType;
+
+  expect(video_config["micChecked"]).toBe(false);
+  video_config["onMicActivityLevel"](
+    event_fail.currentActivityLevel,
+    event_fail.minVolume,
+    event_fail.resolve,
+  );
+  expect(video_config["micChecked"]).toBe(false);
+  expect(event_fail.resolve).not.toHaveBeenCalled();
+
+  const event_pass = {
+    currentActivityLevel: 0.2,
+    minVolume: video_config["minVolume"],
+    resolve: jest.fn(),
+  } as micEventType;
+
+  expect(video_config["micChecked"]).toBe(false);
+  video_config["onMicActivityLevel"](
+    event_pass.currentActivityLevel,
+    event_pass.minVolume,
+    event_pass.resolve,
+  );
+  expect(video_config["micChecked"]).toBe(true);
+  expect(event_pass.resolve).toHaveBeenCalled();
+});
+
+test("Video config onMicActivityLevel", () => {
+  type micEventType = {
+    currentActivityLevel: number;
+    minVolume: number;
+    resolve: () => void;
+  };
+  const event_fail = {
+    currentActivityLevel: 0.0001,
+    minVolume: video_config["minVolume"],
+    resolve: jest.fn(),
+  } as micEventType;
+
+  expect(video_config["micChecked"]).toBe(false);
+  video_config["onMicActivityLevel"](
+    event_fail.currentActivityLevel,
+    event_fail.minVolume,
+    event_fail.resolve,
+  );
+  expect(video_config["micChecked"]).toBe(false);
+  expect(event_fail.resolve).not.toHaveBeenCalled();
+
+  const event_pass = {
+    currentActivityLevel: 0.2,
+    minVolume: video_config["minVolume"],
+    resolve: jest.fn(),
+  } as micEventType;
+
+  expect(video_config["micChecked"]).toBe(false);
+  video_config["onMicActivityLevel"](
+    event_pass.currentActivityLevel,
+    event_pass.minVolume,
+    event_pass.resolve,
+  );
+  expect(video_config["micChecked"]).toBe(true);
+  expect(event_pass.resolve).toHaveBeenCalled();
 });

@@ -1,7 +1,7 @@
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import Mustache from "mustache";
 import video_config from "../templates/video-config.mustache";
-import { NoStreamError } from "./error";
+import { MicCheckError, NoStreamError } from "./errors";
 import chromeInitialPrompt from "./img/chrome_initialprompt.png";
 import chromeAlwaysAllow from "./img/chrome_step1_alwaysallow.png";
 import chromePermissions from "./img/chrome_step1_permissions.png";
@@ -9,6 +9,7 @@ import firefoxInitialPrompt from "./img/firefox_initialprompt.png";
 import firefoxChooseDevice from "./img/firefox_prompt_choose_device.png";
 import firefoxDevicesBlocked from "./img/firefox_prompt_devices_blocked.png";
 import Recorder from "./recorder";
+// import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
 const info = <const>{
   name: "video-config-plugin",
@@ -41,7 +42,8 @@ interface MediaDeviceInfo {
  *
  * CHS jsPsych plugin for presenting a video recording configuration plugin, to
  * help participants set up their webcam and microphone before beginning a study
- * that includes video/audio recording.
+ * that includes video/audio recording. This plugin must be used before any
+ * other trials in the experiment can access the camera/mic.
  *
  * @author Becky Gilbert
  * @see {@link https://github.com/lookit/lookit-jspsych/blob/main/packages/video-config/README.md video-config plugin documentation on Github}
@@ -50,12 +52,18 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   public static info = info;
   private display_el: HTMLElement | null = null;
   private start_time: number | null = null;
-  private recorder!: Recorder | null;
-  private hasCamMicAccess: boolean = false;
+  private recorder: Recorder | null = null;
   private hasReloaded: boolean = false;
   private response: Record<"rt", null | number> = { rt: null };
   private camId: string = "";
   private micId: string = "";
+  private minVolume: number = 0.1;
+  private micChecked: boolean = false;
+  /**
+   * Use null rather than undefined so that we can set these back to null when
+   * reseting.
+   */
+  private processorNode: AudioWorkletNode | null = null;
   // HTML IDs and classes
   private webcam_container_id: string = "lookit-jspsych-webcam-container";
   private reload_button_id_text: string = "lookit-jspsych-reload-webcam";
@@ -157,15 +165,15 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   };
 
   /**
-   * Function to setup the Recorder and run the permissions/mic checks. This is
-   * run when the trial first loads and anytime the user clicks the reload
-   * recorder button.
+   * Function to access media devices, setup the Recorder, and run the
+   * permissions/mic checks. This is run when the trial first loads and anytime
+   * the user clicks the reload recorder button.
    *
-   * 1. Setup a new recorder instance.
-   * 2. Request permissions, if necessary.
-   * 3. Enumerate devices and populate the device selection elements with options.
-   * 4. Setup the recorder with the current/selected devices.
-   * 5. Run the stream checks. (If completed successfully, this will clear any
+   * 1. Request permissions, if necessary.
+   * 2. Enumerate devices and populate the device selection elements with options.
+   * 3. Initialize the jsPsych recorder with the current/selected devices, and
+   *    create a new Recorder.
+   * 4. Run the stream checks. (If completed successfully, this will clear any
    *    error messages and enable the next button).
    *
    * @returns Promise that resolves when the stream checks have finished
@@ -177,12 +185,10 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     this.updateInstructions(1, false);
     this.updateInstructions(3, false);
     this.updateErrors(this.waiting_for_access_msg);
-    this.recorder = new Recorder(this.jsPsych);
-    return this.recorder
-      .requestPermission({ video: true, audio: true })
+    return this.requestPermission({ video: true, audio: true })
       .then(() => {
         this.updateErrors("");
-        return this.recorder!.getDeviceLists();
+        return this.getDeviceLists();
       })
       .then(
         (devices: { cameras: MediaDeviceInfo[]; mics: MediaDeviceInfo[] }) => {
@@ -222,11 +228,11 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     ).value;
     this.micId = selected_mic;
     // Request permission for those specific devices, and initialize the jsPsych recorder.
-    return this.recorder!.requestPermission({
+    return this.requestPermission({
       video: { deviceId: selected_cam },
       audio: { deviceId: selected_mic },
     }).then((stream) => {
-      this.recorder!.intializeRecorder(stream);
+      this.initializeAndCreateRecorder(stream);
     });
   };
 
@@ -246,9 +252,10 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
 
   /** Destroy the recorder. */
   private destroyRecorder = () => {
-    this.recorder?.reset();
-    this.recorder = null;
-    this.hasCamMicAccess = false;
+    if (this.recorder) {
+      this.recorder.stopTracks();
+      this.recorder = null;
+    }
     this.enable_next(false);
     this.updateInstructions(3, false);
     this.updateInstructions(1, false);
@@ -380,9 +387,8 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    *   updated, and errors handled.
    */
   private runStreamChecks = () => {
-    this.hasCamMicAccess = this.recorder ? this.recorder.camMicAccess() : false;
-    if (this.hasCamMicAccess) {
-      this.recorder!.insertWebcamFeed(
+    if (this.jsPsych.pluginAPI.getCameraRecorder() && this.recorder) {
+      this.recorder.insertWebcamFeed(
         this.display_el?.querySelector(
           `#${this.webcam_container_id}`,
         ) as HTMLDivElement,
@@ -390,7 +396,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
       this.updateInstructions(1, true);
       this.updateErrors(this.checking_mic_msg);
 
-      return this.recorder!.checkMic()
+      return this.checkMic()
         .then(() => {
           this.updateErrors("");
           this.updateInstructions(3, true);
@@ -471,12 +477,208 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    * elements.
    */
   private onDeviceChange = () => {
-    this.recorder
-      ?.getDeviceLists()
-      .then(
-        (devices: { cameras: MediaDeviceInfo[]; mics: MediaDeviceInfo[] }) => {
-          this.updateDeviceSelection(devices);
-        },
-      );
+    this.getDeviceLists().then(
+      (devices: { cameras: MediaDeviceInfo[]; mics: MediaDeviceInfo[] }) => {
+        this.updateDeviceSelection(devices);
+      },
+    );
   };
+
+  /**
+   * Gets the lists of available cameras and mics (via Media Devices
+   * 'enumerateDevices'). These lists can be used to populate camera/mic
+   * selection elements.
+   *
+   * @param include_audio - Whether or not to include audio capture (mic)
+   *   devices. Optional, default is true.
+   * @param include_camera - Whether or not to include the webcam (video)
+   *   devices. Optional, default is true.
+   * @returns Promise that resolves with an object with properties 'cameras' and
+   *   'mics', containing lists of available devices.
+   */
+  public getDeviceLists(
+    include_audio: boolean = true,
+    include_camera: boolean = true,
+  ): Promise<{ cameras: MediaDeviceInfo[]; mics: MediaDeviceInfo[] }> {
+    return navigator.mediaDevices.enumerateDevices().then((devices) => {
+      let unique_cameras: Array<MediaDeviceInfo> = [];
+      let unique_mics: Array<MediaDeviceInfo> = [];
+      if (include_camera) {
+        const cams = devices.filter(
+          (d) =>
+            d.kind === "videoinput" &&
+            d.deviceId !== "default" &&
+            d.deviceId !== "communications",
+        );
+        unique_cameras = cams.filter(
+          (cam, index, arr) =>
+            arr.findIndex((v) => v.groupId == cam.groupId) == index,
+        );
+      }
+      if (include_audio) {
+        const mics = devices.filter(
+          (d) =>
+            d.kind === "audioinput" &&
+            d.deviceId !== "default" &&
+            d.deviceId !== "communications",
+        );
+        unique_mics = mics.filter(
+          (mic, index, arr) =>
+            arr.findIndex((v) => v.groupId == mic.groupId) == index,
+        );
+      }
+      return { cameras: unique_cameras, mics: unique_mics };
+    });
+  }
+
+  /**
+   * Initialize recorder using the jsPsych plugin API. This must be called
+   * before running the stream checks.
+   *
+   * @param stream - Media stream returned from getUserMedia that should be used
+   *   to set up the jsPsych recorder.
+   * @param opts - Media recorder options to use when setting up the recorder.
+   */
+  public initializeAndCreateRecorder(
+    stream: MediaStream,
+    opts?: MediaRecorderOptions,
+  ) {
+    this.jsPsych.pluginAPI.initializeCameraRecorder(stream, opts);
+    this.recorder = new Recorder(this.jsPsych);
+  }
+
+  /**
+   * Perform a sound check on the audio input (microphone).
+   *
+   * @param minVol - Minimum mic activity needed to reach the mic check
+   *   threshold (optional). Default is `this.minVolume`
+   * @returns Promise that resolves when the mic check is complete because the
+   *   audio stream has reached the required minimum level.
+   */
+  public checkMic(minVol: number = this.minVolume) {
+    if (this.jsPsych.pluginAPI.getCameraStream()) {
+      const audioContext = new AudioContext();
+      const microphone = audioContext.createMediaStreamSource(
+        this.jsPsych.pluginAPI.getCameraStream(),
+      );
+      // This currently loads from lookit-api static files.
+      // TO DO: load mic_check.js from dist or a URL? See https://github.com/lookit/lookit-jspsych/issues/44
+      return audioContext.audioWorklet
+        .addModule("/static/js/mic_check.js")
+        .then(() => this.createConnectProcessor(audioContext, microphone))
+        .then(() => this.setupPortOnMessage(minVol))
+        .catch((err) => {
+          return Promise.reject(new MicCheckError(err));
+        });
+    } else {
+      return Promise.reject(new NoStreamError());
+    }
+  }
+
+  /**
+   * Private helper to handle the mic level messages that are sent via an
+   * AudioWorkletProcessor. This checks the current level against the minimum
+   * threshold, and if the threshold is met, sets the micChecked property to
+   * true and resolves the checkMic promise.
+   *
+   * @param currentActivityLevel - Microphone activity level calculated by the
+   *   processor node.
+   * @param minVolume - Minimum microphone activity level needed to pass the
+   *   microphone check.
+   * @param resolve - Resolve callback function for Promise returned by the
+   *   checkMic method.
+   */
+  private onMicActivityLevel(
+    currentActivityLevel: number,
+    minVolume: number,
+    resolve: () => void,
+  ) {
+    if (currentActivityLevel > minVolume) {
+      this.micChecked = true;
+      this.processorNode?.port.postMessage({ micChecked: true });
+      this.processorNode = null;
+      resolve();
+    }
+  }
+
+  /**
+   * Private helper that takes the audio context and microphone, creates the
+   * processor node for the mic check input level processing, and connects the
+   * microphone to the processor node.
+   *
+   * @param audioContext - Audio context that was created in checkMic. This is
+   *   used to create the processor node.
+   * @param microphone - Microphone audio stream source, created in checkMic.
+   *   The processor node will be connected to this source.
+   * @returns Promise that resolves after the processor node has been created,
+   *   and the microphone audio stream source is connected to the processor node
+   *   and audio context destination.
+   */
+  private createConnectProcessor(
+    audioContext: AudioContext,
+    microphone: MediaStreamAudioSourceNode,
+  ) {
+    return new Promise<void>((resolve) => {
+      this.processorNode = new AudioWorkletNode(
+        audioContext,
+        "mic-check-processor",
+      );
+      microphone.connect(this.processorNode).connect(audioContext.destination);
+      resolve();
+    });
+  }
+
+  /**
+   * Private helper to setup the port's on message event handler for the mic
+   * check processor node. This adds the event related callback, which calls
+   * onMicActivityLevel with the event data.
+   *
+   * @param minVol - Minimum volume level (RMS amplitude) passed from checkMic.
+   * @returns Promise that resolves from inside the onMicActivityLevel callback,
+   *   when the mic stream input level has reached the threshold.
+   */
+  private setupPortOnMessage(minVol: number) {
+    return new Promise<void>((resolve) => {
+      /**
+       * Callback on the microphone's AudioWorkletNode that fires in response to
+       * a message event containing the current mic level. When the mic level
+       * reaches the threshold, this callback sets the micChecked property to
+       * true and resolves this Promise (via onMicActivityLevel).
+       *
+       * @param event - The message event that was sent from the processor on
+       *   the audio worklet node. Contains a 'data' property (object) which
+       *   contains a 'volume' property (number).
+       */
+      this.processorNode!.port.onmessage = (event: MessageEvent) => {
+        // handle message from the processor: event.data
+        if (this.onMicActivityLevel) {
+          if ("data" in event && "volume" in event.data) {
+            this.onMicActivityLevel(event.data.volume, minVol, resolve);
+          }
+        }
+      };
+    });
+  }
+
+  /**
+   * Request permission to use the webcam and/or microphone. This can be used
+   * with and without specific device selection (and other constraints).
+   *
+   * @param constraints - Media stream constraints object with 'video' and
+   *   'audio' properties, whose values can be boolean or a
+   *   MediaTrackConstraints object or undefined.
+   * @param constraints.video - If false, do not include video. If true, use the
+   *   default webcam device. If a media track constraints object is passed,
+   *   then it can contain the properties of all media tracks and video tracks:
+   *   https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints.
+   * @param constraints.audio - If false, do not include audio. If true, use the
+   *   default mic device. If a media track constraints object is passed, then
+   *   it can contain the properties of all media tracks and audio tracks:
+   *   https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints.
+   * @returns Camera/microphone stream.
+   */
+  public async requestPermission(constraints: MediaStreamConstraints) {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    return stream;
+  }
 }
