@@ -171,8 +171,9 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
         ".lookit-jspsych-device-selection",
       ) as NodeListOf<HTMLSelectElement>
     ).forEach((el) => {
-      el.addEventListener("change", () => {
-        this.setDevices().then(this.runStreamChecks);
+      el.addEventListener("change", async () => {
+        await this.setDevices();
+        this.runStreamChecks();
       });
     });
     // Accordion section (Setup tips and troubleshooting)
