@@ -129,10 +129,10 @@ export class MicCheckError extends Error {
       "message" in err &&
       typeof err.message === "string"
     ) {
-      message+=` ${err.message}`;
+      message += ` ${err.message}`;
     }
     if (typeof err === "string") {
-      message+=` ${err}`;
+      message += ` ${err}`;
     }
     super(message);
     this.name = "MicCheckError";
