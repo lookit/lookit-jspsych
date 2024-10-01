@@ -9,10 +9,12 @@ import firefoxDevicesBlocked from "../img/firefox_prompt_devices_blocked.png";
 import video_config from "../templates/video-config.mustache";
 import { MicCheckError, NoStreamError } from "./errors";
 import Recorder from "./recorder";
+import { version } from '../package.json';
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44
 
 const info = <const>{
   name: "video-config-plugin",
+  version: version,
   parameters: {
     troubleshooting_intro: {
       /**
@@ -23,6 +25,11 @@ const info = <const>{
       default: "",
       pretty_name: "Troubleshooting Intro",
     },
+  },
+  data: {
+    rt: ParameterType.INT,
+    camId: ParameterType.STRING,
+    micId: ParameterType.STRING,
   },
 };
 
