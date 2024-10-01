@@ -247,7 +247,7 @@ test("Video config add event listeners", async () => {
   video_config["addEventListeners"]();
 
   // Next button is disabled when the page loads - it must be enabled before it will accept a click event.
-  video_config["enable_next"](true);
+  video_config["enableNext"](true);
   expect(nextBtnClickMock).toHaveBeenCalledTimes(0);
   await clickTarget(next_button_el);
   expect(nextBtnClickMock).toHaveBeenCalledTimes(1);
@@ -298,14 +298,14 @@ test("Video config enable next", () => {
   expect(next_button_el.disabled).toBe(true);
 
   // Calling with 'true' enables the button and adds the class.
-  video_config["enable_next"](true);
+  video_config["enableNext"](true);
   expect(
     next_button_el.classList.contains(video_config["step_complete_class"]),
   ).toBe(true);
   expect(next_button_el.disabled).toBe(false);
 
   // Calling with 'false' sets everything back.
-  video_config["enable_next"](false);
+  video_config["enableNext"](false);
   expect(
     next_button_el.classList.contains(video_config["step_complete_class"]),
   ).toBe(false);
@@ -621,7 +621,7 @@ test("Video config setDevices", async () => {
 
   // Setup upstream mocks.
   const enableNextMock = jest
-    .spyOn(video_config, "enable_next")
+    .spyOn(video_config, "enableNext")
     .mockImplementation(jest.fn());
   const updateInstructionsMock = jest
     .spyOn(video_config, "updateInstructions")
@@ -775,7 +775,7 @@ test("Video config runStreamChecks enables next button when all checks have pass
   video_config["updateErrors"] = jest.fn();
   video_config["checkMic"] = jest.fn(() => Promise.resolve());
   const enableNextMock = jest
-    .spyOn(video_config, "enable_next")
+    .spyOn(video_config, "enableNext")
     .mockImplementation(jest.fn());
 
   video_config["hasReloaded"] = true;
@@ -898,7 +898,7 @@ test("Video config destroyRecorder", () => {
   const recorderStopTracksSpy = jest.spyOn(Recorder.prototype, "stopTracks");
   video_config["recorder"] = new Recorder(jsPsych);
   const enableNextMock = jest
-    .spyOn(video_config, "enable_next")
+    .spyOn(video_config, "enableNext")
     .mockImplementation(jest.fn());
   const updateInstructionsMock = jest
     .spyOn(video_config, "updateInstructions")
@@ -922,7 +922,7 @@ test("Video config destroyRecorder", () => {
 test("Video config destroyRecorder with no recorder", () => {
   const recorderStopTracksSpy = jest.spyOn(Recorder.prototype, "stopTracks");
   const enableNextMock = jest
-    .spyOn(video_config, "enable_next")
+    .spyOn(video_config, "enableNext")
     .mockImplementation(jest.fn());
   const updateInstructionsMock = jest
     .spyOn(video_config, "updateInstructions")
