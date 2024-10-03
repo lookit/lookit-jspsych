@@ -1,4 +1,5 @@
 import { initJsPsych as origInitJsPsych } from "jspsych";
+import { UndefinedTypeError } from "./errors";
 import { JsPsychOptions, Timeline } from "./types";
 import { on_data_update, on_finish } from "./utils";
 
@@ -39,7 +40,10 @@ const lookitInitJsPsych = (responseUuid: string) => {
      */
     jsPsych.run = function (timeline) {
       // check timeline here...
-      timeline.map((t: Timeline) => {
+      timeline.map((t: Timeline, idx: number) => {
+        if (!t.type) {
+          throw new UndefinedTypeError(idx);
+        }
         addChsData(t);
       });
 
