@@ -282,3 +282,21 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     next.addEventListener("click", () => this.jsPsych.finishTrial());
   }
 }
+
+// type Objectx ={
+//   type:string
+// }
+
+// interface ObjectA extends Objectx {
+//   type: "A";
+//   value1: string;
+//   value2: number;
+// };
+
+// interface ObjectB extends Objectx {
+//   type: "B";
+//   valueA: string;
+//   valueB: number;
+// };
+
+// type TypeA<I extends Objectx>
