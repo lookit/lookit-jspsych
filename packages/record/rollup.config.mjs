@@ -14,7 +14,6 @@ export default makeRollupConfig("chsRecord").map((config) => {
       importAsString({
         include: ["**/*.mustache"],
       }),
-
       image(),
     ],
   };

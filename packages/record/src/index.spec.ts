@@ -9,6 +9,7 @@ declare const window: LookitWindow;
 jest.mock("./recorder");
 jest.mock("@lookit/data");
 jest.mock("jspsych", () => ({
+  ...jest.requireActual("jspsych"),
   initJsPsych: jest
     .fn()
     .mockReturnValue({ finishTrial: jest.fn().mockImplementation() }),
@@ -79,7 +80,7 @@ test("Stop Recording", async () => {
   const jsPsych = initJsPsych();
 
   setCHSValue({
-    sessionRecorder: new Recorder(jsPsych, "prefix"),
+    sessionRecorder: new Recorder(jsPsych),
   });
 
   const stopRec = new Rec.StopRecordPlugin(jsPsych);

@@ -9,7 +9,6 @@ import {
   CreateURLError,
   NoPlayBackElementError,
   NoStopPromiseError,
-  NoStreamError,
   NoWebCamElementError,
   RecorderInitializeError,
   S3UndefinedError,
@@ -59,7 +58,7 @@ test("Recorder start", async () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
   const media = jsPsych.pluginAPI.getCameraRecorder();
-  await rec.start("prefix");
+  await rec.start("consent");
 
   expect(media.addEventListener).toHaveBeenCalledTimes(2);
   expect(media.start).toHaveBeenCalledTimes(1);
@@ -103,7 +102,7 @@ test("Recorder initialize error", () => {
     .fn()
     .mockReturnValue(undefined);
 
-  expect(async () => await rec.start("prefix")).rejects.toThrow(
+  expect(async () => await rec.start("consent")).rejects.toThrow(
     RecorderInitializeError,
   );
 
@@ -239,126 +238,6 @@ test("Webcam feed is removed when stream access stops", async () => {
   document.body.innerHTML = "";
 });
 
-test("Recorder camMicAccess", () => {
-  const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych);
-  const getCameraRecorder = jsPsych.pluginAPI.getCameraRecorder;
-
-  expect(rec.camMicAccess()).toBe(true);
-
-  jsPsych.pluginAPI.getCameraRecorder = jest
-    .fn()
-    .mockReturnValue({ stream: { active: false } });
-
-  expect(rec.camMicAccess()).toBe(false);
-
-  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(undefined);
-  jsPsych.pluginAPI.getMicrophoneRecorder = jest
-    .fn()
-    .mockReturnValue(undefined);
-
-  expect(rec.camMicAccess()).toBe(false);
-
-  jsPsych.pluginAPI.getCameraRecorder = getCameraRecorder;
-});
-
-test("Recorder requestPermission", async () => {
-  const stream = { fake: "stream" } as unknown as MediaStream;
-  const mockGetUserMedia = jest.fn(
-    () =>
-      new Promise<MediaStream>((resolve) => {
-        resolve(stream);
-      }),
-  );
-  Object.defineProperty(global.navigator, "mediaDevices", {
-    writable: true,
-    value: {
-      getUserMedia: mockGetUserMedia,
-    },
-  });
-
-  const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych);
-  const constraints = { video: true, audio: true };
-
-  const returnedStream = await rec.requestPermission(constraints);
-  expect(returnedStream).toStrictEqual(stream);
-  expect(global.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-    constraints,
-  );
-});
-
-test("Recorder getDeviceLists", async () => {
-  const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych);
-
-  const mic1 = {
-    deviceId: "mic1",
-    kind: "audioinput",
-    label: "",
-    groupId: "default",
-  } as MediaDeviceInfo;
-  const cam1 = {
-    deviceId: "cam1",
-    kind: "videoinput",
-    label: "",
-    groupId: "default",
-  } as MediaDeviceInfo;
-  const mic2 = {
-    deviceId: "mic2",
-    kind: "audioinput",
-    label: "",
-    groupId: "other",
-  } as MediaDeviceInfo;
-  const cam2 = {
-    deviceId: "cam2",
-    kind: "videoinput",
-    label: "",
-    groupId: "other",
-  } as MediaDeviceInfo;
-
-  // Returns the mic/cam devices from navigator.mediaDevices.enumerateDevices as an object with 'cameras' and 'mics' (arrays of media device info objects).
-  const devices = [mic1, mic2, cam1, cam2];
-  Object.defineProperty(global.navigator, "mediaDevices", {
-    writable: true,
-    value: {
-      enumerateDevices: jest.fn(
-        () =>
-          new Promise<MediaDeviceInfo[]>((resolve) => {
-            resolve(devices);
-          }),
-      ),
-    },
-  });
-
-  const returnedDevices = await rec.getDeviceLists();
-  expect(global.navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(
-    1,
-  );
-  expect(returnedDevices).toHaveProperty("cameras");
-  expect(returnedDevices).toHaveProperty("mics");
-  expect(returnedDevices.cameras.sort()).toStrictEqual([cam1, cam2].sort());
-  expect(returnedDevices.mics.sort()).toStrictEqual([mic1, mic2].sort());
-
-  // Removes duplicate devices and handles empty device categories.
-  const devices_duplicate = [mic1, mic1, mic1];
-  Object.defineProperty(global.navigator, "mediaDevices", {
-    writable: true,
-    value: {
-      enumerateDevices: jest.fn(
-        () =>
-          new Promise<MediaDeviceInfo[]>((resolve) => {
-            resolve(devices_duplicate);
-          }),
-      ),
-    },
-  });
-
-  const returnedDevicesDuplicates = await rec.getDeviceLists();
-  expect(returnedDevicesDuplicates.cameras).toStrictEqual([]);
-  expect(returnedDevicesDuplicates.mics).toStrictEqual([mic1]);
-});
-
 test("Recorder initializeRecorder", () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
@@ -388,65 +267,10 @@ test("Recorder initializeRecorder", () => {
     return jsPsych.pluginAPI.initializeCameraRecorder(stream);
   });
 
-  rec.intializeRecorder(stream);
+  rec.initializeRecorder(stream);
 
   expect(jsPsych.pluginAPI.initializeCameraRecorder).toHaveBeenCalled();
   expect(rec["stream"]).toStrictEqual(stream);
-
-  jsPsych.pluginAPI.getCameraRecorder = getCameraRecorder;
-});
-
-test("Recorder onMicActivityLevel", () => {
-  const rec = new Recorder(initJsPsych());
-
-  type micEventType = {
-    currentActivityLevel: number;
-    minVolume: number;
-    resolve: () => void;
-  };
-  const event_fail = {
-    currentActivityLevel: 0.0001,
-    minVolume: rec["minVolume"],
-    resolve: jest.fn(),
-  } as micEventType;
-
-  expect(rec.micChecked).toBe(false);
-  rec["onMicActivityLevel"](
-    event_fail.currentActivityLevel,
-    event_fail.minVolume,
-    event_fail.resolve,
-  );
-  expect(rec.micChecked).toBe(false);
-  expect(event_fail.resolve).not.toHaveBeenCalled();
-
-  const event_pass = {
-    currentActivityLevel: 0.2,
-    minVolume: rec["minVolume"],
-    resolve: jest.fn(),
-  } as micEventType;
-
-  expect(rec.micChecked).toBe(false);
-  rec["onMicActivityLevel"](
-    event_pass.currentActivityLevel,
-    event_pass.minVolume,
-    event_pass.resolve,
-  );
-  expect(rec.micChecked).toBe(true);
-  expect(event_pass.resolve).toHaveBeenCalled();
-});
-
-test("Recorder mic check throws error if no stream", () => {
-  const jsPsych = initJsPsych();
-  const rec = new Recorder(jsPsych);
-  const getCameraRecorder = jsPsych.pluginAPI.getCameraRecorder;
-
-  jsPsych.pluginAPI.getCameraRecorder = jest
-    .fn()
-    .mockReturnValueOnce({ stream: false });
-
-  expect(async () => {
-    await rec.checkMic();
-  }).rejects.toThrow(NoStreamError);
 
   jsPsych.pluginAPI.getCameraRecorder = getCameraRecorder;
 });

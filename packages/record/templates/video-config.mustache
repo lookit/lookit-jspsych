@@ -1,0 +1,131 @@
+<div id="lookit-jspsych-video-config">
+  <div id="lookit-jspsych-video-config-title-row">
+    <h2>Webcam setup</h2>
+    <p>No recording during this section</p>
+  </div>
+  <div id="lookit-jspsych-video-config-row-container">
+    <div id="lookit-jspsych-video-config-webcam-column">
+      <div id="{{webcam_container_id}}"></div>
+      <div id="lookit-jspsych-webcam-buttons">
+        <div id="lookit-jspsych-webcam-reload-container">
+          <div><button type="button" id="{{reload_button_id_cam}}" class="jspsych-btn lookit-jspsych-btn">Reload</button></div>
+        </div>
+        <div id="lookit-jspsych-device-selection-container">
+          <div id="lookit-jspsych-webcam-selection">
+            <select name="lookit-jspsych-webcam" id="{{camera_selection_id}}" class="lookit-jspsych-device-selection"></select>
+          </div>
+          <div id="lookit-jspsych-mic-selection">
+            <select name="lookit-jspsych-mic" id="{{mic_selection_id}}" class="lookit-jspsych-device-selection"></select>
+          </div>
+        </div>
+      </div>
+      <div id="lookit-jspsych-browser-note" class="lookit-jspsych-help-text">
+        Note: CHS studies currently only work on recent versions of Firefox and Chrome.
+      </div>
+    </div>
+    <div id="lookit-jspsych-video-config-instructions-column">
+      <div id="lookit-jspsych-video-config-errors"></div>
+      <ol id="lookit-jspsych-video-config-instructions">
+        <li id="{{step1_id}}">
+          <strong>Make sure you can see yourself to the left!</strong> 
+          <span id="{{step1_id}}-span" style="visibility:hidden;" class="{{step_complete_class}}">{{step_complete_text}}</span>
+          <p id="{{step1_id}}-paragraph">You may need to click "Allow" so that we can access your webcam and microphone. On Firefox, make sure to also check "Remember this decision"!</p>
+        </li>
+        <li id="{{step2_id}}">
+          <strong>Make sure your webcam settings got saved by clicking <button id="{{reload_button_id_text}}" class="jspsych-btn lookit-jspsych-btn">this button</button>.</strong> 
+          <span id="{{step2_id}}-span" style="visibility:hidden;" class="{{step_complete_class}}">{{step_complete_text}}</span>
+          <p id="{{step2_id}}-paragraph">Your webcam should re-appear WITHOUT you having to allow access again (if you do see a dialogue, click "Remember this decision" or "Always allow" and try again!).</p>
+        </li>
+        <li id="{{step3_id}}">
+          <strong>Make sure we'll be able to hear you!</strong> 
+          <span id="{{step3_id}}-span" style="visibility:hidden;" class="{{step_complete_class}}">{{step_complete_text}}</span>
+          <p id="{{step3_id}}-paragraph">Try clapping or saying hi.</p>
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div id="lookit-jspsych-next-container" class="jspsych-instructions-nav">
+    <button id="{{next_button_id}}" class="jspsych-btn lookit-jspsych-btn" style="margin-left:5px;" disabled>Next &gt;</button>
+  </div>
+  <div id="lookit-jspsych-config-troubleshooting-column-container">
+    <div id="lookit-jspsych-accordion-header-container">
+      <h2>Setup tips and troubleshooting</h2>
+      <hr>
+      <p id="lookit-jspsych-troubleshooting-intro">{{{troubleshooting_intro}}}</p>
+    </div>
+      <div id="lookit-jspsych-accordion-container">
+        <button class="lookit-jspsych-accordion">Check your device and browser</button>
+        <div class="lookit-jspsych-accordion-panel" style="display:none;">
+          <ol>
+            <li>
+              Are you using a phone or tablet? Lookit only works on computers so far - we're hoping to support mobile devices soon! Please visit again from a computer.
+            </li>
+            <li>
+              Are you using a web browser other than Chrome or Firefox (like Internet Explorer or Safari)? If so, please try again using Chrome or Firefox. These are the only browsers Lookit currently supports.
+            </li>
+          </ol>
+        </div>
+        <button class="lookit-jspsych-accordion">Camera setup instructions for Chrome</button>
+        <div class="lookit-jspsych-accordion-panel" style="display:none;">
+          <ol>
+            <li>
+              When you load this page for the first time, you should see a prompt like the one below. Click "Allow" to let CHS access the webcam and microphone.
+               <img class="lookit-jspsych-screenshot" src="{{chromeInitialPrompt}}" alt="Chrome permissions prompt">
+            </li>
+            <li>
+              If you didn't see that prompt, or if you clicked "Block", you can change the settings by clicking on the camera icon next to the URL. Set Camera and Microphone (and Sound if it's shown) all to "Allow".
+              <img class="lookit-jspsych-screenshot" src="{{chromePermissions}}" alt="Editing microphone and camera permissions in Chrome, step 1">
+            </li>
+            <li>
+              You can check the permissions for camera and microphone separately by clicking each one in the prompt above. This will show you whether or not that specific device is allowed. Make sure that the box is checked for "Allow on every visit".
+              <img class="lookit-jspsych-screenshot" src="{{chromeAlwaysAllow}}" alt="Editing microphone and camera permissions separately in Chrome, step 1">
+            </li>
+            <li>
+              <em>Having trouble passing the sound check?</em> Chrome may be using the wrong input device - unfortunately it doesn't let you pick which microphone when you click "Allow". You can select the correct microphone at chrome://settings/content/microphone (copy and paste that as a URL).
+            </li>
+            <li>
+              <em>Seeing the wrong camera view</em> - like your built-in laptop camera instead of a USB webcam? You can select the correct camera at chrome://settings/content/camera (copy and paste that as a URL).
+            </li>
+            <li>
+              You can also refer to <a href="https://support.google.com/chrome/answer/2693767?hl=en" target="_blank" rel="noopener noreferrer"> these directions from Chrome </a>.
+            </li>
+          </ol>
+        </div>
+        <button class="lookit-jspsych-accordion">Camera setup instructions for Firefox</button>
+        <div class="lookit-jspsych-accordion-panel" style="display:none;">
+          <ol>
+            <li>
+              When you load this page for the first time, you should see a prompt like the one below. If you have multiple camera and/or microphones available, then you'll be able to select the ones you want to use. Check the "Remember this decision" box, and click "Allow".
+              <img class="lookit-jspsych-screenshot" src="{{firefoxInitialPrompt}}" alt="Firefox permissions prompt">
+            </li>
+            <li>
+              If you didn't see that prompt, or if you clicked "Block" at first, you can change the settings by clicking on the crossed-out camera and/or microphone next to the URL. Click the "X" next to the "Blocked" message to allow each device.
+              <img class="lookit-jspsych-screenshot" src="{{firefoxDevicesBlocked}}" alt="Blocked microphone and camera permissions in Firefox">
+            </li>
+            <li>
+              Even after you've checked "Remember my decision" and clicked "Allow", Firefox might show you another pop-up requesting permissions for a specific device. This can happen if you change the devices that are available to your computer and/or change your device selections using the dropdown camera/microphone menus on the page. If you see a dropdown menu in the permissions prompt, make sure you're selecting the device(s) that you want to use. Once you've selected "Remember this decision" and "Allow" for the specific devices you want to use, then you shouldn't see another permissions prompt again.
+              <img class="lookit-jspsych-screenshot" src="{{firefoxChooseDevice}}" alt="Permissions for specific devices in Firefox">
+            </li>
+          </ol>
+        </div>
+        <button class="lookit-jspsych-accordion">It's just not working - what else can I try?</button>
+        <div class="lookit-jspsych-accordion-panel" style="display:none;">
+          <p> First, you are a very dedicated citizen scientist and we're grateful for your help! We're sorry you're having trouble. </p>
+          <ol>
+            <li>
+              Make sure you're able to view your webcam video outside of Lookit. (For example, on a Mac, try Photobooth.)
+            </li>
+            <li>
+              The easiest approach is to try a different web browser if you have one installed anyway. For instance, if you're using Firefox, switch to Chrome, or vice versa. Also, update the browser if you're not using the latest version. You can check by going to "Chrome" -&gt; "About Chrome" or "Firefox" -&gt; "About Firefox" in the menu bar. (This is a good idea to make sure you've gotten any security updates anyway.)
+            </li>
+            <li>
+              Using Chrome? Make sure you're not using an Incognito window - you won't be able to save and use settings throughout the study.
+            </li>
+            <li>
+              If you're stumped, it's our fault. Please let us know so we can improve the site! Email us at lookit-tech@mit.edu with a short description of what's happening. Please include the web browser you're using (Firefox, Chrome, IE, Safari, etc.), what steps you've tried, and this session ID {{session.id}}
+            </li>
+          </ol>
+        </div>
+      </div>
+  </div>
+</div>
