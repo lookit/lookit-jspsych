@@ -188,7 +188,53 @@ img#record-icon {
   visibility: "hidden";
 }
 
-div#lookit-jspsych-video-container {
-  position: relative;
-  width: min-content;
+div#consent-video-trial {
+  text-align: left;
+
+  > div {
+    padding: 60px 40px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 18px;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+
+  p {
+    font-size: 15px;
+  }
+
+  p.buttons {
+    text-align: center;
+  }
+
+  .left-column {
+    max-width: 800px;
+  }
+
+  .right-column {
+    max-width: 600px;
+  }
+
+  .consent-statement {
+    background-color: #eee;
+    padding: 20px;
+    border-radius: 4px;
+    text-align: justify;
+  }
+
+  #lookit-jspsych-video-container {
+    position: relative;
+    margin: auto;
+
+    video {
+      max-width: 500px;
+      min-width: 300px;
+      width: 100%;
+    }
+  }
 }
