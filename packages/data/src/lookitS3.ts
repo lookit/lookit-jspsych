@@ -15,7 +15,7 @@ class LookitS3 {
   private s3: S3Client;
   private uploadId: string = "";
   private key: string;
-  private bucket: string = process.env.S3_BUCKET;
+  private bucket: string = process.env.JSPSYCH_S3_BUCKET;
   private complete: boolean = false;
 
   public static readonly minUploadSize: number = 5 * 1024 * 1024;
@@ -30,10 +30,10 @@ class LookitS3 {
     this.key = key;
     try {
       this.s3 = new S3Client({
-        region: process.env.S3_REGION,
+        region: process.env.JSPSYCH_S3_REGION,
         credentials: {
-          accessKeyId: process.env.S3_ACCESS_KEY_ID,
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+          accessKeyId: process.env.JSPSYCH_S3_ACCESS_KEY_ID,
+          secretAccessKey: process.env.JSPSYCH_S3_SECRET_ACCESS_KEY,
         },
       });
     } catch (e) {
