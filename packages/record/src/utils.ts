@@ -63,7 +63,7 @@ const initHandlebars = () => {
  *
  * @param trial - Yup
  */
-export const init = (trial: TrialType<PluginInfo>) => {
+export const initI18nAndTemplates = (trial: TrialType<PluginInfo>) => {
   initI18next(trial);
   initHandlebars();
 };
