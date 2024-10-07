@@ -19,32 +19,36 @@ const info = <const>{
   version,
   parameters: {
     template: { type: ParameterType.STRING, default: "consent_005" },
-    additional_video_privacy_statement: { type: ParameterType.STRING },
-    datause: { type: ParameterType.STRING },
+    locale: { type: ParameterType.STRING, default: "en-us" },
+    additional_video_privacy_statement: {
+      type: ParameterType.STRING,
+      default: "",
+    },
+    datause: { type: ParameterType.STRING, default: "" },
     gdpr: { type: ParameterType.BOOL, default: false },
-    gdpr_personal_data: { type: ParameterType.STRING },
-    gdpr_sensitive_data: { type: ParameterType.STRING },
-    PIName: { type: ParameterType.STRING },
+    gdpr_personal_data: { type: ParameterType.STRING, default: "" },
+    gdpr_sensitive_data: { type: ParameterType.STRING, default: "" },
+    PIName: { type: ParameterType.STRING, default: "" },
     include_databrary: { type: ParameterType.BOOL, default: false },
-    institution: { type: ParameterType.STRING },
-    PIContact: { type: ParameterType.STRING },
-    payment: { type: ParameterType.STRING },
+    institution: { type: ParameterType.STRING, default: "" },
+    PIContact: { type: ParameterType.STRING, default: "" },
+    payment: { type: ParameterType.STRING, default: "" },
     private_level_only: { type: ParameterType.BOOL, default: false },
-    procedures: { type: ParameterType.STRING },
+    procedures: { type: ParameterType.STRING, default: "" },
     purpose: { type: ParameterType.STRING, default: "" },
-    research_rights_statement: { type: ParameterType.STRING },
-    risk_statement: { type: ParameterType.STRING },
-    voluntary_participation: { type: ParameterType.STRING },
+    research_rights_statement: { type: ParameterType.STRING, default: "" },
+    risk_statement: { type: ParameterType.STRING, default: "" },
+    voluntary_participation: { type: ParameterType.STRING, default: "" },
     purpose_header: { type: ParameterType.STRING, default: "" },
     procedures_header: { type: ParameterType.STRING, default: "" },
     participation_header: { type: ParameterType.STRING, default: "" },
     benefits_header: { type: ParameterType.STRING, default: "" },
     risk_header: { type: ParameterType.STRING, default: "" },
-    summary_statement: { type: ParameterType.STRING },
+    summary_statement: { type: ParameterType.STRING, default: "" },
     additional_segments: { type: ParameterType.COMPLEX },
     prompt_all_adults: { type: ParameterType.BOOL, default: false },
     prompt_only_adults: { type: ParameterType.BOOL, default: false },
-    consent_statement_text: { type: ParameterType.STRING },
+    consent_statement_text: { type: ParameterType.STRING, default: "" },
     omit_injury_phrase: { type: ParameterType.BOOL, default: false },
   },
 };
@@ -99,7 +103,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     display.insertAdjacentHTML("afterbegin", consentVideoTrial);
 
     // Video recording HTML
-    this.webcamFeed(display);
+    this.recordFeed(display);
     this.recordButton(display);
     this.stopButton(display);
     this.playButton(display);
@@ -128,9 +132,9 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
    *
    * @param display - HTML element for experiment.
    */
-  private webcamFeed(display: HTMLElement) {
+  private recordFeed(display: HTMLElement) {
     const videoContainer = this.getVideoContainer(display);
-    this.recorder.insertWebcamFeed(videoContainer);
+    this.recorder.insertRecordFeed(videoContainer);
     this.getImg(display, "record-icon").style.visibility = "hidden";
   }
 
@@ -155,9 +159,12 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     return () => {
       const next = this.getButton(display, "next");
       const play = this.getButton(display, "play");
-      this.webcamFeed(display);
+      const record = this.getButton(display, "record");
+
+      this.recordFeed(display);
       next.disabled = false;
       play.disabled = false;
+      record.disabled = false;
     };
   }
 
@@ -224,9 +231,11 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
    */
   private playButton(display: HTMLElement) {
     const play = this.getButton(display, "play");
+    const record = this.getButton(display, "record");
 
     play.addEventListener("click", () => {
       play.disabled = true;
+      record.disabled = true;
       this.playbackFeed(display);
     });
   }
@@ -240,13 +249,14 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     const stop = this.getButton(display, "stop");
     const record = this.getButton(display, "record");
     const play = this.getButton(display, "play");
+
     stop.addEventListener("click", async () => {
       stop.disabled = true;
       record.disabled = false;
       play.disabled = false;
       await this.recorder.stop();
       this.recorder.reset();
-      this.webcamFeed(display);
+      this.recordFeed(display);
     });
   }
   /**
@@ -259,21 +269,3 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     next.addEventListener("click", () => this.jsPsych.finishTrial());
   }
 }
-
-// type Objectx ={
-//   type:string
-// }
-
-// interface ObjectA extends Objectx {
-//   type: "A";
-//   value1: string;
-//   value2: number;
-// };
-
-// interface ObjectB extends Objectx {
-//   type: "B";
-//   valueA: string;
-//   valueB: number;
-// };
-
-// type TypeA<I extends Objectx>

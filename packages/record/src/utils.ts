@@ -31,16 +31,15 @@ export const expFormat = (text?: string | string[]) => {
  * @param trial - Trial data including user supplied parameters.
  */
 const initI18next = (trial: TrialType<PluginInfo>) => {
-  const { locale } = trial;
   const translation = Yaml.load(en_us) as Record<string, string>;
-  const a2Code = locale.split("-")[0];
   const debug = process.env.DEBUG === "true";
+  const { baseName, language } = new Intl.Locale(trial.locale);
 
   i18next.use(ICU).init({
-    lng: locale,
+    lng: baseName,
     debug,
     resources: {
-      [a2Code]: {
+      [language]: {
         translation,
       },
     },
