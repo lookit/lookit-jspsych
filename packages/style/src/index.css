@@ -8904,6 +8904,65 @@ div#sv-nav-complete.sv-action.sv-action--hidden {
   min-width: unset !important;
 }
 
+div#consent-video-trial {
+  text-align: left;
+  display: flex;
+}
+div#consent-video-trial img#record-icon,
+div#consent-video-trial img#play-icon {
+  top: 7px;
+  left: 7px;
+  height: 25px;
+  position: absolute;
+}
+div#consent-video-trial img#record-icon {
+  visibility: "hidden";
+}
+div#consent-video-trial button#next {
+  float: right;
+}
+div#consent-video-trial > div {
+  padding: 60px 40px;
+}
+div#consent-video-trial h1 {
+  text-align: center;
+  font-size: 18px;
+}
+div#consent-video-trial h2 {
+  font-size: 16px;
+}
+div#consent-video-trial p {
+  font-size: 15px;
+}
+div#consent-video-trial ol {
+  padding-left: 30px;
+}
+div#consent-video-trial li {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+div#consent-video-trial .left-column {
+  max-width: 800px;
+}
+div#consent-video-trial .right-column {
+  max-width: 600px;
+}
+div#consent-video-trial .consent-statement {
+  background-color: #eee;
+  padding: 20px;
+  border-radius: 4px;
+  text-align: justify;
+}
+div#consent-video-trial #lookit-jspsych-video-container {
+  position: relative;
+  margin: auto;
+}
+div#consent-video-trial #lookit-jspsych-video-container video {
+  max-width: 500px;
+  min-width: 300px;
+  width: 100%;
+}
+
 div#lookit-jspsych-video-config {
   margin-top: 5%;
   margin-bottom: 10%;
@@ -9055,57 +9114,4 @@ div#lookit-jspsych-video-config .lookit-jspsych-screenshot {
   display: block;
   margin: 15px auto;
   max-width: 30%;
-}
-
-img#record-icon,
-img#play-icon {
-  top: 7px;
-  left: 7px;
-  height: 25px;
-  position: absolute;
-}
-
-img#record-icon {
-  visibility: "hidden";
-}
-
-div#consent-video-trial {
-  text-align: left;
-}
-div#consent-video-trial > div {
-  padding: 60px 40px;
-}
-div#consent-video-trial h1 {
-  text-align: center;
-  font-size: 18px;
-}
-div#consent-video-trial h2 {
-  font-size: 16px;
-}
-div#consent-video-trial p {
-  font-size: 15px;
-}
-div#consent-video-trial p.buttons {
-  text-align: center;
-}
-div#consent-video-trial .left-column {
-  max-width: 800px;
-}
-div#consent-video-trial .right-column {
-  max-width: 600px;
-}
-div#consent-video-trial .consent-statement {
-  background-color: #eee;
-  padding: 20px;
-  border-radius: 4px;
-  text-align: justify;
-}
-div#consent-video-trial #lookit-jspsych-video-container {
-  position: relative;
-  margin: auto;
-}
-div#consent-video-trial #lookit-jspsych-video-container video {
-  max-width: 500px;
-  min-width: 300px;
-  width: 100%;
 }
