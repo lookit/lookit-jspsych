@@ -2,7 +2,7 @@ import { LookitWindow } from "@lookit/data/dist/types";
 import Handlebars from "handlebars";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import { version } from "../package.json";
-import consentCopyTemplate from "../templates/consent-copy.hbs";
+import consentDocTemplate from "../templates/consent-document.hbs";
 import consentVideoTrialTemplate from "../templates/consent-video-trial.hbs";
 import {
   ButtonNotFoundError,
@@ -10,7 +10,7 @@ import {
   VideoContainerNotFoundError,
 } from "./errors";
 import Recorder from "./recorder";
-import { init } from "./utils";
+import { initI18nAndTemplates } from "./utils";
 
 declare const window: LookitWindow;
 
@@ -18,102 +18,34 @@ const info = <const>{
   name: "consent-video",
   version,
   parameters: {
-    summary_statement: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    locale: {
-      type: ParameterType.STRING,
-      default: "en",
-    },
-    purpose_header: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    procedures: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    purpose: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    voluntary_participation: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    institution: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    risk_statement: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    risk_header: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    benefits_header: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    payment: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    prompt_only_adults: {
-      type: ParameterType.BOOL,
-      default: false,
-    },
-    private_level_only: {
-      type: ParameterType.BOOL,
-      default: false,
-    },
-    include_databrary: {
-      type: ParameterType.BOOL,
-      default: true,
-    },
-    additional_video_privacy_statement: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    datause: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    additional_segments: {
-      type: ParameterType.OBJECT,
-      default: {},
-    },
-    research_rights_statement: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    gdpr: {
-      type: ParameterType.BOOL,
-      default: false,
-    },
-    gdpr_personal_data: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    gdpr_sensitive_data: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    PIName: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    PIContact: {
-      type: ParameterType.STRING,
-      default: "",
-    },
-    omit_injury_phrase: {
-      type: ParameterType.BOOL,
-      default: false,
-    },
+    template: { type: ParameterType.STRING, default: "consent_005" },
+    additional_video_privacy_statement: { type: ParameterType.STRING },
+    datause: { type: ParameterType.STRING },
+    gdpr: { type: ParameterType.BOOL, default: false },
+    gdpr_personal_data: { type: ParameterType.STRING },
+    gdpr_sensitive_data: { type: ParameterType.STRING },
+    PIName: { type: ParameterType.STRING },
+    include_databrary: { type: ParameterType.BOOL, default: false },
+    institution: { type: ParameterType.STRING },
+    PIContact: { type: ParameterType.STRING },
+    payment: { type: ParameterType.STRING },
+    private_level_only: { type: ParameterType.BOOL, default: false },
+    procedures: { type: ParameterType.STRING },
+    purpose: { type: ParameterType.STRING, default: "" },
+    research_rights_statement: { type: ParameterType.STRING },
+    risk_statement: { type: ParameterType.STRING },
+    voluntary_participation: { type: ParameterType.STRING },
+    purpose_header: { type: ParameterType.STRING, default: "" },
+    procedures_header: { type: ParameterType.STRING, default: "" },
+    participation_header: { type: ParameterType.STRING, default: "" },
+    benefits_header: { type: ParameterType.STRING, default: "" },
+    risk_header: { type: ParameterType.STRING, default: "" },
+    summary_statement: { type: ParameterType.STRING },
+    additional_segments: { type: ParameterType.COMPLEX },
+    prompt_all_adults: { type: ParameterType.BOOL, default: false },
+    prompt_only_adults: { type: ParameterType.BOOL, default: false },
+    consent_statement_text: { type: ParameterType.STRING },
+    omit_injury_phrase: { type: ParameterType.BOOL, default: false },
   },
 };
 type Info = typeof info;
@@ -143,24 +75,22 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
   public trial(display: HTMLElement, trial: TrialType<Info>) {
     const { video_container_id } = this;
     const experiment = window.chs.study.attributes;
+    const { PIName, PIContact } = trial;
 
     // Initialize both i18next and Handlebars
-    init(trial);
+    initI18nAndTemplates(trial);
 
     // Render left side (consent text)
-    const renderConsent = Handlebars.compile(consentCopyTemplate);
-    const consent = renderConsent({
-      name: trial.PIName,
-      contact: trial.PIContact,
-      institution: trial.institution,
+    const consent = Handlebars.compile(consentDocTemplate)({
+      ...trial,
+      name: PIName,
+      contact: PIContact,
       experiment,
     });
 
     // Render whole document with above consent text
-    const renderConsentVideoTrial = Handlebars.compile(
-      consentVideoTrialTemplate,
-    );
-    const consentVideoTrial = renderConsentVideoTrial({
+    const consentVideoTrial = Handlebars.compile(consentVideoTrialTemplate)({
+      ...trial,
       consent,
       video_container_id,
     });
