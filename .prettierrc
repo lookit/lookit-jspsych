@@ -1,13 +1,5 @@
 {
   "jsonRecursiveSort": true,
-  "overrides": [
-    {
-      "files": ["*.mustache"],
-      "options": {
-        "parser": "html"
-      }
-    }
-  ],
   "plugins": [
     "prettier-plugin-packagejson",
     "prettier-plugin-sort-json",
