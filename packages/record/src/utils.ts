@@ -4,6 +4,15 @@ import ICU from "i18next-icu";
 import Yaml from "js-yaml";
 import { PluginInfo, TrialType } from "jspsych";
 import en_us from "../i18n/en-us.yaml";
+import eu from "../i18n/eu.yaml";
+import fr from "../i18n/fr.yaml";
+import hu from "../i18n/hu.yaml";
+import it from "../i18n/it.yaml";
+import ja from "../i18n/ja.yaml";
+import nl from "../i18n/nl.yaml";
+import pt_br from "../i18n/pt-br.yaml";
+import pt from "../i18n/pt.yaml";
+import { TranslationNotFoundError } from "./errors";
 
 /**
  * Pulled from EFP. Function to convert researcher's text to HTML.
@@ -26,20 +35,62 @@ export const expFormat = (text?: string | string[]) => {
 };
 
 /**
+ * Get a translation file based on selected language.
+ *
+ * @param lcl - Locale object with locale
+ * @returns Translations from i18next
+ */
+export const getTranslation = (lcl: Intl.Locale) => {
+  /**
+   * Switch case to find language from a string. Will throw error is language
+   * not found.
+   *
+   * @param baseName - Base name from locale (en-us)
+   * @returns Language yaml file
+   */
+  const getYaml = (baseName: string) => {
+    switch (baseName) {
+      case "en-US":
+        return en_us;
+      case "eu":
+        return eu;
+      case "fr":
+        return fr;
+      case "hu":
+        return hu;
+      case "it":
+        return it;
+      case "ja":
+        return ja;
+      case "nl":
+        return nl;
+      case "pt-BR":
+        return pt_br;
+      case "pt":
+        return pt;
+      default:
+        throw new TranslationNotFoundError(baseName);
+    }
+  };
+
+  return Yaml.load(getYaml(lcl.baseName)) as Record<string, string>;
+};
+
+/**
  * Initialize i18next with parameters from trial.
  *
  * @param trial - Trial data including user supplied parameters.
  */
 const initI18next = (trial: TrialType<PluginInfo>) => {
-  const translation = Yaml.load(en_us) as Record<string, string>;
   const debug = process.env.DEBUG === "true";
-  const { baseName, language } = new Intl.Locale(trial.locale);
+  const lcl = new Intl.Locale(trial.locale);
+  const translation = getTranslation(lcl);
 
   i18next.use(ICU).init({
-    lng: baseName,
+    lng: lcl.baseName,
     debug,
     resources: {
-      [language]: {
+      [lcl.language]: {
         translation,
       },
     },

@@ -1,6 +1,7 @@
 # Lookit jsPsych
 
-Here is the monorepo containing packages developed by Lookit to be used with jsPsych on the lookit.mit.edu project.
+Here is the monorepo containing packages developed by Lookit to be used with
+jsPsych on the lookit.mit.edu project.
 
 ## Create new package
 
@@ -12,7 +13,8 @@ To create a new package, run the following at the root of the project:
 npm init --scope @lookit --workspace packages/<name of new package>
 ```
 
-Giving the default answers to `npm init` seems to work okay. I am sure this will change.
+Giving the default answers to `npm init` seems to work okay. I am sure this will
+change.
 
 Add build and test script to new package's `package.json`:
 
@@ -137,13 +139,23 @@ To run a development server:
 npm run dev -w @lookit/<name of package>
 ```
 
-When the server has started, you should see something very similar to `<script src="http://127.0.0.1:10001/index.browser.js"></script>` printed out. Add this html to `web/templates/web/jspsych-study-detail.html` in the Django lookit api project to test the package in your local development environment.
+When the server has started, you should see something very similar to
+`<script src="http://127.0.0.1:10001/index.browser.js"></script>` printed out.
+Add this html to `web/templates/web/jspsych-study-detail.html` in the Django
+lookit api project to test the package in your local development environment.
 
 ### Serve multiple packages
 
-The above command will serve a single package and wait for changes. If you need to serve multiple packages locally, you can open separate terminals for each package and run the `npm run dev` command in each. Another option is to install [Honcho](https://github.com/nickstenning/honcho) and write a Procfile to serve/watch multiple packages in the same terminal.
+The above command will serve a single package and wait for changes. If you need
+to serve multiple packages locally, you can open separate terminals for each
+package and run the `npm run dev` command in each. Another option is to install
+[Honcho](https://github.com/nickstenning/honcho) and write a Procfile to
+serve/watch multiple packages in the same terminal.
 
-Create a file called `Procfile` in the root project directory, and list the `npm run dev` commands for each package that you want to serve, preceded by the label you want to give it (to identify the print statements associated with each package in the terminal).
+Create a file called `Procfile` in the root project directory, and list the
+`npm run dev` commands for each package that you want to serve, preceded by the
+label you want to give it (to identify the print statements associated with each
+package in the terminal).
 
 ```
 lookit-initjspsych: npm run dev -w @lookit/lookit-initjspsych
@@ -151,11 +163,14 @@ lookit-api: npm run dev -w @lookit/lookit-api
 lookit-helpers: npm run dev -w @lookit/lookit-helpers
 ```
 
-This method is optional (Honcho should not be added to the project dependencies, and Procfile has been added to our gitignore).
+This method is optional (Honcho should not be added to the project dependencies,
+and Procfile has been added to our gitignore).
 
 ## Documentation
 
-To run documentation development server you will need to have Python 3.12 and [Poetry](https://python-poetry.org/docs/#installation) installed. To start the local development server:
+To run documentation development server you will need to have Python 3.12 and
+[Poetry](https://python-poetry.org/docs/#installation) installed. To start the
+local development server:
 
 ```
 make serve
@@ -167,10 +182,20 @@ To build the documentation:
 make build
 ```
 
-This will create/update a "site" directory in the project root, containing all of the static files.
+This will create/update a "site" directory in the project root, containing all
+of the static files.
 
 ### Structure
 
-The documentation pages are generated from the README markdown files in the project root directory and the individual package directories. The main project documentation page comes from the root markdown file at `packages/index.md` and the documentation for each package comes from the README markdown files in each package root (e.g. `packages/data/README.md` for the `Data` package.) This documentation structure is defined in `mkdocs.yml`.
+The documentation pages are generated from the README markdown files in the
+project root directory and the individual package directories. The main project
+documentation page comes from the root markdown file at `packages/index.md` and
+the documentation for each package comes from the README markdown files in each
+package root (e.g. `packages/data/README.md` for the `Data` package.) This
+documentation structure is defined in `mkdocs.yml`.
 
-The reason for having the documentation pages in these different locations throughout the repository is so that they can be re-used as the package's landing page on NPM. This way, the documentation is bundled into each package, and the NPM site `npmjs.com` will automatically use the README.md file as the package's landing page.
+The reason for having the documentation pages in these different locations
+throughout the repository is so that they can be re-used as the package's
+landing page on NPM. This way, the documentation is bundled into each package,
+and the NPM site `npmjs.com` will automatically use the README.md file as the
+package's landing page.
