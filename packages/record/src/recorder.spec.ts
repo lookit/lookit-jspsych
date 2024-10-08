@@ -1,4 +1,5 @@
 import Data from "@lookit/data";
+import Handlebars from "handlebars";
 import { initJsPsych } from "jspsych";
 import Mustache from "mustache";
 import play_icon from "../img/play-icon.svg";
@@ -7,7 +8,6 @@ import playbackFeed from "../templates/playback-feed.mustache";
 import webcamFeed from "../templates/webcam-feed.mustache";
 import {
   CreateURLError,
-  NoPlayBackElementError,
   NoStopPromiseError,
   NoWebCamElementError,
   RecorderInitializeError,
@@ -37,6 +37,7 @@ jest.mock("jspsych", () => ({
     },
   }),
 }));
+
 /**
  * Remove new lines, indents (tabs or spaces), and empty HTML property values.
  *
@@ -44,12 +45,21 @@ jest.mock("jspsych", () => ({
  * @returns Cleaned String
  */
 const cleanHTML = (html: string) => {
-  return html
-    .replace(/(\r\n|\n|\r|\t| {4})/gm, "")
-    .replace(/(="")/gm, "")
-    .replaceAll("  ", " ")
-    .replaceAll("&gt;", ">");
+  return (
+    html
+      // attributes equals empty string (disabled="")
+      .replace(/(="")/gm, "")
+      // encoded greater than
+      .replace(/(&gt;)/gm, ">")
+      // Space before string value of attributes (version=" 1.0")
+      .replace(/(=" )/gm, '="')
+      // Multiple whitespaces
+      .replace(/\s\s+/gm, " ")
+      // Whitespace and or slash before html element end (<img />)
+      .replace(/\s*\/*>/gm, ">")
+  );
 };
+
 afterEach(() => {
   jest.clearAllMocks();
 });
@@ -341,7 +351,7 @@ test("Record insert Playback feed", () => {
   const webcam_container_id = "webcam-container";
   const height: CSSWidthHeight = "auto";
   const width: CSSWidthHeight = "100%";
-  const playback_element_id: string = "lookit-jspsych-playback";
+  const webcam_element_id: string = "lookit-jspsych-webcam";
 
   rec["url"] = "some url";
 
@@ -349,7 +359,7 @@ test("Record insert Playback feed", () => {
     src: rec["url"],
     width,
     height,
-    playback_element_id,
+    webcam_element_id,
     play_icon,
   };
 
@@ -359,10 +369,13 @@ test("Record insert Playback feed", () => {
   ) as HTMLDivElement;
 
   rec.insertPlaybackFeed(webcam_div, () => {});
-  const tempHtml = cleanHTML(Mustache.render(playbackFeed, view));
-  const docHtml = cleanHTML(document.body.innerHTML);
 
-  expect(docHtml).toContain(tempHtml);
+  const tempHtml = cleanHTML(Handlebars.compile(playbackFeed)(view));
+  const docHtml = cleanHTML(
+    document.body.querySelector("#webcam-container")!.innerHTML,
+  );
+
+  expect(docHtml).toStrictEqual(tempHtml);
 
   document.body.innerHTML = "";
 });
@@ -375,7 +388,7 @@ test("Record insert Playback feed error if no container", () => {
     insertAdjacentHTML: jest.fn(),
   } as unknown as HTMLDivElement;
   expect(() => rec.insertPlaybackFeed(div, () => {})).toThrow(
-    NoPlayBackElementError,
+    NoWebCamElementError,
   );
 });
 

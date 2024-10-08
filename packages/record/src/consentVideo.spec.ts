@@ -1,7 +1,9 @@
-import { initJsPsych } from "jspsych";
+import { LookitWindow } from "@lookit/data/dist/types";
+import Handlebars from "handlebars";
+import { initJsPsych, PluginInfo, TrialType } from "jspsych";
 import Mustache from "mustache";
-import consentVideoTrial from "../templates/consent-video-trial.mustache";
-import webcamFeed from "../templates/webcam-feed.mustache";
+import consentVideoTrial from "../templates/consent-video-trial.hbs";
+import recordFeed from "../templates/record-feed.hbs";
 import { VideoConsentPlugin } from "./consentVideo";
 import {
   ButtonNotFoundError,
@@ -10,30 +12,40 @@ import {
 } from "./errors";
 import Recorder from "./recorder";
 
+declare const window: LookitWindow;
+
 jest.mock("./recorder");
 
 test("Instantiate recorder", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
-
   expect(plugin["recorder"]).toBeDefined();
 });
 
 test("Trial", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
-  // const display = { insertAdjacentHTML: jest.fn() } as unknown as HTMLElement;
   const display = document.createElement("div");
+  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
 
-  plugin["webcamFeed"] = jest.fn();
+  window.chs = {
+    study: {
+      attributes: {
+        name: "name",
+        duration: "duration",
+      },
+    },
+  } as typeof window.chs;
+
+  plugin["recordFeed"] = jest.fn();
   plugin["recordButton"] = jest.fn();
   plugin["stopButton"] = jest.fn();
   plugin["playButton"] = jest.fn();
   plugin["nextButton"] = jest.fn();
 
-  plugin.trial(display);
+  plugin.trial(display, trial);
 
-  expect(plugin["webcamFeed"]).toHaveBeenCalledTimes(1);
+  expect(plugin["recordFeed"]).toHaveBeenCalledTimes(1);
   expect(plugin["recordButton"]).toHaveBeenCalledTimes(1);
   expect(plugin["stopButton"]).toHaveBeenCalledTimes(1);
   expect(plugin["playButton"]).toHaveBeenCalledTimes(1);
@@ -59,19 +71,19 @@ test("GetVideoContainer", () => {
   expect(html).toBe(`<div id="lookit-jspsych-video-container"></div>`);
 });
 
-test("webcamFeed", () => {
+test("recordFeed", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
   display.innerHTML = `<div id="${plugin["video_container_id"]}"><img id="record-icon"></div>`;
   plugin["getVideoContainer"] = jest.fn();
-  plugin["webcamFeed"](display);
+  plugin["recordFeed"](display);
 
   expect(display.innerHTML).toContain(
     `<img id="record-icon" style="visibility: hidden;">`,
   );
-  expect(Recorder.prototype.insertWebcamFeed).toHaveBeenCalledTimes(1);
+  expect(Recorder.prototype.insertRecordFeed).toHaveBeenCalledTimes(1);
 });
 
 test("playbackFeed", () => {
@@ -87,7 +99,6 @@ test("playbackFeed", () => {
   expect(Recorder.prototype.insertPlaybackFeed).toHaveBeenCalledWith(
     vidContainer,
     "some func",
-    "300px",
   );
 });
 
@@ -97,10 +108,20 @@ test("onEnded", () => {
   const display = document.createElement("div");
   const play = document.createElement("button");
   const next = document.createElement("button");
+  const record = document.createElement("button");
 
-  display.innerHTML = Mustache.render(consentVideoTrial, {});
-  plugin["webcamFeed"] = jest.fn();
+  display.innerHTML = Handlebars.compile(consentVideoTrial)({});
+  plugin["recordFeed"] = jest.fn();
   plugin["getButton"] = jest.fn().mockImplementation((_display, id) => {
+    switch (id) {
+      case "play":
+        return play;
+      case "next":
+        return next;
+      case "record":
+        return record;
+    }
+
     if (id === "play") {
       return play;
     } else if (id === "next") {
@@ -111,9 +132,9 @@ test("onEnded", () => {
 
   plugin["onEnded"](display)();
 
-  expect(plugin["webcamFeed"]).toHaveBeenCalledWith(display);
-  expect(plugin["webcamFeed"]).toHaveBeenCalledTimes(1);
-  expect(plugin["getButton"]).toHaveBeenCalledTimes(2);
+  expect(plugin["recordFeed"]).toHaveBeenCalledWith(display);
+  expect(plugin["recordFeed"]).toHaveBeenCalledTimes(1);
+  expect(plugin["getButton"]).toHaveBeenCalledTimes(3);
   expect(play.disabled).toBeFalsy();
   expect(next.disabled).toBeFalsy();
 });
@@ -123,7 +144,7 @@ test("getButton", () => {
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
-  display.innerHTML = Mustache.render(consentVideoTrial, {});
+  display.innerHTML = Handlebars.compile(consentVideoTrial)({});
 
   expect(plugin["getButton"](display, "next").id).toStrictEqual("next");
 });
@@ -153,7 +174,7 @@ test("recordButton", async () => {
   const display = document.createElement("div");
 
   display.innerHTML =
-    Mustache.render(consentVideoTrial, {}) + Mustache.render(webcamFeed, {});
+    Handlebars.compile(consentVideoTrial)({}) + Mustache.render(recordFeed, {});
 
   plugin["recordButton"](display);
 
@@ -197,7 +218,7 @@ test("playButton", () => {
 
   plugin["playbackFeed"] = jest.fn();
 
-  display.innerHTML = Mustache.render(consentVideoTrial, {});
+  display.innerHTML = Handlebars.compile(consentVideoTrial)({});
 
   plugin["playButton"](display);
 
@@ -216,11 +237,11 @@ test("stopButton", async () => {
   const display = document.createElement("div");
 
   display.innerHTML =
-    Mustache.render(consentVideoTrial, {
+    Handlebars.compile(consentVideoTrial)({
       video_container_id: plugin["video_container_id"],
-    }) + Mustache.render(webcamFeed, {});
+    }) + Mustache.render(recordFeed, {});
 
-  plugin["webcamFeed"] = jest.fn();
+  plugin["recordFeed"] = jest.fn();
   plugin["stopButton"](display);
 
   const stopButton = display.querySelector<HTMLButtonElement>("button#stop");
@@ -232,8 +253,8 @@ test("stopButton", async () => {
   expect(stopButton!.disabled).toBeTruthy();
   expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
   expect(Recorder.prototype.reset).toHaveBeenCalledTimes(1);
-  expect(plugin["webcamFeed"]).toHaveBeenCalledTimes(1);
-  expect(plugin["webcamFeed"]).toHaveBeenCalledWith(display);
+  expect(plugin["recordFeed"]).toHaveBeenCalledTimes(1);
+  expect(plugin["recordFeed"]).toHaveBeenCalledWith(display);
 });
 
 test("nextButton", () => {
@@ -241,7 +262,7 @@ test("nextButton", () => {
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
 
-  display.innerHTML = Mustache.render(consentVideoTrial, {});
+  display.innerHTML = Handlebars.compile(consentVideoTrial)({});
   jsPsych.finishTrial = jest.fn();
 
   plugin["nextButton"](display);

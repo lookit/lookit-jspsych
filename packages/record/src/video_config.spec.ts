@@ -1,16 +1,15 @@
 import { clickTarget } from "@jspsych/test-utils";
+import Handlebars from "handlebars";
 import { initJsPsych, JsPsych } from "jspsych";
-import Mustache from "mustache";
 import videoConfig from "../templates/video-config.mustache";
 import { NoStreamError } from "./errors";
-import Recorder from "./recorder";
-
 import chromeInitialPrompt from "./img/chrome_initialprompt.png";
 import chromeAlwaysAllow from "./img/chrome_step1_alwaysallow.png";
 import chromePermissions from "./img/chrome_step1_permissions.png";
 import firefoxInitialPrompt from "./img/firefox_initialprompt.png";
 import firefoxChooseDevice from "./img/firefox_prompt_choose_device.png";
 import firefoxDevicesBlocked from "./img/firefox_prompt_devices_blocked.png";
+import Recorder from "./recorder";
 import VideoConfigPlugin, { VideoConsentTrialType } from "./video_config";
 
 jest.mock("./recorder");
@@ -54,6 +53,24 @@ let devicesObj: {
 let returnedDeviceLists: {
   cameras: MediaDeviceInfo[];
   mics: MediaDeviceInfo[];
+};
+
+/**
+ * Clean rendered html to be compared with DOM.
+ *
+ * @param html - HTML string
+ * @returns Cleaned HTML string
+ */
+const cleanHTML = (html: string) => {
+  return (
+    html
+      // Multiple whitespaces
+      .replace(/\s\s+/gm, " ")
+      // Whitespace and or slash before html element end
+      .replace(/\s*\/*>/gm, ">")
+      // equals empty string
+      .replace('=""', "")
+  );
 };
 
 beforeEach(() => {
@@ -177,20 +194,15 @@ test("Video config addHtmlContent loads template", () => {
   expect(video_config["display_el"]?.innerHTML).toBe("");
 
   // Render the template with the HTML parameters.
-  let rendered_trial_html = Mustache.render(videoConfig, html_params);
-  // Remove new lines, indents (tabs or spaces), and empty HTML property values.
-  rendered_trial_html = rendered_trial_html.replace(
-    /(\r\n|\n|\r|\t| {4})/gm,
-    "",
+  const rendered_trial_html = cleanHTML(
+    Handlebars.compile(videoConfig)(html_params),
   );
 
   // Run addHtmlContent to get the actual trial HTML.
   video_config["addHtmlContent"]("");
-  let displayed_html = document.body.innerHTML;
-  displayed_html = displayed_html.replace(/(\r\n|\n|\r|\t| {4})/gm, "");
-  displayed_html = displayed_html.replace(/(="")/gm, "");
+  const displayed_html = cleanHTML(document.body.innerHTML);
 
-  expect(displayed_html).toContain(rendered_trial_html);
+  expect(displayed_html).toStrictEqual(rendered_trial_html);
 });
 
 test("Video config addHtmlContent loads template with custom troubleshooting text", () => {
@@ -202,23 +214,22 @@ test("Video config addHtmlContent loads template with custom troubleshooting tex
     ...html_params,
     troubleshooting_intro,
   };
-  let rendered_trial_html = Mustache.render(
-    videoConfig,
-    html_params_custom_intro,
+  const rendered_trial_html = cleanHTML(
+    Handlebars.compile(videoConfig)(html_params_custom_intro),
   );
   // Remove new lines, indents (tabs or spaces), and empty HTML property values.
-  rendered_trial_html = rendered_trial_html.replace(
-    /(\r\n|\n|\r|\t| {4})/gm,
-    "",
-  );
+  // rendered_trial_html = rendered_trial_html.replace(
+  //   /(\r\n|\n|\r|\t| {4})/gm,
+  //   "",
+  // );
 
   // Get the actual trial HTML
   video_config["addHtmlContent"](troubleshooting_intro);
-  let displayed_html = document.body.innerHTML;
-  displayed_html = displayed_html.replace(/(\r\n|\n|\r|\t| {4})/gm, "");
-  displayed_html = displayed_html.replace(/(="")/gm, "");
+  const displayed_html = cleanHTML(document.body.innerHTML);
+  // displayed_html = displayed_html.replace(/(\r\n|\n|\r|\t| {4})/gm, "");
+  // displayed_html = displayed_html.replace(/(="")/gm, "");
 
-  expect(displayed_html).toContain(rendered_trial_html);
+  expect(displayed_html).toStrictEqual(rendered_trial_html);
 });
 
 test("Video config add event listeners", async () => {
