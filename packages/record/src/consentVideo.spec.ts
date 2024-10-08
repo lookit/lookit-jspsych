@@ -1,7 +1,6 @@
 import { LookitWindow } from "@lookit/data/dist/types";
 import Handlebars from "handlebars";
 import { initJsPsych, PluginInfo, TrialType } from "jspsych";
-import Mustache from "mustache";
 import consentVideoTrial from "../templates/consent-video-trial.hbs";
 import recordFeed from "../templates/record-feed.hbs";
 import { VideoConsentPlugin } from "./consentVideo";
@@ -174,7 +173,8 @@ test("recordButton", async () => {
   const display = document.createElement("div");
 
   display.innerHTML =
-    Handlebars.compile(consentVideoTrial)({}) + Mustache.render(recordFeed, {});
+    Handlebars.compile(consentVideoTrial)({}) +
+    Handlebars.compile(recordFeed)({});
 
   plugin["recordButton"](display);
 
@@ -239,7 +239,7 @@ test("stopButton", async () => {
   display.innerHTML =
     Handlebars.compile(consentVideoTrial)({
       video_container_id: plugin["video_container_id"],
-    }) + Mustache.render(recordFeed, {});
+    }) + Handlebars.compile(recordFeed)({});
 
   plugin["recordFeed"] = jest.fn();
   plugin["stopButton"](display);

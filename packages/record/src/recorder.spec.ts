@@ -1,12 +1,11 @@
 import Data from "@lookit/data";
 import Handlebars from "handlebars";
 import { initJsPsych } from "jspsych";
-import Mustache from "mustache";
 import play_icon from "../img/play-icon.svg";
 import record_icon from "../img/record-icon.svg";
-import playbackFeed from "../templates/playback-feed.mustache";
+import playbackFeed from "../templates/playback-feed.hbs";
 import recordFeed from "../templates/record-feed.hbs";
-import webcamFeed from "../templates/webcam-feed.mustache";
+import webcamFeed from "../templates/webcam-feed.hbs";
 import {
   CreateURLError,
   NoStopPromiseError,
@@ -188,7 +187,9 @@ test("Recorder insert webcam display without height/width", () => {
   const webcam_element_id: string = "lookit-jspsych-webcam";
   const params = { height, width, webcam_element_id, record_icon };
 
-  const rendered_webcam_html = cleanHTML(Mustache.render(webcamFeed, params));
+  const rendered_webcam_html = cleanHTML(
+    Handlebars.compile(webcamFeed)(params),
+  );
   const displayed_html = cleanHTML(document.body.innerHTML);
 
   expect(displayed_html).toContain(rendered_webcam_html);
@@ -217,7 +218,9 @@ test("Recorder insert webcam display with height/width", () => {
   // Use the HTML template and settings to figure out what HTML should have been added.
   const webcam_element_id: string = "lookit-jspsych-webcam";
   const params = { height, width, webcam_element_id, record_icon };
-  const rendered_webcam_html = cleanHTML(Mustache.render(webcamFeed, params));
+  const rendered_webcam_html = cleanHTML(
+    Handlebars.compile(webcamFeed)(params),
+  );
   const displayed_html = cleanHTML(document.body.innerHTML);
 
   expect(displayed_html).toContain(rendered_webcam_html);

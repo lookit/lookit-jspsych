@@ -3,12 +3,11 @@ import LookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
 import Handlebars from "handlebars";
 import { JsPsych } from "jspsych";
-import Mustache from "mustache";
 import play_icon from "../img/play-icon.svg";
 import record_icon from "../img/record-icon.svg";
-import playbackFeed from "../templates/playback-feed.mustache";
+import playbackFeed from "../templates/playback-feed.hbs";
 import recordFeed from "../templates/record-feed.hbs";
-import webcamFeed from "../templates/webcam-feed.mustache";
+import webcamFeed from "../templates/webcam-feed.hbs";
 import {
   CreateURLError,
   NoStopPromiseError,
@@ -159,7 +158,7 @@ export default class Recorder {
   ) {
     const { webcam_element_id } = this;
     const view = { height, width, webcam_element_id };
-    this.insertVideoFeed(element, Mustache.render(webcamFeed, view));
+    this.insertVideoFeed(element, Handlebars.compile(webcamFeed)(view));
   }
 
   /**
@@ -190,7 +189,7 @@ export default class Recorder {
 
     const playbackElement = this.insertVideoFeed(
       element,
-      Mustache.render(playbackFeed, view),
+      Handlebars.compile(playbackFeed)(view),
       false,
     );
 
