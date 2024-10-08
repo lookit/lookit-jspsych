@@ -1,9 +1,9 @@
 import { LookitWindow } from "@lookit/data/dist/types";
+import Handlebars from "handlebars";
 import { JsPsych, JsPsychPlugin } from "jspsych";
 import uploadingVideo from "../templates/uploading-video.hbs";
 import { NoSessionRecordingError } from "./errors";
 import Recorder from "./recorder";
-import Handlebars = require("handlebars");
 
 declare let window: LookitWindow;
 
