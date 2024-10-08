@@ -14,7 +14,7 @@ export default makeRollupConfig("chsRecord").map((config) => {
       dotenv(),
       // Add support to import yaml and handlebars files as strings
       importAsString({
-        include: [ "**/*.yaml", "**/*.hbs"],
+        include: ["**/*.yaml", "**/*.hbs"],
       }),
       // Images are converted to base64
       image(),
