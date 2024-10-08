@@ -8,6 +8,7 @@ export class SequenceExpDataError extends Error {
     this.name = "SequenceExpDataError";
   }
 }
+
 /** When a trial is accidentally undefined. */
 export class UndefinedTypeError extends Error {
   /**
