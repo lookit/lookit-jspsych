@@ -1,7 +1,7 @@
 import { clickTarget } from "@jspsych/test-utils";
 import Handlebars from "handlebars";
 import { initJsPsych, JsPsych } from "jspsych";
-import videoConfig from "../templates/video-config.mustache";
+import videoConfig from "../templates/video-config.hbs";
 import { NoStreamError } from "./errors";
 import chromeInitialPrompt from "./img/chrome_initialprompt.png";
 import chromeAlwaysAllow from "./img/chrome_step1_alwaysallow.png";
@@ -79,7 +79,7 @@ beforeEach(() => {
   video_config = new VideoConfigPlugin(jsPsych);
   video_config["display_el"] = display_el;
 
-  // Set up parameters for rendering HTML template with Mustache
+  // Set up parameters for rendering HTML template
   html_params = {
     webcam_container_id: video_config["webcam_container_id"],
     reload_button_id_cam: video_config["reload_button_id_cam"],

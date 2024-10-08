@@ -26,8 +26,7 @@
     "test": "jest --coverage"
   },
   "dependencies": {
-    "auto-bind": "^5.0.1",
-    "mustache": "^4.2.0"
+    "auto-bind": "^5.0.1"
   },
   "devDependencies": {
     "@jspsych/config": "^2.0.0",
@@ -36,7 +35,6 @@
     "@rollup/plugin-replace": "^6.0.1",
     "@types/audioworklet": "^0.0.60",
     "@types/js-yaml": "^4.0.9",
-    "@types/mustache": "^4.2.5",
     "@types/node-polyglot": "^2.5.0",
     "handlebars": "^4.7.8",
     "i18next": "^23.15.1",

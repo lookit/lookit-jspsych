@@ -1,7 +1,7 @@
 import { LookitWindow } from "@lookit/data/dist/types";
+import Handlebars from "handlebars";
 import { JsPsych, JsPsychPlugin } from "jspsych";
-import Mustache from "mustache";
-import uploadingVideo from "../templates/uploading-video.mustache";
+import uploadingVideo from "../templates/uploading-video.hbs";
 import { NoSessionRecordingError } from "./errors";
 import Recorder from "./recorder";
 
@@ -36,7 +36,7 @@ export default class StopRecordPlugin implements JsPsychPlugin<Info> {
    *   plugin's trial method via jsPsych core).
    */
   public trial(display_element: HTMLElement): void {
-    display_element.innerHTML = Mustache.render(uploadingVideo, {});
+    display_element.innerHTML = Handlebars.compile(uploadingVideo)({});
     this.recorder.stop().then(() => {
       window.chs.sessionRecorder = null;
       display_element.innerHTML = "";

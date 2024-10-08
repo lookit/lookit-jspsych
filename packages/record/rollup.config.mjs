@@ -12,9 +12,9 @@ export default makeRollupConfig("chsRecord").map((config) => {
       ...config.plugins,
       // Add support for .env files
       dotenv(),
-      // Add support to import mustache, yaml, handlebars files as strings
+      // Add support to import yaml and handlebars files as strings
       importAsString({
-        include: ["**/*.mustache", "**/*.yaml", "**/*.hbs"],
+        include: ["**/*.yaml", "**/*.hbs"],
       }),
       // Images are converted to base64
       image(),
