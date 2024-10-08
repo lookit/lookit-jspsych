@@ -5,6 +5,7 @@ import Mustache from "mustache";
 import play_icon from "../img/play-icon.svg";
 import record_icon from "../img/record-icon.svg";
 import playbackFeed from "../templates/playback-feed.mustache";
+import recordFeed from "../templates/record-feed.hbs";
 import webcamFeed from "../templates/webcam-feed.mustache";
 import {
   CreateURLError,
@@ -415,4 +416,28 @@ test("Record initialize error inactive stream", () => {
   rec["blobs"] = ["some stream data" as unknown as Blob];
 
   expect(() => initializeCheck()).toThrow(StreamDataInitializeError);
+});
+
+test("Recorder insert record Feed with height/width", () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const display = document.createElement("div");
+
+  const view = {
+    height: "auto",
+    width: "100%",
+    webcam_element_id: "lookit-jspsych-webcam",
+    record_icon,
+  };
+
+  jest.spyOn(Handlebars, "compile");
+  jest.spyOn(rec, "insertVideoFeed");
+
+  rec.insertRecordFeed(display);
+
+  expect(Handlebars.compile).toHaveBeenCalledWith(recordFeed);
+  expect(rec["insertVideoFeed"]).toHaveBeenCalledWith(
+    display,
+    Handlebars.compile(recordFeed)(view),
+  );
 });

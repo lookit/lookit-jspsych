@@ -1,6 +1,7 @@
 import Data from "@lookit/data";
 import LookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
+import Handlebars from "handlebars";
 import { JsPsych } from "jspsych";
 import Mustache from "mustache";
 import play_icon from "../img/play-icon.svg";
@@ -212,7 +213,7 @@ export default class Recorder {
   ) {
     const { webcam_element_id } = this;
     const view = { height, width, webcam_element_id, record_icon };
-    this.insertVideoFeed(element, Mustache.render(recordFeed, view));
+    this.insertVideoFeed(element, Handlebars.compile(recordFeed)(view));
   }
 
   /**

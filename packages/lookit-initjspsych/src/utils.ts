@@ -84,3 +84,14 @@ export const on_finish = (
     exit_url && window.location.replace(exit_url);
   };
 };
+
+/**
+ * Needed to tell user that their nth trial was undefined.
+ * https://stackoverflow.com/a/39466341
+ *
+ * @param n - Number needing suffix
+ * @returns Number with ordinal suffix
+ */
+export const nth = (n: number) => {
+  return `${n}${["st", "nd", "rd"][((((n + 90) % 100) - 10) % 10) - 1] || "th"}`;
+};

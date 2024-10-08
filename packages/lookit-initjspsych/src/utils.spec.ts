@@ -2,7 +2,7 @@ import { DataCollection } from "jspsych";
 
 import { Child, JsPsychExpData, Study } from "@lookit/data/dist/types";
 import { Timeline } from "./types";
-import { on_data_update, on_finish } from "./utils";
+import { nth, on_data_update, on_finish } from "./utils";
 
 delete global.window.location;
 global.window = Object.create(window);
@@ -185,4 +185,15 @@ test("Is an error thrown when experiment sequence is undefined?", () => {
   expect(async () => {
     await on_finish("some id", userFn)(data);
   }).rejects.toThrow("Experiment sequence or data missing.");
+});
+
+test("Ordinal format of numbers", () => {
+  [
+    { a: 1, b: "1st" },
+    { a: 2, b: "2nd" },
+    { a: 3, b: "3rd" },
+    { a: 146, b: "146th" },
+  ].forEach(({ a, b }) => {
+    expect(nth(a)).toStrictEqual(b);
+  });
 });

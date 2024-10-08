@@ -1,13 +1,4 @@
-/**
- * Needed to tell user that their nth trial was undefined.
- * https://stackoverflow.com/a/39466341
- *
- * @param n - Number needing suffix
- * @returns Number with ordinal suffix
- */
-const nth = (n: number) => {
-  return `${n}${["st", "nd", "rd"][((((n + 90) % 100) - 10) % 10) - 1] || "th"}`;
-};
+import { nth } from "./utils";
 
 /** Error when experiment data doesn't contain values on finish. */
 export class SequenceExpDataError extends Error {
@@ -17,6 +8,7 @@ export class SequenceExpDataError extends Error {
     this.name = "SequenceExpDataError";
   }
 }
+
 /** When a trial is accidentally undefined. */
 export class UndefinedTypeError extends Error {
   /**

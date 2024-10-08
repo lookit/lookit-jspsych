@@ -1,5 +1,6 @@
 import { JsPsych } from "jspsych";
 import lookitInitJsPsych from "./";
+import { UndefinedTypeError } from "./errors";
 import { Timeline } from "./types";
 
 afterEach(() => {
@@ -44,4 +45,17 @@ test("Is experiment data injected into timeline w/ data?", async () => {
 
   await jsPsych({}).run(t);
   expect(t[0].data).toMatchObject({ key: "value", other: "data" });
+});
+
+test("Is there an error when experiment type is empty?", () => {
+  const jsPsych = lookitInitJsPsych("some id");
+  [
+    [{ data: { other: "data" } }],
+    [{ type: undefined, data: { other: "data" } }],
+    [{ type: null, data: { other: "data" } }],
+  ].forEach((t) => {
+    expect(async () => await jsPsych({}).run(t)).rejects.toThrow(
+      UndefinedTypeError,
+    );
+  });
 });

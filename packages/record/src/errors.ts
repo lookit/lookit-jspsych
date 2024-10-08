@@ -180,17 +180,7 @@ export class NoWebCamElementError extends Error {
     this.name = "NoWebCamElementError";
   }
 }
-/** Error thrown when playback element wasn't found in the DOM. */
-export class NoPlayBackElementError extends Error {
-  /**
-   * This error will be thrown when attempting to retrieve the playback element
-   * and it wasn't found in the DOM.
-   */
-  public constructor() {
-    super("No playback element found.");
-    this.name = "NoPlayBackElementError";
-  }
-}
+
 /**
  * Error thrown when attempting to create playback/download url and data array
  * is empty.
