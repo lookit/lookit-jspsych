@@ -112,18 +112,72 @@ To create the video consent trial.
 const videoConsent = { type: chsRecord.VideoConsentPlugin, ...parameters };
 ```
 
+### Example
+
+```javascript
+const videoConsent = {
+  type: chsRecord.VideoConsentPlugin,
+  PIName: "Jane Smith",
+  institution: "Science University",
+  PIContact: "Jane Smith at 123 456 7890",
+  purpose:
+    "Why do babies love cats? This study will help us find out whether babies love cats because of their soft fur or their twitchy tails.",
+  procedures:
+    "Your child will be shown pictures of lots of different cats, along with noises that cats make like meowing and purring. We are interested in which pictures and sounds make your child smile. We will ask you (the parent) to turn around to avoid influencing your child's responses.",
+  risk_statement:
+    "There are no expected risks if you participate in the study. (This is optional, but should typically be included. If you leave it out there's no 'risks' section and you should include risk information elsewhere.)",
+  voluntary_participation:
+    "There are two sessions in this study; you will be invited to complete another session next month. It is okay not to do both sessions! (This is optional; leave it out if you don't need to say anything besides participation in this session being voluntary.)",
+  payment:
+    "After you finish the study, we will email you a $5 BabyStore gift card within approximately three days. To be eligible for the gift card your child must be in the age range for this study, you need to submit a valid consent statement, and we need to see that there is a child with you. But we will send a gift card even if you do not finish the whole study or we are not able to use your child's data! There are no other direct benefits to you or your child from participating, but we hope you will enjoy the experience.",
+  datause:
+    "We are primarily interested in your child's emotional reactions to the images and sounds. A research assistant will watch your video to measure the precise amount of delight in your child's face as he or she sees each cat picture.",
+  include_databrary: true,
+  additional_video_privacy_statement:
+    "We will also ask your permission to use your videos as stimuli for other parents. (This is optional; leave it out if there aren't additional ways you'll share video beyond as described in the participant's video privacy level and Databrary selections.)",
+  gdpr: false,
+  research_rights_statement:
+    "You are not waiving any legal claims, rights or remedies because of your participation in this research study.  If you feel you have been treated unfairly, or you have questions regarding your rights as a research subject, you may contact the [IRB NAME], [INSTITUTION], [ADDRESS/CONTACT]",
+  additional_segments: [
+    {
+      title: "US Patriot Act Disclosure",
+      text: "[EXAMPLE ONLY, PLEASE REMOVE ADDITIONAL_SEGMENTS UNLESS YOU NEED THEM.] Lookit is a U.S. organization and all information gathered from the website is stored on servers based in the U.S. Therefore, your video recordings are subject to U.S. laws, such as the US Patriot Act. This act allows authorities access to the records of internet service providers. If you choose to participate in this study, you understand that your video recording will be stored and accessed in the USA. The security and privacy policy for Lookit can be found at the following link: <a href='https://lookit.mit.edu/privacy/' target='_blank' rel='noopener'>https://lookit.mit.edu/privacy/</a>.",
+    },
+  ],
+};
+```
+
 ### Parameters
 
 #### Standard fields
 
-**`additional_video_privacy_statement` [String]** Optional
+**`locale` [String | "en-us"]**
+
+Set this parameter to the languages 2 letter code. In some cases, a regional
+code will have to be provided as well. For example, we currently support english
+only from the US region. Therefore, to get the US english translation you would
+put "en-US" for the locale. We support the following language codes:
+
+| Language       | Region | Code  |
+| -------------- | ------ | ----- |
+| Basque         |        | eu    |
+| Dutch, Flemish |        | nl    |
+| English        | U.S.A. | en-US |
+| French         |        | fr    |
+| Hungarian      |        | hu    |
+| Italian        |        | it    |
+| Japanese       |        | ja    |
+| Portuguese     | Brazil | pt-BR |
+| Portuguese     |        | pt    |
+
+**`additional_video_privacy_statement` [String]**
 
 Optional additional text for under header “Who can see our webcam recordings”.
 For cases where researchers ask for other specific permission to share videos,
 separate from the exit survey, or want to provide more detail or different
 language about Databrary sharing.
 
-**`datause` [String]** Required
+**`datause` [String]**
 
 Study-specific data use statement (optional). This will follow more general text
 like: “The research group led by [PIName] at [institution] will have access to
@@ -144,7 +198,7 @@ single planned study).
 
 **`gdpr` [Boolean | false]**
 
-Whether to include a section on GDPR; only used in template consent_002 + .
+Whether to include a section on GDPR.
 
 **`gdpr_personal_data` [String]**
 
@@ -227,11 +281,11 @@ whether babies love cats because of their soft fur or their twitchy tails.”
 
 **`research_rights_statement` [String]**
 
-Statement about rights of research subjects and how to contact IRB. Used only in
-template consent_002+. For instance, MIT’s standard language is: You are not
-waiving any legal claims, rights or remedies because of your participation in
-this research study. If you feel you have been treated unfairly, or you have
-questions regarding your rights as a research subject, you may contact [CONTACT INFO].
+Statement about rights of research subjects and how to contact IRB. For
+instance, MIT’s standard language is: You are not waiving any legal claims,
+rights or remedies because of your participation in this research study. If you
+feel you have been treated unfairly, or you have questions regarding your rights
+as a research subject, you may contact [CONTACT INFO].
 
 **`risk_statement` [String]**
 
@@ -256,23 +310,23 @@ in the Terms of Use! If it really won’t be possible to use Lookit without maki
 more changes, please let us know before using the following fields to further
 customize the consent form:
 
-**`purpose_header` [String | ""]**
+**`purpose_header` [String]**
 
 Custom alternate header for the section on study purpose.
 
-**`procedures_header` [String | ""]**
+**`procedures_header` [String]**
 
 Custom alternate header for the section on study procedures.
 
-**`participation_header` [String | ""]**
+**`participation_header` [String]**
 
 Custom alternate header for the section on participation being voluntary.
 
-**`benefits_header` [String | ""]**
+**`benefits_header` [String]**
 
 Custom alternate header for the section on benefits/compensation.
 
-**`risk_header` [String | ""]**
+**`risk_header` [String]**
 
 Custom alternate header for risks section.
 
