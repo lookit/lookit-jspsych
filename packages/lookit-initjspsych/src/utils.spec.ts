@@ -1,8 +1,9 @@
 import { DataCollection } from "jspsych";
 
 import { Child, JsPsychExpData, Study } from "@lookit/data/dist/types";
+import { nth } from "./errors";
 import { Timeline } from "./types";
-import { nth, on_data_update, on_finish } from "./utils";
+import { on_data_update, on_finish } from "./utils";
 
 delete global.window.location;
 global.window = Object.create(window);
