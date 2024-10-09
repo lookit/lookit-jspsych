@@ -45,7 +45,20 @@ const info = <const>{
     benefits_header: { type: ParameterType.STRING, default: "" },
     risk_header: { type: ParameterType.STRING, default: "" },
     summary_statement: { type: ParameterType.STRING, default: "" },
-    additional_segments: { type: ParameterType.COMPLEX },
+    additional_segments: {
+      type: ParameterType.COMPLEX,
+      array: true,
+      nested: {
+        title: {
+          type: ParameterType.STRING,
+          default: "",
+        },
+      },
+      text: {
+        type: ParameterType.STRING,
+        default: "",
+      },
+    },
     prompt_all_adults: { type: ParameterType.BOOL, default: false },
     prompt_only_adults: { type: ParameterType.BOOL, default: false },
     consent_statement_text: { type: ParameterType.STRING, default: "" },
