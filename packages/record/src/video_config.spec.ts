@@ -69,7 +69,7 @@ const cleanHTML = (html: string) => {
       // Whitespace and or slash before html element end
       .replace(/\s*\/*>/gm, ">")
       // equals empty string
-      .replace('=""', "")
+      .replace(/(="")/gm, "")
   );
 };
 
@@ -214,20 +214,15 @@ test("Video config addHtmlContent loads template with custom troubleshooting tex
     ...html_params,
     troubleshooting_intro,
   };
+
+  // Remove new lines, indents (tabs or spaces), and empty HTML property values.
   const rendered_trial_html = cleanHTML(
     Handlebars.compile(videoConfig)(html_params_custom_intro),
   );
-  // Remove new lines, indents (tabs or spaces), and empty HTML property values.
-  // rendered_trial_html = rendered_trial_html.replace(
-  //   /(\r\n|\n|\r|\t| {4})/gm,
-  //   "",
-  // );
 
   // Get the actual trial HTML
   video_config["addHtmlContent"](troubleshooting_intro);
   const displayed_html = cleanHTML(document.body.innerHTML);
-  // displayed_html = displayed_html.replace(/(\r\n|\n|\r|\t| {4})/gm, "");
-  // displayed_html = displayed_html.replace(/(="")/gm, "");
 
   expect(displayed_html).toStrictEqual(rendered_trial_html);
 });
