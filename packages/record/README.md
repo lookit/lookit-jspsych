@@ -24,8 +24,8 @@ const videoConfig = { type: chsRecord.VideoConfigPlugin };
 **`troubleshooting_intro` [HTML String]**
 
 Optional text to add at the start of the "Setup tips and troubleshooting"
-section. This string allows HTML formatting (e.g. "<strong></strong>" for bold,
-"<em></em>" for italics).
+section. This string allows HTML formatting (e.g. `<strong></strong>` for bold,
+`<em></em>` for italics).
 
 ### Examples
 
