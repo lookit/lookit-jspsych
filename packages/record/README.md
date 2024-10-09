@@ -102,9 +102,9 @@ jsPsych.run([videoConfig, startRec, morning, evening, stopRec, night]);
 
 ## Video Consent
 
-Users will need to record them accepting the consent document for your study.
-This trial will allow the user to read the consent document and record a video
-accepting it.
+Users will need to record themselves accepting the consent document for your
+study. This trial will allow the user to read the consent document and record a
+video accepting it.
 
 To create the video consent trial.
 
