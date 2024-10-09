@@ -1,6 +1,6 @@
 {
   "name": "@lookit/surveys",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A survey plugin for lookit studies.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@jspsych/plugin-survey": "^2.0.0",
-    "@lookit/data": "^0.0.1",
+    "@lookit/data": "^0.0.2",
     "dompurify": "^3.0.11",
     "marked": "^12.0.1",
     "survey-jquery": "^1.9.136"
