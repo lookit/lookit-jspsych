@@ -1,0 +1,72 @@
+div#consent-video-trial {
+  text-align: left;
+  display: flex;
+
+  img#record-icon,
+  img#play-icon {
+    top: 7px;
+    left: 7px;
+    height: 25px;
+    position: absolute;
+  }
+
+  img#record-icon {
+    visibility: "hidden";
+  }
+
+  button#next {
+    float: right;
+  }
+
+  > div {
+    padding: 60px 40px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 18px;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+
+  p {
+    font-size: 15px;
+  }
+
+  ol {
+    padding-left: 30px;
+  }
+
+  li {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .left-column {
+    max-width: 800px;
+  }
+
+  .right-column {
+    max-width: 600px;
+  }
+
+  .consent-statement {
+    background-color: #eee;
+    padding: 20px;
+    border-radius: 4px;
+    text-align: justify;
+  }
+
+  #lookit-jspsych-video-container {
+    position: relative;
+    margin: auto;
+
+    video {
+      max-width: 500px;
+      min-width: 300px;
+      width: 100%;
+    }
+  }
+}

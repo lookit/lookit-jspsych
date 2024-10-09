@@ -1,3 +1,5 @@
+@import "./consent-video-trial";
+
 div#lookit-jspsych-video-config {
   margin-top: 5%;
   margin-bottom: 10%;
@@ -174,21 +176,4 @@ div#lookit-jspsych-video-config {
     margin: 15px auto;
     max-width: 30%;
   }
-}
-
-img#record-icon,
-img#play-icon {
-  top: 7px;
-  left: 7px;
-  height: 25px;
-  position: absolute;
-}
-
-img#record-icon {
-  visibility: "hidden";
-}
-
-div#lookit-jspsych-video-container {
-  position: relative;
-  width: min-content;
 }

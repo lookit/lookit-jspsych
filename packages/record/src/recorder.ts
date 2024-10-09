@@ -1,15 +1,15 @@
 import Data from "@lookit/data";
 import LookitS3 from "@lookit/data/dist/lookitS3";
 import autoBind from "auto-bind";
+import Handlebars from "handlebars";
 import { JsPsych } from "jspsych";
-import Mustache from "mustache";
 import play_icon from "../img/play-icon.svg";
 import record_icon from "../img/record-icon.svg";
-import playbackFeed from "../templates/playback-feed.mustache";
-import webcamFeed from "../templates/webcam-feed.mustache";
+import playbackFeed from "../templates/playback-feed.hbs";
+import recordFeed from "../templates/record-feed.hbs";
+import webcamFeed from "../templates/webcam-feed.hbs";
 import {
   CreateURLError,
-  NoPlayBackElementError,
   NoStopPromiseError,
   NoWebCamElementError,
   RecorderInitializeError,
@@ -31,7 +31,6 @@ export default class Recorder {
   private filename?: string;
   private stopPromise?: Promise<void>;
   private webcam_element_id = "lookit-jspsych-webcam";
-  private playback_element_id = "lookit-jspsych-playback";
 
   private streamClone: MediaStream;
 
@@ -110,6 +109,39 @@ export default class Recorder {
   }
 
   /**
+   * Insert a rendered template into an element.
+   *
+   * @param element - Element to have video inserted into.
+   * @param template - Template string
+   * @param insertStream - Should the stream be attributed to the webcam
+   *   element.
+   * @returns Webcam element
+   */
+  private insertVideoFeed(
+    element: HTMLDivElement,
+    template: string,
+    insertStream: boolean = true,
+  ) {
+    const { webcam_element_id, stream } = this;
+
+    element.innerHTML = template;
+
+    const webcam = element.querySelector<HTMLVideoElement>(
+      `#${webcam_element_id}`,
+    );
+
+    if (!webcam) {
+      throw new NoWebCamElementError();
+    }
+
+    if (insertStream) {
+      webcam.srcObject = stream;
+    }
+
+    return webcam;
+  }
+
+  /**
    * Insert a video element containing the webcam feed onto the page.
    *
    * @param element - The HTML div element that should serve as the container
@@ -124,18 +156,9 @@ export default class Recorder {
     width: CSSWidthHeight = "100%",
     height: CSSWidthHeight = "auto",
   ) {
-    const { webcam_element_id, stream } = this;
-    const view = { height, width, webcam_element_id, record_icon };
-    element.innerHTML = Mustache.render(webcamFeed, view);
-    const webcam = element.querySelector<HTMLVideoElement>(
-      `#${webcam_element_id}`,
-    );
-
-    if (!webcam) {
-      throw new NoWebCamElementError();
-    }
-
-    webcam.srcObject = stream;
+    const { webcam_element_id } = this;
+    const view = { height, width, webcam_element_id };
+    this.insertVideoFeed(element, Handlebars.compile(webcamFeed)(view));
   }
 
   /**
@@ -155,31 +178,41 @@ export default class Recorder {
     width: CSSWidthHeight = "100%",
     height: CSSWidthHeight = "auto",
   ) {
-    const { playback_element_id } = this;
+    const { webcam_element_id } = this;
     const view = {
       src: this.url,
       width,
       height,
-      playback_element_id,
+      webcam_element_id,
       play_icon,
     };
 
-    this.clearWebcamFeed();
-
-    element.insertAdjacentHTML(
-      "afterbegin",
-      Mustache.render(playbackFeed, view),
+    const playbackElement = this.insertVideoFeed(
+      element,
+      Handlebars.compile(playbackFeed)(view),
+      false,
     );
-
-    const playbackElement = element.querySelector<HTMLVideoElement>(
-      `video#${this.playback_element_id}`,
-    );
-
-    if (!playbackElement) {
-      throw new NoPlayBackElementError();
-    }
 
     playbackElement.addEventListener("ended", on_ended, { once: true });
+  }
+
+  /**
+   * Insert a feed to be used for recording into an element.
+   *
+   * @param element - Element to have record feed inserted into.
+   * @param width - The width of the video element containing the webcam feed,
+   *   in CSS units (optional). Default is `'100%'`
+   * @param height - The height of the video element containing the webcam feed,
+   *   in CSS units (optional). Default is `'auto'`
+   */
+  public insertRecordFeed(
+    element: HTMLDivElement,
+    width: CSSWidthHeight = "100%",
+    height: CSSWidthHeight = "auto",
+  ) {
+    const { webcam_element_id } = this;
+    const view = { height, width, webcam_element_id, record_icon };
+    this.insertVideoFeed(element, Handlebars.compile(recordFeed)(view));
   }
 
   /**

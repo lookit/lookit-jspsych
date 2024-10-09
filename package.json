@@ -23,6 +23,7 @@
     "fix": "prettier './' -lw && eslint './packages/**/src/**/*.ts' --fix",
     "format": "prettier './' -c",
     "lint": "eslint './packages/**/src/**/*.ts'",
+    "style": "npm run build -w @lookit/style",
     "test": "npm test --workspaces"
   },
   "devDependencies": {

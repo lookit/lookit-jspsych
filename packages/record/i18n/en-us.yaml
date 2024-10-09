@@ -1,0 +1,709 @@
+No: No
+Yes: Yes
+Next: Next
+Previous: Previous
+Replay: Replay
+Pause: Pause
+Resume: Resume
+Continue: Continue
+Cancel: Cancel
+Exit: Exit
+Submit: Submit
+Really exit study:
+  Really exit study? <br> Click Exit to stop the study now and select a privacy
+  level for your videos.
+establishing video connection: establishing video connection
+please wait: please wait
+uploading video: uploading video
+return to fullscreen: return to fullscreen
+please wait, setting up: please wait, setting up
+Reload webcam: Reload webcam
+this-field-is-required: This field is required.
+
+exp-lookit-exit-survey:
+  confirm-birthdate: Please confirm your child's birthdate
+  why-birthdate:
+    We ask again just to check for typos during registration or accidental
+    selection of a different child at the start of the study.
+  q-databrary:
+    Would you like to share your video and other data from this session with
+    authorized users of the secure data library Databrary?
+  databrary-info:
+    Only authorized researchers will have access to information in the library.
+    Researchers who are granted access must agree to maintain confidentiality
+    and not use information for commercial purposes. Data sharing will lead to
+    faster progress in research on human development and behavior. If you have
+    any questions about the data-sharing library, please visit <a
+    href="https://nyu.databrary.org/" target="_blank" rel="noopener
+    noreferrer">Databrary</a> or email ethics@databrary.org.
+  acceptable-use-header: Use of video clips and images
+  private-option-part-1:
+    <strong>Private:</strong> Video may only be viewed by authorized scientists
+  private-option-list-with-databrary:
+    Lookit project staff, researchers working with {contact} on the study
+    "{name}," and authorized Databrary users.
+  private-option-list-without-databrary:
+    Lookit project staff and researchers working with {contact} on the study
+    "{name}."
+  scientific-option:
+    <strong>Scientific and educational:</strong> Video may be shared for
+    scientific or educational purposes. For example, we might show a video clip
+    in a talk at a scientific conference or an undergraduate class about
+    cognitive development, or include an image or video in a scientific paper.
+    In some circumstances, video or images may be available online, for instance
+    as supplemental material in a scientific paper.
+  publicity-option:
+    <strong>Publicity:</strong> Please select this option if you'd be excited
+    about seeing your child featured on the Lookit website or in a news article
+    about this study! Your video may be shared for publicity as well as
+    scientific and educational purposes; it will never be used for commercial
+    purposes. Video clips shared may be available online to the general public.
+  withdrawal-header: Withdrawal of video data
+  withdrawal-details:
+    Every video helps us, even if something went wrong! However, if you need
+    your video deleted{include_example, select, true { (your spouse was
+    discussing state secrets in the background, etc.)} other {}}, check here to
+    completely withdraw your video data from this session from the study. Only
+    your consent video will be retained and it may only be viewed by Lookit
+    project staff and researchers working with {contact} on the study "{name}";
+    other video will be deleted without viewing.
+  feedback-label:
+    How did it go? Do you have any suggestions for improving the study?
+  withdrawal-confirmation:
+    You have chosen to withdraw your video data from the study. Any video beyond
+    your consent recording will be deleted without viewing. Are you sure?
+  Withdraw: Withdraw
+  facebook-share: Share this study on Facebook!
+
+exp-lookit-video-assent:
+  header: Child assent to participate
+  explanation-1:
+    For studies with older children, we need to check that both the parent
+    <em>and</em> the child agree to participate. <strong>This page is for the
+    child!</strong>
+  explanation-2: Parents, please help your child read and navigate if needed.
+  step-1: Learn about the study
+  Download: Download
+  step-2: Then decide
+  chose-not-to-participate:
+    You have chosen not to participate. Pressing 'submit' will take you to the
+    main Lookit page.
+  Image: Image
+  Video: Video
+
+exp-lookit-video-consent:
+  consent-step-1: Read through this consent document
+  download: Download
+  click-to: Click to
+  start-consent-recording: start consent recording
+  Recording: Recording
+  read-statement-below:
+    Read the statement below <em class="video-consent-outloud"> out loud</em>
+  signed-alternative: or in ASL
+  prompt:
+    I have read and understand the consent document. I am this child's parent or
+    legal guardian and we both agree to participate in this study.
+  prompt-adult-only:
+    I have read and understand the consent document. I agree to participate in
+    this study.
+  additional-adult-question:
+    Is another adult there too? If so, each additional adult should read out
+    loud
+  additional-adult-prompt:
+    I have read and understand the consent document. I also agree to participate
+    in this study.
+  stop-recording: stop recording
+  play-consent-video-button: Play the consent video
+  review-video:
+    to make sure your video was recorded. (If not, you can try again!)
+  play-video-warning:
+    Please play your video to make sure you can hear the consent statement!
+  consent-recording-warning: Please make a consent recording to continue.
+  Not-recording-yet: Not recording yet
+  Error-starting-recorder: Error starting recorder
+  Starting-recorder: Starting recorder
+  Not-recording: Not recording
+  Stopping-and-uploading: Stopping and uploading
+
+consent-template-2:
+  header: Consent to participate in research
+  intro-sentence:
+    Researchers led by {name} at {institution} are running this study,
+    "{experiment}," on Lookit.
+  purpose-header: Purpose
+  procedures-header: Procedures
+  duration-statement: This study takes about {duration} to complete.
+  participation-header: Participation
+  participation-content:
+    You and your child are free to choose whether to be in this study. If you
+    and your child choose to participate, it's okay to stop at any point during
+    the session. Please pause or stop the session if your child becomes very
+    fussy or does not want to participate! If this is a study with multiple
+    sessions, it's okay not to complete all the sessions.
+  payment-header: Payment
+  data-collection-header: Data collection and webcam recording
+  data-collection-1:
+    During the session, you and your child will be recorded via your computer's
+    webcam and microphone. Video recordings and other data you enter are sent
+    securely to the Lookit platform and stored indefinitely. At the end of the
+    session, you will be prompted to choose a privacy level for your webcam
+    recordings. You will have the option to withdraw your video data at this
+    point. You can view your past recordings on Lookit at any time.
+  data-collection-2:
+    Data is stored securely on Lookit servers and by researchers. However, there
+    is always a small risk that data transmitted over the internet may be
+    intercepted or that the security of stored data may be compromised.
+  data-collection-3:
+    No video clips will be published or shared unless you allow this when
+    selecting a privacy level. If we do not receive a consent recording (the
+    video you'll make to the right) for this session and cannot verify that you
+    agreed to participate, no other video from your session will be viewed.
+  data-use-researchers-header: Use of data by study researchers
+  data-use-researchers-content:
+    The research group led by {name} at {institution} will have access to video
+    and other data collected during this session. We will also have access to
+    your account profile, demographic survey, and the child profile for the
+    child who is participating, including changes you make in the future to any
+    of this information. We may study your child's responses in connection with
+    his or her previous responses to this or other studies run by our group,
+    siblings' responses to this or other studies run by our group, or
+    demographic survey responses.
+  data-use-Lookit-header: Use of data by Lookit
+  data-use-Lookit-content:
+    Because this study is being run on the Lookit platform, researchers working
+    on the Lookit project at MIT will also have access to the data collected
+    during this session, in addition to your account data, child profiles, and
+    demographic survey responses. This data may be used by Lookit to detect and
+    fix technical problems or identify new features that would be helpful;
+    provide support to study researchers; assess data quality (for instance, how
+    well an observer can tell which direction children are looking); evaluate
+    the site's success in reaching a diverse population; and characterize family
+    engagement (for instance, looking at what aspects of a study make parents
+    more interested in coming back later).
+  publication-header: Publication of results
+  publication-contents:
+    The results of the research may be presented at scientific meetings or
+    published in scientific journals. Raw data (for instance, looking times to
+    the left and right of the screen) may be published when it cannot identify
+    children. We never publish children's birthdates or names, and we never
+    publish your demographic data in conjunction with your child's video.
+  research-subject-rights-header: Rights of research subjects
+  gdpr-header: General Data Protection Regulation (GDPR) information
+  gdpr-personal:
+    As part of your participation, we will collect certain personal information
+    about you, including
+  gdpr-sensitive:
+    In addition, we will collect special category data, your personal
+    information that is especially sensitive
+  gdpr-2:
+    Your personal information will be transferred to the United States. You
+    understand that the data protection and privacy laws of the United States
+    may not offer you the same level of protection as those in your country of
+    origin.
+  contact-header: Researcher contact information
+  contact-statement-1:
+    This study is run by {name} at {institution}. If you or your child have any
+    questions or concerns about this study, or in the very unlikely event of a
+    research-related injury, please contact {contact}.
+  contact-statement-2:
+    If you or your child have any questions or concerns about the Lookit
+    platform, please contact Lookit staff at lookit@mit.edu or 617 324 4859.
+
+consent-template-5:
+  header: Consent to participate in research
+  intro-sentence:
+    Researchers led by {name} at {institution} are running this study,
+    "{experiment}," on Lookit.
+  purpose-header: Why we are running this study
+  procedures-header: What happens during this study
+  duration-statement: This study takes about {duration} to complete.
+  participation-header: Participation is voluntary
+  participation-content:
+    You {only_adult, select, true {} other {and your child}} are free to choose
+    whether to be in this study. If you do choose to participate, it's okay to
+    stop at any point during the session. {only_adult, select, true {} other
+    {Please do pause or stop the session if your child becomes fussy or does not
+    want to participate!}}
+  risk-header: What are the risks?
+  benefits-header: What are the benefits?
+  data-collection-header: Data collection and webcam recording
+  data-collection-1:
+    During the session, you {only_adult, select, true {} other {and your child}}
+    will be recorded by your computer's webcam and microphone.
+  data-collection-2:
+    These webcam recordings, and other data like answers you enter in forms, are
+    sent securely to the Lookit platform. You can view your past recordings on
+    Lookit at any time.
+  data-collection-3:
+    Data are stored securely on Lookit servers and by researchers, and are only
+    shared as described in this document. However, there is always a small risk
+    that data transmitted over the internet may be intercepted or that the
+    security of stored data may be compromised.
+  video-privacy-header: Who will be able to see your webcam recordings?
+  video-privacy-consent:
+    We will first check that you really agreed to participate by watching your
+    consent recording. If we cannot confirm that you agreed to participate, no
+    one will view any other recordings from this session.
+  video-privacy-overview:
+    At the end of the session, you will choose a privacy level for your webcam
+    recordings. You can choose one of the following privacy levels for your
+    videos
+  video-privacy-Private: Private
+  video-privacy-Scientific: Scientific
+  video-privacy-Publicity: Publicity
+  video-privacy-private-description:
+    Researchers with access to your recordings will not share them with anyone
+    else.
+  video-privacy-scientific-description:
+    Researchers with access to your recordings may share them for scientific or
+    educational purposes, for instance showing an example in a class or during a
+    scientific conference.
+  video-privacy-publicity-description:
+    Researchers with access to your recordings may also share them for
+    publicity, for instance in a news segment about the research or to recruit
+    more participants.
+  video-privacy-withdraw:
+    You will also have the option to withdraw your recordings. If you do, only
+    your consent recording will be kept and all other recordings will be
+    deleted.
+  video-privacy-withdraw-private-only:
+    At the end of the session, you will have the option to withdraw your
+    recordings. If you do, only your consent recording will be kept and all
+    other recordings will be deleted.
+  databrary:
+    Separately, you can opt in to give access to your recordings and other data
+    to authorized users of the secure data library Databrary. This means that
+    other researchers besides the ones running this study will have access to
+    your recordings, and may be able to use them to answer other questions about
+    child development. Data sharing can lead to faster progress in research on
+    human development and behavior. Authorized Databrary researchers have to
+    agree to maintain confidentiality and not use the data for commercial
+    purposes. If you have any questions about this data-sharing library, visit
+    <a href="https://nyu.databrary.org/" target="_blank" rel="noopener
+    noreferrer">Databrary</a> or email ethics@databrary.org.
+  data-use-researchers-header: How we use your data
+  data-use-researchers-content-1:
+    If you participate in this study, we (the research group led by {name} at
+    {institution}) will have access to
+  data-use-researchers-item-1:
+    webcam recordings and other data collected during this session
+  data-use-researchers-item-2: your account profile and demographic survey
+  data-use-researchers-item-3:
+    the {only_adult, select, true {} other {child}} profile for the {only_adult,
+    select, true {family member} other {child}} who is participating
+  data-use-researchers-content-2:
+    This includes changes you make in the future to any of this information. We
+    may put different types of information together to learn more about child
+    development. For instance, if {only_adult, select, true {you participate}
+    other {your child participates}} in multiple studies from our group, we may
+    look at how {only_adult, select, true {your} other {his or her}} responses
+    compare across studies, or we may look at {only_adult, select, true {how
+    your responses relate to other family members''} other {whether siblings
+    tend to respond similarly}}. We may also study connections between
+    {only_adult, select, true {your} other {children''s}} responses and family
+    demographic survey data.
+  data-use-Lookit-header: How Lookit uses your data
+  data-use-Lookit-content:
+    The Lookit core team at MIT will also have access to the data collected
+    during this session, in addition to your account data. They use this data to
+    run and improve Lookit, for instance to provide technical support, check how
+    well data collection is working, or see whether Lookit is reaching a diverse
+    group of families. Lookit stores data indefinitely unless you withdraw your
+    recordings at the end of the study.
+  publication-header: Publishing the results of this study
+  publication-content:
+    The results of this study may be presented at scientific meetings or
+    published in scientific journals. We may publish individual responses that
+    cannot identify {only_adult, select, true {you} other {children}}, like
+    looking times or sequences of button presses. We never publish {only_adult,
+    select, true {} other {children''s}} birthdates or names. Even if you choose
+    to share your recordings, we never publish information that would make it
+    possible to link recordings with your demographic data.
+  research-subject-rights-header: Your rights as a participant
+  gdpr-header: General Data Protection Regulation (GDPR) information
+  gdpr-personal:
+    As part of your participation, we will collect certain personal information
+    about you, including
+  gdpr-sensitive:
+    In addition, we will collect special category data, your personal
+    information that is especially sensitive
+  gdpr-2:
+    Your personal information will be transferred to the United States. The data
+    protection and privacy laws of the United States may not offer you the same
+    level of protection as those in your country of origin.
+  contact-header: How to reach us
+  contact-statement-1:
+    This study is run by {name} at {institution}. If {only_adult, select, true
+    {you} other {you or your child}} have any questions or concerns about this
+    study, {omit_injury, select, true {} other {or in the very unlikely event of
+    a research-related injury,}} please contact {contact}.
+  contact-statement-2:
+    If {only_adult, select, true {you} other {you or your child}} have any
+    questions or concerns about the Lookit platform, please contact Lookit staff
+    at lookit@mit.edu.
+
+consent-garden:
+  header: "Consent to participate in research: {experiment} for Project GARDEN"
+  intro-sentence:
+    Researchers led by {name} at {institution} are running this study,
+    {experiment}, on Lookit.
+  overview-header: We would like to invite you to participate in our study!
+  overview-content:
+    As one of your child's main caregivers (legal guardians such as a parent),
+    you are invited to participate in {experiment}, which is part of Children
+    Helping Science's Project GARDEN (Growing and Advancing Research in
+    Development and EducatioN; see <a
+    href="https://childrenhelpingscience.com/garden/about" target="_blank"
+    rel="noopener noreferrer">What is Project GARDEN?</a> for more details),
+    which aims to better understand how children grow and develop in the ways
+    that they think, learn, and understand the world around them!<br><br>Right
+    now you are reading the consent form, which will give you some information
+    about this study and help you choose whether you would like to participate.
+    After you read this information, you can decide to complete the form by
+    following the instructions on the page. You may be invited to participate in
+    other Project GARDEN studies later, but this consent form is only for
+    {experiment}.<br><br>We encourage people to ask questions, so please feel
+    free to contact us by emailing us at {contact} if you are unsure about any
+    part of this consent form or the study before you decide whether you would
+    like to participate in {experiment}.
+  study-info-header: What is this study and who is running this study?
+  study-info-content:
+    This is the {experiment} study run by {lab} at {institution} as part of
+    Project GARDEN (see <a
+    href="https://childrenhelpingscience.com/garden/about" target="_blank"
+    rel="noopener noreferrer" >What is Project GARDEN?</a> for more details). In
+    this study, {description}.
+  purpose-header: Why are you running this study?
+  eligibility-header: Who gets to participate?
+  procedures-header: What happens during this study and how long will it take?
+  duration-statement: This study takes about {duration} to complete.
+  payment-header: What do I receive for participating in this study?
+  payment-content:
+    You will receive an $5 Amazon.com gift card (<u>usable on the U.S. website
+    only</u>) as soon as possible after participating in the study (within 7
+    business days).
+  benefits-header: What are some reasons I might want to participate?
+  risk-header: What are some reasons I might not want to participate?
+  risk-content-1:
+    "{experiment} only takes about {duration}, but your child may find some
+    questions uninteresting or boring. "
+  risk-content-2:
+    "Your child may {risk_content_discontinue_options}choose to stop
+    participating at any time. "
+  risk-content-3:
+    We will let you know if we become aware of any other reasons you may not
+    want to participate in the future.
+  data-collection-header: What kinds of information will this study collect?
+  data-collection-content:
+    "There are {omit_video, select, true {two} other {three}} types of
+    information that are collected in this
+    study:<br><br><ol><li><strong>Personal Information</strong>, such as your
+    name, email, and children's names & birthdays, that can be used to identify
+    you. This also includes your Lookit account information and your consent
+    video (where you record yourself stating you agree to participate in the
+    study) and will never be shared outside of {institution} or
+    Lookit.</li><li><strong>Study Information</strong>, such as choices or
+    answers you or your child give to study questions, written descriptions of
+    things you do during the study, or other information you give as part of
+    participation in the study. This information will be “de-identified” and
+    shared with other Project GARDEN researchers and eventually other child
+    development researchers outside Project GARDEN. You can learn more about
+    de-identifying and sharing of study information below.</li>{omit_video,
+    select, true {} other {<li><strong>Video recordings</strong>, of you and/or
+    your child interacting with any part of the study. Video recordings are a
+    special kind of information (you can definitely identify someone from their
+    face!), so we will give you multiple choices for how you would like us to
+    share or not share this information. See <strong>&ldquo;Who will be able to
+    see our video recordings&rdquo;</strong> for more information and your
+    choices.</li>}}</ol>"
+  data-use-researchers-header: What will you use this information for?
+  data-use-researchers-content:
+    We will never use any of your information for any purpose other than
+    non-profit research.<br><br>The results of this study may be presented at
+    scientific meetings or published in scientific journals. We may publish
+    individual responses from your de-identified (2) study information (see
+    <strong>“How do you make sure my privacy is protected?”</strong>), like how
+    long your child looked at a picture or which button they decided to press,
+    but this will only be shared in a way similar to “one of the many
+    five-year-olds who participated chose this option during the study” or
+    “participant number five chose this option during the study.”<br><br>We will
+    <strong>never share or publish</strong> personal information like your email
+    or children's birth dates or names.
+  data-access-header: Who has access to this information?
+  data-access-content:
+    Running studies like ours online requires a small number of specific people
+    at two universities to have access to all three types of information. At
+    {institution}, our research group and {institution} Institutional Review
+    Board (IRB), which is a group that makes sure your rights are protected when
+    you participate in research, have access. At MIT, the administrative staff
+    who run Lookit have access. To learn more about Lookit or the {institution}
+    IRB, please see the specific questions about them below.<br><br>Only people
+    approved by the {institution} Institutional Review Board (IRB) to be on this
+    study's research team or Lookit staff will have access to your personal
+    information. Your personal information will only be used to make sure that
+    you agreed to the study and to contact you about this study or future
+    Project GARDEN studies, including sending you gift cards.<br><br>Your study
+    information will be shared with other Project GARDEN researchers and
+    eventually other child development researchers outside Project GARDEN, but
+    we take multiple steps to de-identify you and protect your privacy by
+    removing personal information before doing so.<br><br>Your video recordings
+    will be shared or not shared according to the option you choose at the end
+    of the study.
+  data-management-header:
+    'How do you make sure that my privacy is protected with "de-identification"?'
+  data-management-content:
+    "Your <u>study information</u> will be de-identified by giving you and your
+    child a “Family ID” and removing any personal information that can be used
+    to identify you. We can give you two examples of how this “de-identification
+    process” works:<br><br><u>Example #1</u>: In our research spreadsheets, we
+    will use something like “F32” or “Family 32” to identify your family/your
+    child instead of “the Smith family” or “Jane Smith”. This de-identified
+    <u>study information</u> will be placed together with other families&rsquo;
+    de-identified study information in spreadsheets/data
+    files.<br><br><u>Example #2</u>: If your child is 5 years old, their
+    information will usually be described as one of many other 5 year olds in
+    the data set, and we will report findings saying something like
+    “five-year-olds in this study were more likely to choose option A more often
+    than other options” or “200 families with five-year-olds were in the
+    Southeast U.S.”.<br><br>If you have any more questions about who has access
+    to your information or how it will be used, please contact us using the
+    information at the end of this consent form. We would also be happy to share
+    examples of papers we have published before so you can see how we use this
+    information without identifying participating families (except in cases
+    where they chose to share their video recordings with the public)."
+  data-sharing-header: Will you ever share my information with anyone else?
+  data-sharing-content:
+    Once your <u>study information</u> is de-identified (see <strong>“How do you
+    make sure my privacy is protected?”</strong>), it will be shared with other
+    Project GARDEN researchers at other universities and will be used to write
+    up research findings which will be shared with the public. The de-identified
+    study information will also eventually be shared with the public so other
+    researchers can verify these findings and also see if there are other
+    important things we can learn from the information. This will allow
+    educators, families and other researchers to use the findings to
+    {data_sharing_learn}.<br><br>You will have full control over which Project
+    GARDEN studies you do or do not wish to participate in. You are only
+    agreeing to participate in {experiment} with this consent form.
+  research-rights-irb-header: What is the {institution} IRB and what does it do?
+  research-rights-irb-content:
+    "The Institutional Review Board (IRB) is a department at {institution} that
+    makes sure the rights of people who participate in research are protected.
+    {include_irb_contact_statement, select, true {A representative of the IRB
+    may contact you to gather information about your experience participating in
+    this research. Just as with the research itself, you can choose to answer or
+    not answer any questions an IRB representative may ask you.} other
+    {}}<br><br>If you or your child has questions or concerns about your child's
+    rights as a research subject, or if you would like to obtain information,
+    offer input, or report a research-related issue, you may contact:
+    {irb_contact}. {irb_extra}"
+  lookit-info-header: Who is Lookit and what do they do with my information?
+  lookit-info-content:
+    Lookit is a website run by a group of researchers at MIT which you are using
+    right now to participate in this study. When you sign-up for Lookit, you
+    provide them with information about you and your family so that they can
+    find studies in which you can participate.<br><br>Because Lookit only exists
+    to help with research on the website, they do not use your information for
+    anything except running the site and only share your information with
+    researchers if you agree to participate in a study. The Lookit
+    administrative team has access to all three kinds of information (video
+    recordings, personal information, and study information) so they can check
+    and make sure that Lookit works well for all families and researchers and
+    make improvements to how Lookit works. Lookit stores the information on your
+    account for as long as you keep the Lookit account, but you have the option
+    to withdraw your information at any time.
+  voluntary-participation-header:
+    What happens if I choose not to participate or change my mind about
+    participating?
+  voluntary-participation-content:
+    "You and your child may choose to not participate in this study at any time.
+    You can also change your mind at any time. If you decide to not participate
+    or change your mind about participating later, there are no penalties and
+    you will not lose any benefits from this research.<br><br>If you do choose
+    to participate, it's okay to stop at any point during the session. Please do
+    feel free to pause, take a quick break, or stop the session if your child
+    becomes uncomfortable, bored, or decides they no longer wish to participate!"
+  video-sharing-header: Who will be able to see my video recordings?
+  video-sharing-consent:
+    At the start of the study, you will be asked to use your webcam to record
+    yourself consenting to participate in the study. This is called your consent
+    recording, and we will review it  to confirm you agreed to be in the study
+    and are eligible. We will never share it or use it for any other purpose.
+  video-sharing-study-all-1:
+    'As part of the study, you will be asked to use your webcam to record you
+    and your child as you go through the study itself. At the end of the study,
+    we will give you some choices about if and when we can share those
+    recordings. These are the choices:<br><br><ul><li><strong>Private</strong>:
+    "Keep my videos private": Your video recordings will only be used for this
+    study and will not be shared with anyone else (not even with other Project
+    GARDEN researchers).</li><li><strong>Scientific and educational</strong>:
+    "You can only share my video recordings for scientific purposes". Your video
+    recordings can be shared for scientific or educational purposes, like
+    showing an example in a university class, showing an example to other
+    researchers at a scientific conference, or sharing with other Project GARDEN
+    researchers.</li><li><strong>Publicity</strong>: “You can share my video
+    recordings with the public”. Although we will never mention your name or
+    other personal information, your video recordings can be added to public
+    research databases or shared with the public, for example in a news segment
+    about the research or to recruit more participants.</li></ul>'
+  video-sharing-study-all-databrary:
+    "If you choose “Scientific and educational” or “publicity” sharing, you can
+    also choose for your videos to be added to “Databrary”, which is a nonprofit
+    video database at New York University which can only be accessed by
+    authorized researchers like us and be used for non-profit scientific and
+    educational purposes only. You can read more about Databrary here:
+    https://databrary.org/about.html.<br><br>"
+  video-sharing-study-all-2:
+    "You can also choose to remove your video recordings from the study entirely
+    in Lookit. If you do, only your consent recording will be kept and all other
+    video recordings will be deleted."
+  video-sharing-study-private:
+    Researchers with access to your recordings will not share them with anyone
+    else. At the end of the session, you will have the option to withdraw your
+    recordings. If you do, only your consent recording will be kept and all
+    other recordings will be deleted.
+  databrary-header: Databrary Authorization for Sharing option
+  databrary-content:
+    Separately, you can opt in to give access to your recordings and other data
+    to authorized users of the secure data library Databrary. This means that
+    other researchers besides the ones running this study will have access to
+    your recordings, and may be able to use them to answer other questions about
+    child development. Data sharing can lead to faster progress in research on
+    human development and behavior. Authorized Databrary researchers have to
+    agree to maintain confidentiality and not use the data for commercial
+    purposes. If you have any questions about this data-sharing library, visit
+    <a href="https://nyu.databrary.org/" target="_blank" rel="noopener
+    noreferrer">Databrary</a> or email ethics@databrary.org.
+  contact-header: How to contact us
+  contact-content:
+    This study is run by {name} at {institution}. If you or your child have any
+    questions or concerns about this study, or in the very unlikely event of a
+    research-related injury, please contact {contact}.<br><br>If you or your
+    child have any questions or concerns about the Lookit platform, please
+    contact Lookit staff at lookit@mit.edu.
+
+exp-lookit-observation:
+  Hide: Hide
+  Show: Show
+  webcam-feed-not-displayed: Webcam feed <br>not displayed
+  Recording: Recording
+  not-recording-yet: Not recording
+  Record: Record
+  recording-required-warning: Recording required to continue
+  stopping-and-uploading: Stopping and uploading
+  Paused: Paused
+
+exp-video-config:
+  title: Webcam setup
+  not-recording-note: No recording during this section
+  Microphone: Microphone
+  Camera: Camera
+  Note: Note
+  support-message:
+    Lookit is currently only supported on recent versions of Firefox and Chrome.
+    It doesn't work on mobile devices like phones or tablets yet!
+  no-connection:
+    We couldn't connect to your webcam. Please make sure you have a webcam
+    connected and
+  click-here-to-detect: click here to detect
+  see-troubleshooting:
+    See the troubleshooting directions below if you're having trouble!
+  step-1:
+    Make sure you can see yourself to the left! You may need to click "Allow" so
+    that we can access your webcam and microphone. On Firefox, make sure to also
+    check "Remember this decision"!
+  looks-good: Looks good!
+  no-webcam-detected: No webcam detected
+  step-2-click-directions: Make sure your webcam settings got saved by clicking
+  reload-button-label: this button
+  step-2-what-should-happen:
+    Your webcam should re-appear WITHOUT you having to allow access again. (If
+    you do see a dialogue, click "Remember this decision" or "Always allow" and
+    try again!)
+  step-3:
+    Make sure we'll be able to hear you! This box will be filled in once we hear
+    a loud enough sound
+  sounds-good: Sounds good!
+  try-clapping: Try clapping or saying hi.
+  step-2-warning:
+    Please press the 'reload webcam' button first to make sure it shows up again
+    without making you click to allow.
+  step-3-warning:
+    Please check that your recording audio is loud enough first. Make some
+    noise!
+  camera-access-warning:
+    We don't seem to have camera access. Are you on a computer (not a phone or
+    tablet), and using Chrome or Firefox? If so, see the troubleshooting info
+    below.
+  setup-tips-header: Setup tips and troubleshooting
+  supported-setup: Check your device and browser
+  mobile-devices:
+    Are you using a phone or tablet? Lookit only works on computers so far -
+    we're hoping to support mobile devices soon! Please visit again from a
+    computer.
+  browser-support:
+    Are you using a web browser other than Chrome or Firefox (like Internet
+    Explorer or Safari)? If so, please try again using Chrome or Firefox. These
+    are the only browsers Lookit currently supports.
+  chrome-instructions-header: Camera setup instructions for Chrome
+  chrome-directions-prompt:
+    When you load this page for the first time, you should see a prompt like the
+    one below. Click "Allow" to let Lookit access the webcam and microphone.
+  chrome-directions-set-perms:
+    If you didn't see that prompt, or if you clicked "Block," you can change the
+    settings by clicking on the green lock icon next to the URL. Set Camera and
+    Microphone (and Sound if it's shown) all to "Allow," and then refresh this
+    page.
+  chrome-select-mic:
+    <em>Having trouble passing the sound check?</em> Chrome may be using the
+    wrong input device - unfortunately it doesn't let you pick which microphone
+    when you click "Allow". You can select the correct microphone at
+    chrome://settings/content/microphone (copy and paste that as a URL). Then
+    refresh this page to try again.
+  chrome-select-camera:
+    <em>Seeing the wrong camera view</em> - like your built-in laptop camera
+    instead of a USB webcam? You can select the correct camera at
+    chrome://settings/content/camera (copy and paste that as a URL). Then
+    refresh this page to try again.
+  chrome-further-help:
+    You can also refer to <a
+    href="https://support.google.com/chrome/answer/2693767?hl=en"
+    target="_blank" rel="noopener noreferrer"> these directions from Chrome
+    </a>.
+  firefox-instructions-header: Camera setup instructions for Firefox
+  firefox-directions-prompt:
+    When you load this page for the first time, you should see a prompt like the
+    one below. Select the camera and microphone you want to use, check "Remember
+    this decision," and click "Allow".
+  firefox-directions-set-perms:
+    If you didn't see that prompt, or if you clicked "Don't Allow" at first, you
+    can change the settings by clicking on crossed-out camera and/or microphone
+    next to the URL. Click the "X" next to each setting, then refresh the page.
+  additional-troubleshooting-header:
+    It's just not working - what else can I try?
+  additional-troubleshooting-intro:
+    First, you are a very dedicated citizen scientist and we're grateful for
+    your help! We're sorry you're having trouble.
+  camera-check:
+    Make sure you're able to view your webcam video outside of Lookit. (For
+    example, on a Mac, try Photobooth.)
+  try-another-browser:
+    The easiest approach is to try a different web browser if you have one
+    installed anyway. For instance, if you're using Firefox, switch to Chrome,
+    or vice versa. Also, update the browser if you're not using the latest
+    version. You can check by going to "Chrome" -> "About Chrome" or "Firefox"
+    -> "About Firefox" in the menu bar. (This is a good idea to make sure you've
+    gotten any security updates anyway.)
+  chrome-incognito:
+    Using Chrome? Make sure you're not using an Incognito window - you won't be
+    able to save and use settings throughout the study.
+  additional-troubleshooting-contact:
+    If you're stumped, it's our fault. Please let us know so we can improve the
+    site! Email us at lookit-tech@mit.edu with a short description of what's
+    happening. Please include the web browser you're using (Firefox, Chrome, IE,
+    Safari, etc.), what steps you've tried, and this session ID
+
+exp-video-config-quality:
+  checkbox-warning:
+    Please check off the "{completedItemText}" box under each instruction before
+    continuing.
+  recording-warning: Please try recording and viewing a video before continuing.

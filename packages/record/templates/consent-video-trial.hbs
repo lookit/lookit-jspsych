@@ -1,0 +1,43 @@
+<div id="consent-video-trial">
+  <div class="left-column">{{{consent}}}</div>
+  <div class="right-column">
+    <div id="{{video_container_id}}" class="jspsych-content"></div>
+
+    <ol>
+      <li>{{t "exp-lookit-video-consent.consent-step-1"}}.</li>
+      <li>{{t "exp-lookit-video-consent.click-to"}}
+        <button class="jspsych-btn" id="record">
+          {{t "exp-lookit-video-consent.start-consent-recording"}}...
+        </button>
+      </li>
+      <li>
+        {{{t "exp-lookit-video-consent.read-statement-below"}}}
+        {{t "exp-lookit-video-consent.signed-alternative"}}
+
+        <div class="consent-statement">
+          {{#if consent_statement_text}}
+            "{{consent_statement_text}}"
+          {{else if prompt_only_adults}}
+            "{{t "exp-lookit-video-consent.prompt-adult-only"}}"
+          {{else}}
+            "{{t "exp-lookit-video-consent.prompt"}}"
+          {{/if}}
+        </div>
+
+      </li>
+      <li>{{t "exp-lookit-video-consent.click-to"}}
+        <button class="jspsych-btn" id="stop" disabled>
+          {{t "exp-lookit-video-consent.stop-recording"}}
+        </button>
+      </li>
+      <li>
+        <button class="jspsych-btn" id="play" disabled>
+          {{t "exp-lookit-video-consent.play-consent-video-button"}}
+        </button>
+        {{t "exp-lookit-video-consent.review-video"}}
+      </li>
+    </ol>
+    <button id="next" class="jspsych-btn" disabled>Next</button>
+  </div>
+
+</div>
