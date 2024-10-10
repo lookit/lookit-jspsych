@@ -23,8 +23,8 @@ export function makeRollupConfig(iifeName) {
 
   /**
    * Change warnings into errors. This will help us catch build concerns before
-   * they are in production. Also, hide known circular dependency warnings. This is
-   * copied from Rollup's documentation:
+   * they are in production. Also, hide known circular dependency warnings. This
+   * is copied from Rollup's documentation:
    * https://rollupjs.org/configuration-options/#onlog
    *
    * @param level - Message level
