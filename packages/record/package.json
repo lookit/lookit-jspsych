@@ -1,6 +1,6 @@
 {
   "name": "@lookit/record",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Recording extensions and plugins for CHS studies.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
@@ -46,7 +46,7 @@
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
-    "@lookit/data": "^0.0.2",
+    "@lookit/data": "^0.0.3",
     "jspsych": "^8.0.2"
   }
 }
