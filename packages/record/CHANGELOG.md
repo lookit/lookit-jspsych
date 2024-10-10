@@ -1,5 +1,14 @@
 # @lookit/record
 
+## 0.0.3
+
+### Patch Changes
+
+- 171a96c: Update to mkdocs config and python packages
+- 171a96c: Documentation for the video consent trial
+- Updated dependencies [171a96c]
+  - @lookit/data@0.0.3
+
 ## 0.0.2
 
 ### Patch Changes
