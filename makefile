@@ -1,5 +1,5 @@
 serve: poetry
-	poetry run mkdocs serve
+	poetry run mkdocs serve -a localhost:8888
 
 build: poetry
 	poetry run mkdocs build --strict

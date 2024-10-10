@@ -17,9 +17,7 @@ exclude_docs: |
   node_modules
   lookit-initjspsych/CHANGELOG.md
 theme:
-  name: mkdocs
-  color_mode: auto
-  user_color_mode_toggle: auto
+  name: readthedocs
 plugins:
   - search
   - macros
