@@ -1,6 +1,6 @@
 {
   "name": "@lookit/data",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "This is a JS implementation of lookit's RESTful API.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {

@@ -1,5 +1,14 @@
 # @lookit/lookit-initjspsych
 
+## 0.0.2
+
+### Patch Changes
+
+- 07ce665: Update code formatting
+- Updated dependencies [f2cd2a8]
+- Updated dependencies [07ce665]
+  - @lookit/data@0.0.2
+
 ## 1.0.5
 
 ### Patch Changes
