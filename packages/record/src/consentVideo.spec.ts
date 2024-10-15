@@ -272,3 +272,7 @@ test("nextButton", () => {
 
   expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
 });
+
+test("Does video consent plugin return chsData correctly?", () => {
+  expect(VideoConsentPlugin.chsData()).toMatchObject({ chs_type: "consent" });
+});

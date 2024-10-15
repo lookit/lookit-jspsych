@@ -281,4 +281,15 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     const next = this.getButton(display, "next");
     next.addEventListener("click", () => this.jsPsych.finishTrial());
   }
+
+  /**
+   * Add CHS type to experiment data. This will enable Lookit API to run the
+   * "consent" Frame Action Dispatcher method after the experiment has
+   * completed. It looks like jsPsych uses snake case for these data.
+   *
+   * @returns Object containing CHS type.
+   */
+  public static chsData() {
+    return { chs_type: "consent" };
+  }
 }
