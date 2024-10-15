@@ -1,3 +1,4 @@
+import Data from "@lookit/data";
 import { LookitWindow } from "@lookit/data/dist/types";
 import Handlebars from "handlebars";
 import { initJsPsych, PluginInfo, TrialType } from "jspsych";
@@ -13,7 +14,22 @@ import Recorder from "./recorder";
 
 declare const window: LookitWindow;
 
+window.chs = {
+  study: {
+    attributes: {
+      name: "name",
+      duration: "duration",
+    },
+  },
+  response: {
+    id: "some id",
+  },
+} as typeof window.chs;
+
 jest.mock("./recorder");
+jest.mock("@lookit/data", () => ({
+  updateResponse: jest.fn().mockReturnValue("Response"),
+}));
 
 test("Instantiate recorder", () => {
   const jsPsych = initJsPsych();
@@ -26,15 +42,6 @@ test("Trial", () => {
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
   const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
-
-  window.chs = {
-    study: {
-      attributes: {
-        name: "name",
-        duration: "duration",
-      },
-    },
-  } as typeof window.chs;
 
   plugin["recordFeed"] = jest.fn();
   plugin["recordButton"] = jest.fn();
@@ -263,14 +270,25 @@ test("nextButton", () => {
   const display = document.createElement("div");
 
   display.innerHTML = Handlebars.compile(consentVideoTrial)({});
-  jsPsych.finishTrial = jest.fn();
+  plugin["endTrial"] = jest.fn();
 
   plugin["nextButton"](display);
   display
     .querySelector<HTMLButtonElement>("button#next")!
     .dispatchEvent(new Event("click"));
 
-  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+  expect(plugin["endTrial"]).toHaveBeenCalledTimes(1);
+});
+
+test("endTrial", () => {
+  const jsPsych = initJsPsych();
+  const plugin = new VideoConsentPlugin(jsPsych);
+
+  plugin["endTrial"]();
+
+  expect(Data.updateResponse).toHaveBeenCalledWith(window.chs.response.id, {
+    completed_consent_frame: true,
+  });
 });
 
 test("Does video consent plugin return chsData correctly?", () => {
