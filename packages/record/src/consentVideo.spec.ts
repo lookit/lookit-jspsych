@@ -2,6 +2,7 @@ import { LookitWindow } from "@lookit/data/dist/types";
 import Handlebars from "handlebars";
 import { initJsPsych, PluginInfo, TrialType } from "jspsych";
 import consentVideoTrial from "../templates/consent-video-trial.hbs";
+import playbackFeed from "../templates/playback-feed.hbs";
 import recordFeed from "../templates/record-feed.hbs";
 import { VideoConsentPlugin } from "./consentVideo";
 import {
@@ -271,4 +272,8 @@ test("nextButton", () => {
     .dispatchEvent(new Event("click"));
 
   expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+});
+
+test("Video playback should not be muted", () => {
+  expect(playbackFeed).not.toContain("muted");
 });
