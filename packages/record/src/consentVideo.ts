@@ -280,7 +280,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
    */
   private nextButton(display: HTMLElement) {
     const next = this.getButton(display, "next");
-    next.addEventListener("click", () => this.endTrial());
+    next.addEventListener("click", this.endTrial);
   }
 
   /**
