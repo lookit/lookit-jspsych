@@ -1,3 +1,4 @@
+import Data from "@lookit/data";
 import { LookitWindow } from "@lookit/data/dist/types";
 import Handlebars from "handlebars";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
@@ -279,13 +280,24 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
    */
   private nextButton(display: HTMLElement) {
     const next = this.getButton(display, "next");
-    next.addEventListener("click", () => this.jsPsych.finishTrial());
+    next.addEventListener("click", () => this.endTrial());
+  }
+
+  /**
+   * Mark the response in the lookit-api database as having completed the consent frame,
+   * then finish the trial.
+   */
+  private async endTrial() {
+    await Data.updateResponse(window.chs.response.id, {
+      completed_consent_frame: true,
+    });
+    this.jsPsych.finishTrial();
   }
 
   /**
    * Add CHS type to experiment data. This will enable Lookit API to run the
    * "consent" Frame Action Dispatcher method after the experiment has
-   * completed. It looks like jsPsych uses snake case for these data.
+   * completed.
    *
    * @returns Object containing CHS type.
    */
