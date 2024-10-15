@@ -284,8 +284,8 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
   }
 
   /**
-   * Mark the response in the lookit-api database as having completed the consent frame,
-   * then finish the trial.
+   * Mark the response in the lookit-api database as having completed the
+   * consent frame, then finish the trial.
    */
   private async endTrial() {
     await Data.updateResponse(window.chs.response.id, {
