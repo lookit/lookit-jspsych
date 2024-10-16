@@ -1,7 +1,3 @@
-// import { makeRollupConfig } from "@jspsych/config/rollup";
-// // This package name needs to be unique
-// export default makeRollupConfig("chsTemplates");
-
 import nodePolyfills from "rollup-plugin-polyfill-node";
 import { importAsString } from "rollup-plugin-string-import";
 import { makeRollupConfig } from "../../rollup.mjs";
