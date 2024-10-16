@@ -14,6 +14,7 @@
   "license": "ISC",
   "author": "Christopher J Green <okaycj@mit.edu> (https://github.com/okaycj)",
   "main": "dist/index.js",
+  "unpkg": "dist/index.browser.min.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "rollup --config",
