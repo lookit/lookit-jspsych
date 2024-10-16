@@ -19,7 +19,7 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "changeset": "changeset",
-    "clean": "trash \"./packages/**/dist\" \"./packages/**/coverage\" \"./packages/**/node_modules\" \"./node_modules\"",
+    "clean": "trash \"./packages/**/dist\" \"./packages/**/coverage\" \"./packages/**/node_modules\" \"./node_modules\" \"./site\"",
     "fix": "prettier './' -lw && eslint './packages/**/src/**/*.ts' --fix",
     "format": "prettier './' -c",
     "lint": "eslint './packages/**/src/**/*.ts'",
