@@ -2,6 +2,7 @@
 // // This package name needs to be unique
 // export default makeRollupConfig("chsTemplates");
 
+import nodePolyfills from "rollup-plugin-polyfill-node";
 import { importAsString } from "rollup-plugin-string-import";
 import { makeRollupConfig } from "../../rollup.mjs";
 
@@ -15,6 +16,8 @@ export default makeRollupConfig("chsTemplates").map((config) => {
       importAsString({
         include: ["**/*.yaml", "**/*.hbs"],
       }),
+      // Handlebars requires node polyfills.
+      nodePolyfills(),
     ],
   };
 });
