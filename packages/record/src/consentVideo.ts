@@ -1,4 +1,5 @@
 import Data from "@lookit/data";
+import { LookitWindow } from "@lookit/data/dist/types";
 import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import { version } from "../package.json";
@@ -8,6 +9,8 @@ import {
   VideoContainerNotFoundError,
 } from "./errors";
 import Recorder from "./recorder";
+
+declare const window: LookitWindow;
 
 const info = <const>{
   name: "consent-video",
