@@ -1,11 +1,11 @@
 import Data from "@lookit/data";
 import Handlebars from "handlebars";
 import { initJsPsych } from "jspsych";
+import playbackFeed from "../hbs/playback-feed.hbs";
+import recordFeed from "../hbs/record-feed.hbs";
+import webcamFeed from "../hbs/webcam-feed.hbs";
 import play_icon from "../img/play-icon.svg";
 import record_icon from "../img/record-icon.svg";
-import playbackFeed from "../templates/playback-feed.hbs";
-import recordFeed from "../templates/record-feed.hbs";
-import webcamFeed from "../templates/webcam-feed.hbs";
 import {
   CreateURLError,
   NoStopPromiseError,

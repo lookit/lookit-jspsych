@@ -1,7 +1,7 @@
 import { clickTarget } from "@jspsych/test-utils";
 import Handlebars from "handlebars";
 import { initJsPsych, JsPsych } from "jspsych";
-import videoConfig from "../templates/video-config.hbs";
+import videoConfig from "../hbs/video-config.hbs";
 import { NoStreamError } from "./errors";
 import chromeInitialPrompt from "./img/chrome_initialprompt.png";
 import chromeAlwaysAllow from "./img/chrome_step1_alwaysallow.png";

@@ -2,9 +2,9 @@ import Data from "@lookit/data";
 import { LookitWindow } from "@lookit/data/dist/types";
 import Handlebars from "handlebars";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
+import consentDocTemplate from "../hbs/consent-document.hbs";
+import consentVideoTrialTemplate from "../hbs/consent-video-trial.hbs";
 import { version } from "../package.json";
-import consentDocTemplate from "../templates/consent-document.hbs";
-import consentVideoTrialTemplate from "../templates/consent-video-trial.hbs";
 import {
   ButtonNotFoundError,
   ImageNotFoundError,
