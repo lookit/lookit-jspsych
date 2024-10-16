@@ -25,7 +25,8 @@
     "test": "jest --coverage"
   },
   "devDependencies": {
-    "@jspsych/config": "^3.0.0"
+    "@jspsych/config": "^3.0.0",
+    "handlebars": "^4.7.8"
   },
   "peerDependencies": {
     "jspsych": "^8.0.2"
