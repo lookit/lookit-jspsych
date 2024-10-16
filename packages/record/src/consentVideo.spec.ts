@@ -1,8 +1,8 @@
 import Data from "@lookit/data";
 import { LookitWindow } from "@lookit/data/dist/types";
+import chsTemplates from "@lookit/templates";
 import Handlebars from "handlebars";
 import { initJsPsych, PluginInfo, TrialType } from "jspsych";
-import consentVideoTrial from "../hbs/consent-video-trial.hbs";
 import playbackFeed from "../hbs/playback-feed.hbs";
 import recordFeed from "../hbs/record-feed.hbs";
 import { VideoConsentPlugin } from "./consentVideo";
@@ -116,8 +116,9 @@ test("onEnded", () => {
   const play = document.createElement("button");
   const next = document.createElement("button");
   const record = document.createElement("button");
+  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
 
-  display.innerHTML = Handlebars.compile(consentVideoTrial)({});
+  display.innerHTML = chsTemplates.consentVideo(trial);
   plugin["recordFeed"] = jest.fn();
   plugin["getButton"] = jest.fn().mockImplementation((_display, id) => {
     switch (id) {
@@ -134,7 +135,8 @@ test("onEnded", () => {
     } else if (id === "next") {
       return next;
     }
-    return;
+
+    return "";
   });
 
   plugin["onEnded"](display)();
@@ -150,8 +152,9 @@ test("getButton", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
+  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
 
-  display.innerHTML = Handlebars.compile(consentVideoTrial)({});
+  display.innerHTML = chsTemplates.consentVideo(trial);
 
   expect(plugin["getButton"](display, "next").id).toStrictEqual("next");
 });
@@ -179,10 +182,12 @@ test("recordButton", async () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
+  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
+
+  display.innerHTML = chsTemplates.consentVideo(trial);
 
   display.innerHTML =
-    Handlebars.compile(consentVideoTrial)({}) +
-    Handlebars.compile(recordFeed)({});
+    chsTemplates.consentVideo(trial) + Handlebars.compile(recordFeed)({});
 
   plugin["recordButton"](display);
 
@@ -223,10 +228,11 @@ test("playButton", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
+  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
 
   plugin["playbackFeed"] = jest.fn();
 
-  display.innerHTML = Handlebars.compile(consentVideoTrial)({});
+  display.innerHTML = chsTemplates.consentVideo(trial);
 
   plugin["playButton"](display);
 
@@ -243,11 +249,10 @@ test("stopButton", async () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
+  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
 
   display.innerHTML =
-    Handlebars.compile(consentVideoTrial)({
-      video_container_id: plugin["video_container_id"],
-    }) + Handlebars.compile(recordFeed)({});
+    chsTemplates.consentVideo(trial) + Handlebars.compile(recordFeed)({});
 
   plugin["recordFeed"] = jest.fn();
   plugin["stopButton"](display);
@@ -269,8 +274,9 @@ test("nextButton", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
+  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
 
-  display.innerHTML = Handlebars.compile(consentVideoTrial)({});
+  display.innerHTML = chsTemplates.consentVideo(trial);
   plugin["endTrial"] = jest.fn();
 
   plugin["nextButton"](display);
