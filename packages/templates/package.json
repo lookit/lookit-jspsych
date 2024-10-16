@@ -1,0 +1,33 @@
+{
+  "name": "@lookit/templates",
+  "version": "0.0.0",
+  "description": "CHS jsPsych trial templates and their translations",
+  "main": "dist/index.js",
+  "unpkg": "dist/index.browser.min.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "test": "jest --coverage",
+    "dev": "rollup --config rollup.config.dev.mjs --watch",
+    "build": "rollup --config"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lookit/lookit-jspsych.git"
+  },
+  "author": "Christopher J Green <okaycj@mit.edu> (https://github.com/okaycj)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lookit/lookit-jspsych/issues"
+  },
+  "homepage": "https://github.com/lookit/lookit-jspsych#readme",
+  "devDependencies": {
+    "@jspsych/config": "^3.0.0"
+  },
+  "peerDependencies": {
+    "jspsych": "^8.0.2"
+  }
+}
