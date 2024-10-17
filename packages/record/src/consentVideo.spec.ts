@@ -216,7 +216,7 @@ test("recordButton", async () => {
 
   // Start recorder
   expect(Recorder.prototype.start).toHaveBeenCalledTimes(1);
-  expect(Recorder.prototype.start).toHaveBeenCalledWith("consent");
+  expect(Recorder.prototype.start).toHaveBeenCalledWith(true, "consent-video");
 });
 
 test("playButton", () => {
