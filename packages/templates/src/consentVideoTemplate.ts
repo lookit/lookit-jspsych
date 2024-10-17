@@ -4,7 +4,7 @@ import { PluginInfo, TrialType } from "jspsych";
 import consent_template_5 from "../hbs/consent-template-5.hbs";
 import consentVideoTrialTemplate from "../hbs/consent-video-trial.hbs";
 import { ConsentTemplateNotFound } from "./errors";
-import { initI18nAndHelpers } from "./utils";
+import { setLocale } from "./utils";
 
 declare const window: LookitWindow;
 
@@ -20,7 +20,8 @@ export const consentVideo = (trial: TrialType<PluginInfo>) => {
   const experiment = window.chs.study.attributes;
   const { PIName, PIContact } = trial;
 
-  initI18nAndHelpers(trial);
+  setLocale(trial);
+
   const consentDocumentTemplate = consentDocument(trial);
 
   const consent = Handlebars.compile(consentDocumentTemplate)({

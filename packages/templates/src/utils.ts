@@ -12,10 +12,7 @@ import ja from "../i18n/ja.yaml";
 import nl from "../i18n/nl.yaml";
 import pt_br from "../i18n/pt-br.yaml";
 import pt from "../i18n/pt.yaml";
-import { TranslationNotFoundError } from "./errors";
-
-// TODO: Can this be in the global context.
-Handlebars.registerHelper("exp-format", (context) => expFormat(context));
+import { LocaleNotFoundError } from "./errors";
 
 /**
  * Pulled from EFP. Function to convert researcher's text to HTML.
@@ -38,45 +35,32 @@ export const expFormat = (text?: string | string[]) => {
 };
 
 /**
- * Get a translation file based on selected language.
+ * Get a translation resources from yaml files.
  *
- * @param lcl - Locale object with locale
- * @returns Translations from i18next
+ * @returns Resources for i18next
  */
-export const getTranslation = (lcl: Intl.Locale) => {
-  /**
-   * Switch case to find language from a string. Will throw error is language
-   * not found.
-   *
-   * @param baseName - Base name from locale (en-us)
-   * @returns Language yaml file
-   */
-  const getYaml = (baseName: string) => {
-    switch (baseName) {
-      case "en-US":
-        return en_us;
-      case "eu":
-        return eu;
-      case "fr":
-        return fr;
-      case "hu":
-        return hu;
-      case "it":
-        return it;
-      case "ja":
-        return ja;
-      case "nl":
-        return nl;
-      case "pt-BR":
-        return pt_br;
-      case "pt":
-        return pt;
-      default:
-        throw new TranslationNotFoundError(baseName);
-    }
+const resources = () => {
+  const translations = {
+    "en-us": en_us,
+    eu,
+    fr,
+    hu,
+    it,
+    ja,
+    nl,
+    "pt-br": pt_br,
+    pt,
   };
 
-  return Yaml.load(getYaml(lcl.baseName)) as Record<string, string>;
+  return Object.entries(translations).reduce((prev, [locale, translation]) => {
+    const lcl = new Intl.Locale(locale);
+    return {
+      ...prev,
+      [lcl.baseName]: {
+        translation: Yaml.load(translation) as Record<string, string>,
+      },
+    };
+  }, {});
 };
 
 /**
@@ -84,39 +68,27 @@ export const getTranslation = (lcl: Intl.Locale) => {
  *
  * @param trial - Trial data including user supplied parameters.
  */
-const initI18next = (trial: TrialType<PluginInfo>) => {
-  const debug = process.env.DEBUG === "true";
-  // TODO: Catch Locale error when bad locale
-  const lcl = new Intl.Locale(trial.locale);
-  const translation = getTranslation(lcl);
-
-  i18next.use(ICU).init({
-    lng: lcl.baseName,
-    debug,
-    resources: {
-      [lcl.language]: {
-        translation,
-      },
-    },
-  });
+export const setLocale = (trial: TrialType<PluginInfo>) => {
+  try {
+    const lcl = new Intl.Locale(trial.locale);
+    if (i18next.language !== lcl.baseName) {
+      i18next.changeLanguage(lcl.baseName);
+    }
+  } catch (error) {
+    if (error instanceof RangeError) {
+      throw new LocaleNotFoundError(trial.locale);
+    } else {
+      throw error;
+    }
+  }
 };
 
-/**
- * Initialize handlebars helpers. This could be done globally, but it does go
- * hand in hand with initializing i18n.
- */
-const initHandlebars = () => {
-  Handlebars.registerHelper("t", (context, { hash }) =>
-    i18next.t(context, hash),
-  );
-};
+// Initialize translations
+i18next.use(ICU).init({
+  debug: process.env.DEBUG === "true",
+  resources: resources(),
+});
 
-/**
- * Initialize both i18next and Handlebars.
- *
- * @param trial - Yup
- */
-export const initI18nAndHelpers = (trial: TrialType<PluginInfo>) => {
-  initI18next(trial);
-  initHandlebars();
-};
+// Setup Handlebars' helpers
+Handlebars.registerHelper("exp-format", (context) => expFormat(context));
+Handlebars.registerHelper("t", (context, { hash }) => i18next.t(context, hash));

@@ -1,12 +1,12 @@
-/** Error throw what specified language isn't found */
-export class TranslationNotFoundError extends Error {
+/** Error thrown when specified language isn't found */
+export class LocaleNotFoundError extends Error {
   /**
    * This will be thrown when attempting to init i18n
    *
    * @param baseName - Language a2code with region
    */
   public constructor(baseName: string) {
-    super(`"${baseName}" translation not found.`);
+    super(`"${baseName}" locale not found.`);
   }
 }
 /** Error thrown when researcher selects template that isn't available. */
