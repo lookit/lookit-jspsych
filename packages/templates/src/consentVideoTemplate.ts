@@ -1,9 +1,10 @@
 import { LookitWindow } from "@lookit/data/dist/types";
 import Handlebars from "handlebars";
 import { PluginInfo, TrialType } from "jspsych";
-import consentDocumentTemplate from "../hbs/consent-document.hbs";
+import consent_template_5 from "../hbs/consent-template-5.hbs";
 import consentVideoTrialTemplate from "../hbs/consent-video-trial.hbs";
-import { initI18nAndTemplates } from "./utils";
+import { ConsentTemplateNotFound } from "./errors";
+import { initI18nAndHelpers } from "./utils";
 
 declare const window: LookitWindow;
 
@@ -19,7 +20,8 @@ export const consentVideo = (trial: TrialType<PluginInfo>) => {
   const experiment = window.chs.study.attributes;
   const { PIName, PIContact } = trial;
 
-  initI18nAndTemplates(trial);
+  initI18nAndHelpers(trial);
+  const consentDocumentTemplate = consentDocument(trial);
 
   const consent = Handlebars.compile(consentDocumentTemplate)({
     ...trial,
@@ -33,4 +35,19 @@ export const consentVideo = (trial: TrialType<PluginInfo>) => {
     consent,
     video_container_id,
   });
+};
+
+/**
+ * Get consent template by name.
+ *
+ * @param trial - Trial data including user supplied parameters.
+ * @returns Consent template
+ */
+const consentDocument = (trial: TrialType<PluginInfo>) => {
+  switch (trial.template) {
+    case "consent-template-5":
+      return consent_template_5;
+    default:
+      throw new ConsentTemplateNotFound(trial.template);
+  }
 };
