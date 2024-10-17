@@ -1,5 +1,12 @@
 # @lookit/data
 
+## 0.0.4
+
+### Patch Changes
+
+- b111054: Update rollup config to hide known circular warnings
+- 888be3d: Update to unpkg config
+
 ## 0.0.3
 
 ### Patch Changes
