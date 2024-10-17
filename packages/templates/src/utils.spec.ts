@@ -1,4 +1,6 @@
-import { expFormat } from "./utils";
+import { PluginInfo, TrialType } from "jspsych";
+import { LocaleNotFoundError } from "./errors";
+import { expFormat, setLocale } from "./utils";
 
 test("expFormat convert written text to format well in HTML", () => {
   expect(expFormat("abcdefg")).toStrictEqual("abcdefg");
@@ -17,4 +19,9 @@ test("expFormat convert written text to format well in HTML", () => {
   expect(expFormat("\tTabbed text")).toStrictEqual(
     "&nbsp;&nbsp;&nbsp;&nbsp;Tabbed text",
   );
+});
+
+test("setLocale throw error with non-existing locale", () => {
+  const trial = { locale: "non-existing" } as unknown as TrialType<PluginInfo>;
+  expect(() => setLocale(trial)).toThrow(LocaleNotFoundError);
 });

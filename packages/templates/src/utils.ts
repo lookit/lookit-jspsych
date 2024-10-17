@@ -69,17 +69,14 @@ const resources = () => {
  * @param trial - Trial data including user supplied parameters.
  */
 export const setLocale = (trial: TrialType<PluginInfo>) => {
-  try {
-    const lcl = new Intl.Locale(trial.locale);
-    if (i18next.language !== lcl.baseName) {
-      i18next.changeLanguage(lcl.baseName);
-    }
-  } catch (error) {
-    if (error instanceof RangeError) {
-      throw new LocaleNotFoundError(trial.locale);
-    } else {
-      throw error;
-    }
+  const lcl = new Intl.Locale(trial.locale);
+
+  if (!i18next.hasResourceBundle(lcl.baseName, "translation")) {
+    throw new LocaleNotFoundError(trial.locale);
+  }
+
+  if (i18next.language !== lcl.baseName) {
+    i18next.changeLanguage(lcl.baseName);
   }
 };
 
