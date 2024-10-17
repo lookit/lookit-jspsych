@@ -149,14 +149,18 @@ const videoConsent = {
 
 ### Parameters
 
+Parameter names are shown below, along with their type and default value. If the
+default value is _undefined_, then a value is required for that parameter.
+
 #### Standard fields
 
 **`locale` [String | "en-us"]**
 
-Set this parameter to the languages 2 letter code. In some cases, a regional
-code will have to be provided as well. For example, we currently support english
-only from the US region. Therefore, to get the US english translation you would
-put "en-US" for the locale. We support the following language codes:
+Optional parameter to set a two-letter language code for translation. In some
+cases, a regional code will have to be provided as well. For example, we
+currently support english only from the US region. Therefore, to get the US
+english translation you would put "en-US" for the locale. We support the
+following language codes:
 
 | Language       | Region | Code  |
 | -------------- | ------ | ----- |
@@ -176,16 +180,16 @@ Which consent document template to use. If you are setting up a new study, we
 recommend using the most recent (highest number) of these options. Options:
 `consent_005`
 
-**`additional_video_privacy_statement` [String]**
+**`additional_video_privacy_statement` [String | ""]**
 
 Optional additional text for under header “Who can see our webcam recordings”.
 For cases where researchers ask for other specific permission to share videos,
 separate from the exit survey, or want to provide more detail or different
 language about Databrary sharing.
 
-**`datause` [String]**
+**`datause` [String | ""]**
 
-Study-specific data use statement (optional). This will follow more general text
+Optional study-specific data use statement. This will follow more general text
 like: “The research group led by [PIName] at [institution] will have access to
 video and other data collected during this session. We will also have access to
 your account profile, demographic survey, and the child profile for the child
@@ -206,39 +210,39 @@ single planned study).
 
 Whether to include a section on GDPR.
 
-**`gdpr_personal_data` [String]**
+**`gdpr_personal_data` [String | ""]**
 
 List of types of personal information collected, for GDPR section only. Do not
 include special category information, which is listed separately.
 
-**`gdpr_sensitive_data` [String]**
+**`gdpr_sensitive_data` [String | ""]**
 
 List of types of special category information collected, for GDPR section only.
 Include all that apply: racial or ethnic origin; political opinions; religious
 or philosophical beliefs; trade union membership; processing of genetic data;
-biometric data; health data; and/or sex life or sexual orientation information
+biometric data; health data; and/or sex life or sexual orientation information.
 
-**`PIName` [String]**
+**`PIName` [String | _undefined_]**
 
-Name of PI running this study
+Name of PI running this study.
 
 **`include_databrary` [Boolean | false]**
 
 Whether to include a paragraph about Databrary under “Who can see our webcam
 recordings?”.
 
-**`institution` [String]**
+**`institution` [String | _undefined_]**
 
 Name of institution running this study (if ambiguous, list institution whose IRB
-approved the study)’
+approved the study).
 
-**`PIContact` [String]**
+**`PIContact` [String | _undefined_]**
 
 Contact information for PI or lab in case of participant questions or concerns.
 This will directly follow the phrase “please contact”, so format accordingly:
 e.g., “the XYZ lab at xyz@science.edu” or “Mary Smith at 123 456 7890”.
 
-**`payment` [String]**
+**`payment` [String | _undefined_]**
 
 Statement about payment/compensation for participation, including a statement
 that there are no additional benefits anticipated to the participant. E.g.,
@@ -264,7 +268,7 @@ IRB has a hard restriction against even offering participants the option to
 share their videos more broadly, and in conjunction with the corresponding
 restriction of options in the exit survey!
 
-**`procedures` [String]**
+**`procedures` [String | _undefined_]**
 
 Brief description of study procedures. For consent templates 001 and 002, this
 should include any risks or a statement that there are no anticipated risks.
@@ -278,7 +282,7 @@ child smile. We will ask you (the parent) to turn around to avoid influencing
 your child’s responses. There are no anticipated risks associated with
 participating.”
 
-**`purpose` [String]**
+**`purpose` [String | _undefined_]**
 
 Brief description of purpose of study - 1-2 sentences that describe what you are
 trying to find out. Language should be as straightforward and accessible as
@@ -293,12 +297,12 @@ rights or remedies because of your participation in this research study. If you
 feel you have been treated unfairly, or you have questions regarding your rights
 as a research subject, you may contact [CONTACT INFO].
 
-**`risk_statement` [String]**
+**`risk_statement` [String | ""]**
 
 Optional statement; if provided, it is displayed under a header “Are there any
 risks if you participate?”.
 
-**`voluntary_participation` [String]**
+**`voluntary_participation` [String | ""]**
 
 Optional additional text for under header “Participation is voluntary”. E.g.,
 “There are two sessions in this study; you will be invited to complete another
