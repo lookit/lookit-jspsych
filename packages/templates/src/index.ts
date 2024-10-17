@@ -1,3 +1,3 @@
-import { consentVideo } from "./consentVideo";
+import { consentVideo } from "./consentVideoTemplate";
 
 export default { consentVideo };

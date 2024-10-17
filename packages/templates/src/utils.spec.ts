@@ -1,15 +1,6 @@
-import Yaml from "js-yaml";
-import en_us from "../i18n/en-us.yaml";
-import eu from "../i18n/eu.yaml";
-import fr from "../i18n/fr.yaml";
-import hu from "../i18n/hu.yaml";
-import it from "../i18n/it.yaml";
-import ja from "../i18n/ja.yaml";
-import nl from "../i18n/nl.yaml";
-import pt_br from "../i18n/pt-br.yaml";
-import pt from "../i18n/pt.yaml";
-import { TranslationNotFoundError } from "./errors";
-import { expFormat, getTranslation } from "./utils";
+import { PluginInfo, TrialType } from "jspsych";
+import { LocaleNotFoundError } from "./errors";
+import { expFormat, setLocale } from "./utils";
 
 test("expFormat convert written text to format well in HTML", () => {
   expect(expFormat("abcdefg")).toStrictEqual("abcdefg");
@@ -30,26 +21,7 @@ test("expFormat convert written text to format well in HTML", () => {
   );
 });
 
-test("Get translation file for specified locale", () => {
-  const translations = {
-    ja,
-    pt,
-    eu,
-    fr,
-    hu,
-    it,
-    nl,
-    "en-us": en_us,
-    "pt-br": pt_br,
-  };
-
-  for (const [k, v] of Object.entries<string>(translations)) {
-    expect(getTranslation(new Intl.Locale(k))).toStrictEqual(Yaml.load(v));
-  }
-
-  expect(pt_br).not.toStrictEqual(pt);
-
-  expect(() => getTranslation(new Intl.Locale("not-a2code"))).toThrow(
-    TranslationNotFoundError,
-  );
+test("setLocale throw error with non-existing locale", () => {
+  const trial = { locale: "non-existing" } as unknown as TrialType<PluginInfo>;
+  expect(() => setLocale(trial)).toThrow(LocaleNotFoundError);
 });

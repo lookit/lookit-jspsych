@@ -42,7 +42,10 @@ test("Trial", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
-  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
+  const trial = {
+    locale: "en-us",
+    template: "consent-template-5",
+  } as unknown as TrialType<PluginInfo>;
 
   plugin["recordFeed"] = jest.fn();
   plugin["recordButton"] = jest.fn();
@@ -116,7 +119,10 @@ test("onEnded", () => {
   const play = document.createElement("button");
   const next = document.createElement("button");
   const record = document.createElement("button");
-  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
+  const trial = {
+    locale: "en-us",
+    template: "consent-template-5",
+  } as unknown as TrialType<PluginInfo>;
 
   display.innerHTML = chsTemplates.consentVideo(trial);
   plugin["recordFeed"] = jest.fn();
@@ -152,7 +158,10 @@ test("getButton", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
-  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
+  const trial = {
+    locale: "en-us",
+    template: "consent-template-5",
+  } as unknown as TrialType<PluginInfo>;
 
   display.innerHTML = chsTemplates.consentVideo(trial);
 
@@ -182,7 +191,10 @@ test("recordButton", async () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
-  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
+  const trial = {
+    locale: "en-us",
+    template: "consent-template-5",
+  } as unknown as TrialType<PluginInfo>;
 
   display.innerHTML = chsTemplates.consentVideo(trial);
 
@@ -228,7 +240,10 @@ test("playButton", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
-  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
+  const trial = {
+    locale: "en-us",
+    template: "consent-template-5",
+  } as unknown as TrialType<PluginInfo>;
 
   plugin["playbackFeed"] = jest.fn();
 
@@ -249,7 +264,10 @@ test("stopButton", async () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
-  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
+  const trial = {
+    locale: "en-us",
+    template: "consent-template-5",
+  } as unknown as TrialType<PluginInfo>;
 
   display.innerHTML =
     chsTemplates.consentVideo(trial) + Handlebars.compile(recordFeed)({});
@@ -274,7 +292,10 @@ test("nextButton", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
-  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
+  const trial = {
+    locale: "en-us",
+    template: "consent-template-5",
+  } as unknown as TrialType<PluginInfo>;
 
   display.innerHTML = chsTemplates.consentVideo(trial);
   plugin["endTrial"] = jest.fn();
