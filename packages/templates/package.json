@@ -1,7 +1,7 @@
 {
-  "name": "@lookit/record",
-  "version": "0.0.3",
-  "description": "Recording extensions and plugins for CHS studies.",
+  "name": "@lookit/templates",
+  "version": "0.0.0",
+  "description": "CHS jsPsych trial templates and their translations",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
     "url": "https://github.com/lookit/lookit-jspsych/issues"
@@ -21,33 +21,16 @@
   ],
   "scripts": {
     "build": "rollup --config",
-    "buildMicCheck": "npx tsc src/mic_check.ts --target esnext --lib ESNext --types node,audioworklet --skipLibCheck true",
     "dev": "rollup --config rollup.config.dev.mjs --watch",
     "test": "jest --coverage"
   },
-  "dependencies": {
-    "auto-bind": "^5.0.1"
-  },
   "devDependencies": {
     "@jspsych/config": "^2.0.0",
-    "@jspsych/test-utils": "^1.2.0",
-    "@rollup/plugin-image": "^3.0.3",
-    "@rollup/plugin-replace": "^6.0.1",
-    "@types/audioworklet": "^0.0.60",
-    "@types/js-yaml": "^4.0.9",
-    "@types/node-polyglot": "^2.5.0",
     "handlebars": "^4.7.8",
-    "i18next": "^23.15.1",
-    "i18next-icu": "^2.3.0",
-    "js-yaml": "^4.1.0",
-    "rollup-plugin-dotenv": "^0.5.1",
-    "rollup-plugin-polyfill-node": "^0.13.0",
-    "rollup-plugin-string-import": "^1.2.4",
-    "typescript": "^5.6.2"
+    "rollup-plugin-polyfill-node": "^0.13.0"
   },
   "peerDependencies": {
     "@lookit/data": "^0.0.3",
-    "@lookit/templates": "^0.0.0",
     "jspsych": "^8.0.2"
   }
 }

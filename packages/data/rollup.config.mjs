@@ -2,9 +2,7 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 import dotenv from "rollup-plugin-dotenv";
 import { makeRollupConfig } from "../../rollup.mjs";
 
-export const iifeNameData = "chsData";
-
-export default makeRollupConfig(iifeNameData).map((config) => {
+export default makeRollupConfig("chsData").map((config) => {
   return {
     ...config,
     plugins: [

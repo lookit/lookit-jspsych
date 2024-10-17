@@ -1,5 +1,6 @@
 import Handlebars from "handlebars";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
+import video_config from "../hbs/video-config.hbs";
 import chromeInitialPrompt from "../img/chrome_initialprompt.png";
 import chromeAlwaysAllow from "../img/chrome_step1_alwaysallow.png";
 import chromePermissions from "../img/chrome_step1_permissions.png";
@@ -7,7 +8,6 @@ import firefoxInitialPrompt from "../img/firefox_initialprompt.png";
 import firefoxChooseDevice from "../img/firefox_prompt_choose_device.png";
 import firefoxDevicesBlocked from "../img/firefox_prompt_devices_blocked.png";
 import { version } from "../package.json";
-import video_config from "../templates/video-config.hbs";
 import { MicCheckError, NoStreamError } from "./errors";
 import Recorder from "./recorder";
 // import MicCheckProcessor from './mic_check';  // TO DO: fix or remove this. See: https://github.com/lookit/lookit-jspsych/issues/44

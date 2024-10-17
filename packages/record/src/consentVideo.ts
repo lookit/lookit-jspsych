@@ -1,17 +1,14 @@
 import Data from "@lookit/data";
 import { LookitWindow } from "@lookit/data/dist/types";
-import Handlebars from "handlebars";
+import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import { version } from "../package.json";
-import consentDocTemplate from "../templates/consent-document.hbs";
-import consentVideoTrialTemplate from "../templates/consent-video-trial.hbs";
 import {
   ButtonNotFoundError,
   ImageNotFoundError,
   VideoContainerNotFoundError,
 } from "./errors";
 import Recorder from "./recorder";
-import { initI18nAndTemplates } from "./utils";
 
 declare const window: LookitWindow;
 
@@ -91,30 +88,11 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
    * @param trial - Trial data including user supplied parameters.
    */
   public trial(display: HTMLElement, trial: TrialType<Info>) {
-    const { video_container_id } = this;
-    const experiment = window.chs.study.attributes;
-    const { PIName, PIContact } = trial;
-
-    // Initialize both i18next and Handlebars
-    initI18nAndTemplates(trial);
-
-    // Render left side (consent text)
-    const consent = Handlebars.compile(consentDocTemplate)({
-      ...trial,
-      name: PIName,
-      contact: PIContact,
-      experiment,
-    });
-
-    // Render whole document with above consent text
-    const consentVideoTrial = Handlebars.compile(consentVideoTrialTemplate)({
-      ...trial,
-      consent,
-      video_container_id,
-    });
+    // Get trial HTML string
+    const consentVideo = chsTemplates.consentVideo(trial);
 
     // Add rendered document to display HTML
-    display.insertAdjacentHTML("afterbegin", consentVideoTrial);
+    display.insertAdjacentHTML("afterbegin", consentVideo);
 
     // Video recording HTML
     this.recordFeed(display);
