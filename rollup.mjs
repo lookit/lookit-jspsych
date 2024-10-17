@@ -1,7 +1,6 @@
 /* eslint-disable func-style */
 
 import { makeRollupConfig as jsPsychMakeRollupConfig } from "@jspsych/config/rollup";
-import { iifeNameData } from "./packages/data/rollup.config.mjs";
 
 /**
  * Create rollup config for any package.
@@ -10,8 +9,10 @@ import { iifeNameData } from "./packages/data/rollup.config.mjs";
  * @returns Rollup config
  */
 export function makeRollupConfig(iifeName) {
-  const dataPackageName = "@lookit/data";
-
+  const packages = {
+    data: { name: "@lookit/data", iife: "chsData" },
+    templates: { name: "@lookit/templates", iife: "chsTemplates" },
+  };
   const knownCircularDeps = [
     "@smithy/util-stream/dist-es/blob/Uint8ArrayBlobAdapter.js",
     "@smithy/util-endpoints/dist-es/utils/callFunction.js",
@@ -33,7 +34,7 @@ export function makeRollupConfig(iifeName) {
    */
   const onLog = (level, log, handler) => {
     // Don't log known circular dependencies with the data package.
-    if (log.code === "CIRCULAR_DEPENDENCY" && iifeName === "chsData") {
+    if (log.code === "CIRCULAR_DEPENDENCY" && iifeName === packages.data.iife) {
       if (knownCircularDeps.some((value) => log.message.includes(value))) {
         return;
       }
@@ -49,19 +50,24 @@ export function makeRollupConfig(iifeName) {
   return jsPsychMakeRollupConfig(iifeName).map((config) => {
     return {
       ...config,
+      onLog,
       // Add data package as external dependency
-      external: [...config.external, dataPackageName],
+      external: [
+        ...config.external,
+        packages.data.name,
+        packages.templates.name,
+      ],
       output: config.output.map((output) => {
         return {
           ...output,
           globals: {
             ...output.globals,
             // Explicitly state data's iife name
-            [dataPackageName]: iifeNameData,
+            [packages.data.name]: packages.data.iife,
+            [packages.templates.name]: packages.templates.iife,
           },
         };
       }),
-      onLog,
     };
   });
 }

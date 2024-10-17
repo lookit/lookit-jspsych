@@ -5,3 +5,4 @@ Procfile
 .env
 site
 .DS_Store
+packages/style/**/*.js
