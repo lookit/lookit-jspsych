@@ -14,6 +14,9 @@ import pt_br from "../i18n/pt-br.yaml";
 import pt from "../i18n/pt.yaml";
 import { TranslationNotFoundError } from "./errors";
 
+// TODO: Can this be in the global context.
+Handlebars.registerHelper("exp-format", (context) => expFormat(context));
+
 /**
  * Pulled from EFP. Function to convert researcher's text to HTML.
  *
@@ -83,6 +86,7 @@ export const getTranslation = (lcl: Intl.Locale) => {
  */
 const initI18next = (trial: TrialType<PluginInfo>) => {
   const debug = process.env.DEBUG === "true";
+  // TODO: Catch Locale error when bad locale
   const lcl = new Intl.Locale(trial.locale);
   const translation = getTranslation(lcl);
 
@@ -105,7 +109,6 @@ const initHandlebars = () => {
   Handlebars.registerHelper("t", (context, { hash }) =>
     i18next.t(context, hash),
   );
-  Handlebars.registerHelper("exp-format", (context) => expFormat(context));
 };
 
 /**
@@ -113,7 +116,7 @@ const initHandlebars = () => {
  *
  * @param trial - Yup
  */
-export const initI18nAndTemplates = (trial: TrialType<PluginInfo>) => {
+export const initI18nAndHelpers = (trial: TrialType<PluginInfo>) => {
   initI18next(trial);
   initHandlebars();
 };
