@@ -10,9 +10,10 @@ jest.mock("./recorder");
 jest.mock("@lookit/data");
 jest.mock("jspsych", () => ({
   ...jest.requireActual("jspsych"),
-  initJsPsych: jest
-    .fn()
-    .mockReturnValue({ finishTrial: jest.fn().mockImplementation() }),
+  initJsPsych: jest.fn().mockReturnValue({
+    finishTrial: jest.fn().mockImplementation(),
+    getCurrentTrial: jest.fn().mockReturnValue({ type: "test-type" }),
+  }),
 }));
 
 /**
