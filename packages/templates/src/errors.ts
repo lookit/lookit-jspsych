@@ -9,3 +9,14 @@ export class TranslationNotFoundError extends Error {
     super(`"${baseName}" translation not found.`);
   }
 }
+/** Error thrown when researcher selects template that isn't available. */
+export class ConsentTemplateNotFound extends Error {
+  /**
+   * This will let the researcher know that their template isn't found.
+   *
+   * @param template - Supplied name of consent template.
+   */
+  public constructor(template: string) {
+    super(`Consent template "${template}" not found.`);
+  }
+}
