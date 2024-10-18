@@ -1,4 +1,5 @@
 import Data from "@lookit/data";
+import { LookitWindow } from "@lookit/data/dist/types";
 import Handlebars from "handlebars";
 import { initJsPsych } from "jspsych";
 import playbackFeed from "../hbs/playback-feed.hbs";
@@ -19,6 +20,19 @@ import {
 import Recorder from "./recorder";
 import { CSSWidthHeight } from "./types";
 
+declare const window: LookitWindow;
+
+window.chs = {
+  study: {
+    id: "123",
+  },
+  response: {
+    id: "456",
+  },
+} as typeof window.chs;
+
+let originalDate: DateConstructor;
+
 jest.mock("@lookit/data");
 jest.mock("jspsych", () => ({
   ...jest.requireActual("jspsych"),
@@ -33,6 +47,13 @@ jest.mock("jspsych", () => ({
           clone: jest.fn(),
           getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]),
         },
+      }),
+    },
+    data: {
+      getLastTrialData: jest.fn().mockReturnValue({
+        values: jest
+          .fn()
+          .mockReturnValue([{ trial_type: "test-type", trial_index: 0 }]),
       }),
     },
   }),
@@ -68,7 +89,7 @@ test("Recorder start", async () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
   const media = jsPsych.pluginAPI.getCameraRecorder();
-  await rec.start("consent");
+  await rec.start(true, "video-consent");
 
   expect(media.addEventListener).toHaveBeenCalledTimes(2);
   expect(media.start).toHaveBeenCalledTimes(1);
@@ -112,7 +133,7 @@ test("Recorder initialize error", () => {
     .fn()
     .mockReturnValue(undefined);
 
-  expect(async () => await rec.start("consent")).rejects.toThrow(
+  expect(async () => await rec.start(true, "video-consent")).rejects.toThrow(
     RecorderInitializeError,
   );
 
@@ -443,4 +464,45 @@ test("Recorder insert record Feed with height/width", () => {
     display,
     Handlebars.compile(recordFeed)(view),
   );
+});
+
+test("Recorder createFileName constructs video file names correctly", () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  // Mock Date().getTime() timestamp
+  originalDate = Date;
+  const mockTimestamp = 1634774400000;
+  jest.spyOn(global, "Date").mockImplementation(() => {
+    return new originalDate(mockTimestamp);
+  });
+  // Mock random 3-digit number
+  jest.spyOn(global.Math, "random").mockReturnValue(0.123456789);
+  const rand_digits = Math.floor(Math.random() * 1000);
+
+  const index = jsPsych.data.getLastTrialData().values()[0].trial_index + 1;
+  const trial_type = "test-type";
+
+  // Consent prefix is "consent-videoStream"
+  expect(rec["createFileName"](true, trial_type)).toBe(
+    `consent-videoStream_${window.chs.study.id}_${index.toString()}-${trial_type}_${window.chs.response.id}_${mockTimestamp.toString()}_${rand_digits.toString()}.webm`,
+  );
+
+  // Non-consent prefix is "videoStream"
+  expect(rec["createFileName"](false, trial_type)).toBe(
+    `videoStream_${window.chs.study.id}_${index.toString()}-${trial_type}_${window.chs.response.id}_${mockTimestamp.toString()}_${rand_digits.toString()}.webm`,
+  );
+
+  // Trial index is 0 if there's no value for 'last trial index' (jsPsych data is empty)
+  jsPsych.data.getLastTrialData = jest.fn().mockReturnValueOnce({
+    values: jest.fn().mockReturnValue([]),
+  });
+  expect(rec["createFileName"](false, trial_type)).toBe(
+    `videoStream_${window.chs.study.id}_${0}-${trial_type}_${window.chs.response.id}_${mockTimestamp.toString()}_${rand_digits.toString()}.webm`,
+  );
+
+  // Restore the original Date constructor
+  global.Date = originalDate;
+  // Restore Math.random
+  jest.spyOn(global.Math, "random").mockRestore();
 });

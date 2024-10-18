@@ -1,5 +1,6 @@
 import Data from "@lookit/data";
 import LookitS3 from "@lookit/data/dist/lookitS3";
+import { LookitWindow } from "@lookit/data/dist/types";
 import autoBind from "auto-bind";
 import Handlebars from "handlebars";
 import { JsPsych } from "jspsych";
@@ -19,6 +20,8 @@ import {
   StreamInactiveInitializeError,
 } from "./errors";
 import { CSSWidthHeight } from "./types";
+
+declare const window: LookitWindow;
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
@@ -219,14 +222,16 @@ export default class Recorder {
    * Start recording. Also, adds event listeners for handling data and checks
    * for recorder initialization.
    *
-   * @param prefix - Prefix for the video recording file name (string). This is
-   *   the string that comes before "_<TIMESTAMP>.webm".
+   * @param consent - Boolean indicating whether or not the recording is consent
+   *   footage.
+   * @param trial_type - Trial type, as saved in the jsPsych data. This comes
+   *   from the plugin info "name" value (not the class name).
    */
-  public async start(prefix: "consent" | "session_video" | "trial_video") {
+  public async start(consent: boolean, trial_type: string) {
     this.initializeCheck();
 
-    // Set filename
-    this.filename = `${prefix}_${new Date().getTime()}.webm`;
+    // Set video filename
+    this.filename = this.createFileName(consent, trial_type);
 
     // Instantiate s3 object
     if (!this.localDownload) {
@@ -349,5 +354,28 @@ export default class Recorder {
     if (webcam_feed_element) {
       webcam_feed_element.remove();
     }
+  }
+
+  /**
+   * Creates a valid video file name based on parameters
+   *
+   * @param consent - Boolean indicating whether or not the recording is consent
+   *   footage.
+   * @param trial_type - Trial type, as saved in the jsPsych data. This comes
+   *   from the plugin info "name" value (not the class name).
+   * @returns File name string with .webm extension.
+   */
+  private createFileName(consent: boolean, trial_type: string) {
+    // File name formats:
+    // consent: consent-videoStream_{study}_{frame_id}_{response}_{timestamp}_{random_digits}.webm
+    // non-consent: videoStream_{study}_{frame_id}_{response}_{timestamp}_{random_digits}.webm
+    const prefix = consent ? "consent-videoStream" : "videoStream";
+    const last_data = this.jsPsych.data.getLastTrialData().values();
+    const curr_trial_index = (
+      last_data.length > 0 ? last_data[last_data.length - 1].trial_index + 1 : 0
+    ).toString();
+    const trial_id = `${curr_trial_index}-${trial_type}`;
+    const rand_digits = Math.floor(Math.random() * 1000);
+    return `${prefix}_${window.chs.study.id}_${trial_id}_${window.chs.response.id}_${new Date().getTime()}_${rand_digits}.webm`;
   }
 }

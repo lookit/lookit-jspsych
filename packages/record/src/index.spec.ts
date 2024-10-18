@@ -10,9 +10,12 @@ jest.mock("./recorder");
 jest.mock("@lookit/data");
 jest.mock("jspsych", () => ({
   ...jest.requireActual("jspsych"),
-  initJsPsych: jest
-    .fn()
-    .mockReturnValue({ finishTrial: jest.fn().mockImplementation() }),
+  initJsPsych: jest.fn().mockReturnValue({
+    finishTrial: jest.fn().mockImplementation(),
+    getCurrentTrial: jest
+      .fn()
+      .mockReturnValue({ type: { info: { name: "test-type" } } }),
+  }),
 }));
 
 /**
@@ -41,6 +44,7 @@ test("Trial recording", () => {
   const mockRecStop = jest.spyOn(Recorder.prototype, "stop");
   const jsPsych = initJsPsych();
   const trialRec = new Rec.TrialRecordExtension(jsPsych);
+  const getCurrentPluginNameSpy = jest.spyOn(trialRec, "getCurrentPluginName");
 
   trialRec.on_start();
   trialRec.on_load();
@@ -48,7 +52,9 @@ test("Trial recording", () => {
 
   expect(Recorder).toHaveBeenCalledTimes(1);
   expect(mockRecStart).toHaveBeenCalledTimes(1);
+  expect(mockRecStart).toHaveBeenCalledWith(false, "test-type");
   expect(mockRecStop).toHaveBeenCalledTimes(1);
+  expect(getCurrentPluginNameSpy).toHaveBeenCalledTimes(1);
 });
 
 test("Trial recording's initialize does nothing", async () => {
