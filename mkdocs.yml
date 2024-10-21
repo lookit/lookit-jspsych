@@ -8,6 +8,7 @@ nav:
   - Data: data/README.md
   - Record: record/README.md
   - Surveys: surveys/README.md
+  - Templates: templates/README.md
 validation:
   omitted_files: warn
   absolute_links: warn
@@ -15,11 +16,12 @@ validation:
   anchors: warn
 exclude_docs: |
   node_modules
-  lookit-initjspsych/CHANGELOG.md
+  CHANGELOG.md
+  !templates
 theme:
   name: readthedocs
 plugins:
   - search
   - macros
 extra:
-  jsPsych: https://www.jspsych.org/7.3/
+  jsPsych: https://www.jspsych.org/v8/
