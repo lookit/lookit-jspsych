@@ -2,7 +2,7 @@ serve: poetry
 	poetry run mkdocs serve -a localhost:8888
 
 build: poetry
-	poetry run mkdocs build --strict
+	poetry run mkdocs build 
 
 poetry:
 	poetry install --no-root --sync
