@@ -31,9 +31,18 @@ const exitSurvey = { type: chsSurvey.ExitSurveyPlugin };
 
 ### Parameters
 
-| Parameter                     | Type    | Default Value | Description                                              |
-| ----------------------------- | ------- | ------------- | -------------------------------------------------------- |
-| show_databrary_options        | boolean | true          | Show question about sharing collected data on Databrary. |
-| include_withdrawal_example    | boolean | true          | Include an example in withdrawal question text.          |
-| private_level_only            | boolean | false         | Only show "private" on use of media question.            |
-| additional_video_privacy_text | string  | ""            | Add custom video privacy text to privacy question.       |
+**`show_databrary_options` [Boolean | true]**
+
+Show question about sharing collected data on Databrary.
+
+**`include_withdrawal_example` [Boolean | true]**
+
+Include an example in withdrawal question text.
+
+**`private_level_only` [Boolean | false]**
+
+Only show "private" on use of media question.
+
+**`additional_video_privacy_text` [String | ""]**
+
+Add custom video privacy text to privacy question.
