@@ -16,7 +16,7 @@ const info = <const>{
   name: "consent-video",
   version,
   parameters: {
-    template: { type: ParameterType.STRING, default: "consent_005" },
+    template: { type: ParameterType.STRING, default: "consent-template-5" },
     locale: { type: ParameterType.STRING, default: "en-us" },
     additional_video_privacy_statement: {
       type: ParameterType.STRING,
