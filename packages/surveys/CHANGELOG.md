@@ -1,5 +1,14 @@
 # @lookit/surveys
 
+## 0.0.4
+
+### Patch Changes
+
+- b111054: Update rollup config to hide known circular warnings
+- Updated dependencies [b111054]
+- Updated dependencies [888be3d]
+  - @lookit/data@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes
