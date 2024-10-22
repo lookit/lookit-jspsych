@@ -7,7 +7,7 @@ build: poetry
 poetry:
 	poetry check
 	poetry self update
-	poetry env use 3.13
+	poetry env use 3.12
 	poetry update --sync
 
 clean:
