@@ -6,7 +6,7 @@ import chsTemplate from "./index";
 declare const window: LookitWindow;
 
 /**
- * Test helper function to create trail object.
+ * Test helper function to create trial object.
  *
  * @param values - Object to replace default trial values
  * @returns Trial object
