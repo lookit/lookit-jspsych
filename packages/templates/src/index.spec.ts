@@ -5,11 +5,22 @@ import chsTemplate from "./index";
 
 declare const window: LookitWindow;
 
-test("consent video", () => {
-  const trial = {
+/**
+ * Test helper function to create trail object.
+ *
+ * @param values - Object to replace default trial values
+ * @returns Trial object
+ */
+const getTrial = (values: Record<string, string> = {}) => {
+  return {
     locale: "en-us",
     template: "consent-template-5",
+    ...values,
   } as unknown as TrialType<PluginInfo>;
+};
+
+test("consent video", () => {
+  const trial = getTrial();
   const name = "some name";
   window.chs = {
     study: {
@@ -29,10 +40,7 @@ test("consent video", () => {
 });
 
 test("consent video in French", () => {
-  const trial = {
-    locale: "fr",
-    template: "consent-template-5",
-  } as unknown as TrialType<PluginInfo>;
+  const trial = getTrial({ locale: "fr" });
   const name = "some name";
   window.chs = {
     study: {
@@ -52,11 +60,15 @@ test("consent video in French", () => {
 });
 
 test("consent video with unknown template", () => {
-  const trial = {
-    locale: "en-us",
+  const trial = getTrial({
     template: "not a real template name",
-  } as unknown as TrialType<PluginInfo>;
+  });
   expect(() => chsTemplate.consentVideo(trial)).toThrow(
     ConsentTemplateNotFound,
   );
+});
+
+test("consent garden template", () => {
+  const trial = getTrial({ template: "consent-garden" });
+  expect(chsTemplate.consentVideo(trial)).toContain("Project GARDEN");
 });
