@@ -1,6 +1,7 @@
 import autoBind from "auto-bind";
 import { JsPsych, JsPsychExtension, JsPsychExtensionInfo } from "jspsych";
 import Recorder from "./recorder";
+import { jsPsychPluginWithInfo } from "./types";
 
 /** This extension will allow reasearchers to record trials. */
 export default class TrialRecordExtension implements JsPsychExtension {
@@ -9,6 +10,7 @@ export default class TrialRecordExtension implements JsPsychExtension {
   };
 
   private recorder?: Recorder;
+  private pluginName: string | undefined;
 
   /**
    * Video recording extension.
@@ -32,7 +34,8 @@ export default class TrialRecordExtension implements JsPsychExtension {
 
   /** Ran when the trial has loaded. */
   public on_load() {
-    this.recorder?.start("trial_video");
+    this.pluginName = this.getCurrentPluginName();
+    this.recorder?.start(false, `${this.pluginName}`);
   }
 
   /**
@@ -43,5 +46,16 @@ export default class TrialRecordExtension implements JsPsychExtension {
   public on_finish() {
     this.recorder?.stop();
     return {};
+  }
+
+  /**
+   * Gets the plugin name for the trial that is being extended. This is same as
+   * the "trial_type" value that is stored in the data for this trial.
+   *
+   * @returns Plugin name string from the plugin class's info.
+   */
+  private getCurrentPluginName() {
+    const current_plugin_class = this.jsPsych.getCurrentTrial().type;
+    return (current_plugin_class as jsPsychPluginWithInfo).info.name;
   }
 }

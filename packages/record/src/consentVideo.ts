@@ -212,7 +212,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
       play.disabled = true;
       next.disabled = true;
       this.getImg(display, "record-icon").style.visibility = "visible";
-      await this.recorder.start("consent");
+      await this.recorder.start(true, VideoConsentPlugin.info.name);
     });
   }
 
