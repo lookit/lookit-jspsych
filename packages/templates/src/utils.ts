@@ -88,4 +88,7 @@ i18next.use(ICU).init({
 
 // Setup Handlebars' helpers
 Handlebars.registerHelper("exp-format", (context) => expFormat(context));
-Handlebars.registerHelper("t", (context, { hash }) => i18next.t(context, hash));
+Handlebars.registerHelper("t", (context, { hash }) => {
+  const txt = String(i18next.t(context, hash));
+  return hash.htmlSafe ? new Handlebars.SafeString(txt) : txt;
+});
