@@ -21,6 +21,8 @@ const videoConfig = { type: chsRecord.VideoConfigPlugin };
 
 ### Parameters
 
+#### Optional
+
 **`troubleshooting_intro` [HTML String]**
 
 Optional text to add at the start of the "Setup tips and troubleshooting"
@@ -149,14 +151,74 @@ const videoConsent = {
 
 ### Parameters
 
-#### Standard fields
+Parameter names are shown below, along with their type and default value. If the
+default value is _undefined_, then a value is required for that parameter.
+
+#### Required
+
+**`PIName` [String | _undefined_]**
+
+Name of PI running this study.
+
+**`institution` [String | _undefined_]**
+
+Name of institution running this study (if ambiguous, list institution whose IRB
+approved the study).
+
+**`PIContact` [String | _undefined_]**
+
+Contact information for PI or lab in case of participant questions or concerns.
+This will directly follow the phrase “please contact”, so format accordingly:
+e.g., “the XYZ lab at xyz@science.edu” or “Mary Smith at 123 456 7890”.
+
+**`payment` [String | _undefined_]**
+
+Statement about payment/compensation for participation, including a statement
+that there are no additional benefits anticipated to the participant. E.g.,
+“After you finish the study, we will email you a $5 BabyStore gift card within
+approximately three days. To be eligible for the gift card your child must be in
+the age range for this study, you need to submit a valid consent statement, and
+we need to see that there is a child with you. But we will send a gift card even
+if you do not finish the whole study or we are not able to use your child’s
+data! There are no other direct benefits to you or your child from
+participating, but we hope you will enjoy the experience.”
+
+This section is by default titled “Are there any benefits to your family?”; it
+should only include information about benefits and compensation. If your IRB
+prefers to combine risk/benefit information, you can change this to something
+like “What are the risks and benefits if you participate?” and include both
+here, then omit the risk_statement.
+
+**`procedures` [String | _undefined_]**
+
+Brief description of study procedures. For consent templates 001 and 002, this
+should include any risks or a statement that there are no anticipated risks.
+(For consent template 003, that is included in payment). We add a statement
+about the duration (from your study definition) to the start (e.g., “This study
+takes about 10 minutes to complete”), so you don’t need to include that. It can
+be in third person or addressed to the parent. E.g., “Your child will be shown
+pictures of lots of different cats, along with noises that cats make like
+meowing and purring. We are interested in which pictures and sounds make your
+child smile. We will ask you (the parent) to turn around to avoid influencing
+your child’s responses. There are no anticipated risks associated with
+participating.”
+
+**`purpose` [String | _undefined_]**
+
+Brief description of purpose of study - 1-2 sentences that describe what you are
+trying to find out. Language should be as straightforward and accessible as
+possible! E.g., “Why do babies love cats? This study will help us find out
+whether babies love cats because of their soft fur or their twitchy tails.”
+
+#### Optional
 
 **`locale` [String | "en-us"]**
 
-Set this parameter to the languages 2 letter code. In some cases, a regional
-code will have to be provided as well. For example, we currently support english
-only from the US region. Therefore, to get the US english translation you would
-put "en-US" for the locale. We support the following language codes:
+Optional parameter to set a two-letter language code for translation. In some
+cases, a regional code will have to be provided as well. For example, we
+currently support english only from the US region. Therefore, to get the US
+english translation you would put "en-US" for the locale. We support the
+following language codes:
 
 | Language       | Region | Code  |
 | -------------- | ------ | ----- |
@@ -176,16 +238,16 @@ Which consent document template to use. If you are setting up a new study, we
 recommend using the most recent (highest number) of these options. Options:
 `consent_005`
 
-**`additional_video_privacy_statement` [String]**
+**`additional_video_privacy_statement` [String | ""]**
 
 Optional additional text for under header “Who can see our webcam recordings”.
 For cases where researchers ask for other specific permission to share videos,
 separate from the exit survey, or want to provide more detail or different
 language about Databrary sharing.
 
-**`datause` [String]**
+**`datause` [String | ""]**
 
-Study-specific data use statement (optional). This will follow more general text
+Optional study-specific data use statement. This will follow more general text
 like: “The research group led by [PIName] at [institution] will have access to
 video and other data collected during this session. We will also have access to
 your account profile, demographic survey, and the child profile for the child
@@ -206,55 +268,22 @@ single planned study).
 
 Whether to include a section on GDPR.
 
-**`gdpr_personal_data` [String]**
+**`gdpr_personal_data` [String | ""]**
 
 List of types of personal information collected, for GDPR section only. Do not
 include special category information, which is listed separately.
 
-**`gdpr_sensitive_data` [String]**
+**`gdpr_sensitive_data` [String | ""]**
 
 List of types of special category information collected, for GDPR section only.
 Include all that apply: racial or ethnic origin; political opinions; religious
 or philosophical beliefs; trade union membership; processing of genetic data;
-biometric data; health data; and/or sex life or sexual orientation information
-
-**`PIName` [String]**
-
-Name of PI running this study
+biometric data; health data; and/or sex life or sexual orientation information.
 
 **`include_databrary` [Boolean | false]**
 
 Whether to include a paragraph about Databrary under “Who can see our webcam
 recordings?”.
-
-**`institution` [String]**
-
-Name of institution running this study (if ambiguous, list institution whose IRB
-approved the study)’
-
-**`PIContact` [String]**
-
-Contact information for PI or lab in case of participant questions or concerns.
-This will directly follow the phrase “please contact”, so format accordingly:
-e.g., “the XYZ lab at xyz@science.edu” or “Mary Smith at 123 456 7890”.
-
-**`payment` [String]**
-
-Statement about payment/compensation for participation, including a statement
-that there are no additional benefits anticipated to the participant. E.g.,
-“After you finish the study, we will email you a $5 BabyStore gift card within
-approximately three days. To be eligible for the gift card your child must be in
-the age range for this study, you need to submit a valid consent statement, and
-we need to see that there is a child with you. But we will send a gift card even
-if you do not finish the whole study or we are not able to use your child’s
-data! There are no other direct benefits to you or your child from
-participating, but we hope you will enjoy the experience.”
-
-This section is by default titled “Are there any benefits to your family?”; it
-should only include information about benefits and compensation. If your IRB
-prefers to combine risk/benefit information, you can change this to something
-like “What are the risks and benefits if you participate?” and include both
-here, then omit the risk_statement.
 
 **`private_level_only` [Boolean | false]**
 
@@ -264,28 +293,7 @@ IRB has a hard restriction against even offering participants the option to
 share their videos more broadly, and in conjunction with the corresponding
 restriction of options in the exit survey!
 
-**`procedures` [String]**
-
-Brief description of study procedures. For consent templates 001 and 002, this
-should include any risks or a statement that there are no anticipated risks.
-(For consent template 003, that is included in payment). We add a statement
-about the duration (from your study definition) to the start (e.g., “This study
-takes about 10 minutes to complete”), so you don’t need to include that. It can
-be in third person or addressed to the parent. E.g., “Your child will be shown
-pictures of lots of different cats, along with noises that cats make like
-meowing and purring. We are interested in which pictures and sounds make your
-child smile. We will ask you (the parent) to turn around to avoid influencing
-your child’s responses. There are no anticipated risks associated with
-participating.”
-
-**`purpose` [String]**
-
-Brief description of purpose of study - 1-2 sentences that describe what you are
-trying to find out. Language should be as straightforward and accessible as
-possible! E.g., “Why do babies love cats? This study will help us find out
-whether babies love cats because of their soft fur or their twitchy tails.”
-
-**`research_rights_statement` [String]**
+**`research_rights_statement` [String | ""]**
 
 Statement about rights of research subjects and how to contact IRB. For
 instance, MIT’s standard language is: You are not waiving any legal claims,
@@ -293,12 +301,12 @@ rights or remedies because of your participation in this research study. If you
 feel you have been treated unfairly, or you have questions regarding your rights
 as a research subject, you may contact [CONTACT INFO].
 
-**`risk_statement` [String]**
+**`risk_statement` [String | ""]**
 
 Optional statement; if provided, it is displayed under a header “Are there any
 risks if you participate?”.
 
-**`voluntary_participation` [String]**
+**`voluntary_participation` [String | ""]**
 
 Optional additional text for under header “Participation is voluntary”. E.g.,
 “There are two sessions in this study; you will be invited to complete another
@@ -316,27 +324,27 @@ in the Terms of Use! If it really won’t be possible to use Lookit without maki
 more changes, please let us know before using the following fields to further
 customize the consent form:
 
-**`purpose_header` [String]**
+**`purpose_header` [String | ""]**
 
 Custom alternate header for the section on study purpose.
 
-**`procedures_header` [String]**
+**`procedures_header` [String | ""]**
 
 Custom alternate header for the section on study procedures.
 
-**`participation_header` [String]**
+**`participation_header` [String | ""]**
 
 Custom alternate header for the section on participation being voluntary.
 
-**`benefits_header` [String]**
+**`benefits_header` [String | ""]**
 
 Custom alternate header for the section on benefits/compensation.
 
-**`risk_header` [String]**
+**`risk_header` [String | ""]**
 
 Custom alternate header for risks section.
 
-**`summary_statement` [String]**
+**`summary_statement` [String | ""]**
 
 Statement inserted at the beginning of the consent form, right after
 “Researchers led by … are running this study … on Lookit.” Please only use this
@@ -372,7 +380,7 @@ Whether to prompt only the adult for consent for themselves to participate,
 rather than also referencing a child. This is for occasional studies running an
 adult comparison group.
 
-**`consent_statement_text` [String]**
+**`consent_statement_text` [String | ""]**
 
 Replace the default spoken consent statement with your custom text.
 
