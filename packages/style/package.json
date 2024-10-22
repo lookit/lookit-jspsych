@@ -1,6 +1,6 @@
 {
   "name": "@lookit/style",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "license": "ISC",
   "author": "",
@@ -18,8 +18,8 @@
   },
   "devDependencies": {
     "@jspsych/config": "^2.0.0",
-    "@lookit/record": "^0.0.3",
-    "@lookit/surveys": "^0.0.3",
+    "@lookit/record": "^0.0.4",
+    "@lookit/surveys": "^0.0.4",
     "rollup-plugin-scss": "^4.0.0",
     "sass": "^1.78.0",
     "trash-cli": "^5.0.0"
