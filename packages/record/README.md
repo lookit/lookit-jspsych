@@ -152,7 +152,63 @@ const videoConsent = {
 Parameter names are shown below, along with their type and default value. If the
 default value is _undefined_, then a value is required for that parameter.
 
-#### Standard fields
+#### Required
+
+**`PIName` [String | _undefined_]**
+
+Name of PI running this study.
+
+**`institution` [String | _undefined_]**
+
+Name of institution running this study (if ambiguous, list institution whose IRB
+approved the study).
+
+**`PIContact` [String | _undefined_]**
+
+Contact information for PI or lab in case of participant questions or concerns.
+This will directly follow the phrase “please contact”, so format accordingly:
+e.g., “the XYZ lab at xyz@science.edu” or “Mary Smith at 123 456 7890”.
+
+**`payment` [String | _undefined_]**
+
+Statement about payment/compensation for participation, including a statement
+that there are no additional benefits anticipated to the participant. E.g.,
+“After you finish the study, we will email you a $5 BabyStore gift card within
+approximately three days. To be eligible for the gift card your child must be in
+the age range for this study, you need to submit a valid consent statement, and
+we need to see that there is a child with you. But we will send a gift card even
+if you do not finish the whole study or we are not able to use your child’s
+data! There are no other direct benefits to you or your child from
+participating, but we hope you will enjoy the experience.”
+
+This section is by default titled “Are there any benefits to your family?”; it
+should only include information about benefits and compensation. If your IRB
+prefers to combine risk/benefit information, you can change this to something
+like “What are the risks and benefits if you participate?” and include both
+here, then omit the risk_statement.
+
+**`procedures` [String | _undefined_]**
+
+Brief description of study procedures. For consent templates 001 and 002, this
+should include any risks or a statement that there are no anticipated risks.
+(For consent template 003, that is included in payment). We add a statement
+about the duration (from your study definition) to the start (e.g., “This study
+takes about 10 minutes to complete”), so you don’t need to include that. It can
+be in third person or addressed to the parent. E.g., “Your child will be shown
+pictures of lots of different cats, along with noises that cats make like
+meowing and purring. We are interested in which pictures and sounds make your
+child smile. We will ask you (the parent) to turn around to avoid influencing
+your child’s responses. There are no anticipated risks associated with
+participating.”
+
+**`purpose` [String | _undefined_]**
+
+Brief description of purpose of study - 1-2 sentences that describe what you are
+trying to find out. Language should be as straightforward and accessible as
+possible! E.g., “Why do babies love cats? This study will help us find out
+whether babies love cats because of their soft fur or their twitchy tails.”
+
+#### Optional
 
 **`locale` [String | "en-us"]**
 
@@ -222,43 +278,10 @@ Include all that apply: racial or ethnic origin; political opinions; religious
 or philosophical beliefs; trade union membership; processing of genetic data;
 biometric data; health data; and/or sex life or sexual orientation information.
 
-**`PIName` [String | _undefined_]**
-
-Name of PI running this study.
-
 **`include_databrary` [Boolean | false]**
 
 Whether to include a paragraph about Databrary under “Who can see our webcam
 recordings?”.
-
-**`institution` [String | _undefined_]**
-
-Name of institution running this study (if ambiguous, list institution whose IRB
-approved the study).
-
-**`PIContact` [String | _undefined_]**
-
-Contact information for PI or lab in case of participant questions or concerns.
-This will directly follow the phrase “please contact”, so format accordingly:
-e.g., “the XYZ lab at xyz@science.edu” or “Mary Smith at 123 456 7890”.
-
-**`payment` [String | _undefined_]**
-
-Statement about payment/compensation for participation, including a statement
-that there are no additional benefits anticipated to the participant. E.g.,
-“After you finish the study, we will email you a $5 BabyStore gift card within
-approximately three days. To be eligible for the gift card your child must be in
-the age range for this study, you need to submit a valid consent statement, and
-we need to see that there is a child with you. But we will send a gift card even
-if you do not finish the whole study or we are not able to use your child’s
-data! There are no other direct benefits to you or your child from
-participating, but we hope you will enjoy the experience.”
-
-This section is by default titled “Are there any benefits to your family?”; it
-should only include information about benefits and compensation. If your IRB
-prefers to combine risk/benefit information, you can change this to something
-like “What are the risks and benefits if you participate?” and include both
-here, then omit the risk_statement.
 
 **`private_level_only` [Boolean | false]**
 
@@ -268,28 +291,7 @@ IRB has a hard restriction against even offering participants the option to
 share their videos more broadly, and in conjunction with the corresponding
 restriction of options in the exit survey!
 
-**`procedures` [String | _undefined_]**
-
-Brief description of study procedures. For consent templates 001 and 002, this
-should include any risks or a statement that there are no anticipated risks.
-(For consent template 003, that is included in payment). We add a statement
-about the duration (from your study definition) to the start (e.g., “This study
-takes about 10 minutes to complete”), so you don’t need to include that. It can
-be in third person or addressed to the parent. E.g., “Your child will be shown
-pictures of lots of different cats, along with noises that cats make like
-meowing and purring. We are interested in which pictures and sounds make your
-child smile. We will ask you (the parent) to turn around to avoid influencing
-your child’s responses. There are no anticipated risks associated with
-participating.”
-
-**`purpose` [String | _undefined_]**
-
-Brief description of purpose of study - 1-2 sentences that describe what you are
-trying to find out. Language should be as straightforward and accessible as
-possible! E.g., “Why do babies love cats? This study will help us find out
-whether babies love cats because of their soft fur or their twitchy tails.”
-
-**`research_rights_statement` [String]**
+**`research_rights_statement` [String | ""]**
 
 Statement about rights of research subjects and how to contact IRB. For
 instance, MIT’s standard language is: You are not waiving any legal claims,
@@ -320,27 +322,27 @@ in the Terms of Use! If it really won’t be possible to use Lookit without maki
 more changes, please let us know before using the following fields to further
 customize the consent form:
 
-**`purpose_header` [String]**
+**`purpose_header` [String | ""]**
 
 Custom alternate header for the section on study purpose.
 
-**`procedures_header` [String]**
+**`procedures_header` [String | ""]**
 
 Custom alternate header for the section on study procedures.
 
-**`participation_header` [String]**
+**`participation_header` [String | ""]**
 
 Custom alternate header for the section on participation being voluntary.
 
-**`benefits_header` [String]**
+**`benefits_header` [String | ""]**
 
 Custom alternate header for the section on benefits/compensation.
 
-**`risk_header` [String]**
+**`risk_header` [String | ""]**
 
 Custom alternate header for risks section.
 
-**`summary_statement` [String]**
+**`summary_statement` [String | ""]**
 
 Statement inserted at the beginning of the consent form, right after
 “Researchers led by … are running this study … on Lookit.” Please only use this
@@ -376,7 +378,7 @@ Whether to prompt only the adult for consent for themselves to participate,
 rather than also referencing a child. This is for occasional studies running an
 adult comparison group.
 
-**`consent_statement_text` [String]**
+**`consent_statement_text` [String | ""]**
 
 Replace the default spoken consent statement with your custom text.
 
