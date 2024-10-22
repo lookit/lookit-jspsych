@@ -8937,6 +8937,10 @@ div#consent-video-trial p {
 div#consent-video-trial ol {
   padding-left: 30px;
 }
+div#consent-video-trial ol, div#consent-video-trial ul {
+  font-size: 15px;
+  margin-top: 0px;
+}
 div#consent-video-trial li {
   padding-top: 10px;
   padding-bottom: 10px;
