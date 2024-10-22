@@ -4,24 +4,34 @@ repo_url: https://github.com/lookit/lookit-jspsych
 
 nav:
   - Home: index.md
-  - CHS's initJsPsych: lookit-initjspsych/README.md
-  - Data: data/README.md
-  - Record: record/README.md
-  - Surveys: surveys/README.md
-  - Templates: templates/README.md
+  - Related projects:
+      - Lookit API: https://lookit.readthedocs.io
+      - Ember Lookit Frameplayer: https://lookit.readthedocs.io/projects/frameplayer
+  - Plugins and Extensions:
+      - Record: record/README.md
+      - Surveys: surveys/README.md
+  - Developers:
+      - Data: data/README.md
+      - CHS's initJsPsych: lookit-initjspsych/README.md
+      - Templates: templates/README.md
+
 validation:
   omitted_files: warn
   absolute_links: warn
   unrecognized_links: warn
   anchors: warn
+
 exclude_docs: |
   node_modules
   CHANGELOG.md
   !templates
+
 theme:
   name: readthedocs
+
 plugins:
   - search
   - macros
+
 extra:
   jsPsych: https://www.jspsych.org/v8/

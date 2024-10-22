@@ -48,9 +48,9 @@ const jsPsych = initJsPsych({
 });
 ```
 
-Next, create a video configuration trial as described above. Add trial recording
-to the extensions parameter of the trial that needs to be recorded. Any trial
-you design can be recorded by add this extension.
+Next, create a video configuration trial as described above. Then, add the trial
+recoding extension parameter to your trial. By adding this extension, you can
+record any trial you design.
 
 ```javascript
 const trialRec = {
@@ -169,6 +169,12 @@ put "en-US" for the locale. We support the following language codes:
 | Japanese       |        | ja    |
 | Portuguese     | Brazil | pt-BR |
 | Portuguese     |        | pt    |
+
+**`template` [String | "consent_005"]**
+
+Which consent document template to use. If you are setting up a new study, we
+recommend using the most recent (highest number) of these options. Options:
+`consent_005`
 
 **`additional_video_privacy_statement` [String]**
 

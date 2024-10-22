@@ -5,7 +5,9 @@ build: poetry
 	poetry run mkdocs build --strict
 
 poetry:
-	poetry install --no-root --sync
+	poetry check
+	poetry self update
+	poetry update --sync
 
 clean:
 	rm -rf ./site $(shell poetry env info -p)
