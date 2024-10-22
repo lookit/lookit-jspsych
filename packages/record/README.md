@@ -21,6 +21,8 @@ const videoConfig = { type: chsRecord.VideoConfigPlugin };
 
 ### Parameters
 
+#### Optional
+
 **`troubleshooting_intro` [HTML String]**
 
 Optional text to add at the start of the "Setup tips and troubleshooting"

@@ -31,6 +31,8 @@ const exitSurvey = { type: chsSurvey.ExitSurveyPlugin };
 
 ### Parameters
 
+#### Optional
+
 **`show_databrary_options` [Boolean | true]**
 
 Show question about sharing collected data on Databrary.
