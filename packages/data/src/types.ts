@@ -140,3 +140,12 @@ export interface LookitWindow extends Window {
     sessionRecorder: unknown;
   };
 }
+
+export interface awsVars {
+  JSPSYCH_S3_REGION: string;
+  JSPSYCH_S3_ACCESS_KEY_ID: string;
+  JSPSYCH_S3_SECRET_ACCESS_KEY: string;
+  JSPSYCH_S3_BUCKET: string;
+  JSPSYCH_S3_SESSION_TOKEN: string;
+  JSPSYCH_S3_EXPIRATION: string;
+}

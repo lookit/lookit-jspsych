@@ -4,7 +4,14 @@ import {
   S3Client,
   UploadPartCommand,
 } from "@aws-sdk/client-s3";
-import { AWSConfigError, AWSMissingAttrError, UploadPartError } from "./errors";
+import {
+  AWSConfigError,
+  AWSMissingAttrError,
+  ExpiredCredentials,
+  MissingCredentials,
+  UploadPartError,
+} from "./errors";
+import { awsVars } from "./types";
 
 /** Provides functionality to upload videos incrementally to an AWS S3 Bucket. */
 class LookitS3 {
@@ -15,7 +22,8 @@ class LookitS3 {
   private s3: S3Client;
   private uploadId: string = "";
   private key: string;
-  private bucket: string = process.env.JSPSYCH_S3_BUCKET;
+  private bucket: string;
+  private awsVars: awsVars;
   private complete: boolean = false;
 
   public static readonly minUploadSize: number = 5 * 1024 * 1024;
@@ -29,20 +37,29 @@ class LookitS3 {
   public constructor(key: string) {
     this.key = key;
     try {
+      this.awsVars = JSON.parse(
+        document.getElementById("aws-vars")!.textContent!,
+      );
+    } catch {
+      throw new MissingCredentials();
+    }
+    try {
+      this.bucket = this.awsVars.JSPSYCH_S3_BUCKET;
       this.s3 = new S3Client({
-        region: process.env.JSPSYCH_S3_REGION,
+        region: this.awsVars.JSPSYCH_S3_REGION,
         credentials: {
-          accessKeyId: process.env.JSPSYCH_S3_ACCESS_KEY_ID,
-          secretAccessKey: process.env.JSPSYCH_S3_SECRET_ACCESS_KEY,
+          accessKeyId: this.awsVars.JSPSYCH_S3_ACCESS_KEY_ID,
+          secretAccessKey: this.awsVars.JSPSYCH_S3_SECRET_ACCESS_KEY,
+          sessionToken: this.awsVars.JSPSYCH_S3_SESSION_TOKEN,
         },
       });
     } catch (e) {
-      console.error(`Error setting up S3 client: ${e}`);
-      let err_msg = "";
-      if (e instanceof Error) {
-        err_msg = e.message;
+      this.logRecordingEvent(`Error setting up the S3 client.\nError: ${e}`);
+      if (this.awsExpiredToken(e)) {
+        throw new ExpiredCredentials();
+      } else {
+        throw new AWSConfigError(e);
       }
-      throw new AWSConfigError(err_msg);
     }
   }
 
@@ -86,13 +103,23 @@ class LookitS3 {
       ContentType: "video/webm", // TO DO: check browser support for type/codec and set the actual value here
     });
 
-    const response = await this.s3.send(command);
-    if (!response.UploadId) {
-      throw new AWSMissingAttrError("UploadId");
+    try {
+      const response = await this.s3.send(command);
+      if (!response.UploadId) {
+        throw new AWSMissingAttrError("UploadId");
+      }
+      this.uploadId = response.UploadId;
+      this.logRecordingEvent(`Connection established.`);
+    } catch (error) {
+      this.logRecordingEvent(
+        `Error creating upload ${this.key}.\nError: ${error}`,
+      );
+      if (this.awsExpiredToken(error)) {
+        throw new ExpiredCredentials();
+      } else {
+        throw error;
+      }
     }
-
-    this.uploadId = response.UploadId;
-    this.logRecordingEvent(`Connection established.`);
   }
 
   /**
@@ -133,8 +160,12 @@ class LookitS3 {
         this.logRecordingEvent(
           `Error uploading part ${partNumber}.\nError: ${_err}`,
         );
-        err = _err as Error;
-        retry += 1;
+        if (this.awsExpiredToken(_err)) {
+          throw new ExpiredCredentials();
+        } else {
+          err = _err as Error;
+          retry += 1;
+        }
       }
     }
 
@@ -157,10 +188,20 @@ class LookitS3 {
       UploadId: this.uploadId,
     };
     const command = new CompleteMultipartUploadCommand(input);
-    const response = await this.s3.send(command);
-    this.complete = true;
-
-    this.logRecordingEvent(`Upload complete: ${response.Location}`);
+    try {
+      const response = await this.s3.send(command);
+      this.complete = true;
+      this.logRecordingEvent(`Upload complete: ${response.Location}`);
+    } catch (error) {
+      this.logRecordingEvent(
+        `Error completing upload ${this.key}.\nError: ${error}`,
+      );
+      if (this.awsExpiredToken(error)) {
+        throw new ExpiredCredentials();
+      } else {
+        throw error;
+      }
+    }
   }
 
   /**
@@ -196,6 +237,24 @@ class LookitS3 {
    */
   public get uploadInProgress(): boolean {
     return this.uploadId !== "" && !this.complete;
+  }
+
+  /**
+   * Check whether an AWS S3 error is due to expired credentials/token.
+   *
+   * @param error - Error returned from S3.
+   * @returns Boolean indicating whether or not this is an Expired Token error.
+   */
+  private awsExpiredToken(error: unknown) {
+    if (
+      error instanceof Object &&
+      "name" in error &&
+      error.name === "ExpiredTokenException"
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
