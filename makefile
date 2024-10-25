@@ -1,11 +1,14 @@
 serve: poetry
-	poetry run mkdocs serve -a localhost:8888
+	poetry run mkdocs serve --strict -a localhost:8888
 
 build: poetry
 	poetry run mkdocs build --strict
 
 poetry:
-	poetry install --no-root --sync
+	poetry check
+	poetry self update
+	poetry env use 3.12
+	poetry update --sync
 
 clean:
 	rm -rf ./site $(shell poetry env info -p)
