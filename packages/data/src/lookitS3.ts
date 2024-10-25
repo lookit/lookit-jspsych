@@ -179,16 +179,16 @@ class LookitS3 {
   public async completeUpload() {
     this.addUploadPartPromise();
 
-    const input = {
-      Bucket: this.bucket,
-      Key: this.key,
-      MultipartUpload: {
-        Parts: await Promise.all(this.promises),
-      },
-      UploadId: this.uploadId,
-    };
-    const command = new CompleteMultipartUploadCommand(input);
     try {
+      const input = {
+        Bucket: this.bucket,
+        Key: this.key,
+        MultipartUpload: {
+          Parts: await Promise.all(this.promises),
+        },
+        UploadId: this.uploadId,
+      };
+      const command = new CompleteMultipartUploadCommand(input);
       const response = await this.s3.send(command);
       this.complete = true;
       this.logRecordingEvent(`Upload complete: ${response.Location}`);
@@ -196,7 +196,7 @@ class LookitS3 {
       this.logRecordingEvent(
         `Error completing upload ${this.key}.\nError: ${error}`,
       );
-      if (this.awsExpiredToken(error)) {
+      if (this.awsExpiredToken(error) || error instanceof ExpiredCredentials) {
         throw new ExpiredCredentials();
       } else {
         throw error;
