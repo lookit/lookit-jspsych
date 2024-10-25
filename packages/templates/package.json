@@ -1,6 +1,6 @@
 {
   "name": "@lookit/templates",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "CHS jsPsych trial templates and their translations",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
@@ -31,7 +31,7 @@
     "rollup-plugin-polyfill-node": "^0.13.0"
   },
   "peerDependencies": {
-    "@lookit/data": "^0.0.3",
+    "@lookit/data": "^0.0.4",
     "jspsych": "^8.0.2"
   }
 }

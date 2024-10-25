@@ -1,5 +1,28 @@
 # @lookit/record
 
+## 0.0.4
+
+### Patch Changes
+
+- bb6754c: Move translations and video consent templates to new templates
+  package.
+- c879e6a: Add ability to select specific video consent template.
+- 4e72f2b: Adds `chs_type: "consent"` to consentVideo trial data and updates the
+  lookit-api response object with `completed_consent_frame: true` at the end of
+  the consentVideo trial.
+- b111054: Update rollup config to hide known circular warnings
+- 2a3ce6d: Change video file names to match existing format, and to pass
+  necessary info to AWS Lambda for saving video files to database.
+- 496b62d: Unmute playback of recorded consent video.
+- 9385555: Add Garden's consent template
+- Updated dependencies [bb6754c]
+- Updated dependencies [c879e6a]
+- Updated dependencies [b111054]
+- Updated dependencies [888be3d]
+- Updated dependencies [9385555]
+  - @lookit/templates@0.0.1
+  - @lookit/data@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes
