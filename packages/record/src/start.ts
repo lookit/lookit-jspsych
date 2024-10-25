@@ -29,8 +29,10 @@ export default class StartRecordPlugin implements JsPsychPlugin<Info> {
 
   /** Trial function called by jsPsych. */
   public trial() {
-    this.recorder.start("session_video").then(() => {
-      this.jsPsych.finishTrial();
-    });
+    this.recorder
+      .start(false, `${StartRecordPlugin.info.name}-multiframe`)
+      .then(() => {
+        this.jsPsych.finishTrial();
+      });
   }
 }
