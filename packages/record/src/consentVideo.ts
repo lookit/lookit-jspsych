@@ -46,16 +46,17 @@ const info = <const>{
     additional_segments: {
       type: ParameterType.COMPLEX,
       array: true,
+      default: [],
       nested: {
         title: {
           type: ParameterType.STRING,
           default: "",
         },
-      },
-      text: {
-        type: ParameterType.STRING,
-        default: "",
-      },
+        text: {
+          type: ParameterType.STRING,
+          default: "",
+        }
+      }
     },
     prompt_all_adults: { type: ParameterType.BOOL, default: false },
     prompt_only_adults: { type: ParameterType.BOOL, default: false },
