@@ -25,13 +25,12 @@
     "dev": "rollup --config rollup.config.dev.mjs --watch",
     "test": "jest --coverage"
   },
-  "dependencies": {
-    "@lookit/data": "0.0.5"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@jspsych/config": "^2.0.0"
   },
   "peerDependencies": {
+    "@lookit/data": "^0.0.5",
     "jspsych": "^8.0.2"
   },
   "optionalDependencies": {
