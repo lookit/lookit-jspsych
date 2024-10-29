@@ -5,7 +5,7 @@ import {
   AudioWorkletNodeMock,
 } from "../fixtures/MockWebAudioAPI";
 import { MicCheckError, NoStreamError } from "./errors";
-import VideoConfigPlugin from "./video_config";
+import VideoConfigPlugin from "./videoConfig";
 
 // The video config mic check relies on the WebAudio API, which is not available in Node/Jest/jsdom, so we'll mock it here.
 // This is in a separate file to avoid polluting the other test environments with the WebAudio API mocks.

@@ -10,7 +10,7 @@ import firefoxInitialPrompt from "./img/firefox_initialprompt.png";
 import firefoxChooseDevice from "./img/firefox_prompt_choose_device.png";
 import firefoxDevicesBlocked from "./img/firefox_prompt_devices_blocked.png";
 import Recorder from "./recorder";
-import VideoConfigPlugin, { VideoConsentTrialType } from "./video_config";
+import VideoConfigPlugin, { VideoConsentTrialType } from "./videoConfig";
 
 jest.mock("./recorder");
 jest.mock("@lookit/data");
