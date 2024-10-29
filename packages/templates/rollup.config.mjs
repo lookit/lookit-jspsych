@@ -9,7 +9,7 @@ export default makeRollupConfig("chsTemplates").map((config) => {
     plugins: [
       ...config.plugins,
       // Add support for .env files
-      dotenv(),
+      dotenv({ cwd: "../../" }),
       // Add support to import yaml and handlebars files as strings
       importAsString({
         include: ["**/*.yaml", "**/*.hbs"],

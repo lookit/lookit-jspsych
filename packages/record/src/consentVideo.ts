@@ -46,15 +46,16 @@ const info = <const>{
     additional_segments: {
       type: ParameterType.COMPLEX,
       array: true,
+      default: [],
       nested: {
         title: {
           type: ParameterType.STRING,
           default: "",
         },
-      },
-      text: {
-        type: ParameterType.STRING,
-        default: "",
+        text: {
+          type: ParameterType.STRING,
+          default: "",
+        },
       },
     },
     prompt_all_adults: { type: ParameterType.BOOL, default: false },
@@ -212,7 +213,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
       play.disabled = true;
       next.disabled = true;
       this.getImg(display, "record-icon").style.visibility = "visible";
-      await this.recorder.start("consent");
+      await this.recorder.start(true, VideoConsentPlugin.info.name);
     });
   }
 
