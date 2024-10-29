@@ -1,5 +1,11 @@
 # @lookit/data
 
+## 0.0.5
+
+### Patch Changes
+
+- 6c42a48: Generate environment file before production build
+
 ## 0.0.4
 
 ### Patch Changes
