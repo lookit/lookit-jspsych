@@ -1,7 +1,7 @@
 <div id="lookit-jspsych-video-config">
   <div id="lookit-jspsych-video-config-title-row">
-    <h2>Webcam setup</h2>
-    <p>No recording during this section</p>
+    <h2>{{t "exp-video-config.title"}}</h2>
+    <p>{{t "exp-video-config.not-recording-note"}}</p>
   </div>
   <div id="lookit-jspsych-video-config-row-container">
     <div id="lookit-jspsych-video-config-webcam-column">
@@ -36,8 +36,8 @@
         </div>
       </div>
       <div id="lookit-jspsych-browser-note" class="lookit-jspsych-help-text">
-        Note: CHS studies currently only work on recent versions of Firefox and
-        Chrome.
+        {{t "exp-video-config.Note"}}:
+        {{t "exp-video-config.support-message"}}
       </div>
     </div>
     <div id="lookit-jspsych-video-config-instructions-column">
@@ -49,7 +49,7 @@
             id="{{step1_id}}-span"
             style="visibility: hidden"
             class="{{step_complete_class}}"
-          >{{step_complete_text}}</span>
+          >{{t "exp-video-config.looks-good"}}</span>
           <p id="{{step1_id}}-paragraph">
             You may need to click "Allow" so that we can access your webcam and
             microphone. On Firefox, make sure to also check "Remember this
@@ -57,31 +57,32 @@
           </p>
         </li>
         <li id="{{step2_id}}">
-          <strong>Make sure your webcam settings got saved by clicking
+          <strong>{{t "exp-video-config.step-2-click-directions"}}
             <button
               id="{{reload_button_id_text}}"
               class="jspsych-btn lookit-jspsych-btn"
             >
-              this button</button>.</strong>
+              {{t "exp-video-config.reload-button-label"}}
+            </button>.</strong>
           <span
             id="{{step2_id}}-span"
             style="visibility: hidden"
             class="{{step_complete_class}}"
           >{{step_complete_text}}</span>
           <p id="{{step2_id}}-paragraph">
-            Your webcam should re-appear WITHOUT you having to allow access
-            again (if you do see a dialogue, click "Remember this decision" or
-            "Always allow" and try again!).
+            {{t "exp-video-config.step-2-what-should-happen"}}
           </p>
         </li>
         <li id="{{step3_id}}">
-          <strong>Make sure we'll be able to hear you!</strong>
+          <strong>{{t "exp-video-config.step-3"}}:</strong>
           <span
             id="{{step3_id}}-span"
             style="visibility: hidden"
             class="{{step_complete_class}}"
           >{{step_complete_text}}</span>
-          <p id="{{step3_id}}-paragraph">Try clapping or saying hi.</p>
+          <p id="{{step3_id}}-paragraph">{{t
+              "exp-video-config.try-clapping"
+            }}</p>
         </li>
       </ol>
     </div>
@@ -93,44 +94,38 @@
       style="margin-left: 5px"
       disabled
     >
-      Next &gt;
+      {{t "Next"}}
     </button>
   </div>
   <div id="lookit-jspsych-config-troubleshooting-column-container">
     <div id="lookit-jspsych-accordion-header-container">
-      <h2>Setup tips and troubleshooting</h2>
+      <h2> {{t "exp-video-config.setup-tips-header"}} </h2>
       <hr />
       <p id="lookit-jspsych-troubleshooting-intro">
-        {{{troubleshooting_intro}}}
+        {{exp-format troubleshooting_intro}}
       </p>
     </div>
     <div id="lookit-jspsych-accordion-container">
       <button class="lookit-jspsych-accordion">
-        Check your device and browser
+        {{t "exp-video-config.supported-setup"}}
       </button>
       <div class="lookit-jspsych-accordion-panel" style="display: none">
         <ol>
           <li>
-            Are you using a phone or tablet? Lookit only works on computers so
-            far - we're hoping to support mobile devices soon! Please visit
-            again from a computer.
+            {{t "exp-video-config.mobile-devices"}}
           </li>
           <li>
-            Are you using a web browser other than Chrome or Firefox (like
-            Internet Explorer or Safari)? If so, please try again using Chrome
-            or Firefox. These are the only browsers Lookit currently supports.
+            {{t "exp-video-config.browser-support"}}
           </li>
         </ol>
       </div>
       <button class="lookit-jspsych-accordion">
-        Camera setup instructions for Chrome
+        {{t "exp-video-config.chrome-instructions-header"}}
       </button>
       <div class="lookit-jspsych-accordion-panel" style="display: none">
         <ol>
           <li>
-            When you load this page for the first time, you should see a prompt
-            like the one below. Click "Allow" to let CHS access the webcam and
-            microphone.
+            {{t "exp-video-config.chrome-directions-prompt"}}
             <img
               class="lookit-jspsych-screenshot"
               src="{{chromeInitialPrompt}}"
@@ -138,9 +133,7 @@
             />
           </li>
           <li>
-            If you didn't see that prompt, or if you clicked "Block", you can
-            change the settings by clicking on the camera icon next to the URL.
-            Set Camera and Microphone (and Sound if it's shown) all to "Allow".
+            {{t "exp-video-config.chrome-directions-set-perms"}}
             <img
               class="lookit-jspsych-screenshot"
               src="{{chromePermissions}}"
@@ -159,40 +152,23 @@
             />
           </li>
           <li>
-            <em>Having trouble passing the sound check?</em>
-            Chrome may be using the wrong input device - unfortunately it
-            doesn't let you pick which microphone when you click "Allow". You
-            can select the correct microphone at
-            chrome://settings/content/microphone (copy and paste that as a URL).
+            {{t "exp-video-config.chrome-select-mic" htmlSafe=true}}
           </li>
           <li>
-            <em>Seeing the wrong camera view</em>
-            - like your built-in laptop camera instead of a USB webcam? You can
-            select the correct camera at chrome://settings/content/camera (copy
-            and paste that as a URL).
+            {{t "exp-video-config.chrome-select-camera" htmlSafe=true}}
           </li>
           <li>
-            You can also refer to
-            <a
-              href="https://support.google.com/chrome/answer/2693767?hl=en"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              these directions from Chrome
-            </a>.
+            {{t "exp-video-config.chrome-further-help" htmlSafe=true}}
           </li>
         </ol>
       </div>
       <button class="lookit-jspsych-accordion">
-        Camera setup instructions for Firefox
+        {{t "exp-video-config.firefox-instructions-header"}}
       </button>
       <div class="lookit-jspsych-accordion-panel" style="display: none">
         <ol>
           <li>
-            When you load this page for the first time, you should see a prompt
-            like the one below. If you have multiple camera and/or microphones
-            available, then you'll be able to select the ones you want to use.
-            Check the "Remember this decision" box, and click "Allow".
+            {{t "exp-video-config.firefox-directions-prompt"}}
             <img
               class="lookit-jspsych-screenshot"
               src="{{firefoxInitialPrompt}}"
@@ -200,10 +176,7 @@
             />
           </li>
           <li>
-            If you didn't see that prompt, or if you clicked "Block" at first,
-            you can change the settings by clicking on the crossed-out camera
-            and/or microphone next to the URL. Click the "X" next to the
-            "Blocked" message to allow each device.
+            {{t "exp-video-config.firefox-directions-set-perms"}}
             <img
               class="lookit-jspsych-screenshot"
               src="{{firefoxDevicesBlocked}}"
@@ -230,37 +203,24 @@
         </ol>
       </div>
       <button class="lookit-jspsych-accordion">
-        It's just not working - what else can I try?
+        {{t "exp-video-config.additional-troubleshooting-header"}}
       </button>
       <div class="lookit-jspsych-accordion-panel" style="display: none">
         <p>
-          First, you are a very dedicated citizen scientist and we're grateful
-          for your help! We're sorry you're having trouble.
+          {{t "exp-video-config.additional-troubleshooting-intro"}}
         </p>
         <ol>
           <li>
-            Make sure you're able to view your webcam video outside of Lookit.
-            (For example, on a Mac, try Photobooth.)
+            {{t "exp-video-config.camera-check"}}
           </li>
           <li>
-            The easiest approach is to try a different web browser if you have
-            one installed anyway. For instance, if you're using Firefox, switch
-            to Chrome, or vice versa. Also, update the browser if you're not
-            using the latest version. You can check by going to "Chrome" -&gt;
-            "About Chrome" or "Firefox" -&gt; "About Firefox" in the menu bar.
-            (This is a good idea to make sure you've gotten any security updates
-            anyway.)
+            {{t "exp-video-config.try-another-browser"}}
           </li>
           <li>
-            Using Chrome? Make sure you're not using an Incognito window - you
-            won't be able to save and use settings throughout the study.
+            {{t "exp-video-config.chrome-incognito"}}
           </li>
           <li>
-            If you're stumped, it's our fault. Please let us know so we can
-            improve the site! Email us at lookit-tech@mit.edu with a short
-            description of what's happening. Please include the web browser
-            you're using (Firefox, Chrome, IE, Safari, etc.), what steps you've
-            tried, and this session ID
+            {{t "exp-video-config.additional-troubleshooting-contact"}}:
             {{session.id}}
           </li>
         </ol>
