@@ -1,5 +1,11 @@
 # @lookit/data
 
+## 0.1.0
+
+### Minor Changes
+
+- 9605ac4: Move AWS secrets for video uploading from .env to lookit-api.
+
 ## 0.0.5
 
 ### Patch Changes

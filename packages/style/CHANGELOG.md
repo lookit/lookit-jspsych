@@ -1,5 +1,11 @@
 # @lookit/style
 
+## 0.0.5
+
+### Patch Changes
+
+- ec2fdec: Update consent video style
+
 ## 0.0.4
 
 ### Patch Changes
