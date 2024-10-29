@@ -1,5 +1,11 @@
 # @lookit/lookit-initjspsych
 
+## 1.0.6
+
+### Patch Changes
+
+- 23acf4c: Bump version to get around incorrectly versioned releases
+
 ## 1.0.0
 
 ### Patch Changes
