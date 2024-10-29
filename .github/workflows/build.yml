@@ -23,7 +23,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libpango1.0-dev
 
       - name: Install NPM dependencies
-        run: npm ci
+        run: npm install --package-lock
 
       - name: Lint project
         run: npm run lint
@@ -36,3 +36,13 @@ jobs:
 
       - name: Build packages
         run: npm run build
+
+      - name: Check for clean git tree
+        shell: bash
+        run: |
+          if [[ $(git status -s) ]]
+          then 
+              echo "The following files have changed:"
+              git status -s
+              exit 1
+          fi
