@@ -1,6 +1,5 @@
-import Handlebars from "handlebars";
+import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
-import video_config from "../hbs/video-config.hbs";
 import chromeInitialPrompt from "../img/chrome_initialprompt.png";
 import chromeAlwaysAllow from "../img/chrome_step1_alwaysallow.png";
 import chromePermissions from "../img/chrome_step1_permissions.png";
@@ -16,6 +15,7 @@ const info = <const>{
   name: "video-config-plugin",
   version: version,
   parameters: {
+    locale: { type: ParameterType.STRING, default: "en-us" },
     troubleshooting_intro: {
       /**
        * Optional string to appear at the start of the "Setup tips and
@@ -112,7 +112,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     // Set up the event listener for device changes.
     navigator.mediaDevices.ondevicechange = this.onDeviceChange;
     // Add page content.
-    this.addHtmlContent(trial.troubleshooting_intro as string);
+    this.addHtmlContent(trial);
     // Add event listeners after elements have been added to the page.
     this.addEventListeners();
     // Begin the initial recorder setup steps.
@@ -124,10 +124,9 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   /**
    * Add HTML content to the page.
    *
-   * @param troubleshooting_intro - Troubleshooting intro parameter from the
-   *   Trial object.
+   * @param trial - Trial object.
    */
-  private addHtmlContent = (troubleshooting_intro: string) => {
+  private addHtmlContent = (trial: VideoConsentTrialType) => {
     const html_params = {
       webcam_container_id: this.webcam_container_id,
       reload_button_id_cam: this.reload_button_id_cam,
@@ -146,9 +145,8 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
       firefoxInitialPrompt,
       firefoxChooseDevice,
       firefoxDevicesBlocked,
-      troubleshooting_intro,
     };
-    this.display_el!.innerHTML = Handlebars.compile(video_config)(html_params);
+    this.display_el!.innerHTML = chsTemplates.videoConfig(trial, html_params);
   };
 
   /** Add event listeners to elements after they've been added to the page. */
