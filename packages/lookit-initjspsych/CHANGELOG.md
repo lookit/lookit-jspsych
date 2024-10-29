@@ -1,5 +1,13 @@
 # @lookit/lookit-initjspsych
 
+## 1.0.0
+
+### Patch Changes
+
+- ec2fdec: Moved @lookit/data to peer dependency.
+- Updated dependencies [9605ac4]
+  - @lookit/data@0.1.0
+
 ## 0.0.5
 
 ### Patch Changes
