@@ -9,7 +9,7 @@ export default makeRollupConfig("chsData").map((config) => {
       // Resolve node dependencies to be used in a browser.
       nodeResolve({ browser: true, preferBuiltins: false }),
       // Add support for .env files
-      dotenv(),
+      dotenv({ cwd: "../../" }),
       ...config.plugins,
     ],
   };

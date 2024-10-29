@@ -95,15 +95,21 @@ npm i @jspsych/config -w @lookit/<name of new package>
 
 ## Build all packages
 
-We can use npm workspaces to build all packages.
+First, create a `.env` file at the root of the monorepo. It can contain the
+following for a successful local development build.
 
-First, install dependencies:
+```
+DEBUG=true
+LOCAL_DOWNLOAD=true
+```
+
+Next, we can use npm to install dependencies.
 
 ```
 npm ci
 ```
 
-Build all packages:
+Then, build all packages.
 
 ```
 npm run build
