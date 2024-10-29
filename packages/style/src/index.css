@@ -8934,12 +8934,10 @@ div#consent-video-trial h2 {
 div#consent-video-trial p {
   font-size: 15px;
 }
-div#consent-video-trial ol {
+div#consent-video-trial ol,
+div#consent-video-trial ul {
   padding-left: 30px;
-}
-div#consent-video-trial ol, div#consent-video-trial ul {
   font-size: 15px;
-  margin-top: 0px;
 }
 div#consent-video-trial li {
   padding-top: 10px;
