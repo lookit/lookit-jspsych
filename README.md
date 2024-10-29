@@ -117,15 +117,15 @@ npm run build
 
 ## Linting/formating
 
-Lint and formating is done at the monorepo level.
+Lint and formatting is done at the monorepo level.
 
-To auto fix linting/formating issues:
+To auto fix linting/formatting issues:
 
 ```
 npm run fix
 ```
 
-Unfixable issues will be diplayed as errors.
+Unfixable issues will be displayed as errors.
 
 ## Change log
 
@@ -135,7 +135,38 @@ Adding a change log through `changeset` is done with the following command:
 npm run changeset
 ```
 
-Make sure to add the change log found in the `.changeset` directory to the PR.
+Try to only bump packages that have actual changes and be sure to add the change
+log found in the `.changeset` directory to the PR.
+
+## Package Release
+
+Package release is automated using github actions. You can find the release
+script in this repo in the `.github/workflows/` directory.
+
+The NPM token required to release packages should never expire. If, for some
+reason, a new token is required. You will have to first generate one through
+NPM.
+
+1.  Login to https://www.npmjs.com.
+2.  Select "Access Tokens" from your user dropdown.
+3.  In the "Generate New Token" dropdown, select "Classic Token".
+4.  Give the token a meaningful name, select "Automation" radio button, and
+    click "Generate Token".
+5.  Copy token or leave the website open. If you close this page without
+    copying, you will have to generate a new token. There will be no way to get
+    it back.
+
+Next we have to move the NPM token to github actions.
+
+1. Login to Github and goto
+   https://github.com/lookit/lookit-jspsych/settings/secrets/actions.
+2. Click the "Pencil" icon next to `NPM_TOKEN`.
+3. Paste NPM token from above. There won't be a token in the value box. This is
+   to keep the current token secret.
+4. Click "Update secret".
+
+This should allow the release script to be able to publish our packages without
+authentication.
 
 ## Run dev server
 
