@@ -1,5 +1,13 @@
 # @lookit/templates
 
+## 0.0.2
+
+### Patch Changes
+
+- 6c42a48: Generate environment file before production build
+- Updated dependencies [6c42a48]
+  - @lookit/data@0.0.5
+
 ## 0.0.1
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @lookit/record
 
+## 0.0.5
+
+### Patch Changes
+
+- 6c42a48: Generate environment file before production build
+- 7230f51: Add missing default value for video consent "additional_segments"
+  parameter, which was causing an error when this optional parameter was omitted
+  (#84).
+- Updated dependencies [6c42a48]
+  - @lookit/templates@0.0.2
+  - @lookit/data@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes
