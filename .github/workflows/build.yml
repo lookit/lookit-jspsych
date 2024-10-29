@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ["18.x", "20.x"]
+        node: ["20.x"]
 
     steps:
       - uses: actions/checkout@v4
@@ -25,15 +25,6 @@ jobs:
       - name: Install NPM dependencies
         run: npm ci
 
-      - name: Create environment file
-        run: printenv > .env
-        env:
-          DEBUG: "false"
-          LOCAL_DOWNLOAD: "false"
-
-      - name: Build packages
-        run: npm run build
-
       - name: Lint project
         run: npm run lint
 
@@ -42,3 +33,6 @@ jobs:
 
       - name: Test project
         run: npm test
+
+      - name: Build packages
+        run: npm run build
