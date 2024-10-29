@@ -30,18 +30,46 @@ export class AWSConfigError extends Error {
    * AWS cofiguration error. This could be due to incorrect credentials, bucket
    * name, and/or region.
    *
-   * @param errorMsg - Message property of error object from the AWS response.
+   * @param error - Error object from the AWS response.
    */
-  public constructor(errorMsg: string) {
-    super(`AWS configuration error: ${errorMsg}`);
+  public constructor(error: unknown) {
+    let err_msg = "";
+    if (error instanceof Error) {
+      err_msg = error.message;
+    }
+    super(`AWS configuration error: ${err_msg}`);
     this.name = "AWSConfigError";
   }
 }
+
 /** Error for when URL from Django API is not formatted as expected. */
 export class URLWrongError extends Error {
   /** Throw error when URL is not formatted correctly. */
   public constructor() {
     super("URL is different than expected.");
     this.name = "URLWrongError";
+  }
+}
+
+/** Error for when temporary AWS credentials are not found on the page. */
+export class MissingCredentials extends Error {
+  /** Throw error when AWS credentials are not found. */
+  public constructor() {
+    super("AWS credentials for video uploading not found.");
+    this.name = "MissingCredentials";
+  }
+}
+
+/** Error for when temporary AWS credentials have expired. */
+export class ExpiredCredentials extends Error {
+  /** Throw error when temporary AWS credentials have expired. */
+  public constructor() {
+    super(
+      "The video upload credentials have expired. Please re-start the experiment on the CHS website.",
+    );
+    alert(
+      "Your credentials have expired. Please re-start the experiment on the CHS website.",
+    );
+    this.name = "ExpiredCredentials";
   }
 }
