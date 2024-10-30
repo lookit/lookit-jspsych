@@ -50,6 +50,32 @@ interface MediaDeviceInfo {
   groupId: string;
 }
 
+export const html_params = {
+  webcam_container_id: "lookit-jspsych-webcam-container",
+  reload_button_id_text: "lookit-jspsych-reload-webcam",
+  reload_button_id_cam: "lookit-jspsych-reload-cam-mic",
+  camera_selection_id: "lookit-jspsych-which-webcam",
+  mic_selection_id: "lookit-jspsych-which-mic",
+  next_button_id: "lookit-jspsych-next",
+  error_msg_div_id: "lookit-jspsych-video-config-errors",
+  step1_id: "lookit-jspsych-step1",
+  step2_id: "lookit-jspsych-step2",
+  step3_id: "lookit-jspsych-step3",
+  step_complete_class: "lookit-jspsych-step-complete",
+  // info/error messages
+  step_complete_text: "Done!",
+  waiting_for_access_msg: "Waiting for camera/mic access...",
+  checking_mic_msg: "Checking mic input...",
+  access_problem_msg: "There was a problem accessing your media devices.",
+  setup_problem_msg: "There was a problem setting up your camera and mic.",
+  chromeInitialPrompt,
+  chromeAlwaysAllow,
+  chromePermissions,
+  firefoxInitialPrompt,
+  firefoxChooseDevice,
+  firefoxDevicesBlocked,
+};
+
 /**
  * **Video Config**.
  *
@@ -73,26 +99,6 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   private minVolume: number = 0.1;
   private micChecked: boolean = false;
   private processorNode: AudioWorkletNode | null = null;
-  // HTML IDs and classes
-  private webcam_container_id: string = "lookit-jspsych-webcam-container";
-  private reload_button_id_text: string = "lookit-jspsych-reload-webcam";
-  private reload_button_id_cam: string = "lookit-jspsych-reload-cam-mic";
-  private camera_selection_id: string = "lookit-jspsych-which-webcam";
-  private mic_selection_id: string = "lookit-jspsych-which-mic";
-  private next_button_id: string = "lookit-jspsych-next";
-  private error_msg_div_id: string = "lookit-jspsych-video-config-errors";
-  private step1_id: string = "lookit-jspsych-step1";
-  private step2_id: string = "lookit-jspsych-step2";
-  private step3_id: string = "lookit-jspsych-step3";
-  private step_complete_class: string = "lookit-jspsych-step-complete";
-  // info/error messages
-  private step_complete_text: string = "Done!";
-  private waiting_for_access_msg: string = "Waiting for camera/mic access...";
-  private checking_mic_msg: string = "Checking mic input...";
-  private access_problem_msg: string =
-    "There was a problem accessing your media devices.";
-  private setup_problem_msg: string =
-    "There was a problem setting up your camera and mic.";
 
   /**
    * Constructor for video config plugin.
@@ -127,25 +133,6 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    * @param trial - Trial object.
    */
   private addHtmlContent = (trial: VideoConsentTrialType) => {
-    const html_params = {
-      webcam_container_id: this.webcam_container_id,
-      reload_button_id_cam: this.reload_button_id_cam,
-      camera_selection_id: this.camera_selection_id,
-      mic_selection_id: this.mic_selection_id,
-      step1_id: this.step1_id,
-      step2_id: this.step2_id,
-      step3_id: this.step3_id,
-      step_complete_class: this.step_complete_class,
-      step_complete_text: this.step_complete_text,
-      reload_button_id_text: this.reload_button_id_text,
-      next_button_id: this.next_button_id,
-      chromeInitialPrompt,
-      chromeAlwaysAllow,
-      chromePermissions,
-      firefoxInitialPrompt,
-      firefoxChooseDevice,
-      firefoxDevicesBlocked,
-    };
     this.display_el!.innerHTML = chsTemplates.videoConfig(trial, html_params);
   };
 
@@ -153,13 +140,13 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   private addEventListeners = () => {
     // Next button.
     const next_button_el = this.display_el?.querySelector(
-      `#${this.next_button_id}`,
+      `#${html_params.next_button_id}`,
     ) as HTMLButtonElement;
     next_button_el.addEventListener("click", this.nextButtonClick);
     // Reload buttons.
     (
       this.display_el?.querySelectorAll(
-        `#${this.reload_button_id_cam}, #${this.reload_button_id_text}`,
+        `#${html_params.reload_button_id_cam}, #${html_params.reload_button_id_text}`,
       ) as NodeListOf<HTMLButtonElement>
     ).forEach((el) => el.addEventListener("click", this.reloadButtonClick));
     // Camera/mic selection elements.
@@ -209,7 +196,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     // Don't reset step 2 (reload) because that should persist after being checked once with any Recorder/devices.
     this.updateInstructions(1, false);
     this.updateInstructions(3, false);
-    this.updateErrors(this.waiting_for_access_msg);
+    this.updateErrors(html_params.waiting_for_access_msg);
     await this.requestPermission({ video: true, audio: true });
     this.updateErrors("");
     await this.onDeviceChange();
@@ -257,11 +244,11 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   }) => {
     // Clear any existing options in select elements
     const cam_selection_el = this.display_el?.querySelector(
-      `#${this.camera_selection_id}`,
+      `#${html_params.camera_selection_id}`,
     ) as HTMLSelectElement;
     cam_selection_el.innerHTML = "";
     const mic_selection_el = this.display_el?.querySelector(
-      `#${this.mic_selection_id}`,
+      `#${html_params.mic_selection_id}`,
     ) as HTMLSelectElement;
     mic_selection_el.innerHTML = "";
     // Populate select elements with current device options.
@@ -297,13 +284,13 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     // Get the devices selected from the drop-down element.
     const selected_cam: string = (
       this.display_el?.querySelector(
-        `#${this.camera_selection_id}`,
+        `#${html_params.camera_selection_id}`,
       ) as HTMLSelectElement
     ).value;
     this.camId = selected_cam;
     const selected_mic: string = (
       this.display_el?.querySelector(
-        `#${this.mic_selection_id}`,
+        `#${html_params.mic_selection_id}`,
       ) as HTMLSelectElement
     ).value;
     this.micId = selected_mic;
@@ -330,11 +317,11 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     if (this.jsPsych.pluginAPI.getCameraRecorder() && this.recorder) {
       this.recorder.insertWebcamFeed(
         this.display_el?.querySelector(
-          `#${this.webcam_container_id}`,
+          `#${html_params.webcam_container_id}`,
         ) as HTMLDivElement,
       );
       this.updateInstructions(1, true);
-      this.updateErrors(this.checking_mic_msg);
+      this.updateErrors(html_params.checking_mic_msg);
       try {
         await this.checkMic();
         this.updateErrors("");
@@ -345,11 +332,11 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
         }
       } catch (e) {
         console.warn(`${e}`);
-        this.updateErrors(this.setup_problem_msg);
+        this.updateErrors(html_params.setup_problem_msg);
         throw new Error(`${e}`);
       }
     } else {
-      this.updateErrors(this.access_problem_msg);
+      this.updateErrors(html_params.access_problem_msg);
       throw new NoStreamError();
     }
   };
@@ -551,15 +538,15 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     let step_id = null;
     switch (step) {
       case 1: {
-        step_id = this.step1_id;
+        step_id = html_params.step1_id;
         break;
       }
       case 2: {
-        step_id = this.step2_id;
+        step_id = html_params.step2_id;
         break;
       }
       case 3: {
-        step_id = this.step3_id;
+        step_id = html_params.step3_id;
         break;
       }
     }
@@ -589,7 +576,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    */
   private updateErrors = (errorMsg: string) => {
     const error_msg_div = this.display_el?.querySelector(
-      `#${this.error_msg_div_id}`,
+      `#${html_params.error_msg_div_id}`,
     ) as HTMLDivElement;
     error_msg_div.innerHTML = errorMsg;
   };
@@ -650,14 +637,14 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    */
   private enableNext = (enable: boolean) => {
     const next_button_el = this.display_el?.querySelector(
-      `#${this.next_button_id}`,
+      `#${html_params.next_button_id}`,
     ) as HTMLButtonElement;
     if (enable) {
       next_button_el.disabled = false;
-      next_button_el.classList.add(`${this.step_complete_class}`);
+      next_button_el.classList.add(`${html_params.step_complete_class}`);
     } else {
       next_button_el.disabled = true;
-      next_button_el.classList.remove(`${this.step_complete_class}`);
+      next_button_el.classList.remove(`${html_params.step_complete_class}`);
     }
   };
 }
