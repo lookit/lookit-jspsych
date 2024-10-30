@@ -1,5 +1,5 @@
 import { initJsPsych } from "jspsych";
-import { ExitSurveyPlugin, Trial as ExitTrial } from "./exit";
+import { ExitSurveyPlugin, Trial as ExitTrial } from "./exitSurvey";
 import { names, surveyJSON } from "./exit_json";
 
 afterEach(() => {
