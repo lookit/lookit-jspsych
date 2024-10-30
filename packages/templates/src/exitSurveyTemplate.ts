@@ -5,7 +5,7 @@ import { setLocale } from "./utils";
 
 declare const window: LookitWindow;
 
-export const names = <const>{
+const names = <const>{
   birthDate: "birthDate",
   databraryShare: "databraryShare",
   useOfMedia: "useOfMedia",
@@ -13,7 +13,7 @@ export const names = <const>{
   feedback: "feedback",
 };
 
-export const surveyJSON = {
+const survey = {
   pages: [
     {
       elements: [
@@ -89,7 +89,7 @@ export const surveyJSON = {
  */
 const privateLevelOnly = (trial: TrialType<PluginInfo>) => {
   if (trial.private_level_only) {
-    const media_use_element = surveyJSON.pages[0].elements.find(
+    const media_use_element = survey.pages[0].elements.find(
       (element) => element.name === names.useOfMedia,
     );
     media_use_element &&
@@ -109,7 +109,7 @@ const privateLevelOnly = (trial: TrialType<PluginInfo>) => {
  */
 const showDatabraryOptions = (trial: TrialType<PluginInfo>) => {
   if (!trial.show_databrary_options) {
-    const survey_elements = surveyJSON.pages[0].elements;
+    const survey_elements = survey.pages[0].elements;
     const databrary_share_element_idx = survey_elements.findIndex(
       (element) => element.name === names.databraryShare,
     );
@@ -123,7 +123,7 @@ const showDatabraryOptions = (trial: TrialType<PluginInfo>) => {
  * @param trial - Info parameters.
  */
 const additionalVideoPrivacyText = (trial: TrialType<PluginInfo>) => {
-  const element = surveyJSON.pages[0].elements.find(
+  const element = survey.pages[0].elements.find(
     (element) => element.name === names.useOfMedia,
   );
   element &&
@@ -146,7 +146,7 @@ const translation = (trial: TrialType<PluginInfo>) => {
     name,
   };
 
-  surveyJSON.pages[0].elements.forEach((element) => {
+  survey.pages[0].elements.forEach((element) => {
     // Descriptions
     element.description &&
       Object.assign(element, {
@@ -176,5 +176,5 @@ export const exitSurvey = (trial: TrialType<PluginInfo>) => {
   privateLevelOnly(trial);
   translation(trial);
 
-  return surveyJSON;
+  return survey;
 };
