@@ -451,9 +451,7 @@ exp-video-config:
     Sua webcam deve reaparecer SEM que você precise permitir o acesso novamente.
     (Se você vir uma caixa de diálogo, clique em "Lembrar desta decisão" ou
     "Sempre permitir" e tente novamente!)
-  step-3:
-    Certifique-se de que podemos ouvi-lo! Esta caixa será preenchida assim que
-    ouvirmos um som alto o suficiente
+  step-3: Certifique-se de que podemos ouvi-lo!
   step-3-warning:
     Verifique primeiro se o áudio da sua gravação está alto o suficiente. Faça
     algum Barulho!

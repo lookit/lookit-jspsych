@@ -728,9 +728,7 @@ exp-video-config:
     Votre webcam devrait réapparaître SANS que vous ayez besoin d'approuver à
     nouveau l'accès. (Si vous voyez encore une boîte de dialogue, cliquez «Se
     souvenir de ce choix» ou «Toujours permettre» et essayez à nouveau!)
-  step-3:
-    Assurez-vous que nous puissions vous entendre! Cette boîte se remplira une
-    fois que nous aurons entendu un son suffisamment long
+  step-3: Assurez-vous que nous puissions vous entendre!
   sounds-good: Très bien!
   try-clapping: Essayez de taper des mains ou de dire bonjour.
   step-2-warning:

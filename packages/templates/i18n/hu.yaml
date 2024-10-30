@@ -671,9 +671,7 @@ exp-video-config:
     kellene a hozzáférést. (Ha lát egy párbeszédablakot, kattintson a
     "Emlékezzen erre a döntésre" vagy a "Mindig engedélyezze" gombra, és
     próbálja újra!)
-  step-3:
-    Győződjön meg róla, hogy halljuk Önt! Ez a mező akkor lesz teli, ha elég
-    hangos hangot hallunk
+  step-3: Győződjön meg róla, hogy halljuk Önt!
   sounds-good: Jòl hallhatò!
   try-clapping: Pròbáljon tapsolni vagy köszönjön.
   step-2-warning:

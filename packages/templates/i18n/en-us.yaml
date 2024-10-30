@@ -619,9 +619,7 @@ exp-video-config:
     Your webcam should re-appear WITHOUT you having to allow access again. (If
     you do see a dialogue, click "Remember this decision" or "Always allow" and
     try again!)
-  step-3:
-    Make sure we'll be able to hear you! This box will be filled in once we hear
-    a loud enough sound
+  step-3: Make sure we'll be able to hear you!
   sounds-good: Sounds good!
   try-clapping: Try clapping or saying hi.
   step-2-warning:

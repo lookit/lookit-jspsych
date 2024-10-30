@@ -424,9 +424,7 @@ exp-video-config:
     La tua webcam dovrebbe riapparire SENZA che tu debba consentire nuovamente
     l'accesso. (Se vedi una finestra di dialogo, fai clic su "Ricorda questa
     decisione" o "Consenti sempre" e riprova!)
-  step-3:
-    Assicurati che possiamo sentirti chiaramente! Questa casella diventerà verde
-    quando sentiremo un suono abbastanza alto
+  step-3: Assicurati che possiamo sentirti chiaramente!
   sounds-good: Ti sentiamo bene!
   try-clapping: Prova ad applaudire o a salutare.
   step-2-warning:

@@ -627,9 +627,7 @@ exp-video-config:
     Webcamak berriz agertu beharko luke berriz baimenik eman GABE. (Dialogo bat
     agertzen bada, sakatu "Gogoratu aukera hau" edo "Beti baimendu" eta berriz
     saiatu!)
-  step-3:
-    Entzun zaitzakegula egiaztatu! Hotsa behar bezain altua denean kutxa hau
-    beteko da
+  step-3: Entzun zaitzakegula egiaztatu!
   sounds-good: Itxura ona du!
   try-clapping: Txalo egin edo kaixo esan.
   step-2-warning:

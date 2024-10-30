@@ -419,9 +419,7 @@ exp-video-config:
     Uw webcam zou opnieuw moeten verschijnen ZONDER dat u opnieuw toegang hoeft
     te verlenen. (Als je een dialoogvenster ziet, klik dan op 'Onthoud deze
     beslissing' of 'Altijd toestaan' en probeer het opnieuw!)
-  step-3:
-    Zorg ervoor dat we u kunnen horen! Dit vak wordt ingevuld zodra we een
-    voldoende luid geluid horen
+  step-3: Zorg ervoor dat we u kunnen horen!
   sounds-good: Klinkt goed!
   try-clapping: Probeer te klappen of hallo te zeggen.
   step-2-warning:
