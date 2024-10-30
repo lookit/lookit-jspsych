@@ -608,7 +608,7 @@ exp-video-config:
   see-troubleshooting:
     See the troubleshooting directions below if you're having trouble!
   step-1-title: Make sure you can see yourself to the left!
-  step1-text:
+  step-1-text:
     You may need to click "Allow" so that we can access your webcam and
     microphone. On Firefox, make sure to also check "Remember this decision"!
   looks-good: Looks good!
