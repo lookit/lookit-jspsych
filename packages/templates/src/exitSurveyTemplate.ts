@@ -157,9 +157,10 @@ const translation = (trial: TrialType<PluginInfo>) => {
     Object.assign(element, { title: i18next.t(element.title, view) });
 
     // Choices
-    element.choices?.forEach((choice) => {
-      Object.assign(choice, { text: i18next.t(choice.text, view) });
-    });
+    element.choices &&
+      element.choices.forEach((choice) => {
+        Object.assign(choice, { text: i18next.t(choice.text, view) });
+      });
   });
 };
 
