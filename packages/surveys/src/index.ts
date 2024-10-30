@@ -1,4 +1,4 @@
 import { ConsentSurveyPlugin } from "./consentSurvey";
-import { ExitSurveyPlugin } from "./exit";
+import { ExitSurveyPlugin } from "./exitSurvey";
 
 export default { ExitSurveyPlugin, ConsentSurveyPlugin };
