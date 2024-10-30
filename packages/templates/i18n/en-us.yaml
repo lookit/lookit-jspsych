@@ -607,10 +607,10 @@ exp-video-config:
   click-here-to-detect: click here to detect
   see-troubleshooting:
     See the troubleshooting directions below if you're having trouble!
-  step-1:
-    Make sure you can see yourself to the left! You may need to click "Allow" so
-    that we can access your webcam and microphone. On Firefox, make sure to also
-    check "Remember this decision"!
+  step-1-title: Make sure you can see yourself to the left!
+  step1-text:
+    You may need to click "Allow" so that we can access your webcam and
+    microphone. On Firefox, make sure to also check "Remember this decision"!
   looks-good: Looks good!
   no-webcam-detected: No webcam detected
   step-2-click-directions: Make sure your webcam settings got saved by clicking

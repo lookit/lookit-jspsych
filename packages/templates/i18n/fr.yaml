@@ -714,11 +714,11 @@ exp-video-config:
   see-troubleshooting:
     Voir les conseils ci-dessous pour la résolution de problèmes si vous avez
     des difficultés.
-  step-1:
-    Assurez-vous que vous soyez visible à gauche. Il peut être nécessaire de
-    cliquer «Permettre» pour que nous puissions avoir accès à votre webcam et
-    micro. Sur Firefox, assurez-vous aussi de sélectionner «Se souvenir de ce
-    choix»!
+  step-1-title: Assurez-vous que vous soyez visible à gauche.
+  step-1-text:
+    Il peut être nécessaire de cliquer «Permettre» pour que nous puissions avoir
+    accès à votre webcam et micro. Sur Firefox, assurez-vous aussi de
+    sélectionner «Se souvenir de ce choix»!
   looks-good: Très bien!
   no-webcam-detected: Aucune webcam n'est détectée
   step-2-click-directions:

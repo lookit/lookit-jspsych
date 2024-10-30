@@ -614,10 +614,11 @@ exp-video-config:
   click-here-to-detect: klikatu hemen kamera hautemateko
   see-troubleshooting:
     Arazorik baduzu, ikusi behean dauden arazoak konpontzeko jarraibideak!
-  step-1:
-    Ziurtatu zeure burua ezkerretara ikusten duzula! Beharbada "Baimendu"
-    klikatu beharko duzu webcamerako eta mikrofonorako sarbidea izan dezagun.
-    Firefoxen, ziurtatu "Aukera hau gogoratu" tikatzen duzula!
+  step-1-title: Ziurtatu zeure burua ezkerretara ikusten duzula!
+  step-1-text:
+    Beharbada "Baimendu" klikatu beharko duzu webcamerako eta mikrofonorako
+    sarbidea izan dezagun. Firefoxen, ziurtatu "Aukera hau gogoratu" tikatzen
+    duzula!
   looks-good: Itxura ona du!
   no-webcam-detected: Ez da webcamik hauteman
   step-2-click-directions: Ziurtatu webcam ezarpenak gorde direla

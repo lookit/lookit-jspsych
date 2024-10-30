@@ -409,11 +409,11 @@ exp-video-config:
   see-troubleshooting:
     Se hai problemi, consulta le istruzioni per la risoluzione dei problemi di
     seguito!
-  step-1:
-    Assicurati di essere nell'inquadratura a sinistra! Potrebbe essere
-    necessario fare clic su "Consenti" per farci accedere alla tua webcam e
-    microfono. Su Firefox, assicurati di selezionare anche "Ricorda questa
-    decisione"!
+  step-1-title: Assicurati di essere nell'inquadratura a sinistra!
+  step-1-text:
+    Potrebbe essere necessario fare clic su "Consenti" per farci accedere alla
+    tua webcam e microfono. Su Firefox, assicurati di selezionare anche "Ricorda
+    questa decisione"!
   looks-good: Ti vediamo bene!
   no-webcam-detected: Nessuna webcam e' stata rilevata
   step-2-click-directions:

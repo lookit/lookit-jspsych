@@ -437,10 +437,11 @@ exp-video-config:
     problemas!
   setup-tips-header: Dicas de configuração e solução de problemas
   sounds-good: Soa bem!
-  step-1:
-    Certifique-se de que você pode se ver à esquerda! Pode ser necessário clicar
-    em "Permitir" para que possamos acessar sua webcam e microfone. No Firefox,
-    certifique-se de marcar também "Lembrar desta decisão"!
+  step-1-title: Certifique-se de que você pode se ver à esquerda!
+  step-1-text:
+    Pode ser necessário clicar em "Permitir" para que possamos acessar sua
+    webcam e microfone. No Firefox, certifique-se de marcar também "Lembrar
+    desta decisão"!
   step-2-click-directions:
     Certifique-se de que as configurações da sua webcam foram salvas clicando em
   step-2-warning:
