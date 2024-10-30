@@ -1,6 +1,6 @@
+import { names, surveyJSON } from "@lookit/templates/dist/exit_json";
 import { initJsPsych } from "jspsych";
 import { ExitSurveyPlugin, Trial as ExitTrial } from "./exitSurvey";
-import { names, surveyJSON } from "./exit_json";
 
 afterEach(() => {
   jest.clearAllMocks();

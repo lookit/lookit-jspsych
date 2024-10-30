@@ -1,7 +1,7 @@
 import SurveyPlugin from "@jspsych/plugin-survey";
 import { initJsPsych } from "jspsych";
 import { Trial as ConsentTrial } from "./consentSurvey";
-import { Trial as ExitTrial } from "./exit";
+import { Trial as ExitTrial } from "./exitSurvey";
 import Surveys from "./index";
 import { consentSurveyFunction, exitSurveyFunction } from "./utils";
 
