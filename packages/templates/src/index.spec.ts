@@ -95,3 +95,19 @@ test("video config template in Italian", () => {
     `<h2>Configurazione della webcam</h2>`,
   );
 });
+
+test("uploading video template", () => {
+  const trial = getTrial();
+
+  expect(chsTemplate.uploadingVideo(trial)).toContain(
+    "<div>uploading video, please wait...</div>",
+  );
+});
+
+test("uploading video template in Portuguese", () => {
+  const trial = getTrial({ locale: "pt" });
+
+  expect(chsTemplate.uploadingVideo(trial)).toContain(
+    "<div>enviando vídeo, por favor, aguarde...</div>",
+  );
+});
