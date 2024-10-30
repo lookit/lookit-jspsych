@@ -1,5 +1,6 @@
 import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
+import checkmarkIcon from "../img/checkmark-icon.png";
 import chromeInitialPrompt from "../img/chrome_initialprompt.png";
 import chromeAlwaysAllow from "../img/chrome_step1_alwaysallow.png";
 import chromePermissions from "../img/chrome_step1_permissions.png";
@@ -63,7 +64,6 @@ export const html_params = {
   step3_id: "lookit-jspsych-step3",
   step_complete_class: "lookit-jspsych-step-complete",
   // info/error messages
-  step_complete_text: "Done!",
   waiting_for_access_msg: "Waiting for camera/mic access...",
   checking_mic_msg: "Checking mic input...",
   access_problem_msg: "There was a problem accessing your media devices.",
@@ -74,6 +74,7 @@ export const html_params = {
   firefoxInitialPrompt,
   firefoxChooseDevice,
   firefoxDevicesBlocked,
+  checkmarkIcon,
 };
 
 /**
