@@ -12,7 +12,6 @@ type VideoConfigTemplateParams = {
   step2_id: string;
   step3_id: string;
   step_complete_class: string;
-  step_complete_text: string;
   reload_button_id_text: string;
   next_button_id: string;
   chromeInitialPrompt: string;
@@ -21,6 +20,7 @@ type VideoConfigTemplateParams = {
   firefoxInitialPrompt: string;
   firefoxChooseDevice: string;
   firefoxDevicesBlocked: string;
+  checkmarkIcon: string;
 };
 
 /**
