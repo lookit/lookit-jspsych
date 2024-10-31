@@ -3,6 +3,28 @@
 This package contains the plugins and extensions to record audio and/or video of
 either a single trial or multiple trials.
 
+## Parameters available in all plugins
+
+**`locale` [String | "en-us"]**
+
+Optional parameter to set a two-letter language code for translation. In some
+cases, a regional code will have to be provided as well. For example, we
+currently support english only from the US region. Therefore, to get the US
+english translation you would put "en-US" for the locale. We support the
+following language codes:
+
+| Language       | Region | Code  |
+| -------------- | ------ | ----- |
+| Basque         |        | eu    |
+| Dutch, Flemish |        | nl    |
+| English        | U.S.A. | en-US |
+| French         |        | fr    |
+| Hungarian      |        | hu    |
+| Italian        |        | it    |
+| Japanese       |        | ja    |
+| Portuguese     | Brazil | pt-BR |
+| Portuguese     |        | pt    |
+
 ## Video Configuration
 
 To record _any_ video during an experiment, including a consent video, you must
@@ -211,26 +233,6 @@ possible! E.g., “Why do babies love cats? This study will help us find out
 whether babies love cats because of their soft fur or their twitchy tails.”
 
 #### Optional
-
-**`locale` [String | "en-us"]**
-
-Optional parameter to set a two-letter language code for translation. In some
-cases, a regional code will have to be provided as well. For example, we
-currently support english only from the US region. Therefore, to get the US
-english translation you would put "en-US" for the locale. We support the
-following language codes:
-
-| Language       | Region | Code  |
-| -------------- | ------ | ----- |
-| Basque         |        | eu    |
-| Dutch, Flemish |        | nl    |
-| English        | U.S.A. | en-US |
-| French         |        | fr    |
-| Hungarian      |        | hu    |
-| Italian        |        | it    |
-| Japanese       |        | ja    |
-| Portuguese     | Brazil | pt-BR |
-| Portuguese     |        | pt    |
 
 **`template` [String | "consent_005"]**
 
