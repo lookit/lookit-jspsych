@@ -9117,3 +9117,7 @@ div#lookit-jspsych-video-config .lookit-jspsych-screenshot {
   margin: 15px auto;
   max-width: 30%;
 }
+
+video.webcam-feed {
+  transform: rotateY(180deg);
+}
