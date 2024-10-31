@@ -63,11 +63,10 @@ export const html_params = {
   step2_id: "lookit-jspsych-step2",
   step3_id: "lookit-jspsych-step3",
   step_complete_class: "lookit-jspsych-step-complete",
-  // info/error messages
-  waiting_for_access_msg: "Waiting for camera/mic access...",
-  checking_mic_msg: "Checking mic input...",
-  access_problem_msg: "There was a problem accessing your media devices.",
-  setup_problem_msg: "There was a problem setting up your camera and mic.",
+  waiting_for_access_msg_id: "lookit-jspsych-waiting-for-access",
+  checking_mic_msg_id: "lookit-jspsych-checking-mic",
+  access_problem_msg_id: "lookit-jspsych-access-problem",
+  setup_problem_msg_id: "lookit-jspsych-setup-problem",
   chromeInitialPrompt,
   chromeAlwaysAllow,
   chromePermissions,
@@ -197,9 +196,9 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
     // Don't reset step 2 (reload) because that should persist after being checked once with any Recorder/devices.
     this.updateInstructions(1, false);
     this.updateInstructions(3, false);
-    this.updateErrors(html_params.waiting_for_access_msg);
+    this.updateErrors(html_params.waiting_for_access_msg_id);
     await this.requestPermission({ video: true, audio: true });
-    this.updateErrors("");
+    this.updateErrors();
     await this.onDeviceChange();
     await this.setDevices();
     await this.runStreamChecks();
@@ -322,10 +321,10 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
         ) as HTMLDivElement,
       );
       this.updateInstructions(1, true);
-      this.updateErrors(html_params.checking_mic_msg);
+      this.updateErrors(html_params.checking_mic_msg_id);
       try {
         await this.checkMic();
-        this.updateErrors("");
+        this.updateErrors();
         this.updateInstructions(3, true);
         // Allow user to continue (end trial) when all checks have passed.
         if (this.hasReloaded) {
@@ -333,11 +332,11 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
         }
       } catch (e) {
         console.warn(`${e}`);
-        this.updateErrors(html_params.setup_problem_msg);
+        this.updateErrors(html_params.setup_problem_msg_id);
         throw new Error(`${e}`);
       }
     } else {
-      this.updateErrors(html_params.access_problem_msg);
+      this.updateErrors(html_params.access_problem_msg_id);
       throw new NoStreamError();
     }
   };
@@ -572,14 +571,27 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    * Update the errors/messages div with information for the user about the
    * camera/mic checks.
    *
-   * @param errorMsg - Message to display in the error message div. Pass an
-   *   empty string to clear any existing errors/messages.
+   * @param errorMsgId - Span element ID containing the message to display in
+   *   the error message div. Call the function without an errorMsgId to clear
+   *   the errors.
    */
-  private updateErrors = (errorMsg: string) => {
-    const error_msg_div = this.display_el?.querySelector(
+  private updateErrors = (errorMsgId?: string) => {
+    const error_msg_container = this.display_el?.querySelector(
       `#${html_params.error_msg_div_id}`,
     ) as HTMLDivElement;
-    error_msg_div.innerHTML = errorMsg;
+    (
+      error_msg_container.querySelectorAll(
+        "span.error_msg",
+      ) as NodeListOf<HTMLSpanElement>
+    ).forEach((span) => {
+      span.style.display = "none";
+    });
+    if (errorMsgId) {
+      const error_msg_el = this.display_el?.querySelector(
+        `#${errorMsgId}`,
+      ) as HTMLSpanElement;
+      error_msg_el.style.display = "block";
+    }
   };
 
   /**

@@ -14,6 +14,10 @@ type VideoConfigTemplateParams = {
   step_complete_class: string;
   reload_button_id_text: string;
   next_button_id: string;
+  waiting_for_access_msg_id: string;
+  checking_mic_msg_id: string;
+  access_problem_msg_id: string;
+  setup_problem_msg_id: string;
   chromeInitialPrompt: string;
   chromeAlwaysAllow: string;
   chromePermissions: string;

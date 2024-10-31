@@ -41,7 +41,28 @@
       </div>
     </div>
     <div id="lookit-jspsych-video-config-instructions-column">
-      <div id="lookit-jspsych-video-config-errors"></div>
+      <div id="lookit-jspsych-video-config-errors">
+        <span
+          id="lookit-jspsych-waiting-for-access"
+          class="error_msg"
+          style="display: none;"
+        >{{t "exp-video-config.no-webcam-detected"}}</span>
+        <span
+          id="lookit-jspsych-checking-mic"
+          class="error_msg"
+          style="display: none;"
+        >{{t "exp-video-config.try-clapping"}}</span>
+        <span
+          id="lookit-jspsych-access-problem"
+          class="error_msg"
+          style="display: none;"
+        >{{t "exp-video-config.camera-access-warning"}}</span>
+        <span
+          id="lookit-jspsych-setup-problem"
+          class="error_msg"
+          style="display: none;"
+        >{{t "exp-video-config.see-troubleshooting"}}</span>
+      </div>
       <ol id="lookit-jspsych-video-config-instructions">
         <li id="{{step1_id}}">
           <strong>{{t "exp-video-config.step-1-title"}}</strong>
@@ -86,7 +107,8 @@
             id="{{step3_id}}-span"
             style="visibility: hidden"
             class="{{step_complete_class}}"
-          ><img
+          >{{t "exp-video-config.sounds-good"}}
+            <img
               class="lookit-jspsych-checkmark"
               src="{{checkmarkIcon}}"
               alt="Green checkmark"
