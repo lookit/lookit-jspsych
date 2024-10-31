@@ -4,9 +4,13 @@ import DOMPurify from "dompurify";
 import { marked } from "marked";
 import { Model } from "survey-core";
 import "survey-core/survey.i18n";
-import { Trial } from "./exitSurvey";
+import { Trial as ConsentSurveyTrial } from "./consentSurvey";
+import { TrialLocaleParameterUnset } from "./errors";
+import { Trial as ExitSurveyTrial } from "./exitSurvey";
 
 declare let window: LookitWindow;
+
+type LocaleTrial = ConsentSurveyTrial | ExitSurveyTrial;
 
 const CONFIG = <const>{
   marked: { async: false },
@@ -31,6 +35,19 @@ export const textMarkdownSurveyFunction = (survey: Model) => {
 };
 
 /**
+ * Set locale parameter on SurveyJS Model.
+ *
+ * @param survey - SurveyJS model
+ * @param trial - Trial data including user supplied parameters.
+ */
+const setSurveyLocale = (survey: Model, trial: LocaleTrial) => {
+  if (!trial.locale) {
+    throw new TrialLocaleParameterUnset();
+  }
+  survey.locale = new Intl.Locale(trial.locale).baseName;
+};
+
+/**
  * Survey function used in exit survey. Adds markdown support through
  * "textMarkdownSurveyFunction". For the withdrawal checkbox question, this
  * takes the boolean response value out of an array and saves it as a single
@@ -41,20 +58,19 @@ export const textMarkdownSurveyFunction = (survey: Model) => {
  * @param trial - Trial data including user supplied parameters.
  * @returns Survey model.
  */
-export const exitSurveyFunction = (trial: Trial) => (survey: Model) => {
-  if (trial.locale) {
-    survey.locale = new Intl.Locale(trial.locale).baseName;
-  }
+export const exitSurveyFunction =
+  (trial: ExitSurveyTrial) => (survey: Model) => {
+    setSurveyLocale(survey, trial);
+    textMarkdownSurveyFunction(survey);
 
-  textMarkdownSurveyFunction(survey);
+    survey.onComplete.add((sender) => {
+      const trueFalseValue =
+        sender.getQuestionByName("withdrawal").value.length > 0;
+      sender.setValue("withdrawal", trueFalseValue);
+    });
 
-  survey.onComplete.add((sender) => {
-    const trueFalseValue =
-      sender.getQuestionByName("withdrawal").value.length > 0;
-    sender.setValue("withdrawal", trueFalseValue);
-  });
-  return survey;
-};
+    return survey;
+  };
 
 /**
  * Survey function used by Consent Survey. Adds markdown support through
@@ -62,11 +78,12 @@ export const exitSurveyFunction = (trial: Trial) => (survey: Model) => {
  * that consent was completed, and that the consent was through a survey (rather
  * than video).
  *
- * @param userfn - Survey function provided by user.
+ * @param trial - Trial data including user supplied parameters.
  * @returns Survey model.
  */
-export const consentSurveyFunction = (userfn?: (x: Model) => Model) => {
-  return function (survey: Model) {
+export const consentSurveyFunction =
+  (trial: ConsentSurveyTrial) => (survey: Model) => {
+    setSurveyLocale(survey, trial);
     textMarkdownSurveyFunction(survey);
 
     survey.onComplete.add(async () => {
@@ -76,10 +93,9 @@ export const consentSurveyFunction = (userfn?: (x: Model) => Model) => {
       });
     });
 
-    if (typeof userfn === "function") {
-      userfn(survey);
+    if (typeof trial.survey_function === "function") {
+      trial.survey_function(survey);
     }
 
     return survey;
   };
-};
