@@ -1,7 +1,7 @@
 import SurveyPlugin from "@jspsych/plugin-survey";
 import chsTemplates from "@lookit/templates";
 import { ParameterType, TrialType } from "jspsych";
-import { exitSurveyFunction as survey_function } from "./utils";
+import { exitSurveyFunction } from "./utils";
 
 const info = <const>{
   ...SurveyPlugin.info,
@@ -48,11 +48,11 @@ export class ExitSurveyPlugin extends SurveyPlugin {
    * @param display_element - Display element.
    * @param trial - Info parameters.
    */
-  public trial(display_element: HTMLElement, trial: TrialType<Info>) {
+  public trial(display_element: HTMLElement, trial: Trial) {
     super.trial(display_element, {
       ...trial,
       survey_json: chsTemplates.exitSurvey(trial),
-      survey_function,
+      survey_function: exitSurveyFunction(trial),
     });
   }
 
