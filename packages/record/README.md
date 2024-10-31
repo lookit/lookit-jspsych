@@ -232,11 +232,11 @@ following language codes:
 | Portuguese     | Brazil | pt-BR |
 | Portuguese     |        | pt    |
 
-**`template` [String | "consent_005"]**
+**`template` [String | "consent-template-5"]**
 
 Which consent document template to use. If you are setting up a new study, we
 recommend using the most recent (highest number) of these options. Options:
-`consent_005`
+`consent-template-5`, `consent-garden`.
 
 **`additional_video_privacy_statement` [String | ""]**
 
