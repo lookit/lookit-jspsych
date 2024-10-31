@@ -1,4 +1,5 @@
 import { Model } from "survey-jquery";
+import { TrialLocaleParameterUnset } from "./errors";
 import { Trial } from "./exitSurvey";
 import {
   consentSurveyFunction,
@@ -17,9 +18,10 @@ jest.mock("@lookit/data", () => ({
  * @param values - Additonal paramters added to trial object
  * @returns Trial object
  */
-const getTrial = (values: Record<string, string | boolean> = {}) =>
+const getTrial = (values: Record<string, string | boolean | undefined> = {}) =>
   ({
     locale: "en-US",
+    survey_function: jest.fn(),
     ...values,
   }) as unknown as Trial;
 
@@ -98,7 +100,8 @@ test("Anonymous function within exit survey function where withdrawal is 0", () 
 
 test("Consent survey function", () => {
   const survey = getSurvey();
-  const survey_function = consentSurveyFunction();
+  const trial = getTrial();
+  const survey_function = consentSurveyFunction(trial);
   const rtnSurvey = survey_function(survey);
 
   expect(survey.onComplete.add).toHaveBeenCalledTimes(1);
@@ -108,19 +111,20 @@ test("Consent survey function", () => {
 
 test("User function for consent survey function", () => {
   const survey = getSurvey();
-  const userFn = jest.fn();
-  const survey_function = consentSurveyFunction(userFn);
+  const trial = getTrial();
+  const survey_function = consentSurveyFunction(trial);
 
   survey_function(survey);
 
-  expect(userFn).toHaveBeenCalledTimes(1);
+  expect(trial.survey_function).toHaveBeenCalledTimes(1);
 });
 
 test("Anonymous function within consent survey function", () => {
   const addMock = jest.fn();
   const survey = getSurvey({ onComplete: { add: addMock } });
+  const trial = getTrial();
 
-  consentSurveyFunction()(survey);
+  consentSurveyFunction(trial)(survey);
 
   const anonFn = addMock.mock.calls[0][0];
 
@@ -144,4 +148,12 @@ test("Set SurveyJS locale parameter to French", () => {
   const survey = getSurvey();
   exitSurveyFunction(trial)(survey);
   expect(survey.locale).toStrictEqual(trial.locale);
+});
+
+test("Survey will throw error if locale is not set", () => {
+  const trial = getTrial({ locale: undefined });
+  const survey = getSurvey();
+  expect(() => exitSurveyFunction(trial)(survey)).toThrow(
+    TrialLocaleParameterUnset,
+  );
 });
