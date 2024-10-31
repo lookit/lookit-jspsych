@@ -14,11 +14,7 @@ jest.mock("./utils");
 
 afterEach(() => {
   jest.clearAllMocks();
-  Object.defineProperty(global, "window", {
-    value: {
-      chs: {},
-    },
-  });
+  chsData();
 });
 
 /**
@@ -40,11 +36,9 @@ const getTrial = (values: Record<string, string | boolean> = {}) =>
  *
  * @param values - Data added to global data object
  */
-const chsData = (values: typeof window.chs) => {
-  Object.defineProperty(global, "window", {
-    value: {
-      chs: values,
-    },
+const chsData = (values: typeof window.chs = {}) => {
+  Object.assign(window, {
+    chs: values,
   });
 };
 
