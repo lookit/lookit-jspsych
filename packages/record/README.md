@@ -61,69 +61,6 @@ const videoConfig = {
 };
 ```
 
-## Trial Recording
-
-To record a single trial, you will have to first load the extension in
-`initJsPsych`.
-
-```javascript
-const jsPsych = initJsPsych({
-  extensions: [{ type: chsRecord.TrialRecordExtension }],
-});
-```
-
-Next, create a video configuration trial as described above. Then, add the trial
-recoding extension parameter to your trial. By adding this extension, you can
-record any trial you design.
-
-```javascript
-const trialRec = {
-  // ... Other trial paramters ...
-  extensions: [{ type: chsRecord.TrialRecordExtension }],
-};
-```
-
-Finally, insert the trials into the timeline.
-
-```javascript
-jsPsych.run([videoConfig, trialRec]);
-```
-
-## Session Recording
-
-You might prefer to record across multiple trials in a study session. This can
-be done by using trials created with the start and stop recording plugins. This
-gives a bit of flexibility over which of the study trials are recorded.
-
-To record a study session, create the start and stop recording trials.
-
-```javascript
-const startRec = { type: chsRecord.StartRecordPlugin };
-const stopRec = { type: chsRecord.StopRecordPlugin };
-```
-
-Next, create the trials that you would like to be recorded.
-
-```javascript
-const morning = { type: jsPsychHtmlKeyboardResponse, stimulus: "Good morning!" };
-const evening = { type: jsPsychHtmlKeyboardResponse stimulus: "Good evening!" };
-const night = { type: jsPsychHtmlKeyboardResponse, stimulus: "Good night!" };
-```
-
-Lastly, add these trials to the timeline. Again, the video configuration trial
-must come before any other recording trials.
-
-```javascript
-jsPsych.run([videoConfig, startRec, morning, evening, night, stopRec]);
-```
-
-It's possible to record only some of the trials. This can be done by moving the
-stop or start recording trials within the timeline.
-
-```javascript
-jsPsych.run([videoConfig, startRec, morning, evening, stopRec, night]);
-```
-
 ## Video Consent
 
 Users will need to record themselves accepting the consent document for your
@@ -390,3 +327,66 @@ Replace the default spoken consent statement with your custom text.
 
 Whether to omit the phrase “or in the very unlikely event of a research-related
 injury” from the contact section. (This was required by the Northwestern IRB.)
+
+## Trial Recording
+
+To record a single trial, you will have to first load the extension in
+`initJsPsych`.
+
+```javascript
+const jsPsych = initJsPsych({
+  extensions: [{ type: chsRecord.TrialRecordExtension }],
+});
+```
+
+Next, create a video configuration trial as described above. Then, add the trial
+recoding extension parameter to your trial. By adding this extension, you can
+record any trial you design.
+
+```javascript
+const trialRec = {
+  // ... Other trial paramters ...
+  extensions: [{ type: chsRecord.TrialRecordExtension }],
+};
+```
+
+Finally, insert the trials into the timeline.
+
+```javascript
+jsPsych.run([videoConfig, trialRec]);
+```
+
+## Session Recording
+
+You might prefer to record across multiple trials in a study session. This can
+be done by using trials created with the start and stop recording plugins. This
+gives a bit of flexibility over which of the study trials are recorded.
+
+To record a study session, create the start and stop recording trials.
+
+```javascript
+const startRec = { type: chsRecord.StartRecordPlugin };
+const stopRec = { type: chsRecord.StopRecordPlugin };
+```
+
+Next, create the trials that you would like to be recorded.
+
+```javascript
+const morning = { type: jsPsychHtmlKeyboardResponse, stimulus: "Good morning!" };
+const evening = { type: jsPsychHtmlKeyboardResponse stimulus: "Good evening!" };
+const night = { type: jsPsychHtmlKeyboardResponse, stimulus: "Good night!" };
+```
+
+Lastly, add these trials to the timeline. Again, the video configuration trial
+must come before any other recording trials.
+
+```javascript
+jsPsych.run([videoConfig, startRec, morning, evening, night, stopRec]);
+```
+
+It's possible to record only some of the trials. This can be done by moving the
+stop or start recording trials within the timeline.
+
+```javascript
+jsPsych.run([videoConfig, startRec, morning, evening, stopRec, night]);
+```
