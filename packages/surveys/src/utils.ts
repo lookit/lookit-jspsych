@@ -2,7 +2,9 @@ import Data from "@lookit/data";
 import { LookitWindow } from "@lookit/data/dist/types";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
-import { Model } from "survey-jquery";
+import { Model } from "survey-core";
+import "survey-core/survey.i18n";
+import { Trial } from "./exitSurvey";
 
 declare let window: LookitWindow;
 
@@ -36,10 +38,14 @@ export const textMarkdownSurveyFunction = (survey: Model) => {
  * question type rather than boolean with "renderAs: checkbox" because the
  * latter doesn't allow both a question title and label next to the checkbox.
  *
- * @param survey - Survey model provided by SurveyJS.
+ * @param trial - Trial data including user supplied parameters.
  * @returns Survey model.
  */
-export const exitSurveyFunction = (survey: Model) => {
+export const exitSurveyFunction = (trial: Trial) => (survey: Model) => {
+  if (trial.locale) {
+    survey.locale = new Intl.Locale(trial.locale).baseName;
+  }
+
   textMarkdownSurveyFunction(survey);
 
   survey.onComplete.add((sender) => {
