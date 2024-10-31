@@ -359,13 +359,20 @@ test("Video config update errors", () => {
     `#${html_params["error_msg_div_id"]}`,
   ) as HTMLDivElement;
 
-  // Error/info message div is empty when the page first loads.
-  expect(error_msg_div.innerHTML).toStrictEqual("");
+  // Error/info messages are all hidden when the page first loads.
+  const error_msg_elements = error_msg_div.querySelectorAll(
+    "span.error_msg",
+  ) as NodeListOf<HTMLSpanElement>;
+  error_msg_elements.forEach((span) => {
+    expect(span.style.display).toBe("none");
+  });
 
-  const test_msg = "Test message.";
-  video_config["updateErrors"](test_msg);
-
-  expect(error_msg_div.innerHTML).toStrictEqual(test_msg);
+  // Calling with an error message ID displays the message element
+  video_config["updateErrors"](html_params["waiting_for_access_msg_id"]);
+  const waiting_for_access_msg_el = error_msg_div.querySelector(
+    `span#${html_params["waiting_for_access_msg_id"]}`,
+  ) as HTMLSpanElement;
+  expect(waiting_for_access_msg_el?.style.display).toBe("block");
 });
 
 test("Video config reload button click", async () => {
@@ -561,9 +568,9 @@ test("Video config setupRecorder", async () => {
   // Adds error message when waiting for stream access, then clears the message after access is granted.
   expect(updateErrorsMock).toHaveBeenCalledTimes(2);
   expect(updateErrorsMock.mock.calls[0]).toStrictEqual([
-    html_params["waiting_for_access_msg"],
+    html_params["waiting_for_access_msg_id"],
   ]);
-  expect(updateErrorsMock.mock.calls[1]).toStrictEqual([""]);
+  expect(updateErrorsMock.mock.calls[1]).toStrictEqual([]);
   // Needs to request permissions before it can get device lists.
   expect(requestPermissionMock).toHaveBeenCalledWith({
     video: true,
@@ -708,10 +715,10 @@ test("Video config runStreamChecks throws Mic Check error", async () => {
   // If the recorder mic check throws an error, then the plugin should update the error message and throw the error.
   expect(updateErrorsMock).toHaveBeenCalledTimes(2);
   expect(updateErrorsMock.mock.calls[0]).toStrictEqual([
-    html_params["checking_mic_msg"],
+    html_params["checking_mic_msg_id"],
   ]);
   expect(updateErrorsMock.mock.calls[1]).toStrictEqual([
-    html_params["setup_problem_msg"],
+    html_params["setup_problem_msg_id"],
   ]);
 });
 
@@ -743,9 +750,9 @@ test("Video config runStreamChecks", async () => {
   // Called twice: first with "checking mic" message, then to clear that message.
   expect(updateErrorsMock).toHaveBeenCalledTimes(2);
   expect(updateErrorsMock.mock.calls[0]).toStrictEqual([
-    html_params["checking_mic_msg"],
+    html_params["checking_mic_msg_id"],
   ]);
-  expect(updateErrorsMock.mock.calls[1]).toStrictEqual([""]);
+  expect(updateErrorsMock.mock.calls[1]).toStrictEqual([]);
   expect(checkMicMock).toHaveBeenCalledTimes(1);
 });
 
