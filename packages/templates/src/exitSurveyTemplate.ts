@@ -141,7 +141,6 @@ class ExitSurveyJson {
 
   /** Translate the survey text. */
   private translation() {
-    console.log(this.survey.pages[0].elements[0]);
     const { contact_info, name } = window.chs.study.attributes;
     const view = {
       ...this.trial,
