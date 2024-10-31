@@ -12,7 +12,7 @@ declare const window: LookitWindow;
  * @param values - Object to replace default trial values
  * @returns Trial object
  */
-const getTrial = (values: Record<string, string> = {}) => {
+const getTrial = (values: Record<string, string | boolean> = {}) => {
   return {
     locale: "en-us",
     template: "consent-template-5",
@@ -109,5 +109,21 @@ test("uploading video template in Portuguese", () => {
 
   expect(chsTemplate.uploadingVideo(trial)).toContain(
     "<div>enviando vídeo, por favor, aguarde...</div>",
+  );
+});
+
+test("exit survey template", () => {
+  const trial = getTrial({ private_level_only: true });
+  const survey = chsTemplate.exitSurvey(trial);
+  expect(survey.pages[0].elements[0].description).toStrictEqual(
+    "We ask again just to check for typos during registration or accidental selection of a different child at the start of the study.",
+  );
+});
+
+test("exit survey template in French", () => {
+  const trial = getTrial({ locale: "fr" });
+  const survey = chsTemplate.exitSurvey(trial);
+  expect(survey.pages[0].elements[0].description).toStrictEqual(
+    "Nous vous demandons à nouveau en cas d'erreur lors de l'enregistrement ou de sélection par erreur d'un enfant différent au début de l'étude.",
   );
 });
