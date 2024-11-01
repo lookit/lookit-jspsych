@@ -1,5 +1,5 @@
 import { LookitWindow } from "@lookit/data/dist/types";
-import { initJsPsych } from "jspsych";
+import { initJsPsych, PluginInfo, TrialType } from "jspsych";
 import { ExistingRecordingError, NoSessionRecordingError } from "./errors";
 import Rec from "./index";
 import Recorder from "./recorder";
@@ -96,7 +96,11 @@ test("Stop Recording", async () => {
 
   mockRecStop.mockImplementation(jest.fn().mockReturnValue(Promise.resolve()));
 
-  await stopRec.trial(display_element);
+  const trial = {
+    locale: "en-us",
+  } as unknown as TrialType<PluginInfo>;
+
+  await stopRec.trial(display_element, trial);
 
   expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
   expect(window.chs.sessionRecorder).toBeNull();

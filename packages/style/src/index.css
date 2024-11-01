@@ -9047,7 +9047,6 @@ div#lookit-jspsych-video-config #lookit-jspsych-next-container {
   padding: 10px 0px;
 }
 div#lookit-jspsych-video-config .lookit-jspsych-step-complete {
-  background-color: lightgreen;
   font-weight: bold;
 }
 div#lookit-jspsych-video-config .lookit-jspsych-help-text {
@@ -9116,4 +9115,11 @@ div#lookit-jspsych-video-config .lookit-jspsych-screenshot {
   display: block;
   margin: 15px auto;
   max-width: 30%;
+}
+div#lookit-jspsych-video-config img.lookit-jspsych-checkmark {
+  max-width: 20px;
+}
+
+video.webcam-feed {
+  transform: rotateY(180deg);
 }

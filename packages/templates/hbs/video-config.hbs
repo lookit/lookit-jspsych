@@ -1,0 +1,235 @@
+<div id="lookit-jspsych-video-config">
+  <div id="lookit-jspsych-video-config-title-row">
+    <h2>{{t "exp-video-config.title"}}</h2>
+    <p>{{t "exp-video-config.not-recording-note"}}</p>
+  </div>
+  <div id="lookit-jspsych-video-config-row-container">
+    <div id="lookit-jspsych-video-config-webcam-column">
+      <div id="{{webcam_container_id}}"></div>
+      <div id="lookit-jspsych-webcam-buttons">
+        <div id="lookit-jspsych-webcam-reload-container">
+          <div>
+            <button
+              type="button"
+              id="{{reload_button_id_cam}}"
+              class="jspsych-btn lookit-jspsych-btn"
+            >
+              {{t "Reload webcam"}}
+            </button>
+          </div>
+        </div>
+        <div id="lookit-jspsych-device-selection-container">
+          <div id="lookit-jspsych-webcam-selection">
+            <select
+              name="lookit-jspsych-webcam"
+              id="{{camera_selection_id}}"
+              class="lookit-jspsych-device-selection"
+            ></select>
+          </div>
+          <div id="lookit-jspsych-mic-selection">
+            <select
+              name="lookit-jspsych-mic"
+              id="{{mic_selection_id}}"
+              class="lookit-jspsych-device-selection"
+            ></select>
+          </div>
+        </div>
+      </div>
+      <div id="lookit-jspsych-browser-note" class="lookit-jspsych-help-text">
+        {{t "exp-video-config.Note"}}:
+        {{t "exp-video-config.support-message"}}
+      </div>
+    </div>
+    <div id="lookit-jspsych-video-config-instructions-column">
+      <div id="lookit-jspsych-video-config-errors">
+        <span
+          id="lookit-jspsych-waiting-for-access"
+          class="error_msg"
+          style="display: none;"
+        >{{t "exp-video-config.no-webcam-detected"}}</span>
+        <span
+          id="lookit-jspsych-checking-mic"
+          class="error_msg"
+          style="display: none;"
+        >{{t "exp-video-config.try-clapping"}}</span>
+        <span
+          id="lookit-jspsych-access-problem"
+          class="error_msg"
+          style="display: none;"
+        >{{t "exp-video-config.camera-access-warning"}}</span>
+        <span
+          id="lookit-jspsych-setup-problem"
+          class="error_msg"
+          style="display: none;"
+        >{{t "exp-video-config.see-troubleshooting"}}</span>
+      </div>
+      <ol id="lookit-jspsych-video-config-instructions">
+        <li id="{{step1_id}}">
+          <strong>{{t "exp-video-config.step-1-title"}}</strong>
+          <span
+            id="{{step1_id}}-span"
+            style="visibility: hidden"
+            class="{{step_complete_class}}"
+          >{{t "exp-video-config.looks-good"}}
+            <img
+              class="lookit-jspsych-checkmark"
+              src="{{checkmarkIcon}}"
+              alt="Green checkmark"
+            /></span>
+          <p id="{{step1_id}}-paragraph">
+            {{t "exp-video-config.step-1-text"}}
+          </p>
+        </li>
+        <li id="{{step2_id}}">
+          <strong>{{t "exp-video-config.step-2-click-directions"}}
+            <button
+              id="{{reload_button_id_text}}"
+              class="jspsych-btn lookit-jspsych-btn"
+            >
+              {{t "exp-video-config.reload-button-label"}}
+            </button>.</strong>
+          <span
+            id="{{step2_id}}-span"
+            style="visibility: hidden"
+            class="{{step_complete_class}}"
+          ><img
+              class="lookit-jspsych-checkmark"
+              src="{{checkmarkIcon}}"
+              alt="Green checkmark"
+            /></span>
+          <p id="{{step2_id}}-paragraph">
+            {{t "exp-video-config.step-2-what-should-happen"}}
+          </p>
+        </li>
+        <li id="{{step3_id}}">
+          <strong>{{t "exp-video-config.step-3"}}:</strong>
+          <span
+            id="{{step3_id}}-span"
+            style="visibility: hidden"
+            class="{{step_complete_class}}"
+          >{{t "exp-video-config.sounds-good"}}
+            <img
+              class="lookit-jspsych-checkmark"
+              src="{{checkmarkIcon}}"
+              alt="Green checkmark"
+            /></span>
+          <p id="{{step3_id}}-paragraph">{{t
+              "exp-video-config.try-clapping"
+            }}</p>
+        </li>
+      </ol>
+    </div>
+  </div>
+  <div id="lookit-jspsych-next-container" class="jspsych-instructions-nav">
+    <button
+      id="{{next_button_id}}"
+      class="jspsych-btn lookit-jspsych-btn"
+      style="margin-left: 5px"
+      disabled
+    >
+      {{t "Next"}}
+    </button>
+  </div>
+  <div id="lookit-jspsych-config-troubleshooting-column-container">
+    <div id="lookit-jspsych-accordion-header-container">
+      <h2> {{t "exp-video-config.setup-tips-header"}} </h2>
+      <hr />
+      <p id="lookit-jspsych-troubleshooting-intro">
+        {{exp-format troubleshooting_intro}}
+      </p>
+    </div>
+    <div id="lookit-jspsych-accordion-container">
+      <button class="lookit-jspsych-accordion">
+        {{t "exp-video-config.supported-setup"}}
+      </button>
+      <div class="lookit-jspsych-accordion-panel" style="display: none">
+        <ol>
+          <li>
+            {{t "exp-video-config.mobile-devices"}}
+          </li>
+          <li>
+            {{t "exp-video-config.browser-support"}}
+          </li>
+        </ol>
+      </div>
+      <button class="lookit-jspsych-accordion">
+        {{t "exp-video-config.chrome-instructions-header"}}
+      </button>
+      <div class="lookit-jspsych-accordion-panel" style="display: none">
+        <ol>
+          <li>
+            {{t "exp-video-config.chrome-directions-prompt"}}
+            <img
+              class="lookit-jspsych-screenshot"
+              src="{{chromeInitialPrompt}}"
+              alt="Chrome permissions prompt"
+            />
+          </li>
+          <li>
+            {{t "exp-video-config.chrome-directions-set-perms"}}
+            <img
+              class="lookit-jspsych-screenshot"
+              src="{{chromePermissions}}"
+              alt="Editing microphone and camera permissions in Chrome, step 1"
+            />
+          </li>
+          <li>
+            {{t "exp-video-config.chrome-select-mic" htmlSafe=true}}
+          </li>
+          <li>
+            {{t "exp-video-config.chrome-select-camera" htmlSafe=true}}
+          </li>
+          <li>
+            {{t "exp-video-config.chrome-further-help" htmlSafe=true}}
+          </li>
+        </ol>
+      </div>
+      <button class="lookit-jspsych-accordion">
+        {{t "exp-video-config.firefox-instructions-header"}}
+      </button>
+      <div class="lookit-jspsych-accordion-panel" style="display: none">
+        <ol>
+          <li>
+            {{t "exp-video-config.firefox-directions-prompt"}}
+            <img
+              class="lookit-jspsych-screenshot"
+              src="{{firefoxInitialPrompt}}"
+              alt="Firefox permissions prompt"
+            />
+          </li>
+          <li>
+            {{t "exp-video-config.firefox-directions-set-perms"}}
+            <img
+              class="lookit-jspsych-screenshot"
+              src="{{firefoxDevicesBlocked}}"
+              alt="Blocked microphone and camera permissions in Firefox"
+            />
+          </li>
+        </ol>
+      </div>
+      <button class="lookit-jspsych-accordion">
+        {{t "exp-video-config.additional-troubleshooting-header"}}
+      </button>
+      <div class="lookit-jspsych-accordion-panel" style="display: none">
+        <p>
+          {{t "exp-video-config.additional-troubleshooting-intro"}}
+        </p>
+        <ol>
+          <li>
+            {{t "exp-video-config.camera-check"}}
+          </li>
+          <li>
+            {{t "exp-video-config.try-another-browser"}}
+          </li>
+          <li>
+            {{t "exp-video-config.chrome-incognito"}}
+          </li>
+          <li>
+            {{t "exp-video-config.additional-troubleshooting-contact"}}:
+            {{session.id}}
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>

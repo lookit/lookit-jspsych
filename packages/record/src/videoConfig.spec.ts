@@ -1,16 +1,12 @@
 import { clickTarget } from "@jspsych/test-utils";
-import Handlebars from "handlebars";
+import chsTemplates from "@lookit/templates";
 import { initJsPsych, JsPsych } from "jspsych";
-import videoConfig from "../hbs/video-config.hbs";
 import { NoStreamError } from "./errors";
-import chromeInitialPrompt from "./img/chrome_initialprompt.png";
-import chromeAlwaysAllow from "./img/chrome_step1_alwaysallow.png";
-import chromePermissions from "./img/chrome_step1_permissions.png";
-import firefoxInitialPrompt from "./img/firefox_initialprompt.png";
-import firefoxChooseDevice from "./img/firefox_prompt_choose_device.png";
-import firefoxDevicesBlocked from "./img/firefox_prompt_devices_blocked.png";
 import Recorder from "./recorder";
-import VideoConfigPlugin, { VideoConsentTrialType } from "./video_config";
+import VideoConfigPlugin, {
+  html_params,
+  VideoConsentTrialType,
+} from "./videoConfig";
 
 jest.mock("./recorder");
 jest.mock("@lookit/data");
@@ -42,7 +38,6 @@ jest.mock("jspsych", () => ({
 let display_el: HTMLBodyElement;
 let jsPsych: JsPsych;
 let video_config: VideoConfigPlugin;
-let html_params: object;
 let devices: MediaDeviceInfo[];
 let devicesObj: {
   cam1: MediaDeviceInfo;
@@ -54,6 +49,12 @@ let returnedDeviceLists: {
   cameras: MediaDeviceInfo[];
   mics: MediaDeviceInfo[];
 };
+
+// Video consent trial object with defaults
+const trial_info = {
+  locale: "en-us",
+  troubleshooting_intro: "",
+} as VideoConsentTrialType;
 
 /**
  * Clean rendered html to be compared with DOM.
@@ -70,6 +71,10 @@ const cleanHTML = (html: string) => {
       .replace(/\s*\/*>/gm, ">")
       // equals empty string
       .replace(/(="")/gm, "")
+      // convert &quot; to double quote
+      .replace(/(&quot;)/gm, '"')
+      // convert &#x27; to single quote
+      .replace(/(&#x27;)/gm, "'")
   );
 };
 
@@ -78,28 +83,6 @@ beforeEach(() => {
   display_el = document.getElementsByTagName("body")[0] as HTMLBodyElement;
   video_config = new VideoConfigPlugin(jsPsych);
   video_config["display_el"] = display_el;
-
-  // Set up parameters for rendering HTML template
-  html_params = {
-    webcam_container_id: video_config["webcam_container_id"],
-    reload_button_id_cam: video_config["reload_button_id_cam"],
-    camera_selection_id: video_config["camera_selection_id"],
-    mic_selection_id: video_config["mic_selection_id"],
-    step1_id: video_config["step1_id"],
-    step2_id: video_config["step2_id"],
-    step3_id: video_config["step3_id"],
-    step_complete_class: video_config["step_complete_class"],
-    step_complete_text: video_config["step_complete_text"],
-    reload_button_id_text: video_config["reload_button_id_text"],
-    next_button_id: video_config["next_button_id"],
-    chromeInitialPrompt: chromeInitialPrompt,
-    chromeAlwaysAllow: chromeAlwaysAllow,
-    chromePermissions: chromePermissions,
-    firefoxInitialPrompt: firefoxInitialPrompt,
-    firefoxChooseDevice: firefoxChooseDevice,
-    firefoxDevicesBlocked: firefoxDevicesBlocked,
-    troubleshooting_intro: "",
-  };
 
   // Mocks for handling media streams and devices
   const mic1 = {
@@ -158,10 +141,6 @@ afterEach(() => {
 });
 
 test("Video config trial method sets up trial", () => {
-  const trial_info = {
-    troubleshooting_intro: "",
-  } as unknown as VideoConsentTrialType;
-
   // Set up mocks for upstream functions called in trial method.
   const addHtmlMock = jest
     .spyOn(video_config, "addHtmlContent")
@@ -195,11 +174,11 @@ test("Video config addHtmlContent loads template", () => {
 
   // Render the template with the HTML parameters.
   const rendered_trial_html = cleanHTML(
-    Handlebars.compile(videoConfig)(html_params),
+    chsTemplates.videoConfig(trial_info, html_params),
   );
 
   // Run addHtmlContent to get the actual trial HTML.
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
   const displayed_html = cleanHTML(document.body.innerHTML);
 
   expect(displayed_html).toStrictEqual(rendered_trial_html);
@@ -209,19 +188,18 @@ test("Video config addHtmlContent loads template with custom troubleshooting tex
   expect(video_config["display_el"]?.innerHTML).toBe("");
 
   // Render the template with a custom trial parameter.
-  const troubleshooting_intro = "Custom text.";
-  const html_params_custom_intro = {
-    ...html_params,
-    troubleshooting_intro,
-  };
+  const trial_info_custom_troubleshoot = {
+    locale: "en-us",
+    troubleshooting_intro: "Custom text.",
+  } as VideoConsentTrialType;
 
   // Remove new lines, indents (tabs or spaces), and empty HTML property values.
   const rendered_trial_html = cleanHTML(
-    Handlebars.compile(videoConfig)(html_params_custom_intro),
+    chsTemplates.videoConfig(trial_info_custom_troubleshoot, html_params),
   );
 
   // Get the actual trial HTML
-  video_config["addHtmlContent"](troubleshooting_intro);
+  video_config["addHtmlContent"](trial_info_custom_troubleshoot);
   const displayed_html = cleanHTML(document.body.innerHTML);
 
   expect(displayed_html).toStrictEqual(rendered_trial_html);
@@ -229,14 +207,14 @@ test("Video config addHtmlContent loads template with custom troubleshooting tex
 
 test("Video config add event listeners", async () => {
   expect(video_config["display_el"]?.innerHTML).toBe("");
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
 
   // Get relevant elements (device selection elements tested separately)
   const next_button_el = video_config["display_el"]?.querySelector(
-    `#${video_config["next_button_id"]}`,
+    `#${html_params["next_button_id"]}`,
   ) as HTMLButtonElement;
   const reload_button_els = video_config["display_el"]?.querySelectorAll(
-    `#${video_config["reload_button_id_cam"]}, #${video_config["reload_button_id_text"]}`,
+    `#${html_params["reload_button_id_cam"]}, #${html_params["reload_button_id_text"]}`,
   ) as NodeListOf<HTMLButtonElement>;
   const acc_button_els = document.getElementsByClassName(
     "lookit-jspsych-accordion",
@@ -291,41 +269,41 @@ test("Video config add event listeners", async () => {
 test("Video config enable next", () => {
   expect(video_config["display_el"]?.innerHTML).toBe("");
 
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
   const next_button_el = video_config["display_el"]?.querySelector(
-    `#${video_config["next_button_id"]}`,
+    `#${html_params["next_button_id"]}`,
   ) as HTMLButtonElement;
 
   // When trial first loads, next button should exist but be disabled and no 'step_complete_class'
   expect(next_button_el).toBeTruthy();
   expect(
-    next_button_el.classList.contains(video_config["step_complete_class"]),
+    next_button_el.classList.contains(html_params["step_complete_class"]),
   ).toBe(false);
   expect(next_button_el.disabled).toBe(true);
 
   // Calling with 'true' enables the button and adds the class.
   video_config["enableNext"](true);
   expect(
-    next_button_el.classList.contains(video_config["step_complete_class"]),
+    next_button_el.classList.contains(html_params["step_complete_class"]),
   ).toBe(true);
   expect(next_button_el.disabled).toBe(false);
 
   // Calling with 'false' sets everything back.
   video_config["enableNext"](false);
   expect(
-    next_button_el.classList.contains(video_config["step_complete_class"]),
+    next_button_el.classList.contains(html_params["step_complete_class"]),
   ).toBe(false);
   expect(next_button_el.disabled).toBe(true);
 });
 
 test("Video config update instructions", () => {
   expect(video_config["display_el"]?.innerHTML).toBe("");
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
 
   // Get the relevant elements from the instructions section.
-  const step1_id = video_config["step1_id"];
-  const step2_id = video_config["step2_id"];
-  const step3_id = video_config["step3_id"];
+  const step1_id = html_params["step1_id"];
+  const step2_id = html_params["step2_id"];
+  const step3_id = html_params["step3_id"];
   const step1_span = video_config["display_el"]?.querySelector(
     `#${step1_id}-span`,
   ) as HTMLSpanElement;
@@ -376,27 +354,34 @@ test("Video config update instructions", () => {
 
 test("Video config update errors", () => {
   expect(video_config["display_el"]?.innerHTML).toBe("");
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
   const error_msg_div = video_config["display_el"]?.querySelector(
-    `#${video_config["error_msg_div_id"]}`,
+    `#${html_params["error_msg_div_id"]}`,
   ) as HTMLDivElement;
 
-  // Error/info message div is empty when the page first loads.
-  expect(error_msg_div.innerHTML).toStrictEqual("");
+  // Error/info messages are all hidden when the page first loads.
+  const error_msg_elements = error_msg_div.querySelectorAll(
+    "span.error_msg",
+  ) as NodeListOf<HTMLSpanElement>;
+  error_msg_elements.forEach((span) => {
+    expect(span.style.display).toBe("none");
+  });
 
-  const test_msg = "Test message.";
-  video_config["updateErrors"](test_msg);
-
-  expect(error_msg_div.innerHTML).toStrictEqual(test_msg);
+  // Calling with an error message ID displays the message element
+  video_config["updateErrors"](html_params["waiting_for_access_msg_id"]);
+  const waiting_for_access_msg_el = error_msg_div.querySelector(
+    `span#${html_params["waiting_for_access_msg_id"]}`,
+  ) as HTMLSpanElement;
+  expect(waiting_for_access_msg_el?.style.display).toBe("block");
 });
 
 test("Video config reload button click", async () => {
   expect(video_config["hasReloaded"]).toBe(false);
 
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
 
   const reload_button_els = video_config["display_el"]?.querySelectorAll(
-    `#${video_config["reload_button_id_cam"]}, #${video_config["reload_button_id_text"]}`,
+    `#${html_params["reload_button_id_cam"]}, #${html_params["reload_button_id_text"]}`,
   ) as NodeListOf<HTMLButtonElement>;
 
   // Mock upstream function calls.
@@ -432,12 +417,12 @@ test("Video config reload button click", async () => {
 });
 
 test("Video config updateDeviceSelection", () => {
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
   const cam_selection_el = video_config["display_el"]?.querySelector(
-    `#${video_config["camera_selection_id"]}`,
+    `#${html_params["camera_selection_id"]}`,
   ) as HTMLSelectElement;
   const mic_selection_el = video_config["display_el"]?.querySelector(
-    `#${video_config["mic_selection_id"]}`,
+    `#${html_params["mic_selection_id"]}`,
   ) as HTMLSelectElement;
 
   expect(cam_selection_el).not.toBeUndefined();
@@ -583,9 +568,9 @@ test("Video config setupRecorder", async () => {
   // Adds error message when waiting for stream access, then clears the message after access is granted.
   expect(updateErrorsMock).toHaveBeenCalledTimes(2);
   expect(updateErrorsMock.mock.calls[0]).toStrictEqual([
-    video_config["waiting_for_access_msg"],
+    html_params["waiting_for_access_msg_id"],
   ]);
-  expect(updateErrorsMock.mock.calls[1]).toStrictEqual([""]);
+  expect(updateErrorsMock.mock.calls[1]).toStrictEqual([]);
   // Needs to request permissions before it can get device lists.
   expect(requestPermissionMock).toHaveBeenCalledWith({
     video: true,
@@ -603,15 +588,15 @@ test("Video config setupRecorder", async () => {
 });
 
 test("Video config setDevices", async () => {
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
   const cam_selection_el = video_config["display_el"]?.querySelector(
-    `#${video_config["camera_selection_id"]}`,
+    `#${html_params["camera_selection_id"]}`,
   ) as HTMLSelectElement;
   const mic_selection_el = video_config["display_el"]?.querySelector(
-    `#${video_config["mic_selection_id"]}`,
+    `#${html_params["mic_selection_id"]}`,
   ) as HTMLSelectElement;
   const next_button_el = video_config["display_el"]?.querySelector(
-    `#${video_config["next_button_id"]}`,
+    `#${html_params["next_button_id"]}`,
   ) as HTMLButtonElement;
   video_config["recorder"] = new Recorder(jsPsych);
 
@@ -683,7 +668,7 @@ test("Video config setDevices", async () => {
 });
 
 test("Video config runStreamChecks throws NoStreamAccess", () => {
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
   video_config["recorder"] = new Recorder(initJsPsych());
   jest
     .spyOn(jsPsych.pluginAPI, "getCameraRecorder")
@@ -704,7 +689,7 @@ test("Video config runStreamChecks throws NoStreamAccess", () => {
 });
 
 test("Video config runStreamChecks throws Mic Check error", async () => {
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
   video_config["recorder"] = new Recorder(jsPsych);
 
   // Setup upstream mocks.
@@ -730,15 +715,15 @@ test("Video config runStreamChecks throws Mic Check error", async () => {
   // If the recorder mic check throws an error, then the plugin should update the error message and throw the error.
   expect(updateErrorsMock).toHaveBeenCalledTimes(2);
   expect(updateErrorsMock.mock.calls[0]).toStrictEqual([
-    video_config["checking_mic_msg"],
+    html_params["checking_mic_msg_id"],
   ]);
   expect(updateErrorsMock.mock.calls[1]).toStrictEqual([
-    video_config["setup_problem_msg"],
+    html_params["setup_problem_msg_id"],
   ]);
 });
 
 test("Video config runStreamChecks", async () => {
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
   video_config["recorder"] = new Recorder(jsPsych);
 
   // Setup upstream mocks.
@@ -765,14 +750,14 @@ test("Video config runStreamChecks", async () => {
   // Called twice: first with "checking mic" message, then to clear that message.
   expect(updateErrorsMock).toHaveBeenCalledTimes(2);
   expect(updateErrorsMock.mock.calls[0]).toStrictEqual([
-    video_config["checking_mic_msg"],
+    html_params["checking_mic_msg_id"],
   ]);
-  expect(updateErrorsMock.mock.calls[1]).toStrictEqual([""]);
+  expect(updateErrorsMock.mock.calls[1]).toStrictEqual([]);
   expect(checkMicMock).toHaveBeenCalledTimes(1);
 });
 
 test("Video config runStreamChecks enables next button when all checks have passed", async () => {
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
   video_config["recorder"] = new Recorder(jsPsych);
 
   // Setup upstream mocks.
@@ -840,7 +825,7 @@ test("Video config onDeviceChange event listener", async () => {
 });
 
 test("Video config device selection element on change event listener", async () => {
-  video_config["addHtmlContent"]("");
+  video_config["addHtmlContent"](trial_info);
 
   // Mock upstream functions called by device selection change event listener.
   const setDevicesMock = jest

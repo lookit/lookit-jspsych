@@ -655,11 +655,11 @@ exp-video-config:
   click-here-to-detect: klikkeljen ide
   see-troubleshooting:
     Ha problémába ütközöl, olvasd el az alábbi hibaelhárítási utasításokat!
-  step-1:
-    Győződjön meg róla, hogy a bal oldalon látja magát! Előfordulhat, hogy az
-    "Engedélyezés" gombra kell kattintania, hogy hozzáférhessünk webkamerájához
-    és mikrofonjához. Firefoxban jelölje be a "Jegyezze meg ezt a döntést"
-    jelölőnégyzetet is!
+  step-1-title: Győződjön meg róla, hogy a bal oldalon látja magát!
+  step-1-text:
+    Előfordulhat, hogy az "Engedélyezés" gombra kell kattintania, hogy
+    hozzáférhessünk webkamerájához és mikrofonjához. Firefoxban jelölje be a
+    "Jegyezze meg ezt a döntést" jelölőnégyzetet is!
   looks-good: Minden rendben!
   no-webcam-detected: Nincs webkamera
   step-2-click-directions:
@@ -671,9 +671,7 @@ exp-video-config:
     kellene a hozzáférést. (Ha lát egy párbeszédablakot, kattintson a
     "Emlékezzen erre a döntésre" vagy a "Mindig engedélyezze" gombra, és
     próbálja újra!)
-  step-3:
-    Győződjön meg róla, hogy halljuk Önt! Ez a mező akkor lesz teli, ha elég
-    hangos hangot hallunk
+  step-3: Győződjön meg róla, hogy halljuk Önt!
   sounds-good: Jòl hallhatò!
   try-clapping: Pròbáljon tapsolni vagy köszönjön.
   step-2-warning:

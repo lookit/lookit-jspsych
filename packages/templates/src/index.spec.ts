@@ -1,5 +1,6 @@
 import { LookitWindow } from "@lookit/data/dist/types";
 import { PluginInfo, TrialType } from "jspsych";
+import { html_params } from "../../record/src/videoConfig";
 import { ConsentTemplateNotFound } from "./errors";
 import chsTemplate from "./index";
 
@@ -71,4 +72,42 @@ test("consent video with unknown template", () => {
 test("consent garden template", () => {
   const trial = getTrial({ template: "consent-garden" });
   expect(chsTemplate.consentVideo(trial)).toContain("Project GARDEN");
+});
+
+test("video config template", () => {
+  const trial = getTrial();
+
+  expect(chsTemplate.videoConfig(trial, html_params)).toContain(
+    '<div id="lookit-jspsych-video-config">',
+  );
+  expect(chsTemplate.videoConfig(trial, html_params)).toContain(
+    `<h2>Webcam setup</h2>`,
+  );
+});
+
+test("video config template in Italian", () => {
+  const trial = getTrial({ locale: "it" });
+
+  expect(chsTemplate.videoConfig(trial, html_params)).toContain(
+    '<div id="lookit-jspsych-video-config">',
+  );
+  expect(chsTemplate.videoConfig(trial, html_params)).toContain(
+    `<h2>Configurazione della webcam</h2>`,
+  );
+});
+
+test("uploading video template", () => {
+  const trial = getTrial();
+
+  expect(chsTemplate.uploadingVideo(trial)).toContain(
+    "<div>uploading video, please wait...</div>",
+  );
+});
+
+test("uploading video template in Portuguese", () => {
+  const trial = getTrial({ locale: "pt" });
+
+  expect(chsTemplate.uploadingVideo(trial)).toContain(
+    "<div>enviando vídeo, por favor, aguarde...</div>",
+  );
 });
