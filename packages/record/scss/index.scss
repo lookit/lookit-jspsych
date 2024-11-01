@@ -91,7 +91,6 @@ div#lookit-jspsych-video-config {
 
   /* Instruction step complete class */
   .lookit-jspsych-step-complete {
-    background-color: lightgreen;
     font-weight: bold;
   }
 
@@ -175,5 +174,9 @@ div#lookit-jspsych-video-config {
     display: block;
     margin: 15px auto;
     max-width: 30%;
+  }
+
+  img.lookit-jspsych-checkmark {
+    max-width: 20px;
   }
 }

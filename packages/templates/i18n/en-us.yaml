@@ -607,10 +607,10 @@ exp-video-config:
   click-here-to-detect: click here to detect
   see-troubleshooting:
     See the troubleshooting directions below if you're having trouble!
-  step-1:
-    Make sure you can see yourself to the left! You may need to click "Allow" so
-    that we can access your webcam and microphone. On Firefox, make sure to also
-    check "Remember this decision"!
+  step-1-title: Make sure you can see yourself to the left!
+  step-1-text:
+    You may need to click "Allow" so that we can access your webcam and
+    microphone. On Firefox, make sure to also check "Remember this decision"!
   looks-good: Looks good!
   no-webcam-detected: No webcam detected
   step-2-click-directions: Make sure your webcam settings got saved by clicking
@@ -619,9 +619,7 @@ exp-video-config:
     Your webcam should re-appear WITHOUT you having to allow access again. (If
     you do see a dialogue, click "Remember this decision" or "Always allow" and
     try again!)
-  step-3:
-    Make sure we'll be able to hear you! This box will be filled in once we hear
-    a loud enough sound
+  step-3: Make sure we'll be able to hear you!
   sounds-good: Sounds good!
   try-clapping: Try clapping or saying hi.
   step-2-warning:
