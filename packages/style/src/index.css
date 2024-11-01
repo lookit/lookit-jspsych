@@ -9119,3 +9119,7 @@ div#lookit-jspsych-video-config .lookit-jspsych-screenshot {
 div#lookit-jspsych-video-config img.lookit-jspsych-checkmark {
   max-width: 20px;
 }
+
+video.webcam-feed {
+  transform: rotateY(180deg);
+}
