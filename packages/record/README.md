@@ -9,8 +9,8 @@ either a single trial or multiple trials.
 
 Optional parameter to set a two-letter language code for translation. In some
 cases, a regional code will have to be provided as well. For example, we
-currently support english only from the US region. Therefore, to get the US
-english translation you would put "en-US" for the locale. We support the
+currently support English only from the US region. Therefore, to get the US
+English translation you would put "en-US" for the locale. We support the
 following language codes:
 
 | Language       | Region | Code  |

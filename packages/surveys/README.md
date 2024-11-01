@@ -4,6 +4,28 @@ This package contains the custom surveys provided by CHS for jsPsych studies.
 These surveys are built off of the very nice [jsPsych
 Survey plugin]({{ jsPsych }}plugins/survey/).
 
+## Parameters available in all plugins
+
+**`locale` [String | "en-us"]**
+
+Optional parameter to set a two-letter language code for translation. In some
+cases, a regional code will have to be provided as well. For example, we
+currently support English only from the US region. Therefore, to get the US
+English translation you would put "en-US" for the locale. We support the
+following language codes:
+
+| Language       | Region | Code  |
+| -------------- | ------ | ----- |
+| Basque         |        | eu    |
+| Dutch, Flemish |        | nl    |
+| English        | U.S.A. | en-US |
+| French         |        | fr    |
+| Hungarian      |        | hu    |
+| Italian        |        | it    |
+| Japanese       |        | ja    |
+| Portuguese     | Brazil | pt-BR |
+| Portuguese     |        | pt    |
+
 ## Consent Survey
 
 The Consent Survey will will give you two things out of the box:
