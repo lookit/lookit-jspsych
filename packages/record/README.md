@@ -3,6 +3,28 @@
 This package contains the plugins and extensions to record audio and/or video of
 either a single trial or multiple trials.
 
+## Parameters available in all plugins
+
+**`locale` [String | "en-us"]**
+
+Optional parameter to set a two-letter language code for translation. In some
+cases, a regional code will have to be provided as well. For example, we
+currently support english only from the US region. Therefore, to get the US
+english translation you would put "en-US" for the locale. We support the
+following language codes:
+
+| Language       | Region | Code  |
+| -------------- | ------ | ----- |
+| Basque         |        | eu    |
+| Dutch, Flemish |        | nl    |
+| English        | U.S.A. | en-US |
+| French         |        | fr    |
+| Hungarian      |        | hu    |
+| Italian        |        | it    |
+| Japanese       |        | ja    |
+| Portuguese     | Brazil | pt-BR |
+| Portuguese     |        | pt    |
+
 ## Video Configuration
 
 To record _any_ video during an experiment, including a consent video, you must
@@ -37,69 +59,6 @@ const videoConfig = {
   troubleshooting_intro:
     "If you're having any trouble getting your webcam set up, please feel free to call the XYZ lab at (123) 456-7890 and we'd be glad to help you out!",
 };
-```
-
-## Trial Recording
-
-To record a single trial, you will have to first load the extension in
-`initJsPsych`.
-
-```javascript
-const jsPsych = initJsPsych({
-  extensions: [{ type: chsRecord.TrialRecordExtension }],
-});
-```
-
-Next, create a video configuration trial as described above. Then, add the trial
-recoding extension parameter to your trial. By adding this extension, you can
-record any trial you design.
-
-```javascript
-const trialRec = {
-  // ... Other trial paramters ...
-  extensions: [{ type: chsRecord.TrialRecordExtension }],
-};
-```
-
-Finally, insert the trials into the timeline.
-
-```javascript
-jsPsych.run([videoConfig, trialRec]);
-```
-
-## Session Recording
-
-You might prefer to record across multiple trials in a study session. This can
-be done by using trials created with the start and stop recording plugins. This
-gives a bit of flexibility over which of the study trials are recorded.
-
-To record a study session, create the start and stop recording trials.
-
-```javascript
-const startRec = { type: chsRecord.StartRecordPlugin };
-const stopRec = { type: chsRecord.StopRecordPlugin };
-```
-
-Next, create the trials that you would like to be recorded.
-
-```javascript
-const morning = { type: jsPsychHtmlKeyboardResponse, stimulus: "Good morning!" };
-const evening = { type: jsPsychHtmlKeyboardResponse stimulus: "Good evening!" };
-const night = { type: jsPsychHtmlKeyboardResponse, stimulus: "Good night!" };
-```
-
-Lastly, add these trials to the timeline. Again, the video configuration trial
-must come before any other recording trials.
-
-```javascript
-jsPsych.run([videoConfig, startRec, morning, evening, night, stopRec]);
-```
-
-It's possible to record only some of the trials. This can be done by moving the
-stop or start recording trials within the timeline.
-
-```javascript
-jsPsych.run([videoConfig, startRec, morning, evening, stopRec, night]);
 ```
 
 ## Video Consent
@@ -211,26 +170,6 @@ possible! E.g., “Why do babies love cats? This study will help us find out
 whether babies love cats because of their soft fur or their twitchy tails.”
 
 #### Optional
-
-**`locale` [String | "en-us"]**
-
-Optional parameter to set a two-letter language code for translation. In some
-cases, a regional code will have to be provided as well. For example, we
-currently support english only from the US region. Therefore, to get the US
-english translation you would put "en-US" for the locale. We support the
-following language codes:
-
-| Language       | Region | Code  |
-| -------------- | ------ | ----- |
-| Basque         |        | eu    |
-| Dutch, Flemish |        | nl    |
-| English        | U.S.A. | en-US |
-| French         |        | fr    |
-| Hungarian      |        | hu    |
-| Italian        |        | it    |
-| Japanese       |        | ja    |
-| Portuguese     | Brazil | pt-BR |
-| Portuguese     |        | pt    |
 
 **`template` [String | "consent_005"]**
 
@@ -388,3 +327,66 @@ Replace the default spoken consent statement with your custom text.
 
 Whether to omit the phrase “or in the very unlikely event of a research-related
 injury” from the contact section. (This was required by the Northwestern IRB.)
+
+## Trial Recording
+
+To record a single trial, you will have to first load the extension in
+`initJsPsych`.
+
+```javascript
+const jsPsych = initJsPsych({
+  extensions: [{ type: chsRecord.TrialRecordExtension }],
+});
+```
+
+Next, create a video configuration trial as described above. Then, add the trial
+recoding extension parameter to your trial. By adding this extension, you can
+record any trial you design.
+
+```javascript
+const trialRec = {
+  // ... Other trial paramters ...
+  extensions: [{ type: chsRecord.TrialRecordExtension }],
+};
+```
+
+Finally, insert the trials into the timeline.
+
+```javascript
+jsPsych.run([videoConfig, trialRec]);
+```
+
+## Session Recording
+
+You might prefer to record across multiple trials in a study session. This can
+be done by using trials created with the start and stop recording plugins. This
+gives a bit of flexibility over which of the study trials are recorded.
+
+To record a study session, create the start and stop recording trials.
+
+```javascript
+const startRec = { type: chsRecord.StartRecordPlugin };
+const stopRec = { type: chsRecord.StopRecordPlugin };
+```
+
+Next, create the trials that you would like to be recorded.
+
+```javascript
+const morning = { type: jsPsychHtmlKeyboardResponse, stimulus: "Good morning!" };
+const evening = { type: jsPsychHtmlKeyboardResponse stimulus: "Good evening!" };
+const night = { type: jsPsychHtmlKeyboardResponse, stimulus: "Good night!" };
+```
+
+Lastly, add these trials to the timeline. Again, the video configuration trial
+must come before any other recording trials.
+
+```javascript
+jsPsych.run([videoConfig, startRec, morning, evening, night, stopRec]);
+```
+
+It's possible to record only some of the trials. This can be done by moving the
+stop or start recording trials within the timeline.
+
+```javascript
+jsPsych.run([videoConfig, startRec, morning, evening, stopRec, night]);
+```

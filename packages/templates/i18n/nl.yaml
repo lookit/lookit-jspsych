@@ -405,10 +405,11 @@ exp-video-config:
   see-troubleshooting:
     Raadpleeg de onderstaande instructies voor oplossingen als u problemen
     ondervindt!
-  step-1:
-    Zorg ervoor dat je jezelf aan de linkerkant kunt zien! Mogelijk moet u op
-    "Toestaan" klikken zodat we toegang hebben tot uw webcam en microfoon. Zorg
-    er in Firefox voor dat u ook "Onthoud deze beslissing" aanvinkt!
+  step-1-title: Zorg ervoor dat je jezelf aan de linkerkant kunt zien!
+  step-1-text:
+    Mogelijk moet u op "Toestaan" klikken zodat we toegang hebben tot uw webcam
+    en microfoon. Zorg er in Firefox voor dat u ook "Onthoud deze beslissing"
+    aanvinkt!
   looks-good: Ziet er goed uit!
   no-webcam-detected: Geen webcam gedetecteerd
   step-2-click-directions:
@@ -418,9 +419,7 @@ exp-video-config:
     Uw webcam zou opnieuw moeten verschijnen ZONDER dat u opnieuw toegang hoeft
     te verlenen. (Als je een dialoogvenster ziet, klik dan op 'Onthoud deze
     beslissing' of 'Altijd toestaan' en probeer het opnieuw!)
-  step-3:
-    Zorg ervoor dat we u kunnen horen! Dit vak wordt ingevuld zodra we een
-    voldoende luid geluid horen
+  step-3: Zorg ervoor dat we u kunnen horen!
   sounds-good: Klinkt goed!
   try-clapping: Probeer te klappen of hallo te zeggen.
   step-2-warning:
