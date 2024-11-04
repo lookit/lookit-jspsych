@@ -1,7 +1,14 @@
 # Lookit jsPsych
 
-Here is the monorepo containing packages developed by Lookit to be used with
+[![Documentation Status](https://readthedocs.org/projects/lookit-jspsych/badge/?version=latest)](https://lookit.readthedocs.io/projects/chs-jspsych)
+[![Github Actions build](https://github.com/lookit/lookit-jspsych/actions/workflows/build.yml/badge.svg)](https://github.com/lookit/lookit-jspsych/actions/workflows/build.yml)
+[![Github Actions release](https://github.com/lookit/lookit-jspsych/actions/workflows/release.yml/badge.svg)](https://github.com/lookit/lookit-jspsych/actions/workflows/release.yml)
+
+Here is our mono-repo containing packages developed by Lookit to used with
 jsPsych on the lookit.mit.edu project.
+
+For those looking to use our jsPsych packages, please see our
+[researcher documentation](https://lookit.readthedocs.io/projects/chs-jspsych).
 
 ## Create new package
 
