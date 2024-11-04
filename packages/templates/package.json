@@ -26,7 +26,11 @@
   },
   "devDependencies": {
     "@jspsych/config": "^2.0.0",
+    "@types/js-yaml": "^4.0.9",
     "handlebars": "^4.7.8",
+    "i18next": "^23.16.4",
+    "i18next-icu": "^2.3.0",
+    "js-yaml": "^4.1.0",
     "rollup-plugin-dotenv": "^0.5.1",
     "rollup-plugin-polyfill-node": "^0.13.0"
   },

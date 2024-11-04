@@ -1,8 +1,19 @@
 import SurveyPlugin from "@jspsych/plugin-survey";
-import { TrialType } from "jspsych";
+import { ParameterType, TrialType } from "jspsych";
 import { consentSurveyFunction } from "./utils";
 
-type Info = typeof SurveyPlugin.info;
+const info = <const>{
+  ...SurveyPlugin.info,
+  parameters: {
+    ...SurveyPlugin.info.parameters,
+    locale: {
+      type: ParameterType.STRING,
+      default: "en-us",
+    },
+  },
+};
+
+type Info = typeof info;
 export type Trial = TrialType<Info>;
 
 /** Consent Survey plugin extends jsPsych's Survey Plugin. */
@@ -18,7 +29,7 @@ export class ConsentSurveyPlugin extends SurveyPlugin {
   public trial(display_element: HTMLElement, trial: Trial) {
     super.trial(display_element, {
       ...trial,
-      survey_function: consentSurveyFunction(trial.survey_function),
+      survey_function: consentSurveyFunction(trial),
     });
   }
   /**
