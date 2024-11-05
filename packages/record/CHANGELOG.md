@@ -1,5 +1,21 @@
 # @lookit/record
 
+## 2.0.0
+
+### Minor Changes
+
+- 1118fc7: Adds support for translation and an optional locale parameter to the
+  VideoConfigPlugin and StopRecordPlugin in the record packages.
+
+### Patch Changes
+
+- 1a7d73e: Change the webcam display to mirror the participant.
+- bbdac4a: Documentation update: add/modify locale parameter documentation.
+- 4df1e26: Update video consent template options in documentation.
+- Updated dependencies [c678107]
+- Updated dependencies [1118fc7]
+  - @lookit/templates@1.1.0
+
 ## 1.0.0
 
 ### Patch Changes

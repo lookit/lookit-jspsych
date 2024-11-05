@@ -1,5 +1,16 @@
 # @lookit/templates
 
+## 1.1.0
+
+### Minor Changes
+
+- 1118fc7: Adds support for translation and an optional locale parameter to the
+  VideoConfigPlugin and StopRecordPlugin in the record packages.
+
+### Patch Changes
+
+- c678107: Add localization to the exit survey trial
+
 ## 1.0.0
 
 ### Patch Changes

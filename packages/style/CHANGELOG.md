@@ -1,5 +1,13 @@
 # @lookit/style
 
+## 0.0.6
+
+### Patch Changes
+
+- 1a7d73e: Change the webcam display to mirror the participant.
+- 1118fc7: Adds support for translation and an optional locale parameter to the
+  VideoConfigPlugin and StopRecordPlugin in the record packages.
+
 ## 0.0.5
 
 ### Patch Changes

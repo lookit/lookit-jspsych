@@ -1,5 +1,16 @@
 # @lookit/surveys
 
+## 2.0.0
+
+### Patch Changes
+
+- c678107: Set SurveyJS Locale to trial's locale parameter.
+- bbdac4a: Documentation update: add/modify locale parameter documentation.
+- c678107: Add localization to the exit survey trial
+- Updated dependencies [c678107]
+- Updated dependencies [1118fc7]
+  - @lookit/templates@1.1.0
+
 ## 1.0.0
 
 ### Patch Changes
