@@ -1,5 +1,12 @@
 # @lookit/surveys
 
+## 2.0.1
+
+### Patch Changes
+
+- 683a072: Fix "missing locale" error when the optional locale parameter is not
+  specified in a consent-survey plugin.
+
 ## 2.0.0
 
 ### Patch Changes
