@@ -18,7 +18,7 @@ export type Trial = TrialType<Info>;
 
 /** Consent Survey plugin extends jsPsych's Survey Plugin. */
 export class ConsentSurveyPlugin extends SurveyPlugin {
-  public static readonly info = SurveyPlugin.info;
+  public static readonly info = info;
   /**
    * Custom consent survey function adds functionality before creating a survey
    * based on the user-defined survey JSON/function.
