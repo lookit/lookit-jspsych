@@ -9,6 +9,8 @@ export default makeRollupConfig("chsRecord").map((config) => {
   return {
     ...config,
     plugins: [
+      // Handlebars requires node polyfills.
+      nodePolyfills(),
       ...config.plugins,
       // Add support for .env files
       dotenv({ cwd: "../../" }),
@@ -24,8 +26,6 @@ export default makeRollupConfig("chsRecord").map((config) => {
         },
         preventAssignment: true,
       }),
-      // Handlebars requires node polyfills.
-      nodePolyfills(),
     ],
   };
 });

@@ -14,6 +14,7 @@ export function makeRollupConfig(iifeName) {
     templates: { name: "@lookit/templates", iife: "chsTemplates" },
   };
   const knownCircularDeps = [
+    "@smithy/core/dist-es/submodules/protocols/index.js",
     "@smithy/util-stream/dist-es/blob/Uint8ArrayBlobAdapter.js",
     "@smithy/util-endpoints/dist-es/utils/callFunction.js",
     "@smithy/util-endpoints/dist-es/utils/getEndpointProperties.js",
@@ -48,26 +49,35 @@ export function makeRollupConfig(iifeName) {
   };
 
   return jsPsychMakeRollupConfig(iifeName).map((config) => {
+    // We need to update the config from jsPysch
+    const output = // Move all outputs into an array
+    (Array.isArray(config.output) ? config.output : [config.output])
+      // Iife outputs need to have external packages as globals
+      .map((o) => {
+        return o.format === "iife"
+          ? {
+              ...o,
+              globals: {
+                ...config.output.globals,
+                [packages.data.name]: packages.data.iife,
+                [packages.templates.name]: packages.templates.iife,
+              },
+            }
+          : o;
+      })
+      // Set source map to true for all outputs
+      .map((o) => ({ ...o, sourcemap: true }));
+
     return {
       ...config,
       onLog,
       // Add data package as external dependency
       external: [
-        ...config.external,
+        ...(config.external ? config.external : []),
         packages.data.name,
         packages.templates.name,
       ],
-      output: config.output.map((output) => {
-        return {
-          ...output,
-          globals: {
-            ...output.globals,
-            // Explicitly state data's iife name
-            [packages.data.name]: packages.data.iife,
-            [packages.templates.name]: packages.templates.iife,
-          },
-        };
-      }),
+      output,
     };
   });
 }
