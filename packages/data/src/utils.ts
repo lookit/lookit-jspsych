@@ -66,16 +66,24 @@ export const csrfToken = () => {
 };
 
 /**
+ * Wrapper for location.href. This is mainly to make testing easier.
+ *
+ * @returns Href
+ */
+export const getLocationHref = () => window.location.href;
+
+/**
  * Get Study and Child UUID from URL.
  *
  * @returns Object containing UUIDs.
  */
 export const getUuids = () => {
-  const locationHref = window.location.href;
+  const locationHref = getLocationHref();
   const uuids = locationHref.replace("preview/", "").split("/").slice(-3, -1);
   if (locationHref.includes("studies/j/") && uuids && uuids.length === 2) {
     return { study: uuids[0], child: uuids[1] };
   } else {
+    console.log(locationHref);
     throw new URLWrongError();
   }
 };
