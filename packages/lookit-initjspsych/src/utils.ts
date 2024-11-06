@@ -74,13 +74,12 @@ export const on_finish = (
       userFunc(data);
     }
 
-    await Api.finish();
     await Api.updateResponse(responseUuid, {
       exp_data,
       sequence: [...sequence, `${last_exp.trial_index}-${last_exp.trial_type}`],
       completed: true,
-    });
-
-    exit_url && window.location.replace(exit_url);
+    })
+      .then(() => Api.finish())
+      .then(() => exit_url && window.location.replace(exit_url));
   };
 };
