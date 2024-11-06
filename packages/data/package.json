@@ -34,6 +34,6 @@
     "jest-fetch-mock": "^3.0.3"
   },
   "peerDependencies": {
-    "jspsych": "^8.0.2"
+    "jspsych": "^8.0.3"
   }
 }
