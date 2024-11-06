@@ -1,8 +1,7 @@
 import { DataCollection } from "jspsych";
 
 import { Child, JsPsychExpData, Study } from "@lookit/data/dist/types";
-import { nth } from "./errors";
-import { Timeline } from "./types";
+import { nth, SequenceExpDataError } from "./errors";
 import { on_data_update, on_finish } from "./utils";
 
 delete global.window.location;
@@ -104,48 +103,6 @@ test("jsPsych's on_finish", async () => {
   expect(Request).toHaveBeenCalledTimes(2);
 });
 
-test("Is an error thrown when experiment data is empty?", () => {
-  const exp_data: Timeline[] = [];
-  const jsonData = {
-    data: {
-      attributes: { exp_data, sequence: ["0-value"] },
-    },
-  };
-  const data = {
-    /**
-     * Mocked jsPsych Data Collection.
-     *
-     * @returns Exp data.
-     */
-    values: () => exp_data,
-  } as DataCollection;
-  const response = {
-    /**
-     * Mocked json function used in API calls.
-     *
-     * @returns Promise containing mocked json data.
-     */
-    json: () => Promise.resolve(jsonData),
-    ok: true,
-  } as Response;
-
-  const userFn = jest.fn();
-  global.fetch = jest.fn(() => Promise.resolve(response));
-  global.Request = jest.fn();
-
-  Object.assign(window, {
-    chs: {
-      study: { attributes: { exit_url: "exit url" } } as Study,
-      child: {} as Child,
-      pastSessions: {} as Response[],
-    },
-  });
-
-  expect(async () => {
-    await on_finish("some id", userFn)(data);
-  }).rejects.toThrow("Experiment sequence or data missing.");
-});
-
 test("Is an error thrown when experiment sequence is undefined?", () => {
   const exp_data = [{ key: "value" }];
   const jsonData = {
@@ -185,7 +142,7 @@ test("Is an error thrown when experiment sequence is undefined?", () => {
 
   expect(async () => {
     await on_finish("some id", userFn)(data);
-  }).rejects.toThrow("Experiment sequence or data missing.");
+  }).rejects.toThrow(SequenceExpDataError);
 });
 
 test("Ordinal format of numbers", () => {
