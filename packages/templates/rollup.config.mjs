@@ -1,6 +1,6 @@
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import dotenv from "rollup-plugin-dotenv";
-import { importAsString } from "rollup-plugin-string-import";
+import { string } from "rollup-plugin-string";
 import { makeRollupConfig } from "../../rollup.mjs";
 
 export default makeRollupConfig("chsTemplates").map((config) => {
@@ -13,7 +13,7 @@ export default makeRollupConfig("chsTemplates").map((config) => {
       // Add support for .env files
       dotenv({ cwd: "../../" }),
       // Add support to import yaml and handlebars files as strings
-      importAsString({
+      string({
         include: ["**/*.yaml", "**/*.hbs"],
       }),
     ],
