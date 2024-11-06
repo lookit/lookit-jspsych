@@ -62,7 +62,7 @@ export const on_finish = (
 
     const exp_data: JsPsychExpData[] = data.values();
 
-    if (!sequence || sequence.length === 0 || exp_data.length === 0) {
+    if (!sequence || (sequence.length === 0 && exp_data.length === 0)) {
       throw new SequenceExpDataError();
     }
 
