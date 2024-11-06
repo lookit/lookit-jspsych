@@ -51,22 +51,22 @@ export function makeRollupConfig(iifeName) {
   return jsPsychMakeRollupConfig(iifeName).map((config) => {
     // We need to update the config from jsPysch
     const output = // Move all outputs into an array
-    (Array.isArray(config.output) ? config.output : [config.output])
-      // Iife outputs need to have external packages as globals
-      .map((o) => {
-        return o.format === "iife"
-          ? {
-              ...o,
-              globals: {
-                ...config.output.globals,
-                [packages.data.name]: packages.data.iife,
-                [packages.templates.name]: packages.templates.iife,
-              },
-            }
-          : o;
-      })
-      // Set source map to true for all outputs
-      .map((o) => ({ ...o, sourcemap: true }));
+      (Array.isArray(config.output) ? config.output : [config.output])
+        // Iife outputs need to have external packages as globals
+        .map((o) => {
+          return o.format === "iife"
+            ? {
+                ...o,
+                globals: {
+                  ...config.output.globals,
+                  [packages.data.name]: packages.data.iife,
+                  [packages.templates.name]: packages.templates.iife,
+                },
+              }
+            : o;
+        })
+        // Set source map to true for all outputs
+        .map((o) => ({ ...o, sourcemap: true }));
 
     return {
       ...config,
