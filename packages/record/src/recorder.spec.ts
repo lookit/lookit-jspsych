@@ -156,7 +156,7 @@ test("Recorder handleStop", async () => {
 
   await handleStop();
 
-  // // Upload the file to s3
+  // Upload the file to s3
   rec["localDownload"] = false;
   rec["_s3"] = new Data.LookitS3("some key");
 
