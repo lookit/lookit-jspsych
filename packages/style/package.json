@@ -5,7 +5,7 @@
   "license": "ISC",
   "author": "",
   "main": "css/index.scss",
-  "unpkg": "src/index.css",
+  "unpkg": "dist/index.min.css",
   "files": [
     "dist",
     "src",
