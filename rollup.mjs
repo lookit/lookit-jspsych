@@ -33,18 +33,12 @@ export function makeRollupConfig(iifeName) {
    * @param log - Log object containing location, frame, and message.
    * @param handler - Function called to record log.
    */
-  const onLog = (level, log, handler) => {
+  const onLog = (level, log) => {
     // Don't log known circular dependencies with the data package.
     if (log.code === "CIRCULAR_DEPENDENCY" && iifeName === packages.data.iife) {
       if (knownCircularDeps.some((value) => log.message.includes(value))) {
         return;
       }
-    }
-
-    if (level === "warn") {
-      handler("error", log);
-    } else {
-      handler(level, log);
     }
   };
 
