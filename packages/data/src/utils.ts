@@ -83,7 +83,6 @@ export const getUuids = () => {
   if (locationHref.includes("studies/j/") && uuids && uuids.length === 2) {
     return { study: uuids[0], child: uuids[1] };
   } else {
-    console.log(locationHref);
     throw new URLWrongError();
   }
 };
