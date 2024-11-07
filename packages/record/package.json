@@ -26,23 +26,23 @@
     "test": "jest --coverage"
   },
   "dependencies": {
-    "auto-bind": "^5.0.1"
+    "auto-bind": "^5.0.1",
+    "handlebars": "^4.7.8"
   },
   "devDependencies": {
-    "@jspsych/config": "^2.0.0",
+    "@jspsych/config": "^3.0.1",
     "@jspsych/test-utils": "^1.2.0",
     "@rollup/plugin-image": "^3.0.3",
     "@rollup/plugin-replace": "^6.0.1",
     "@types/audioworklet": "^0.0.60",
-    "handlebars": "^4.7.8",
     "rollup-plugin-dotenv": "^0.5.1",
     "rollup-plugin-polyfill-node": "^0.13.0",
-    "rollup-plugin-string-import": "^1.2.4",
+    "rollup-plugin-string": "^3.0.0",
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
     "@lookit/data": "^0.1.0",
     "@lookit/templates": "^1.1.0",
-    "jspsych": "^8.0.2"
+    "jspsych": "^8.0.3"
   }
 }

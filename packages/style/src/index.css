@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /*!
- * surveyjs - Survey JavaScript library v1.11.14
+ * surveyjs - Survey JavaScript library v1.12.8
  * Copyright (c) 2015-2024 Devsoft Baltic OÜ  - http://surveyjs.io/
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -432,6 +432,23 @@ button.sv-action-bar-item {
   margin-top: calc(1.5 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
+.sv-matrixdynamic-dragged-row {
+  cursor: grabbing;
+  position: absolute;
+  z-index: 10000;
+  font-family: var(--sjs-font-family, var(--font-family, var(--sjs-default-font-family)));
+}
+
+.sv-matrixdynamic-dragged-row .sd-table__row {
+  box-shadow: var(--sjs-shadow-large, 0px 8px 16px 0px rgba(0, 0, 0, 0.1)), var(--sjs-shadow-medium, 0px 2px 6px 0px rgba(0, 0, 0, 0.1));
+  background-color: var(--sjs-general-backcolor, var(--background, #fff));
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+  align-items: center;
+  line-height: 0;
+}
+
 .sv-matrix-row--drag-drop-ghost-mod td {
   background-color: var(--sjs-general-backcolor-dim, var(--background-dim, #f3f3f3));
 }
@@ -445,6 +462,17 @@ button.sv-action-bar-item {
   position: absolute;
   z-index: 10000;
   font-family: var(--sjs-font-family, var(--font-family, var(--sjs-default-font-family)));
+  min-width: 100px;
+  max-width: 400px;
+}
+
+.sv-drag-drop-choices-shortcut .sv-ranking-item {
+  height: calc(6 * (var(--sjs-base-unit, var(--base-unit, 8px))));
+}
+
+.sv-drag-drop-choices-shortcut .sv-ranking-item .sv-ranking-item__text .sv-string-viewer, .sv-drag-drop-choices-shortcut .sv-ranking-item .sv-ranking-item__text .sv-string-editor {
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .sv-drag-drop-choices-shortcut__content.sv-drag-drop-choices-shortcut__content {
@@ -493,16 +521,10 @@ sv-popup {
 
 .sv-popup__container {
   background-color: var(--sjs-general-backcolor-dim, var(--background-dim, #f3f3f3));
-  box-shadow: var(--sjs-shadow-large, 0px 8px 16px 0px rgba(0, 0, 0, 0.1));
+  box-shadow: var(--sjs-shadow-medium, 0px 2px 6px 0px rgba(0, 0, 0, 0.1)), var(--sjs-shadow-large, 0px 8px 16px 0px rgba(0, 0, 0, 0.1));
   border-radius: var(--sjs-corner-radius, 4px);
   position: absolute;
   padding: 0;
-}
-
-.sv-popup__shadow {
-  width: 100%;
-  height: 100%;
-  border-radius: var(--sjs-corner-radius, 4px);
 }
 
 .sv-popup__body-content {
@@ -522,7 +544,7 @@ sv-popup {
   align-items: center;
   justify-content: center;
   background-color: var(--background-semitransparent, rgba(144, 144, 144, 0.5));
-  padding: calc(11 * (var(--sjs-base-unit, var(--base-unit, 8px)))) calc(15 * (var(--sjs-base-unit, var(--base-unit, 8px))));
+  padding: calc(4 * (var(--sjs-base-unit, var(--base-unit, 8px)))) calc(15 * (var(--sjs-base-unit, var(--base-unit, 8px)))) calc(8 * (var(--sjs-base-unit, var(--base-unit, 8px))));
   box-sizing: border-box;
 }
 
@@ -531,23 +553,15 @@ sv-popup {
   display: flex;
 }
 
-.sv-popup--modal > .sv-popup__container > .sv-popup__shadow > .sv-popup__body-content {
-  box-shadow: var(--sjs-shadow-large, 0px 8px 16px 0px rgba(0, 0, 0, 0.1));
+.sv-popup--modal > .sv-popup__container > .sv-popup__body-content {
   background-color: var(--sjs-general-backcolor-dim-light, var(--background-dim-light, #f9f9f9));
   padding: calc(4 * (var(--sjs-base-unit, var(--base-unit, 8px))));
   height: auto;
-}
-
-.sv-popup--modal > .sv-popup__container > .sv-popup__shadow > .sv-popup__body-content .sv-popup__body-footer {
-  padding-bottom: 2px;
+  gap: calc(4 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
 .sv-popup--modal .sv-popup__body-footer .sv-footer-action-bar {
   overflow: visible;
-}
-
-.sv-popup--confirm-delete .sv-popup__shadow {
-  height: initial;
 }
 
 .sv-popup--confirm-delete .sv-popup__container {
@@ -563,7 +577,6 @@ sv-popup {
 
 .sv-popup--confirm-delete .sv-popup__body-header {
   color: var(--sjs-font-editorfont-color, var(--sjs-general-forecolor, rgba(0, 0, 0, 0.91)));
-  margin-bottom: 0;
   align-self: self-start;
   font-family: var(--sjs-font-family, var(--font-family, var(--sjs-default-font-family)));
   font-size: var(--sjs-font-size, 16px);
@@ -577,7 +590,6 @@ sv-popup {
 }
 
 .sv-popup--confirm-delete .sv-popup__body-footer {
-  padding-bottom: 0;
   max-width: max-content;
 }
 
@@ -598,6 +610,7 @@ sv-popup {
   width: 100%;
   padding-top: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
   border: unset;
+  box-shadow: unset;
   box-sizing: content-box;
 }
 
@@ -606,17 +619,12 @@ sv-popup {
   max-width: 100vw;
   border-radius: calc(4 * (var(--sjs-corner-radius, 4px))) calc(4 * (var(--sjs-corner-radius, 4px))) 0px 0px;
   background: var(--sjs-general-backcolor, var(--background, #fff));
-  box-shadow: var(--sjs-shadow-large, 0px 8px 16px 0px rgba(0, 0, 0, 0.1));
   padding: calc(3 * (var(--sjs-base-unit, var(--base-unit, 8px)))) calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px)))) calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
   height: calc(100% - 1 * var(--sjs-base-unit, var(--base-unit, 8px)));
 }
 
 .sv-popup--overlay .sv-popup__scrolling-content {
   height: calc(100% - 10 * var(--base-unit, 8px));
-}
-
-.sv-popup--overlay .sv-popup__body-footer {
-  margin-top: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
 .sv-popup--overlay .sv-popup__body-footer .sv-action-bar {
@@ -627,14 +635,14 @@ sv-popup {
   width: 100%;
 }
 
+.sv-popup--overlay .sv-popup__body-footer .sv-action {
+  flex: 1 0 0;
+}
+
 .sv-popup--overlay .sv-popup__button.sv-popup__button {
   background-color: var(--sjs-primary-backcolor, var(--primary, #19b394));
   border: 2px solid var(--sjs-primary-backcolor, var(--primary, #19b394));
   color: var(--sjs-primary-forecolor, var(--primary-foreground, #fff));
-}
-
-.sv-popup--overlay .sv-popup__body-footer .sv-action {
-  flex: 1 0 0;
 }
 
 .sv-popup--modal .sv-popup__scrolling-content {
@@ -714,21 +722,15 @@ sv-popup {
   line-height: calc(2 * (var(--sjs-font-size, 16px)));
   font-style: normal;
   font-weight: 700;
-  margin-bottom: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
   color: var(--sjs-general-forecolor, var(--foreground, #161616));
 }
 
 .sv-popup__body-footer {
   display: flex;
-  margin-top: calc(4 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
 .sv-popup__body-footer .sv-action-bar {
   gap: calc(1.5 * (var(--sjs-base-unit, var(--base-unit, 8px))));
-}
-
-.sv-popup__button {
-  margin: calc(0.25 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
 .sv-popup--modal .sv-list__filter, .sv-popup--overlay .sv-list__filter {
@@ -743,17 +745,13 @@ sv-popup {
   margin-bottom: var(--sjs-base-unit, var(--base-unit, 8px));
 }
 
-.sv-popup--dropdown .sv-popup__shadow {
-  box-shadow: var(--sjs-shadow-medium, 0px 2px 6px 0px rgba(0, 0, 0, 0.1));
-}
-
 .sv-popup--dropdown .sv-popup__body-content {
   background-color: var(--sjs-general-backcolor, var(--background, #fff));
   padding: var(--sjs-base-unit, var(--base-unit, 8px)) 0;
   height: 100%;
 }
 
-.sv-popup--dropdown > .sv-popup__container > .sv-popup__shadow > .sv-popup__body-content .sv-list {
+.sv-popup--dropdown > .sv-popup__container > .sv-popup__body-content .sv-list {
   background-color: rgba(0, 0, 0, 0);
 }
 
@@ -767,6 +765,7 @@ sv-popup {
 
 .sv-popup--overlay .sv-popup__body-content {
   background-color: var(--sjs-general-backcolor-dim, var(--background-dim, #f3f3f3));
+  gap: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
 .sv-popup--dropdown-overlay {
@@ -790,7 +789,6 @@ sv-popup {
   box-shadow: none;
   padding: calc(0.5 * (var(--sjs-base-unit, var(--base-unit, 8px)))) calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
   border-radius: calc(12.5 * (var(--sjs-base-unit, var(--base-unit, 8px))));
-  margin: 0;
 }
 
 .sv-popup--dropdown-overlay .sv-popup__container {
@@ -801,11 +799,11 @@ sv-popup {
 
 .sv-popup--dropdown-overlay .sv-popup__body-content {
   height: calc(var(--sv-popup-overlay-height, 100vh));
+  gap: 0;
 }
 
 .sv-popup--dropdown-overlay .sv-popup__body-footer {
   background-color: var(--sjs-general-backcolor-dim, var(--background-dim, #f3f3f3));
-  margin-top: 0;
   padding-top: var(--sjs-base-unit, var(--base-unit, 8px));
   padding-bottom: var(--sjs-base-unit, var(--base-unit, 8px));
   border-top: 1px solid var(--sjs-border-light, var(--border-light, #eaeaea));
@@ -949,7 +947,7 @@ sv-popup {
   max-width: var(--sv-popup-overlay-max-width);
   border-radius: var(--sjs-corner-radius, 4px);
   overflow: hidden;
-  margin: 0;
+  box-shadow: var(--sjs-shadow-medium, 0px 2px 6px 0px rgba(0, 0, 0, 0.1)), var(--sjs-shadow-large, 0px 8px 16px 0px rgba(0, 0, 0, 0.1));
 }
 
 .sv-popup--dropdown-overlay.sv-popup--tablet .sv-popup__content, .sv-popup--dropdown-overlay.sv-popup--tablet .sv-popup__scrolling-content, .sv-popup--dropdown-overlay.sv-popup--tablet .sv-list__container {
@@ -964,24 +962,26 @@ sv-popup {
   opacity: 0;
 }
 
-.sv-popup--animate-enter {
+.sv-popup--enter {
   animation-name: fadeIn;
   animation-fill-mode: forwards;
   animation-duration: 0.15s;
 }
 
-.sv-popup--modal.sv-popup--animate-enter {
+.sv-popup--modal.sv-popup--enter {
+  animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
   animation-duration: 0.25s;
 }
 
-.sv-popup--animate-leave {
+.sv-popup--leave {
   animation-direction: reverse;
   animation-name: fadeIn;
   animation-fill-mode: forwards;
   animation-duration: 0.15s;
 }
 
-.sv-popup--modal.sv-popup--animate-leave {
+.sv-popup--modal.sv-popup--leave {
+  animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
   animation-duration: 0.25s;
 }
 
@@ -989,14 +989,6 @@ sv-popup {
   opacity: 0;
 }
 
-@keyframes modalMoveDown {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(64px);
-  }
-}
 @keyframes modalMoveUp {
   from {
     transform: translateY(64px);
@@ -1005,16 +997,16 @@ sv-popup {
     transform: translateY(0);
   }
 }
-.sv-popup--modal.sv-popup--animate-leave .sv-popup__container {
-  animation-name: modalMoveDown;
+.sv-popup--modal.sv-popup--leave .sv-popup__container, .sv-popup--modal.sv-popup--enter .sv-popup__container {
+  animation-name: modalMoveUp;
+  animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
   animation-fill-mode: forwards;
   animation-duration: 0.25s;
 }
 
-.sv-popup--modal.sv-popup--animate-enter .sv-popup__container {
-  animation-name: modalMoveUp;
-  animation-fill-mode: forwards;
-  animation-duration: 0.25s;
+.sv-popup--modal.sv-popup--leave .sv-popup__container {
+  animation-direction: reverse;
+  animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
 }
 
 :root {
@@ -1512,13 +1504,13 @@ sv-brand-info, .sv-brand-info {
   line-height: calc(1.5 * (var(--sjs-internal-font-editorfont-size)));
   margin: 0 calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
   overflow-wrap: break-word;
-  word-break: break-all;
+  word-break: normal;
   align-self: self-start;
   padding-top: var(--sjs-base-unit, var(--base-unit, 8px));
   padding-bottom: var(--sjs-base-unit, var(--base-unit, 8px));
 }
 
-.sv-ranking-item__text .sv-string-viewer {
+.sv-ranking-item__text .sv-string-viewer, .sv-ranking-item__text .sv-string-editor {
   overflow: initial;
   white-space: pre-line;
 }
@@ -1564,7 +1556,7 @@ sv-brand-info, .sv-brand-info {
   height: calc(6 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
-.sv-ranking-item--ghost .sv-ranking-item__text .sv-string-viewer {
+.sv-ranking-item--ghost .sv-ranking-item__text .sv-string-viewer, .sv-ranking-item--ghost .sv-ranking-item__text .sv-string-editor {
   white-space: unset;
 }
 
@@ -1664,7 +1656,7 @@ sv-brand-info, .sv-brand-info {
   height: calc(6 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
-.sv-ranking-shortcut .sv-ranking-item .sv-ranking-item__text .sv-string-viewer {
+.sv-ranking-shortcut .sv-ranking-item .sv-ranking-item__text .sv-string-viewer, .sv-ranking-shortcut .sv-ranking-item .sv-ranking-item__text .sv-string-editor {
   overflow: hidden;
   white-space: nowrap;
 }
@@ -1806,6 +1798,38 @@ sv-brand-info, .sv-brand-info {
   left: initial;
 }
 
+.sv-ranking--select-to-rank-swap-areas {
+  flex-direction: row-reverse;
+}
+
+.sv-ranking--select-to-rank-swap-areas .sv-ranking__container--to .sv-ranking-item {
+  padding-left: 0;
+  left: -24px !important;
+}
+
+.sv-ranking--select-to-rank-swap-areas .sv-ranking__container--from .sv-ranking-item {
+  padding-left: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
+  left: 0;
+}
+
+.sv-ranking--select-to-rank-swap-areas .sv-ranking__container--from .sv-ranking-item__ghost.sv-ranking-item__ghost {
+  left: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
+}
+
+.sv-ranking--select-to-rank-swap-areas .sv-ranking__container--empty.sv-ranking__container--to .sv-ranking__container-placeholder {
+  padding-right: calc(5 * (var(--sjs-base-unit, var(--base-unit, 8px))));
+  padding-left: 0;
+}
+
+.sv-ranking--select-to-rank-swap-areas .sv-ranking__container--empty.sv-ranking__container--to .sv-ranking-item__ghost.sv-ranking-item__ghost {
+  right: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
+}
+
+.sv-ranking--select-to-rank-swap-areas .sv-ranking__container--empty.sv-ranking__container--from .sv-ranking__container-placeholder {
+  padding-left: calc(5 * (var(--sjs-base-unit, var(--base-unit, 8px))));
+  padding-right: 0;
+}
+
 :root {
   --sjs-transition-duration: 150ms;
 }
@@ -1862,7 +1886,7 @@ sv-brand-info, .sv-brand-info {
   line-height: calc(1.5 * (var(--sjs-font-size, 16px)));
   cursor: pointer;
   overflow: hidden;
-  text-align: left;
+  text-align: start;
   text-overflow: ellipsis;
   white-space: nowrap;
   transition: background-color var(--sjs-transition-duration, 150ms), color var(--sjs-transition-duration, 150ms);
@@ -2170,15 +2194,36 @@ sv-brand-info, .sv-brand-info {
 @keyframes moveInWithOverflow {
   from {
     overflow: hidden;
-    height: 0;
+    height: var(--animation-height-from);
+    min-height: var(--animation-height-from);
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
   }
   99% {
     overflow: hidden;
-    height: var(--animation-height);
+    margin-top: var(--animation-margin-top);
+    margin-bottom: var(--animation-margin-bottom);
+    padding-top: var(--animation-padding-top);
+    padding-bottom: var(--animation-padding-bottom);
+    border-top-width: var(--animation-border-top-width);
+    border-bottom-width: var(--animation-border-bottom-width);
+    height: var(--animation-height-to);
+    min-height: var(--animation-height-to);
   }
   to {
     overflow: visible;
-    height: var(--animation-height);
+    margin-top: var(--animation-margin-top);
+    margin-bottom: var(--animation-margin-bottom);
+    padding-top: var(--animation-padding-top);
+    padding-bottom: var(--animation-padding-bottom);
+    border-top-width: var(--animation-border-top-width);
+    border-bottom-width: var(--animation-border-bottom-width);
+    height: var(--animation-height-to);
+    min-height: var(--animation-height-to);
   }
 }
 @keyframes moveIn {
@@ -2210,10 +2255,6 @@ sv-brand-info, .sv-brand-info {
 
 .sd-element__title.sd-element__title--disabled {
   opacity: 0.25;
-}
-
-.sd-element__title.sd-element__title--hidden {
-  display: none;
 }
 
 .sd-root--readonly .sd-element__title.sd-element__title--disabled {
@@ -2287,7 +2328,7 @@ sv-brand-info, .sv-brand-info {
   flex-shrink: 0;
 }
 
-.sd-element__num + span {
+.sd-page__num + span, .sd-element__num + span {
   float: left;
   width: 0;
 }
@@ -2374,7 +2415,7 @@ sv-brand-info, .sv-brand-info {
     overflow: visible;
   }
 }
-.sd-element-wrapper--fade-in {
+.sd-element-wrapper--enter {
   animation-name: elementMoveIn, fadeIn;
   animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
   animation-fill-mode: forwards;
@@ -2383,7 +2424,7 @@ sv-brand-info, .sv-brand-info {
   opacity: 0;
 }
 
-.sd-element-wrapper--fade-out {
+.sd-element-wrapper--leave {
   animation-name: elementMoveIn, fadeIn;
   animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
   animation-fill-mode: forwards;
@@ -2396,28 +2437,28 @@ sv-brand-info, .sv-brand-info {
   box-sizing: border-box;
 }
 
-.sd-element__content--fade-in, .sd-element__content--fade-out {
+.sd-element__content--enter, .sd-element__content--leave {
   --animation-padding-top: 0;
   --animation-padding-bottom: 0;
 }
 
-.sd-element__content--fade-in {
-  animation-name: fadeIn, moveInWithOverflow, paddingFadeIn;
+.sd-element__content--enter {
+  animation-name: fadeIn, moveInWithOverflow;
   min-height: 0 !important;
   opacity: 0;
   animation-fill-mode: forwards;
   animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
-  animation-duration: var(--sjs-expand-fade-in-duration, 500ms), var(--sjs-expand-move-in-duration, 150ms), var(--sjs-expand-move-in-duration, 150ms);
+  animation-duration: var(--sjs-expand-fade-in-duration, 500ms), var(--sjs-expand-move-in-duration, 150ms);
   animation-delay: var(--sjs-expand-fade-in-delay, 150ms), 0s, 0s;
 }
 
-.sd-element__content--fade-out {
-  animation-name: fadeIn, moveInWithOverflow, paddingFadeIn;
+.sd-element__content--leave {
+  animation-name: fadeIn, moveInWithOverflow;
   min-height: 0 !important;
   animation-direction: reverse;
   animation-fill-mode: forwards;
   animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
-  animation-duration: var(--sjs-collapse-fade-out-duration, 150ms), var(--sjs-collapse-move-out-duration, 250ms), var(--sjs-collapse-move-out-duration, 250ms);
+  animation-duration: var(--sjs-collapse-fade-out-duration, 150ms), var(--sjs-collapse-move-out-duration, 250ms);
   animation-delay: 0s, var(--sjs-collapse-move-out-delay, 100ms), var(--sjs-collapse-move-out-delay, 100ms);
 }
 
@@ -2907,7 +2948,7 @@ input.sd-input:disabled:not(.sd-input--disabled), textarea.sd-input:disabled:not
   inset-block-end: calc(1.5 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
-.sd-question__content:focus-within .sd-remaining-character-counter {
+.sd-text__content:focus-within .sd-remaining-character-counter, .sd-comment__content:focus-within .sd-remaining-character-counter, .sd-multipletext__content:focus-within .sd-remaining-character-counter, .sd-matrix__question-wrapper:focus-within .sd-remaining-character-counter {
   display: flex;
 }
 
@@ -3242,85 +3283,74 @@ input.sd-input:disabled:not(.sd-input--disabled), textarea.sd-input:disabled:not
   }
 }
 @keyframes empty {}
-.sd-table__row--fade-out, .sd-table__row--fade-in {
+.sd-table__row--leave, .sd-table__row--enter {
   animation-name: empty;
-  animation-fill-mode: forwards;
-  --fade-in-animation-duration: calc(var(--sjs-matrix-row-fade-in-duration, 250ms) + var(--sjs-matrix-row-fade-in-delay, 150ms));
-  animation-duration: max(var(--fade-in-animation-duration), var(--sjs-matrix-row-move-in-duration, 150ms));
+  --move-whole-animation-duration: calc(var(--move-animation-duration) + var(--move-animation-delay));
+  --fade-whole-animation-duration: calc(var(--fade-animation-duration) + var(--fade-animation-delay));
+  animation-duration: max(var(--fade-whole-animation-duration), var(--move-whole-animation-duration));
 }
 
-.sd-table__row--fade-out > td, .sd-table__row--fade-in > td {
+.sd-table__row--leave > td, .sd-table__row--enter > td {
   animation-name: borderAnimation;
-  animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
-  animation-duration: var(--sjs-matrix-row-move-in-duration, 150ms);
+  animation-direction: var(--animation-direction);
+  animation-timing-function: var(--animation-timing-function);
+  animation-duration: var(--move-animation-duration);
   animation-fill-mode: forwards;
+  animation-delay: var(--move-animation-delay);
 }
 
-.sd-table__row--fade-out > td > div, .sd-table__row--fade-in > td > div {
+.sd-table__row--leave > td > div, .sd-table__row--enter > td > div {
   animation-name: fadeIn, moveInWithOverflow;
   opacity: 0;
-  animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
+  animation-direction: var(--animation-direction);
+  animation-timing-function: var(--animation-timing-function);
   animation-fill-mode: forwards;
-  animation-duration: var(--sjs-matrix-row-fade-in-duration, 250ms), var(--sjs-matrix-row-move-in-duration, 150ms);
-  animation-delay: var(--sjs-matrix-row-fade-in-delay, 150ms), 0s;
+  animation-duration: var(--fade-animation-duration), var(--move-animation-duration);
+  animation-delay: var(--fade-animation-delay), var(--move-animation-delay);
 }
 
-.sd-table__row--fade-out {
-  animation-direction: reverse;
-  --move-out-animation-duration: calc(var(--sjs-matrix-row-move-out-duration, 250ms) + var(--sjs-matrix-row-move-out-delay, 100ms));
-  animation-duration: max(var(--move-out-animation-duration), var(--sjs-matrix-row-fade-out-duration, 100ms));
+.sd-table__row--enter {
+  --move-animation-delay: 0s;
+  --move-animation-duration: var(--sjs-matrix-row-move-in-duration, 150ms);
+  --fade-animation-duration: var(--sjs-matrix-row-fade-in-duration, 250ms);
+  --fade-animation-delay: var(--sjs-matrix-row-fade-in-delay, 150ms);
+  --animation-direction: normal;
+  --animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
 }
 
-.sd-table__row--fade-out > td {
-  animation-duration: var(--sjs-matrix-row-move-out-duration, 250ms);
-  animation-delay: var(--sjs-matrix-row-move-out-delay, 100ms);
-  animation-direction: reverse;
-  animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
+.sd-table__row--leave {
+  --move-animation-delay: var(--sjs-matrix-row-move-out-delay, 100ms);
+  --move-animation-duration: var(--sjs-matrix-row-move-out-duration, 250ms);
+  --fade-animation-duration: var(--sjs-matrix-row-fade-out-duration, 100ms);
+  --fade-animation-delay: 0s;
+  --animation-direction: reverse;
+  --animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
 }
 
-.sd-table__row--fade-out > td > div {
-  animation-direction: reverse;
-  animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
-  animation-duration: var(--sjs-matrix-row-fade-out-duration, 100ms), var(--sjs-matrix-row-move-out-duration, 250ms);
-  animation-delay: 0s, var(--sjs-matrix-row-move-out-delay, 100ms);
-}
-
-.sd-table__row--detail.sd-table__row--fade-in > td, .sd-table__row--detail.sd-table__row--fade-out > td {
+.sd-table__row--detail.sd-table__row--enter > td, .sd-table__row--detail.sd-table__row--leave > td {
   animation-name: borderAnimation, paddingAnimation;
-  animation-duration: var(--sjs-matrix-row-move-in-duration, 150ms);
+  animation-duration: var(--move-animation-duration);
   animation-fill-mode: forwards;
+  animation-direction: var(--animation-direction);
+  animation-timing-function: var(--animation-timing-function);
 }
 
-.sd-table__row--detail.sd-table__row--fade-in {
-  --fade-in-animation-duration: calc(var(--sjs-matrix-detail-row-fade-in-duration, 500ms) + var(--sjs-matrix-detail-row-fade-in-delay, 150ms));
-  animation-duration: max(var(--fade-in-animation-duration), var(--sjs-matrix-detail-row-move-in-duration, 150ms));
+.sd-table__row--detail.sd-table__row--enter {
+  --move-animation-delay: 0s;
+  --move-animation-duration: var(--sjs-matrix-detail-row-move-in-duration, 150ms);
+  --fade-animation-duration: var(--sjs-matrix-detail-row-fade-in-duration, 500ms);
+  --fade-animation-delay: var(--sjs-matrix-detail-row-fade-in-delay, 150ms);
+  --animation-direction: normal;
+  --animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
 }
 
-.sd-table__row--detail.sd-table__row--fade-in > td {
-  animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
-  animation-duration: var(--sjs-matrix-detail-row-move-in-duration, 150ms);
-}
-
-.sd-table__row--detail.sd-table__row--fade-in > td > div {
-  animation-duration: var(--sjs-matrix-detail-row-fade-in-duration, 500ms), var(--sjs-matrix-detail-row-move-in-duration, 150ms);
-  animation-delay: var(--sjs-matrix-detail-row-fade-in-delay, 150ms), 0s;
-}
-
-.sd-table__row--detail.sd-table__row--fade-out {
-  --move-out-animation-duration: calc(var(--sjs-matrix-detail-row-move-out-duration, 250ms) + var(--sjs-matrix-detail-row-move-out-delay, 100ms));
-  animation-duration: max(var(--move-out-animation-duration), var(--sjs-matrix-detail-row-fade-out-duration, 150ms));
-}
-
-.sd-table__row--detail.sd-table__row--fade-out > td {
-  animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
-  animation-duration: var(--sjs-matrix-detail-row-move-out-duration, 250ms);
-  animation-delay: var(--sjs-matrix-detail-row-move-out-delay, 100ms);
-  animation-direction: reverse;
-}
-
-.sd-table__row--detail.sd-table__row--fade-out > td > div {
-  animation-duration: var(--sjs-matrix-detail-row-fade-out-duration, 150ms), var(--sjs-matrix-detail-row-move-out-duration, 250ms);
-  animation-delay: 0s, var(--sjs-matrix-detail-row-move-out-delay, 100ms);
+.sd-table__row--detail.sd-table__row--leave {
+  --move-animation-delay: var(--sjs-matrix-detail-row-move-out-delay, 100ms);
+  --move-animation-duration: var(--sjs-matrix-detail-row-move-out-duration, 250ms);
+  --fade-animation-duration: var(--sjs-matrix-detail-row-fade-out-duration, 150ms);
+  --fade-animation-delay: 0s;
+  --animation-direction: reverse;
+  --animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
 }
 
 .sd-table {
@@ -3451,6 +3481,10 @@ input.sd-input:disabled:not(.sd-input--disabled), textarea.sd-input:disabled:not
 
 .sd-question:not(.sd-question--mobile) .sd-table--alternate-rows .sd-table__row:nth-of-type(odd) > td.sd-table__cell:not(.sd-table__cell--actions) .sd-item:not(.sd-item--error).sd-item--checked .sd-item__decorator, .sd-question:not(.sd-question--mobile) .sd-table--alternate-rows .sd-table__row:nth-of-type(odd) td:first-of-type .sd-item:not(.sd-item--error).sd-item--checked .sd-item__decorator {
   background-color: var(--sjs-primary-backcolor, var(--primary, #19b394));
+}
+
+.sd-question:not(.sd-question--mobile) .sd-table--alternate-rows .sd-table__row:nth-of-type(odd) > td.sd-table__cell:not(.sd-table__cell--actions) .sd-item:not(.sd-item--error).sd-item--checked .sd-item__control:focus + .sd-item__decorator, .sd-question:not(.sd-question--mobile) .sd-table--alternate-rows .sd-table__row:nth-of-type(odd) td:first-of-type .sd-item:not(.sd-item--error).sd-item--checked .sd-item__control:focus + .sd-item__decorator {
+  background-color: var(--sjs-general-backcolor, var(--background, #fff));
 }
 
 .sd-question:not(.sd-question--mobile) .sd-table--alternate-rows .sd-table__row:nth-of-type(odd) > td.sd-table__cell:not(.sd-table__cell--actions) .sd-item:not(.sd-item--error).sd-item--readonly.sd-item--checked .sd-item__decorator, .sd-question:not(.sd-question--mobile) .sd-table--alternate-rows .sd-table__row:nth-of-type(odd) td:first-of-type .sd-item:not(.sd-item--error).sd-item--readonly.sd-item--checked .sd-item__decorator {
@@ -3634,7 +3668,7 @@ input.sd-input:disabled:not(.sd-input--disabled), textarea.sd-input:disabled:not
   padding: calc(1.5 * (var(--sjs-base-unit, var(--base-unit, 8px)))) var(--sjs-base-unit, var(--base-unit, 8px));
 }
 
-.sd-matrixdynamic__content .sd-table__question-wrapper {
+.sd-matrix__question-wrapper {
   position: relative;
 }
 
@@ -4068,45 +4102,38 @@ input.sd-input:disabled:not(.sd-input--disabled), textarea.sd-input:disabled:not
   flex-direction: row;
   width: 100%;
   box-sizing: border-box;
-  --animate-margin: var(--sd-base-vertical-padding);
   margin-top: var(--sd-base-vertical-padding);
 }
 
 .sd-row.sd-page__row {
   margin-top: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
-  --animate-margin: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
 .sd-page__row.sd-row--compact {
   margin-top: var(--sd-base-vertical-padding);
-  --animate-margin: var(--sd-base-vertical-padding);
 }
 
 .sd-row:first-of-type {
   margin-top: 0;
-  --animate-margin: 0;
 }
 
 .sd-page__title ~ .sd-row.sd-page__row:not(.sd-row--compact), .sd-page__description ~ .sd-row.sd-page__row:not(.sd-row--compact) {
   margin-top: calc(3 * (var(--sjs-base-unit, var(--base-unit, 8px))));
-  --animate-margin: calc(3 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
 .sd-page__title ~ .sd-page__row.sd-row--compact, .sd-page__description ~ .sd-page__row.sd-row--compact {
   margin-top: var(--sd-base-vertical-padding);
-  --animate-margin: var(--sd-base-vertical-padding);
 }
 
-.sd-page__title ~ .sd-page__row.sd-row.sd-row--fade-in.sd-row--fade-in, .sd-page__description ~ .sd-page__row.sd-row.sd-row--fade-in.sd-row--fade-in {
+.sd-page__title ~ .sd-page__row.sd-row.sd-row--enter.sd-row-delayed-enter, .sd-page__description ~ .sd-page__row.sd-row.sd-row--enter.sd-row-delayed-enter {
   margin-top: 0;
 }
 
 .sd-row.sd-page__row:not(.sd-row--compact) ~ .sd-row.sd-page__row:not(.sd-row--compact) {
   margin-top: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
-  --animate-margin: calc(2 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
-.sd-row.sd-page__row:not(.sd-row--compact) ~ .sd-page__row.sd-row.sd-row--fade-in.sd-row--fade-in {
+.sd-row.sd-page__row:not(.sd-row--compact) ~ .sd-page__row.sd-row.sd-row--enter.sd-row-delayed-enter {
   margin-top: 0;
 }
 
@@ -4167,21 +4194,13 @@ input.sd-input:disabled:not(.sd-input--disabled), textarea.sd-input:disabled:not
   white-space: nowrap;
 }
 
-@keyframes marginFadeIn {
-  from {
-    margin-top: 0;
-  }
-  to {
-    margin-top: var(--animate-margin);
-  }
-}
-.sd-row.sd-row--fade-in {
+.sd-row.sd-row--enter {
   margin-top: 0;
 }
 
-.sd-row--fade-in {
+.sd-row--enter {
   animation-fill-mode: forwards;
-  animation-name: fadeIn, moveInWithOverflow, marginFadeIn;
+  animation-name: fadeIn, moveInWithOverflow;
   min-height: 0 !important;
   opacity: 0;
   height: 0;
@@ -4190,12 +4209,12 @@ input.sd-input:disabled:not(.sd-input--disabled), textarea.sd-input:disabled:not
   animation-duration: var(--sjs-row-fade-in-duration, 500ms), var(--sjs-row-move-in-duration, 150ms), var(--sjs-row-move-in-duration, 150ms);
 }
 
-.sd-row--delayed-fade-in {
+.sd-row--delayed-enter {
   animation-delay: calc(var(--sjs-row-fade-in-delay, 150ms) + var(--sjs-row-fade-in-animation-delay, 400ms)), var(--sjs-row-fade-in-animation-delay, 400ms), var(--sjs-row-fade-in-animation-delay, 400ms);
 }
 
-.sd-row--fade-out {
-  animation-name: fadeIn, moveInWithOverflow, marginFadeIn;
+.sd-row--leave {
+  animation-name: fadeIn, moveInWithOverflow;
   animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
   animation-fill-mode: forwards;
   animation-direction: reverse;
@@ -4204,11 +4223,11 @@ input.sd-input:disabled:not(.sd-input--disabled), textarea.sd-input:disabled:not
   animation-duration: var(--sjs-row-fade-out-duration, 150ms), var(--sjs-row-move-out-duration, 250ms), var(--sjs-row-move-out-duration, 250ms);
 }
 
-.sd-row--fade-in .sd-element-wrapper--fade-in {
+.sd-row--enter .sd-element-wrapper--enter {
   animation: none;
 }
 
-.sd-row--fade-out .sd-element-wrapper--fade-out {
+.sd-row--leave .sd-element-wrapper--leave {
   animation: none;
 }
 
@@ -4403,7 +4422,7 @@ input.sd-input:disabled:not(.sd-input--disabled), textarea.sd-input:disabled:not
   color: var(--sjs-font-questiontitle-color, var(--sjs-general-forecolor, var(--foreground, #161616)));
   white-space: normal;
   width: 100%;
-  text-align: left;
+  text-align: start;
   min-width: 0;
 }
 
@@ -4478,6 +4497,37 @@ input.sd-input:disabled:not(.sd-input--disabled), textarea.sd-input:disabled:not
 
 .sd-selectbase__column.sv-q-column-1 {
   width: 100%;
+}
+
+.sd-item--enter, .sd-item--leave {
+  animation-name: moveInWithOverflow, fadeIn;
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
+  animation-direction: var(--animation-direction);
+  animation-duration: var(--move-animation-duration), var(--fade-animation-duration);
+  animation-delay: var(--move-animation-delay), var(--fade-animation-delay);
+}
+
+.sd-item--enter {
+  --animation-direction: normal;
+  --move-animation-duration: var(--sjs-ranking-move-in-duration, 150ms);
+  --move-animation-delay: 0s;
+  --fade-animation-duration: var(--sjs-ranking-fade-in-duration, 100ms);
+  --fade-animation-delay: var(--sjs-ranking-fade-in-delay, 150ms);
+}
+
+.sd-item--leave {
+  --animation-direction: reverse;
+  --move-animation-duration: var(--sjs-ranking-move-out-duration, 150ms);
+  --move-animation-delay: var(--sjs-ranking-move-out-delay, 0ms);
+  --fade-animation-duration: var(--sjs-ranking-fade-out-duration, 100ms);
+  --fade-animation-delay: 0s;
+}
+
+div[class*=sv-q-column-]:not(:first-of-type) .sd-item--enter {
+  --move-animation-duration: 0s;
+  --fade-animation-delay: 0s;
 }
 
 .sd-checkbox__decorator {
@@ -5610,7 +5660,7 @@ legend + .sd-rating__item-smiley, legend + sv-ng-rating-item + .sd-rating__item-
   margin-inline-start: calc(-0.25 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
-.sv-dropdown-popup.sv-single-select-list.sv-popup--animate-leave .sd-list__item.sv-list__item--selected .sv-list__item-body {
+.sv-dropdown-popup.sv-single-select-list.sv-popup--leave .sd-list__item.sv-list__item--selected .sv-list__item-body {
   font-weight: normal;
   color: var(--sjs-font-questiontitle-color, var(--sjs-general-forecolor, var(--foreground, #161616)));
   background-color: rgba(0, 0, 0, 0);
@@ -5732,7 +5782,7 @@ legend + .sd-rating__item-smiley, legend + sv-ng-rating-item + .sd-rating__item-
   max-width: 100%;
   width: auto;
   height: 100%;
-  text-align: left;
+  text-align: start;
   cursor: text;
   pointer-events: none;
   color: var(--sjs-general-forecolor-light, var(--foreground-light, #909090));
@@ -6599,7 +6649,7 @@ legend + .sd-rating__item-smiley, legend + sv-ng-rating-item + .sd-rating__item-
     transform: translateX(0);
   }
 }
-.sd-paneldynamic__panel-wrapper--fade-in.sv-pd-animation-left, .sd-paneldynamic__panel-wrapper--fade-in.sv-pd-animation-right {
+.sd-paneldynamic__panel-wrapper--enter.sv-pd-animation-left, .sd-paneldynamic__panel-wrapper--enter.sv-pd-animation-right {
   --sjs-pd-tab-animation-delay: 0ms;
   animation-name: movePanel, changeHeight, paddingFadeIn, fadeIn;
   animation-duration: var(--sjs-pd-tab-move-in-duration, 250ms), var(--sjs-pd-tab-height-change-duration, 250ms), var(--sjs-pd-tab-height-change-duration, 250ms), var(--sjs-pd-tab-fade-in-duration, 250ms);
@@ -6614,15 +6664,15 @@ legend + .sd-rating__item-smiley, legend + sv-ng-rating-item + .sd-rating__item-
   --animation-padding-bottom: calc(1 * var(--sd-base-padding));
 }
 
-.sd-paneldynamic__panel-wrapper--fade-in.sv-pd-animation-left {
+.sd-paneldynamic__panel-wrapper--enter.sv-pd-animation-left {
   --sjs-pd-tab-move-margin: calc(1 * var(--sjs-pd-tab-move-in-margin, 50%));
 }
 
-.sd-paneldynamic__panel-wrapper--fade-in.sv-pd-animation-right {
+.sd-paneldynamic__panel-wrapper--enter.sv-pd-animation-right {
   --sjs-pd-tab-move-margin: calc(-1 * var(--sjs-pd-tab-move-in-margin, 50%));
 }
 
-.sd-paneldynamic__panel-wrapper--fade-out.sv-pd-animation-left, .sd-paneldynamic__panel-wrapper--fade-out.sv-pd-animation-right {
+.sd-paneldynamic__panel-wrapper--leave.sv-pd-animation-left, .sd-paneldynamic__panel-wrapper--leave.sv-pd-animation-right {
   animation-name: fadeIn, movePanel;
   animation-duration: var(--sjs-pd-tab-fade-out-duration, 250ms), var(--sjs-pd-tab-move-out-duration, 250ms);
   animation-delay: var(--sjs-pd-tab-fade-out-delay, 0ms), var(--sjs-pd-tab-move-out-delay, 0ms);
@@ -6635,15 +6685,15 @@ legend + .sd-rating__item-smiley, legend + sv-ng-rating-item + .sd-rating__item-
   width: calc(100% - 2 * var(--sd-base-padding));
 }
 
-.sd-paneldynamic__panel-wrapper--fade-out.sv-pd-animation-left {
+.sd-paneldynamic__panel-wrapper--leave.sv-pd-animation-left {
   --sjs-pd-tab-move-margin: calc(-1 * var(--sjs-pd-tab-move-out-margin, 50%));
 }
 
-.sd-paneldynamic__panel-wrapper--fade-out.sv-pd-animation-right {
+.sd-paneldynamic__panel-wrapper--leave.sv-pd-animation-right {
   --sjs-pd-tab-move-margin: calc(1 * var(--sjs-pd-tab-move-out-margin, 50%));
 }
 
-.sd-paneldynamic__panel-wrapper--fade-in.sv-pd-animation-adding {
+.sd-paneldynamic__panel-wrapper--enter.sv-pd-animation-adding {
   animation-name: fadeIn, changeHeight, paddingFadeIn;
   animation-duration: var(--sjs-pd-tab-add-fade-in-duration, 500ms), var(--sjs-pd-tab-height-change-duration, 250ms), var(--sjs-pd-tab-height-change-duration, 250ms);
   animation-delay: calc(var(--sjs-pd-tab-add-fade-in-delay, 250ms) + var(--sjs-pd-tab-animation-delay)), calc(var(--sjs-pd-tab-height-change-delay, 0ms) + var(--sjs-pd-tab-animation-delay)), calc(var(--sjs-pd-tab-height-change-delay, 0ms) + var(--sjs-pd-tab-animation-delay));
@@ -6652,11 +6702,11 @@ legend + .sd-rating__item-smiley, legend + sv-ng-rating-item + .sd-rating__item-
   transform: translateX(0);
 }
 
-.sd-paneldynamic__panel-wrapper--fade-in.sv-pd-animation-removing {
+.sd-paneldynamic__panel-wrapper--enter.sv-pd-animation-removing {
   --sjs-pd-tab-animation-delay: var(--sjs-pd-tab-remove-fade-in-delay, 150ms);
 }
 
-.sd-paneldynamic__panel-wrapper--fade-out.sv-pd-animation-removing {
+.sd-paneldynamic__panel-wrapper--leave.sv-pd-animation-removing {
   animation-name: fadeIn;
   animation-duration: var(--sjs-pd-tab-remove-fade-out-duration, 150ms);
   animation-delay: var(--sjs-pd-tab-remove-fade-out-delay, 0ms);
@@ -6669,22 +6719,22 @@ legend + .sd-rating__item-smiley, legend + sv-ng-rating-item + .sd-rating__item-
   width: calc(100% - 2 * var(--sd-base-padding));
 }
 
-.sd-paneldynamic__panel-wrapper--fade-in, .sd-paneldynamic__panel-wrapper--fade-out {
-  animation-name: fadeIn, moveInWithOverflow, paddingFadeIn;
+.sd-paneldynamic__panel-wrapper--enter, .sd-paneldynamic__panel-wrapper--leave {
+  animation-name: fadeIn, moveInWithOverflow;
   animation-fill-mode: forwards;
   --animation-padding-top: 0;
   --animation-padding-bottom: calc(1 * var(--sd-base-padding));
   min-height: 0 !important;
 }
 
-.sd-paneldynamic__panel-wrapper--fade-in {
+.sd-paneldynamic__panel-wrapper--enter {
   opacity: 0;
   animation-timing-function: cubic-bezier(0, 0, 0.58, 1);
   animation-duration: var(--sjs-pd-list-fade-in-duration, 500ms), var(--sjs-pd-list-move-in-duration, 250ms), var(--sjs-pd-list-move-in-duration, 250ms);
   animation-delay: var(--sjs-pd-list-fade-in-delay, 250ms), 0s, 0s;
 }
 
-.sd-paneldynamic__panel-wrapper--fade-out {
+.sd-paneldynamic__panel-wrapper--leave {
   animation-direction: reverse;
   animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
   animation-duration: var(--sjs-pd-list-fade-out-duration, 150ms), var(--sjs-pd-list-move-out-duration, 250ms), var(--sjs-pd-list-move-out-duration, 250ms);
@@ -6855,15 +6905,86 @@ legend + .sd-rating__item-smiley, legend + sv-ng-rating-item + .sd-rating__item-
 
 .sd-file__list {
   display: flex;
-  gap: calc(4 * (var(--sjs-base-unit, var(--base-unit, 8px))));
+  position: relative;
+  overflow: hidden;
   box-sizing: content-box;
   flex-direction: row;
-  align-items: stretch;
-  justify-content: center;
   padding: calc(10.5 * (var(--sjs-base-unit, var(--base-unit, 8px)))) 0;
   min-height: calc(15 * (var(--sjs-base-unit, var(--base-unit, 8px))));
   max-height: calc(15 * (var(--sjs-base-unit, var(--base-unit, 8px))));
   width: 100%;
+}
+
+.sd-file__page {
+  display: flex;
+  left: 0;
+  align-items: stretch;
+  justify-content: center;
+  gap: calc(4 * (var(--sjs-base-unit, var(--base-unit, 8px))));
+  height: calc(100% - 21 * var(--sjs-base-unit, var(--base-unit, 8px)));
+  width: 100%;
+  position: absolute;
+}
+
+@keyframes file-page-to-right {
+  from {
+    opacity: 1;
+    left: 0;
+  }
+  to {
+    opacity: 0;
+    left: 100%;
+  }
+}
+@keyframes file-page-from-right {
+  from {
+    opacity: 0;
+    left: 100%;
+  }
+  to {
+    opacity: 1;
+    left: 0;
+  }
+}
+@keyframes file-page-from-left {
+  from {
+    opacity: 0;
+    left: -100%;
+  }
+  to {
+    opacity: 1;
+    left: 0;
+  }
+}
+@keyframes file-page-to-left {
+  from {
+    opacity: 1;
+    left: 0;
+  }
+  to {
+    opacity: 0;
+    left: -100%;
+  }
+}
+.sd-file__page--leave-to-right, .sd-file__page--enter-from-right, .sd-file__page--leave-to-left, .sd-file__page--enter-from-left {
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+.sd-file__page--leave-to-right {
+  animation-name: file-page-to-right;
+}
+
+.sd-file__page--enter-from-right {
+  animation-name: file-page-from-right;
+}
+
+.sd-file__page--leave-to-left {
+  animation-name: file-page-to-left;
+}
+
+.sd-file__page--enter-from-left {
+  animation-name: file-page-from-left;
 }
 
 .sd-file__preview-item {
@@ -6966,6 +7087,10 @@ legend + .sd-rating__item-smiley, legend + sv-ng-rating-item + .sd-rating__item-
 
 .sd-file--single-image {
   height: calc(36 * var(--sjs-base-unit, var(--base-unit, 8px)));
+}
+
+.sd-file--single-image .sd-file__page {
+  height: 100%;
 }
 
 .sd-file--single-image .sd-file__preview-item {
@@ -8343,9 +8468,12 @@ svg.sd-action--icon {
 }
 
 .sd-timer__text--minor {
-  color: var(--sjs-general-forecolor-light, var(--foreground-light, #909090));
+  color: var(--lbr-timer-text-color-secondary, var(--sjs-general-dim-forecolor-light, rgba(0, 0, 0, 0.45)));
+  font-size: var(--lbr-font-default-size, var(--sjs-font-size, 16px));
+  font-style: normal;
   font-weight: 600;
-  font-size: calc(0.75 * (var(--sjs-font-size, 16px)));
+  line-height: var(--lbr-font-default-line-height, calc(1.5 * (var(--sjs-font-size, 16px))));
+  margin-top: calc(-0.5 * (var(--sjs-base-unit, var(--base-unit, 8px))));
 }
 
 .sv-header {
