@@ -1,5 +1,17 @@
 # @lookit/record
 
+## 3.0.0
+
+### Minor Changes
+
+- c28bd6c: Update to @jspsych/config v3 and various fixes to breaking changes
+
+### Patch Changes
+
+- Updated dependencies [c28bd6c]
+  - @lookit/templates@2.0.0
+  - @lookit/data@0.2.0
+
 ## 2.0.0
 
 ### Minor Changes
