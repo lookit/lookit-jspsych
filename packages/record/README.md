@@ -67,8 +67,9 @@ Users will need to record themselves accepting the consent document for your
 study. This trial will allow the user to read the consent document and record a
 video accepting it.
 
-!!! caution "Don't forget a video config trial!" You MUST have a video config
-trial in your experiment timeline before the video consent trial.
+!!! caution "Don't forget a video config trial!"
+
+    You MUST have a video config trial in your experiment timeline before the video consent trial.
 
 To create the video consent trial:
 
@@ -338,9 +339,9 @@ that allows you to add video recording to the trial. The trial will start once
 the video recording has been set up, and the video recording will finish as soon
 as the trial has ended.
 
-!!! important "When to use trial recording" Trial recording should NOT occur
-simultaneously with session recording, or with any plugins that already use the
-webcam (e.g. video config, video consent).
+!!! important "When to use trial recording"
+
+    Trial recording should NOT occur simultaneously with session recording, or with any plugins that already use the webcam (e.g. video config, video consent).
 
 To use the CHS trial recording extension, you need to:
 
@@ -349,8 +350,9 @@ To use the CHS trial recording extension, you need to:
 2. Add it to the `extensions` parameter for any trial(s) that you want to be
    recorded.
 
-!!! caution "Don't forget a video config trial!" You MUST have a video config
-trial in your experiment timeline before doing any trial recording.
+!!! caution "Don't forget a video config trial!"
+
+    You MUST have a video config trial in your experiment timeline before doing any trial recording.
 
 ### Parameters
 
@@ -390,16 +392,17 @@ You might prefer to record across multiple trials in a study session. This can
 be done by using trials created with the start and stop recording plugins. This
 gives a bit of flexibility over which of the study trials are recorded.
 
-!!! important "When to use session recording" Sesssion recording should NOT
-occur simultaneously with trial recording, or with any plugins that already use
-the webcam (e.g. video config, video consent).
+!!! important "When to use session recording"
+
+    Sesssion recording should NOT occur simultaneously with trial recording, or with any plugins that already use the webcam (e.g. video config, video consent).
 
 To record a set of trials, add a 'start' trial in your jsPsych experiment
 timeline right before you'd like to start recording, and add a 'stop' trial at
 the point in your timeline when you'd like to stop recording.
 
-!!! caution "Don't forget a video config trial!" You MUST have a video config
-trial in your experiment timeline before doing any session recording.
+!!! caution "Don't forget a video config trial!"
+
+    You MUST have a video config trial in your experiment timeline before doing any session recording.
 
 ### Start Recording Plugin
 
