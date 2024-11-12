@@ -25,6 +25,7 @@ exclude_docs: |
   node_modules
   CHANGELOG.md
   !templates
+  templates/node_modules
 
 theme:
   name: readthedocs
