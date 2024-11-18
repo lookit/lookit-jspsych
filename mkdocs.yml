@@ -38,5 +38,6 @@ extra:
   jsPsych: https://www.jspsych.org/v8/
 
 markdown_extensions:
+  - admonition
   - toc:
       permalink: True
