@@ -28,6 +28,13 @@ exclude_docs: |
 
 theme:
   name: readthedocs
+  custom_dir: _custom_theme/
+
+extra_css:
+  - css/jspsych_docs.css
+
+extra_javascript:
+  - js/links_in_new_tab.js
 
 plugins:
   - search
