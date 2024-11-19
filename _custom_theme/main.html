@@ -1,0 +1,36 @@
+{%- extends "base.html" %} {%- block search_button %} {%- if 'search' in
+config.plugins %}{%- include "searchbox.html" %}{%- endif %} {# From Kim's
+forked RTD theme: https://github.com/kimberscott/sphinx-rtd-theme-frameplayer #}
+<div id="toggle-tab-container" style="position: relative">
+  <nav id="toggle-lookit-frameplayer">
+    <ul>
+      <li>
+        <a href="https://lookit.readthedocs.io" class="icon icon-home"> CHS </a>
+      </li>
+      <li>
+        <a
+          href="https://lookit.readthedocs.io/projects/frameplayer/"
+          class="fa fa-puzzle-piece"
+        >
+          Lookit EFP
+        </a>
+      </li>
+      <li id="selected">
+        {%- if config.theme.logo %}
+        <a href="{{ nav.homepage.url|url }}">
+          <img
+            src="{{ config.theme.logo|url }}"
+            class="logo"
+            alt="{{ _('Logo') }}"
+        /></a>
+        {%- else %}
+        <a href="{{ nav.homepage.url|url }}" class="fa fa-puzzle-piece">
+          jsPsych
+        </a>
+        {%- endif %}
+      </li>
+    </ul>
+  </nav>
+</div>
+
+{%- endblock %}

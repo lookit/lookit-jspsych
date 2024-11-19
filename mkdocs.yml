@@ -3,10 +3,6 @@ docs_dir: ./packages
 repo_url: https://github.com/lookit/lookit-jspsych
 
 nav:
-  - Home: index.md
-  - Related projects:
-      - Lookit API: https://lookit.readthedocs.io
-      - Ember Lookit Frameplayer: https://lookit.readthedocs.io/projects/frameplayer
   - Plugins and Extensions:
       - Record: record/README.md
       - Surveys: surveys/README.md
@@ -14,6 +10,8 @@ nav:
       - Data: data/README.md
       - CHS's initJsPsych: lookit-initjspsych/README.md
       - Templates: templates/README.md
+
+not_in_nav: index.md
 
 validation:
   omitted_files: warn
@@ -29,6 +27,13 @@ exclude_docs: |
 
 theme:
   name: readthedocs
+  custom_dir: _custom_theme/
+
+extra_css:
+  - css/jspsych_docs.css
+
+extra_javascript:
+  - js/links_in_new_tab.js
 
 plugins:
   - search
