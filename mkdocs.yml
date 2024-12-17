@@ -1,6 +1,8 @@
 site_name: CHS jsPsych
 docs_dir: ./packages
+
 repo_url: https://github.com/lookit/lookit-jspsych
+edit_uri: tree/develop/packages
 
 nav:
   - Plugins and Extensions:
