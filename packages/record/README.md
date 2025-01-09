@@ -25,7 +25,7 @@ following language codes:
 | Portuguese     | Brazil | pt-BR |
 | Portuguese     |        | pt    |
 
-## Video Configuration
+## Video Configuration Plugin
 
 To record _any_ video during an experiment, including a consent video, you must
 add a video configuration trial. This trial allows the user to give permissions
@@ -61,51 +61,20 @@ const videoConfig = {
 };
 ```
 
-## Video Consent
+## Video Consent Plugin
 
 Users will need to record themselves accepting the consent document for your
 study. This trial will allow the user to read the consent document and record a
 video accepting it.
 
-To create the video consent trial.
+!!! caution "Don't forget a video config trial!"
+
+    You MUST have a video config trial in your experiment timeline before the video consent trial.
+
+To create the video consent trial:
 
 ```javascript
 const videoConsent = { type: chsRecord.VideoConsentPlugin, ...parameters };
-```
-
-### Example
-
-```javascript
-const videoConsent = {
-  type: chsRecord.VideoConsentPlugin,
-  PIName: "Jane Smith",
-  institution: "Science University",
-  PIContact: "Jane Smith at 123 456 7890",
-  purpose:
-    "Why do babies love cats? This study will help us find out whether babies love cats because of their soft fur or their twitchy tails.",
-  procedures:
-    "Your child will be shown pictures of lots of different cats, along with noises that cats make like meowing and purring. We are interested in which pictures and sounds make your child smile. We will ask you (the parent) to turn around to avoid influencing your child's responses.",
-  risk_statement:
-    "There are no expected risks if you participate in the study. (This is optional, but should typically be included. If you leave it out there's no 'risks' section and you should include risk information elsewhere.)",
-  voluntary_participation:
-    "There are two sessions in this study; you will be invited to complete another session next month. It is okay not to do both sessions! (This is optional; leave it out if you don't need to say anything besides participation in this session being voluntary.)",
-  payment:
-    "After you finish the study, we will email you a $5 BabyStore gift card within approximately three days. To be eligible for the gift card your child must be in the age range for this study, you need to submit a valid consent statement, and we need to see that there is a child with you. But we will send a gift card even if you do not finish the whole study or we are not able to use your child's data! There are no other direct benefits to you or your child from participating, but we hope you will enjoy the experience.",
-  datause:
-    "We are primarily interested in your child's emotional reactions to the images and sounds. A research assistant will watch your video to measure the precise amount of delight in your child's face as he or she sees each cat picture.",
-  include_databrary: true,
-  additional_video_privacy_statement:
-    "We will also ask your permission to use your videos as stimuli for other parents. (This is optional; leave it out if there aren't additional ways you'll share video beyond as described in the participant's video privacy level and Databrary selections.)",
-  gdpr: false,
-  research_rights_statement:
-    "You are not waiving any legal claims, rights or remedies because of your participation in this research study.  If you feel you have been treated unfairly, or you have questions regarding your rights as a research subject, you may contact the [IRB NAME], [INSTITUTION], [ADDRESS/CONTACT]",
-  additional_segments: [
-    {
-      title: "US Patriot Act Disclosure",
-      text: "[EXAMPLE ONLY, PLEASE REMOVE ADDITIONAL_SEGMENTS UNLESS YOU NEED THEM.] Lookit is a U.S. organization and all information gathered from the website is stored on servers based in the U.S. Therefore, your video recordings are subject to U.S. laws, such as the US Patriot Act. This act allows authorities access to the records of internet service providers. If you choose to participate in this study, you understand that your video recording will be stored and accessed in the USA. The security and privacy policy for Lookit can be found at the following link: <a href='https://lookit.mit.edu/privacy/' target='_blank' rel='noopener'>https://lookit.mit.edu/privacy/</a>.",
-    },
-  ],
-};
 ```
 
 ### Parameters
@@ -328,7 +297,68 @@ Replace the default spoken consent statement with your custom text.
 Whether to omit the phrase “or in the very unlikely event of a research-related
 injury” from the contact section. (This was required by the Northwestern IRB.)
 
-## Trial Recording
+### Example
+
+```javascript
+const videoConsent = {
+  type: chsRecord.VideoConsentPlugin,
+  PIName: "Jane Smith",
+  institution: "Science University",
+  PIContact: "Jane Smith at 123 456 7890",
+  purpose:
+    "Why do babies love cats? This study will help us find out whether babies love cats because of their soft fur or their twitchy tails.",
+  procedures:
+    "Your child will be shown pictures of lots of different cats, along with noises that cats make like meowing and purring. We are interested in which pictures and sounds make your child smile. We will ask you (the parent) to turn around to avoid influencing your child's responses.",
+  risk_statement:
+    "There are no expected risks if you participate in the study. (This is optional, but should typically be included. If you leave it out there's no 'risks' section and you should include risk information elsewhere.)",
+  voluntary_participation:
+    "There are two sessions in this study; you will be invited to complete another session next month. It is okay not to do both sessions! (This is optional; leave it out if you don't need to say anything besides participation in this session being voluntary.)",
+  payment:
+    "After you finish the study, we will email you a $5 BabyStore gift card within approximately three days. To be eligible for the gift card your child must be in the age range for this study, you need to submit a valid consent statement, and we need to see that there is a child with you. But we will send a gift card even if you do not finish the whole study or we are not able to use your child's data! There are no other direct benefits to you or your child from participating, but we hope you will enjoy the experience.",
+  datause:
+    "We are primarily interested in your child's emotional reactions to the images and sounds. A research assistant will watch your video to measure the precise amount of delight in your child's face as he or she sees each cat picture.",
+  include_databrary: true,
+  additional_video_privacy_statement:
+    "We will also ask your permission to use your videos as stimuli for other parents. (This is optional; leave it out if there aren't additional ways you'll share video beyond as described in the participant's video privacy level and Databrary selections.)",
+  gdpr: false,
+  research_rights_statement:
+    "You are not waiving any legal claims, rights or remedies because of your participation in this research study.  If you feel you have been treated unfairly, or you have questions regarding your rights as a research subject, you may contact the [IRB NAME], [INSTITUTION], [ADDRESS/CONTACT]",
+  additional_segments: [
+    {
+      title: "US Patriot Act Disclosure",
+      text: "[EXAMPLE ONLY, PLEASE REMOVE ADDITIONAL_SEGMENTS UNLESS YOU NEED THEM.] Lookit is a U.S. organization and all information gathered from the website is stored on servers based in the U.S. Therefore, your video recordings are subject to U.S. laws, such as the US Patriot Act. This act allows authorities access to the records of internet service providers. If you choose to participate in this study, you understand that your video recording will be stored and accessed in the USA. The security and privacy policy for Lookit can be found at the following link: <a href='https://lookit.mit.edu/privacy/' target='_blank' rel='noopener'>https://lookit.mit.edu/privacy/</a>.",
+    },
+  ],
+};
+```
+
+## Trial Recording Extension
+
+Trial recording can be added to most jsPsych trials. This is a jsPsych extension
+that allows you to add video recording to the trial. The trial will start once
+the video recording has been set up, and the video recording will finish as soon
+as the trial has ended.
+
+!!! important "When to use trial recording"
+
+    Trial recording should NOT occur simultaneously with session recording, or with any plugins that already use the webcam (e.g. video config, video consent).
+
+To use the CHS trial recording extension, you need to:
+
+1. Add it to the experiment settings, which is an optional object passed to
+   `initjsPsych`.
+2. Add it to the `extensions` parameter for any trial(s) that you want to be
+   recorded.
+
+!!! caution "Don't forget a video config trial!"
+
+    You MUST have a video config trial in your experiment timeline before doing any trial recording.
+
+### Parameters
+
+This extension does not accept any parameters.
+
+### Example
 
 To record a single trial, you will have to first load the extension in
 `initJsPsych`.
@@ -362,7 +392,48 @@ You might prefer to record across multiple trials in a study session. This can
 be done by using trials created with the start and stop recording plugins. This
 gives a bit of flexibility over which of the study trials are recorded.
 
-To record a study session, create the start and stop recording trials.
+!!! important "When to use session recording"
+
+    Sesssion recording should NOT occur simultaneously with trial recording, or with any plugins that already use the webcam (e.g. video config, video consent).
+
+To record a set of trials, add a 'start' trial in your jsPsych experiment
+timeline right before you'd like to start recording, and add a 'stop' trial at
+the point in your timeline when you'd like to stop recording.
+
+!!! caution "Don't forget a video config trial!"
+
+    You MUST have a video config trial in your experiment timeline before doing any session recording.
+
+### Start Recording Plugin
+
+The plugin to start session recording is called `chsRecord.StartRecordPlugin`.
+
+```javascript
+const startRec = { type: chsRecord.StartRecordPlugin };
+```
+
+#### Parameters
+
+This plugin does not accept any parameters, other those available in all
+plugins.
+
+### Stop Recording Plugin
+
+The plugin to stop session recording is called `chsRecord.StopRecordPlugin`.
+
+```javascript
+const stopRec = { type: chsRecord.StopRecordPlugin };
+```
+
+#### Parameters
+
+This plugin does not accept any parameters, other those available in all
+plugins.
+
+### Example
+
+First, make sure that you've added a video config trial to your experiment
+timeline. Then, create your start and stop recording trials:
 
 ```javascript
 const startRec = { type: chsRecord.StartRecordPlugin };
@@ -389,4 +460,19 @@ stop or start recording trials within the timeline.
 
 ```javascript
 jsPsych.run([videoConfig, startRec, morning, evening, stopRec, night]);
+```
+
+You can also create more than one session recording:
+
+```javascript
+jsPsych.run([
+  videoConfig,
+  startRec,
+  morning,
+  stopRec,
+  evening,
+  startRec,
+  night,
+  stopRec,
+]);
 ```
