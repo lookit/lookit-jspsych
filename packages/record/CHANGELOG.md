@@ -1,5 +1,11 @@
 # @lookit/record
 
+## 3.0.1
+
+### Patch Changes
+
+- 1f7afa1: Update the documentation.
+
 ## 3.0.0
 
 ### Minor Changes

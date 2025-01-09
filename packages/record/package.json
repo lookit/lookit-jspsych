@@ -1,6 +1,6 @@
 {
   "name": "@lookit/record",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Recording extensions and plugins for CHS studies.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
