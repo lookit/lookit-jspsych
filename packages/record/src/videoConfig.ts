@@ -99,6 +99,7 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
   private minVolume: number = 0.1;
   private micChecked: boolean = false;
   private processorNode: AudioWorkletNode | null = null;
+  private mimeType = "video/webm";
 
   /**
    * Constructor for video config plugin.
@@ -404,12 +405,20 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    * @param stream - Media stream returned from getUserMedia that should be used
    *   to set up the jsPsych recorder.
    * @param opts - Media recorder options to use when setting up the recorder.
+   *   This will include the mimeType property that is set via getMimeTypeCodec,
+   *   as well as any other options that can passed via the calling context.
    */
   public initializeAndCreateRecorder = (
     stream: MediaStream,
     opts?: MediaRecorderOptions,
   ) => {
-    this.jsPsych.pluginAPI.initializeCameraRecorder(stream, opts);
+    // If no mime types from the list are supported (getCompatibleMimeType returns null) then use the default.
+    this.mimeType = this.getCompatibleMimeType() || this.mimeType;
+    const recorder_options: MediaRecorderOptions = {
+      ...opts,
+      mimeType: this.mimeType,
+    };
+    this.jsPsych.pluginAPI.initializeCameraRecorder(stream, recorder_options);
     this.recorder = new Recorder(this.jsPsych);
   };
 
@@ -660,4 +669,30 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
       next_button_el.classList.remove(`${html_params.step_complete_class}`);
     }
   };
+
+  /**
+   * Check support for recording containers/codecs, in order of preference, and
+   * get the first supported type. The first supported type found in the
+   * mime_types array is returned and will be passed to the "mimeType" property
+   * in the recorder options object that is passed to the recorder
+   * initialization function (jsPsych.pluginAPI.initializeCameraRecorder). If
+   * none of these types is supported, the function returns null.
+   *
+   * @returns Mime type string, or null (if none from the array are supported).
+   */
+  private getCompatibleMimeType() {
+    const mime_types = [
+      "video/webm;codecs=vp9,opus",
+      "video/webm;codecs=vp8,opus",
+      "video/webm;codecs=av1,opus",
+    ];
+    let mime_type_index = 0;
+    while (mime_type_index < mime_types.length) {
+      if (MediaRecorder.isTypeSupported(mime_types[mime_type_index])) {
+        return mime_types[mime_type_index];
+      }
+      mime_type_index++;
+    }
+    return null;
+  }
 }
