@@ -132,6 +132,30 @@ beforeEach(() => {
     cameras: [devicesObj.cam1, devicesObj.cam2],
     mics: [devicesObj.mic1, devicesObj.mic2],
   };
+
+  // Global MediaRecorder.isTypeSupported
+  Object.defineProperty(global, "MediaRecorder", {
+    writable: true,
+    value: jest.fn().mockImplementation(() => ({
+      start: jest.fn(),
+      ondataavailable: jest.fn(),
+      onerror: jest.fn(),
+      state: "",
+      stop: jest.fn(),
+      pause: jest.fn(),
+      resume: jest.fn(),
+    })),
+  });
+
+  Object.defineProperty(MediaRecorder, "isTypeSupported", {
+    writable: true,
+    /**
+     * Placeholder for value
+     *
+     * @returns True
+     */
+    value: () => true,
+  });
 });
 
 afterEach(() => {
@@ -1095,4 +1119,120 @@ test("Video config onMicActivityLevel", () => {
   );
   expect(video_config["micChecked"]).toBe(true);
   expect(event_pass.resolve).toHaveBeenCalled();
+});
+
+test("Video config initializeAndCreateRecorder uses supported mime type", () => {
+  const getCompatibleMimeTypeSpy = jest.spyOn(
+    video_config,
+    "getCompatibleMimeType",
+  );
+
+  // getCameraRecorder is just a convenient way of grabbing the mock stream.
+  video_config["initializeAndCreateRecorder"](
+    jsPsych.pluginAPI.getCameraRecorder().stream,
+  );
+
+  expect(getCompatibleMimeTypeSpy).toHaveBeenCalled();
+  // isTypeSupported is already mocked to return true, so this should use the first mime type value in the list
+  expect(jsPsych.pluginAPI.initializeCameraRecorder).toHaveBeenCalledWith(
+    jsPsych.pluginAPI.getCameraRecorder().stream,
+    { mimeType: "video/webm;codecs=vp9,opus" },
+  );
+});
+
+test("Video config initializeAndCreateRecorder uses default if no mime types are supported", () => {
+  const getCompatibleMimeTypeSpy = jest.spyOn(
+    video_config,
+    "getCompatibleMimeType",
+  );
+
+  // Override the isTypeSupported mock that is set in beforeEach
+  // No type is supported
+  jest.spyOn(MediaRecorder, "isTypeSupported").mockImplementation(() => {
+    return false;
+  });
+  expect(MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")).toBe(
+    false,
+  );
+
+  // getCameraRecorder is just a convenient way of grabbing the mock stream.
+  video_config["initializeAndCreateRecorder"](
+    jsPsych.pluginAPI.getCameraRecorder().stream,
+  );
+
+  expect(getCompatibleMimeTypeSpy).toHaveBeenCalled();
+  // If there are no compatible mime types, then it should use the default "video/webm" for initialization.
+  expect(jsPsych.pluginAPI.initializeCameraRecorder).toHaveBeenCalledWith(
+    jsPsych.pluginAPI.getCameraRecorder().stream,
+    { mimeType: "video/webm" },
+  );
+});
+
+test("Video config getCompatibleMimeType gets correct mime type or null", () => {
+  // Note - don't use 'mockImplementationOnce' for the isTypeSupported mock because isTypeSupported can be called multiple times by getCompatibleMimeType.
+
+  // Override the isTypeSupported mock that is set in beforeEach
+  // 1. only supports vp9,opus
+  const isTypeSupportedSpy = jest
+    .spyOn(MediaRecorder, "isTypeSupported")
+    .mockImplementation((type) => {
+      if (type == "video/webm;codecs=vp9,opus") {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  const mime_type_1 = video_config["getCompatibleMimeType"]();
+  expect(mime_type_1).toBe("video/webm;codecs=vp9,opus");
+
+  // 2. only supports vp8,opus
+  isTypeSupportedSpy.mockImplementation((type) => {
+    if (type == "video/webm;codecs=vp8,opus") {
+      return true;
+    } else {
+      return false;
+    }
+  });
+  const mime_type_2 = video_config["getCompatibleMimeType"]();
+  expect(mime_type_2).toBe("video/webm;codecs=vp8,opus");
+
+  // 3. only supports av1,opus
+  isTypeSupportedSpy.mockImplementation((type) => {
+    if (type == "video/webm;codecs=av1,opus") {
+      return true;
+    } else {
+      return false;
+    }
+  });
+  const mime_type_3 = video_config["getCompatibleMimeType"]();
+  expect(mime_type_3).toBe("video/webm;codecs=av1,opus");
+
+  // 4. supports vp9,opus and av1,opus, should use the former
+  isTypeSupportedSpy.mockImplementation((type) => {
+    if (type == "video/webm;codecs=vp8,opus") {
+      return false;
+    } else {
+      return true;
+    }
+  });
+  const mime_type_4 = video_config["getCompatibleMimeType"]();
+  expect(mime_type_4).toBe("video/webm;codecs=vp9,opus");
+
+  // 5. supports vp8,opus and av1,opus, should use the former
+  isTypeSupportedSpy.mockImplementation((type) => {
+    if (type == "video/webm;codecs=vp9,opus") {
+      return false;
+    } else {
+      return true;
+    }
+  });
+  const mime_type_5 = video_config["getCompatibleMimeType"]();
+  expect(mime_type_5).toBe("video/webm;codecs=vp8,opus");
+
+  // 6. none supported, should return null
+  isTypeSupportedSpy.mockImplementation(() => {
+    return false;
+  });
+  const mime_type_6 = video_config["getCompatibleMimeType"]();
+  expect(mime_type_6).toBeNull();
 });

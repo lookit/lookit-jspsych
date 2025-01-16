@@ -40,6 +40,7 @@ jest.mock("jspsych", () => ({
     pluginAPI: {
       getCameraRecorder: jest.fn().mockReturnValue({
         addEventListener: jest.fn(),
+        mimeType: "video/webm",
         start: jest.fn(),
         stop: jest.fn(),
         stream: {
@@ -356,7 +357,7 @@ test("Recorder reset", () => {
   expect(jsPsych.pluginAPI.initializeCameraRecorder).toHaveBeenCalledTimes(1);
   expect(jsPsych.pluginAPI.initializeCameraRecorder).toHaveBeenCalledWith(
     streamClone,
-    undefined,
+    { mimeType: "video/webm" },
   );
   expect(rec["blobs"]).toStrictEqual([]);
 
@@ -505,4 +506,99 @@ test("Recorder createFileName constructs video file names correctly", () => {
   global.Date = originalDate;
   // Restore Math.random
   jest.spyOn(global.Math, "random").mockRestore();
+});
+
+test("Initializing a new recorder gets the mime type from the initialization", () => {
+  const jsPsych = initJsPsych();
+  const originalInitializeCameraRecorder =
+    jsPsych.pluginAPI.initializeCameraRecorder;
+
+  const stream = {
+    active: true,
+    clone: jest.fn(),
+    getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]),
+  } as unknown as MediaStream;
+
+  jsPsych.pluginAPI.initializeCameraRecorder = jest
+    .fn()
+    .mockImplementation(
+      (stream: MediaStream, recorder_options: MediaRecorderOptions) => {
+        return {
+          addEventListener: jest.fn(),
+          mimeType: recorder_options.mimeType,
+          start: jest.fn(),
+          stop: jest.fn(),
+          stream: stream,
+        };
+      },
+    );
+
+  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockImplementation(() => {
+    return jsPsych.pluginAPI.initializeCameraRecorder(stream, recorder_options);
+  });
+
+  // Initialize with vp9
+  let recorder_options: MediaRecorderOptions = {
+    mimeType: "video/webm;codecs=vp9,opus",
+  };
+  jsPsych.pluginAPI.initializeCameraRecorder(stream, recorder_options);
+  const rec_1 = new Recorder(jsPsych);
+  // Called twice per construction - once for stream clone and once for mime type
+  expect(jsPsych.pluginAPI.getCameraRecorder).toHaveBeenCalledTimes(2);
+  expect(rec_1["mimeType"]).toBe("video/webm;codecs=vp9,opus");
+
+  // Initialize with vp8
+  recorder_options = {
+    mimeType: "video/webm;codecs=vp8,opus",
+  };
+  jsPsych.pluginAPI.initializeCameraRecorder(stream, recorder_options);
+  const rec_2 = new Recorder(jsPsych);
+  expect(jsPsych.pluginAPI.getCameraRecorder).toHaveBeenCalledTimes(4);
+  expect(rec_2["mimeType"]).toBe("video/webm;codecs=vp8,opus");
+
+  // Initialize with av1
+  recorder_options = {
+    mimeType: "video/webm;codecs=av1,opus",
+  };
+  jsPsych.pluginAPI.initializeCameraRecorder(stream, recorder_options);
+  const rec_3 = new Recorder(jsPsych);
+  expect(jsPsych.pluginAPI.getCameraRecorder).toHaveBeenCalledTimes(6);
+  expect(rec_3["mimeType"]).toBe("video/webm;codecs=av1,opus");
+
+  jsPsych.pluginAPI.initializeCameraRecorder = originalInitializeCameraRecorder;
+});
+
+test("New recorder uses a default mime type if none is set already", () => {
+  const jsPsych = initJsPsych();
+  const originalInitializeCameraRecorder =
+    jsPsych.pluginAPI.initializeCameraRecorder;
+
+  const stream = {
+    active: true,
+    clone: jest.fn(),
+    getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]),
+  } as unknown as MediaStream;
+
+  jsPsych.pluginAPI.initializeCameraRecorder = jest
+    .fn()
+    .mockImplementation((stream: MediaStream) => {
+      return {
+        addEventListener: jest.fn(),
+        start: jest.fn(),
+        stop: jest.fn(),
+        stream: stream,
+      };
+    });
+
+  jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockImplementation(() => {
+    return jsPsych.pluginAPI.initializeCameraRecorder(stream);
+  });
+
+  jsPsych.pluginAPI.initializeCameraRecorder(stream);
+  const rec = new Recorder(jsPsych);
+  // Called twice per construction - once for stream clone and once for mime type
+  expect(jsPsych.pluginAPI.getCameraRecorder).toHaveBeenCalledTimes(2);
+  expect(rec["mimeType"]).toBe("video/webm");
+
+  jsPsych.pluginAPI.initializeCameraRecorder = originalInitializeCameraRecorder;
 });
