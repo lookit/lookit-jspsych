@@ -34,6 +34,7 @@ export default class Recorder {
   private filename?: string;
   private stopPromise?: Promise<void>;
   private webcam_element_id = "lookit-jspsych-webcam";
+  private mimeType = "video/webm";
 
   private streamClone: MediaStream;
 
@@ -45,6 +46,8 @@ export default class Recorder {
   public constructor(private jsPsych: JsPsych) {
     this.streamClone = this.stream.clone();
     autoBind(this);
+    // Use the class instance's mimeType default as a fallback if we can't get the mime type from the initialized jsPsych recorder.
+    this.mimeType = this.recorder?.mimeType || this.mimeType;
   }
 
   /**
@@ -99,7 +102,11 @@ export default class Recorder {
    * @param opts - Media recorder options to use when setting up the recorder.
    */
   public initializeRecorder(stream: MediaStream, opts?: MediaRecorderOptions) {
-    this.jsPsych.pluginAPI.initializeCameraRecorder(stream, opts);
+    const recorder_options: MediaRecorderOptions = {
+      ...opts,
+      mimeType: this.mimeType,
+    };
+    this.jsPsych.pluginAPI.initializeCameraRecorder(stream, recorder_options);
   }
 
   /** Reset the recorder to be used again. */
