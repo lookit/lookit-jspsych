@@ -678,13 +678,15 @@ export default class VideoConfigPlugin implements JsPsychPlugin<Info> {
    * initialization function (jsPsych.pluginAPI.initializeCameraRecorder). If
    * none of these types is supported, the function returns null.
    *
+   * Note: we will likely need to continuously update the mime_types list as new
+   * formats become supported, we support other browsers/versions, etc.
+   *
    * @returns Mime type string, or null (if none from the array are supported).
    */
   private getCompatibleMimeType() {
     const mime_types = [
       "video/webm;codecs=vp9,opus",
       "video/webm;codecs=vp8,opus",
-      "video/webm;codecs=av1,opus",
     ];
     let mime_type_index = 0;
     while (mime_type_index < mime_types.length) {
