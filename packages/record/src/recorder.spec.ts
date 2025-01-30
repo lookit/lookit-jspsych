@@ -556,15 +556,6 @@ test("Initializing a new recorder gets the mime type from the initialization", (
   expect(jsPsych.pluginAPI.getCameraRecorder).toHaveBeenCalledTimes(4);
   expect(rec_2["mimeType"]).toBe("video/webm;codecs=vp8,opus");
 
-  // Initialize with av1
-  recorder_options = {
-    mimeType: "video/webm;codecs=av1,opus",
-  };
-  jsPsych.pluginAPI.initializeCameraRecorder(stream, recorder_options);
-  const rec_3 = new Recorder(jsPsych);
-  expect(jsPsych.pluginAPI.getCameraRecorder).toHaveBeenCalledTimes(6);
-  expect(rec_3["mimeType"]).toBe("video/webm;codecs=av1,opus");
-
   jsPsych.pluginAPI.initializeCameraRecorder = originalInitializeCameraRecorder;
 });
 

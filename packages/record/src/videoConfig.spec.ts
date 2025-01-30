@@ -1196,43 +1196,18 @@ test("Video config getCompatibleMimeType gets correct mime type or null", () => 
   const mime_type_2 = video_config["getCompatibleMimeType"]();
   expect(mime_type_2).toBe("video/webm;codecs=vp8,opus");
 
-  // 3. only supports av1,opus
+  // 3. supports vp9,opus and vp8,opus, should use the former
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isTypeSupportedSpy.mockImplementation((type) => {
-    if (type == "video/webm;codecs=av1,opus") {
-      return true;
-    } else {
-      return false;
-    }
+    return true;
   });
   const mime_type_3 = video_config["getCompatibleMimeType"]();
-  expect(mime_type_3).toBe("video/webm;codecs=av1,opus");
+  expect(mime_type_3).toBe("video/webm;codecs=vp9,opus");
 
-  // 4. supports vp9,opus and av1,opus, should use the former
-  isTypeSupportedSpy.mockImplementation((type) => {
-    if (type == "video/webm;codecs=vp8,opus") {
-      return false;
-    } else {
-      return true;
-    }
-  });
-  const mime_type_4 = video_config["getCompatibleMimeType"]();
-  expect(mime_type_4).toBe("video/webm;codecs=vp9,opus");
-
-  // 5. supports vp8,opus and av1,opus, should use the former
-  isTypeSupportedSpy.mockImplementation((type) => {
-    if (type == "video/webm;codecs=vp9,opus") {
-      return false;
-    } else {
-      return true;
-    }
-  });
-  const mime_type_5 = video_config["getCompatibleMimeType"]();
-  expect(mime_type_5).toBe("video/webm;codecs=vp8,opus");
-
-  // 6. none supported, should return null
+  // 4. none supported, should return null
   isTypeSupportedSpy.mockImplementation(() => {
     return false;
   });
-  const mime_type_6 = video_config["getCompatibleMimeType"]();
-  expect(mime_type_6).toBeNull();
+  const mime_type_4 = video_config["getCompatibleMimeType"]();
+  expect(mime_type_4).toBeNull();
 });
