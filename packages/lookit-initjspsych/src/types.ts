@@ -1,5 +1,6 @@
 import { JsPsychExpData } from "@lookit/data/dist/types";
 import { DataCollection } from "jspsych";
+import { TrialDescription } from "jspsych/src/timeline";
 
 export type UserFuncOnDataUpdate = (data: JsPsychExpData) => void;
 export type UserFuncOnFinish = (data: DataCollection) => void;
@@ -9,7 +10,7 @@ export type JsPsychOptions = {
   on_finish?: UserFuncOnFinish;
 };
 
-export type Timeline = {
+export type ChsTrialDescription = TrialDescription & {
   type: {
     chsData?: () => object;
   };
