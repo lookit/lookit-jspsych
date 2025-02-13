@@ -18,16 +18,19 @@ export class SequenceExpDataError extends Error {
   }
 }
 
-/** When a trial is accidentally undefined. */
+/** When a trial type is accidentally undefined. */
 export class UndefinedTypeError extends Error {
   /**
-   * Inform user that their nth trial is undefined.
+   * Inform user that one of their timeline trial objects is missing the type
+   * parameter.
    *
-   * @param idx - Index of timeline where trial type is undefined
+   * @param object - Timeline object with a type key whose value is
+   *   null/undefined.
    */
-  public constructor(idx: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public constructor(object: Record<string, any>) {
     super(
-      `${nth(idx + 1)} trial has an undefined type.  Maybe the type name is misspelled.`,
+      `A trial object in the timeline has an undefined type. Maybe the type name is misspelled, or the plugin you want to use is not supported. Object: ${JSON.stringify(object)}.`,
     );
   }
 }
