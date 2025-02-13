@@ -34,3 +34,20 @@ export class UndefinedTypeError extends Error {
     );
   }
 }
+
+/** When a timeline element is incorrectly formatted. */
+export class UndefinedTimelineError extends Error {
+  /**
+   * Inform user that one of the elements on their timeline is formatted
+   * incorrectly.
+   *
+   * @param el - Element in the timeline. Likely a timeline node with an
+   *   incorrect timeline value, or trial object with missing type key/value.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public constructor(el: any) {
+    super(
+      `An element in the timeline is not structured correctly or is missing required information. It may be a timeline node with a timeline array that is the wrong type or missing/undefined, or a trial object with a missing type. Element: ${JSON.stringify(el)}`,
+    );
+  }
+}
