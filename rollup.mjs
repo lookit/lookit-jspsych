@@ -33,13 +33,14 @@ export function makeRollupConfig(iifeName) {
    * @param log - Log object containing location, frame, and message.
    * @param handler - Function called to record log.
    */
-  const onLog = (level, log) => {
+  const onLog = (level, log, handler) => {
     // Don't log known circular dependencies with the data package.
     if (log.code === "CIRCULAR_DEPENDENCY" && iifeName === packages.data.iife) {
       if (knownCircularDeps.some((value) => log.message.includes(value))) {
         return;
       }
     }
+    handler(level, log);
   };
 
   return jsPsychMakeRollupConfig(iifeName).map((config) => {
