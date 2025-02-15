@@ -1,5 +1,9 @@
 import { JsPsychExpData } from "@lookit/data/dist/types";
-import { DataCollection, JsPsychPlugin } from "jspsych";
+import {
+  DataCollection,
+  JsPsych as OriginalJsPsych,
+  JsPsychPlugin,
+} from "jspsych";
 import {
   PluginInfo,
   UniversalPluginParameters,
@@ -35,3 +39,7 @@ export interface ChsTimelineDescription
 export type ChsTimelineArray = Array<
   ChsTimelineDescription | ChsTrialDescription | ChsTimelineArray
 >;
+
+export interface ChsJsPsych extends Omit<OriginalJsPsych, "run"> {
+  run(timeline: ChsTimelineDescription | ChsTimelineArray): Promise<void>;
+}
