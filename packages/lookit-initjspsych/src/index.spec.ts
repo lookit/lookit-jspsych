@@ -97,30 +97,28 @@ describe("lookit-initjspsych", () => {
   test("Throws UndefinedTimelineError when timeline object is invalid", () => {
     const jsPsych: ChsJsPsych = lookitInitJsPsych("some id");
 
-    const t1 = [
-      { timeline: { type: TestPlugin } },
-    ] as unknown as ChsTimelineArray;
+    const t1 = [{ timeline: { type: TestPlugin } }] as ChsTimelineArray;
 
     expect(
-      async () => await jsPsych({}).run(t1 as unknown as ChsTimelineArray),
+      async () => await jsPsych({}).run(t1 as ChsTimelineArray),
     ).rejects.toThrow(UndefinedTimelineError);
 
-    const t2 = [{ timeline: true }] as unknown as ChsTimelineArray;
+    const t2 = [{ timeline: true }] as ChsTimelineArray;
 
     expect(
-      async () => await jsPsych({}).run(t2 as unknown as ChsTimelineArray),
+      async () => await jsPsych({}).run(t2 as ChsTimelineArray),
     ).rejects.toThrow(UndefinedTimelineError);
 
-    const t3 = [true] as unknown as ChsTimelineArray;
+    const t3 = [true] as ChsTimelineArray;
 
     expect(
-      async () => await jsPsych({}).run(t3 as unknown as ChsTimelineArray),
+      async () => await jsPsych({}).run(t3 as ChsTimelineArray),
     ).rejects.toThrow(UndefinedTimelineError);
 
-    const t4 = [42] as unknown as ChsTimelineArray;
+    const t4 = [42] as ChsTimelineArray;
 
     expect(
-      async () => await jsPsych({}).run(t4 as unknown as ChsTimelineArray),
+      async () => await jsPsych({}).run(t4 as ChsTimelineArray),
     ).rejects.toThrow(UndefinedTimelineError);
   });
 
