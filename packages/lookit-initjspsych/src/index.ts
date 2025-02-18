@@ -1,7 +1,7 @@
 import { initJsPsych as origInitJsPsych } from "jspsych";
-import { TimelineArray } from "jspsych/src/timeline";
+import type { TimelineArray } from "jspsych/src/timeline";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
-import {
+import type {
   ChsJsPsych,
   ChsTimelineArray,
   ChsTimelineDescription,

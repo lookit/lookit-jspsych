@@ -1,14 +1,17 @@
-import { JsPsychExpData } from "@lookit/data/dist/types";
-import {
+import type { JsPsychExpData } from "@lookit/data/dist/types";
+import type {
   DataCollection,
   JsPsych as OriginalJsPsych,
   JsPsychPlugin,
 } from "jspsych";
-import {
+import type {
   PluginInfo,
   UniversalPluginParameters,
 } from "jspsych/src/modules/plugins";
-import { TimelineDescription, TrialDescription } from "jspsych/src/timeline";
+import type {
+  TimelineDescription,
+  TrialDescription,
+} from "jspsych/src/timeline";
 
 export type UserFuncOnDataUpdate = (data: JsPsychExpData) => void;
 export type UserFuncOnFinish = (data: DataCollection) => void;

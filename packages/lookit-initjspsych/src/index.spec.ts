@@ -2,7 +2,7 @@ import { JsPsych } from "jspsych";
 import TestPlugin from "../fixtures/TestPlugin";
 import lookitInitJsPsych from "./";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
-import {
+import type {
   ChsJsPsych,
   ChsTimelineArray,
   ChsTimelineDescription,
