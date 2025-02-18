@@ -3,6 +3,7 @@ import TestPlugin from "../fixtures/TestPlugin";
 import lookitInitJsPsych from "./";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
 import {
+  ChsJsPsych,
   ChsTimelineArray,
   ChsTimelineDescription,
   ChsTrialDescription,
@@ -18,7 +19,7 @@ describe("lookit-initjspsych", () => {
   });
 
   test("Does lookitInitJsPsych return an instance of jspsych?", () => {
-    const jsPsych = lookitInitJsPsych("uuid-string");
+    const jsPsych: ChsJsPsych = lookitInitJsPsych("uuid-string");
     const opts = {
       on_data_update: jest.fn(),
       on_finish: jest.fn(),
@@ -29,13 +30,13 @@ describe("lookit-initjspsych", () => {
   test("Is jspsych's run called?", async () => {
     const mockRun = jest.fn();
     jest.spyOn(JsPsych.prototype, "run").mockImplementation(mockRun);
-    const jsPsych = lookitInitJsPsych("some id");
+    const jsPsych: ChsJsPsych = lookitInitJsPsych("some id");
     await jsPsych({}).run([]);
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
   test("Is experiment data injected into timeline w/o data?", async () => {
-    const jsPsych = lookitInitJsPsych("some id");
+    const jsPsych: ChsJsPsych = lookitInitJsPsych("some id");
     const trial: ChsTrialDescription = { type: TestPlugin };
     const t: ChsTimelineArray = [trial];
 
@@ -62,19 +63,19 @@ describe("lookit-initjspsych", () => {
   });
 
   test("Throws UndefinedTypeError when trial description has no type", () => {
-    const jsPsych = lookitInitJsPsych("some id");
+    const jsPsych: ChsJsPsych = lookitInitJsPsych("some id");
     [
       [{ type: undefined, data: { other: "data" } } as ChsTrialDescription],
       [{ type: null, data: { other: "data" } } as ChsTrialDescription],
     ].forEach((t) => {
       expect(
-        async () => await jsPsych({}).run(t as TrialDescription[]),
+        async () => await jsPsych({}).run(t as ChsTimelineArray),
       ).rejects.toThrow(UndefinedTypeError);
     });
   });
 
   test("Does the experiment run when the timeline contains a valid timeline node?", async () => {
-    const jsPsych = lookitInitJsPsych("some id");
+    const jsPsych: ChsJsPsych = lookitInitJsPsych("some id");
     const timeline_node: ChsTimelineDescription = {
       timeline: [
         {
@@ -94,7 +95,7 @@ describe("lookit-initjspsych", () => {
   });
 
   test("Throws UndefinedTimelineError when timeline object is invalid", () => {
-    const jsPsych = lookitInitJsPsych("some id");
+    const jsPsych: ChsJsPsych = lookitInitJsPsych("some id");
 
     const t1 = [
       { timeline: { type: TestPlugin } },
@@ -124,7 +125,7 @@ describe("lookit-initjspsych", () => {
   });
 
   test("When the timeline array element is an array, handleTrialTypes is called on that array", async () => {
-    const jsPsych = lookitInitJsPsych("some id");
+    const jsPsych: ChsJsPsych = lookitInitJsPsych("some id");
     const timeline_node_nested_array: ChsTimelineDescription = {
       timeline: [[{ type: TestPlugin, data: { other: "data" } }]],
     };
@@ -142,7 +143,7 @@ describe("lookit-initjspsych", () => {
   });
 
   test("When a trial description contains a type and nested timeline, handleTrialTypes treats it as a trial instead of timeline node", async () => {
-    const jsPsych = lookitInitJsPsych("some id");
+    const jsPsych: ChsJsPsych = lookitInitJsPsych("some id");
     const nested_timeline: ChsTrialDescription = {
       type: TestPlugin,
       timeline: [{ data: { trialnumber: 1 } }, { data: { trialnumber: 2 } }],
@@ -157,7 +158,7 @@ describe("lookit-initjspsych", () => {
   });
 
   test("When a trial description contains a nested timeline with no type, handleTrialTypes handles it as a timeline node", async () => {
-    const jsPsych = lookitInitJsPsych("some id");
+    const jsPsych: ChsJsPsych = lookitInitJsPsych("some id");
     const nested_timeline: ChsTrialDescription = {
       data: { somekey: "somevalue" },
       timeline: [{ type: TestPlugin }, { type: TestPlugin }],
