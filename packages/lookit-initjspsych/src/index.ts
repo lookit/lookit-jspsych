@@ -2,6 +2,7 @@ import { initJsPsych as origInitJsPsych } from "jspsych";
 import { TimelineArray } from "jspsych/src/timeline";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
 import {
+  ChsJsPsych,
   ChsTimelineArray,
   ChsTimelineDescription,
   ChsTrialDescription,
@@ -44,7 +45,12 @@ const isTimelineNodeArray = (
 const isTrialWithType = (
   description: ChsTrialDescription | ChsTimelineDescription,
 ) => {
-  return typeof description === "object" && !isTimelineNodeArray(description);
+  return (
+    typeof description === "object" &&
+    !isTimelineNodeArray(
+      description as ChsTrialDescription | ChsTimelineDescription,
+    )
+  );
 };
 
 /**
@@ -54,13 +60,15 @@ const isTrialWithType = (
  * @returns InitJsPsych function.
  */
 const lookitInitJsPsych = (responseUuid: string) => {
-  return function (opts: JsPsychOptions) {
+  return function (opts: JsPsychOptions): ChsJsPsych {
     const jsPsych = origInitJsPsych({
       ...opts,
       on_data_update: on_data_update(responseUuid, opts?.on_data_update),
       on_finish: on_finish(responseUuid, opts?.on_finish),
     });
     const origJsPsychRun = jsPsych.run;
+
+    const lookitJsPsych = jsPsych as ChsJsPsych;
 
     /**
      * Overriding default jsPsych run function. This will allow us to
@@ -70,7 +78,7 @@ const lookitInitJsPsych = (responseUuid: string) => {
      *   nodes (descriptions).
      * @returns Original jsPsych run function.
      */
-    jsPsych.run = function (timeline: TimelineArray) {
+    lookitJsPsych.run = async function (timeline: ChsTimelineArray) {
       /**
        * Iterate over a timeline and recursively locate any trial descriptions
        * (objects with a "type" key, whose value is a plugin class). For each
@@ -93,12 +101,25 @@ const lookitInitJsPsych = (responseUuid: string) => {
             el: ChsTimelineDescription | ChsTrialDescription | ChsTimelineArray,
           ) => {
             // First check for timeline descriptions: arrays or objects with 'timeline' key that do not also have a 'type' key.
-            if (isTimelineNodeArray(el)) {
+            if (
+              isTimelineNodeArray(
+                el as
+                  | ChsTrialDescription
+                  | ChsTimelineDescription
+                  | ChsTimelineArray,
+              )
+            ) {
               if (Array.isArray(el)) {
-                return handleTrialTypes(el, callback);
+                return handleTrialTypes(el as ChsTimelineArray, callback);
               } else if ("timeline" in el && Array.isArray(el.timeline)) {
-                el.timeline = handleTrialTypes(el.timeline, callback);
-                return el;
+                const chsTimelineDescription: ChsTimelineDescription = {
+                  ...el,
+                  timeline: handleTrialTypes(
+                    el.timeline as ChsTimelineArray,
+                    callback,
+                  ),
+                };
+                return chsTimelineDescription;
               } else {
                 throw new UndefinedTimelineError(el);
               }
@@ -114,8 +135,10 @@ const lookitInitJsPsych = (responseUuid: string) => {
                 el.type !== null &&
                 el.type !== undefined
               ) {
-                callback(el as ChsTrialDescription);
-                return el;
+                const chsTrialDescription =
+                  el as unknown as ChsTrialDescription;
+                callback(chsTrialDescription);
+                return chsTrialDescription;
               } else {
                 throw new UndefinedTypeError(el);
               }
@@ -123,14 +146,13 @@ const lookitInitJsPsych = (responseUuid: string) => {
               throw new UndefinedTimelineError(el);
             }
           },
-        );
+        ) as ChsTimelineArray;
       };
 
-      // Note about type conversion here: This function takes the timeline passed to jsPsych.run, so it must be typed as a jsPsych timeline array for compatibility with that original function, but in fact it is the CHS version of the timeline array.
-      const modifiedTimeline = handleTrialTypes(
-        timeline as ChsTimelineArray | ChsTimelineDescription,
+      // This function takes the CHS-typed timeline passed to our modified jsPsych.run and modifies it by adding data from the chsData function in each trial type.
+      const modifiedTimeline: ChsTimelineArray = handleTrialTypes(
+        timeline as ChsTimelineArray,
         (trial) => {
-          // Search timeline object for the method "chsData". When found, add to timeline data parameter. This will inject values into the experiment to be parsed chs after experiment has completed.
           if ("type" in trial) {
             if (trial.type?.chsData) {
               trial.data = { ...trial.data, ...trial.type.chsData() };
@@ -139,11 +161,11 @@ const lookitInitJsPsych = (responseUuid: string) => {
         },
       );
 
-      // Note about type conversion here: We need to convert the CHS-typed (extended) timeline array back to the jsPsych-typed version for compatibility with the original jsPsych.run function.
-      return origJsPsychRun(modifiedTimeline as TimelineArray);
+      // Convert the CHS-typed timeline array back to the jsPsych-type version for compatibility with the original jsPsych.run function.
+      return await origJsPsychRun(modifiedTimeline as TimelineArray);
     };
 
-    return jsPsych;
+    return lookitJsPsych;
   };
 };
 
