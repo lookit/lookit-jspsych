@@ -1,5 +1,12 @@
 # @lookit/lookit-initjspsych
 
+## 2.0.1
+
+### Patch Changes
+
+- 9f9647a: Fixed bug that was causing errors when running a jsPsych study that
+  contained a timeline node.
+
 ## 2.0.0
 
 ### Minor Changes
