@@ -1,19 +1,56 @@
 import { initJsPsych as origInitJsPsych } from "jspsych";
-import { UndefinedTypeError } from "./errors";
-import { JsPsychOptions, Timeline } from "./types";
+import type { TimelineArray } from "jspsych/src/timeline";
+import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
+import type {
+  ChsJsPsych,
+  ChsTimelineArray,
+  ChsTimelineDescription,
+  ChsTrialDescription,
+  JsPsychOptions,
+} from "./types";
 import { on_data_update, on_finish } from "./utils";
 
 /**
- * Search timeline object for the method "chsData". When found, add to timeline
- * data parameter. This will inject values into the experiment to be parsed chs
- * after experiment has completed.
+ * Checks if the given description is a timeline array or description (node),
+ * both of which might contain trial descriptions. Modified from
+ * isTimelineDescription in jspsych/src/timeline to exclude trial descriptions
+ * with nested timelines (jsPsych returns true for trial description objects
+ * that have a "type" property and a nested timelines, but we need to return
+ * false.)
  *
- * @param t - Timeline object.
+ * @param description - The description array or object to check.
+ * @returns True if the description is a timeline array or timeline description
+ *   (object with "timeline" key but no "type" key), otherwise false.
  */
-const addChsData = (t: Timeline) => {
-  if (t.type.chsData) {
-    t.data = { ...t.data, ...t.type.chsData() };
-  }
+const isTimelineNodeArray = (
+  description: ChsTrialDescription | ChsTimelineDescription | ChsTimelineArray,
+) => {
+  return (
+    (Boolean((description as ChsTimelineDescription).timeline) ||
+      Array.isArray(description)) &&
+    !(description as ChsTimelineDescription).type
+  );
+};
+
+/**
+ * Checks if the description is an object that contains a "type" key, whose
+ * value is a plugin class. Returns true even when the trial object contains a
+ * nested timeline. Modified from isTrialDescription in jspsych/src/timeline to
+ * return true for trial descriptions with nested timelines.
+ *
+ * @param description - The description object to check.
+ * @returns True if the description is an object with a "type" property,
+ *   otherwise false.
+ */
+const isTrialWithType = (
+  description: ChsTrialDescription | ChsTimelineDescription,
+) => {
+  return (
+    typeof description === "object" &&
+    !isTimelineNodeArray(
+      description as ChsTrialDescription | ChsTimelineDescription,
+    )
+  );
 };
 
 /**
@@ -23,7 +60,7 @@ const addChsData = (t: Timeline) => {
  * @returns InitJsPsych function.
  */
 const lookitInitJsPsych = (responseUuid: string) => {
-  return function (opts: JsPsychOptions) {
+  return function (opts: JsPsychOptions): ChsJsPsych {
     const jsPsych = origInitJsPsych({
       ...opts,
       on_data_update: on_data_update(responseUuid, opts?.on_data_update),
@@ -31,26 +68,104 @@ const lookitInitJsPsych = (responseUuid: string) => {
     });
     const origJsPsychRun = jsPsych.run;
 
+    const lookitJsPsych = jsPsych as ChsJsPsych;
+
     /**
      * Overriding default jsPsych run function. This will allow us to
      * check/alter the timeline before running an experiment.
      *
-     * @param timeline - List of jsPsych trials.
+     * @param timeline - Array of jsPsych trials (descriptions) and/or timeline
+     *   nodes (descriptions).
      * @returns Original jsPsych run function.
      */
-    jsPsych.run = function (timeline) {
-      // check timeline here...
-      timeline.map((t: Timeline, idx: number) => {
-        if (!t.type) {
-          throw new UndefinedTypeError(idx);
-        }
-        addChsData(t);
-      });
+    lookitJsPsych.run = async function (timeline: ChsTimelineArray) {
+      /**
+       * Iterate over a timeline and recursively locate any trial descriptions
+       * (objects with a "type" key, whose value is a plugin class). For each
+       * trial description, call the callback function that receives the trial
+       * description as an argument.
+       *
+       * @param timeline - CHS versions of the jsPsych timeline array or
+       *   timeline description
+       * @param callback - Callback function that handles each plugin class,
+       *   which receives as an argument the plugin class from the trial
+       *   description "type".
+       * @returns Timeline array
+       */
+      const handleTrialTypes = (
+        timeline: ChsTimelineArray | ChsTimelineDescription,
+        callback: (trial: ChsTrialDescription) => void,
+      ): ChsTimelineArray => {
+        return timeline.map(
+          (
+            el: ChsTimelineDescription | ChsTrialDescription | ChsTimelineArray,
+          ) => {
+            // First check for timeline descriptions: arrays or objects with 'timeline' key that do not also have a 'type' key.
+            if (
+              isTimelineNodeArray(
+                el as
+                  | ChsTrialDescription
+                  | ChsTimelineDescription
+                  | ChsTimelineArray,
+              )
+            ) {
+              if (Array.isArray(el)) {
+                return handleTrialTypes(el as ChsTimelineArray, callback);
+              } else if ("timeline" in el && Array.isArray(el.timeline)) {
+                const chsTimelineDescription: ChsTimelineDescription = {
+                  ...el,
+                  timeline: handleTrialTypes(
+                    el.timeline as ChsTimelineArray,
+                    callback,
+                  ),
+                };
+                return chsTimelineDescription;
+              } else {
+                throw new UndefinedTimelineError(el);
+              }
+            } else if (
+              isTrialWithType(
+                el as ChsTimelineDescription | ChsTrialDescription,
+              )
+            ) {
+              // Now handle objects with a 'type' key. This includes trial descriptions with nested timelines, as long as they include a plugin type.
+              if (
+                el !== null &&
+                "type" in el &&
+                el.type !== null &&
+                el.type !== undefined
+              ) {
+                const chsTrialDescription =
+                  el as unknown as ChsTrialDescription;
+                callback(chsTrialDescription);
+                return chsTrialDescription;
+              } else {
+                throw new UndefinedTypeError(el);
+              }
+            } else {
+              throw new UndefinedTimelineError(el);
+            }
+          },
+        ) as ChsTimelineArray;
+      };
 
-      return origJsPsychRun(timeline);
+      // This function takes the CHS-typed timeline passed to our modified jsPsych.run and modifies it by adding data from the chsData function in each trial type.
+      const modifiedTimeline: ChsTimelineArray = handleTrialTypes(
+        timeline as ChsTimelineArray,
+        (trial) => {
+          if ("type" in trial) {
+            if (trial.type?.chsData) {
+              trial.data = { ...trial.data, ...trial.type.chsData() };
+            }
+          }
+        },
+      );
+
+      // Convert the CHS-typed timeline array back to the jsPsych-type version for compatibility with the original jsPsych.run function.
+      return await origJsPsychRun(modifiedTimeline as TimelineArray);
     };
 
-    return jsPsych;
+    return lookitJsPsych;
   };
 };
 
