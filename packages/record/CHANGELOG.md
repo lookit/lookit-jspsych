@@ -1,5 +1,13 @@
 # @lookit/record
 
+## 3.0.1
+
+### Patch Changes
+
+- 5ec0b66: Fix recording playback issues, which were caused by not specifying
+  codecs in the recorder mime type.
+- 1f7afa1: Update the documentation.
+
 ## 3.0.0
 
 ### Minor Changes
