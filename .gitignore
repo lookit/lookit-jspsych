@@ -7,3 +7,4 @@ site
 .DS_Store
 packages/style/**/*.js
 .python-version
+__pycache__
