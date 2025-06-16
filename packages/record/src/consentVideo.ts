@@ -246,8 +246,8 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     stop.addEventListener("click", async () => {
       stop.disabled = true;
       record.disabled = false;
-      play.disabled = false;
       await this.recorder.stop();
+      play.disabled = false;
       this.recorder.reset();
       this.recordFeed(display);
     });
