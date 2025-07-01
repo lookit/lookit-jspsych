@@ -1,8 +1,8 @@
 # Surveys
 
 This package contains the custom surveys provided by CHS for jsPsych studies.
-These surveys are built off of the very nice [jsPsych
-Survey plugin]({{ jsPsych }}plugins/survey/).
+These surveys are built off of the very nice [jsPsych Survey
+plugin]({{ jsPsych }}plugins/survey/).
 
 ## Parameters available in all plugins
 
@@ -39,8 +39,8 @@ const consentSurvey = { type: chsSurvey.ConsentSurveyPlugin };
 ```
 
 Other than that, the rest of the survey is entirely designed by you. Please
-refer to [jsPsych's Documentation]({{ jsPsych }}plugins/survey/) for the full explanation
-on how to use their plugin.
+refer to [jsPsych's Documentation]({{ jsPsych }}plugins/survey/) for the full
+explanation on how to use their plugin.
 
 ## Exit Survey
 
