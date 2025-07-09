@@ -10,6 +10,7 @@ import { setLocale } from "./utils";
 declare const window: LookitWindow;
 
 const video_container_id = "lookit-jspsych-video-container";
+const msg_container_id = "lookit-jspsych-video-msg-container";
 
 /**
  * Translate, render, and get consent document HTML.
@@ -36,6 +37,7 @@ export const consentVideo = (trial: TrialType<PluginInfo>) => {
     ...trial,
     consent,
     video_container_id,
+    msg_container_id,
   });
 };
 
