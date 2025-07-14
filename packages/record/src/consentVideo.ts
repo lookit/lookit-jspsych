@@ -299,14 +299,14 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
 
     stop.addEventListener("click", async () => {
       stop.disabled = true;
-      record.disabled = false;
       this.addMessage(display, this.uploadingMsg!);
       await this.recorder.stop();
-      play.disabled = false;
       this.recorder.reset();
       this.recordFeed(display);
       this.getImg(display, "record-icon").style.visibility = "hidden";
       this.addMessage(display, this.notRecordingMsg!);
+      play.disabled = false;
+      record.disabled = false;
     });
   }
   /**
