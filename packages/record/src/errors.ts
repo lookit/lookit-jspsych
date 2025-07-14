@@ -196,25 +196,16 @@ export class CreateURLError extends Error {
   }
 }
 
-/** Error thrown when video container couldn't be found. */
-export class VideoContainerNotFoundError extends Error {
-  /** No video container found. */
-  public constructor() {
-    super("Video Container could not be found.");
-    this.name = "VideoContainerError";
-  }
-}
-
-/** Error thrown when button not found. */
-export class ButtonNotFoundError extends Error {
+/** Error thrown when an HTML element is not found. */
+export class ElementNotFoundError extends Error {
   /**
-   * Button couldn't be found by ID field.
+   * Element couldn't be found by ID field.
    *
    * @param id - HTML ID parameter.
    */
   public constructor(id: string) {
-    super(`"${id}" button not found.`);
-    this.name = "ButtonNotFoundError";
+    super(`"${id}" not found.`);
+    this.name = "ElementNotFoundError";
   }
 }
 

@@ -3,11 +3,7 @@ import { LookitWindow } from "@lookit/data/dist/types";
 import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import { version } from "../package.json";
-import {
-  ButtonNotFoundError,
-  ImageNotFoundError,
-  VideoContainerNotFoundError,
-} from "./errors";
+import { ElementNotFoundError, ImageNotFoundError } from "./errors";
 import Recorder from "./recorder";
 
 declare const window: LookitWindow;
@@ -71,6 +67,11 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
   public static readonly info = info;
   private readonly recorder: Recorder;
   private readonly video_container_id = "lookit-jspsych-video-container";
+  private readonly msg_container_id = "lookit-jspsych-video-msg-container";
+  private uploadingMsg: string | null = null;
+  private startingMsg: string | null = null;
+  private recordingMsg: string | null = null;
+  private notRecordingMsg: string | null = null;
 
   /**
    * Instantiate video consent plugin.
@@ -89,7 +90,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
    * @param trial - Trial data including user supplied parameters.
    */
   public trial(display: HTMLElement, trial: TrialType<Info>) {
-    // Get trial HTML string
+    // Get trial HTML string from templates package. This will also set the i18n locale.
     const consentVideo = chsTemplates.consentVideo(trial);
 
     // Add rendered document to display HTML
@@ -97,11 +98,26 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
 
     // Video recording HTML
     this.recordFeed(display);
+    // Set event listeners for buttons.
     this.recordButton(display);
     this.stopButton(display);
     this.playButton(display);
     this.nextButton(display);
+    // Translate and store any messages that may need to be shown. Locale has already been set via the chsTemplates consentVideo method.
+    this.uploadingMsg = chsTemplates.translateString(
+      "exp-lookit-video-consent.Stopping-and-uploading",
+    );
+    this.startingMsg = chsTemplates.translateString(
+      "exp-lookit-video-consent.Starting-recorder",
+    );
+    this.recordingMsg = chsTemplates.translateString(
+      "exp-lookit-video-consent.Recording",
+    );
+    this.notRecordingMsg = chsTemplates.translateString(
+      "exp-lookit-video-consent.Not-recording",
+    );
   }
+
   /**
    * Retrieve video container element.
    *
@@ -114,7 +130,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     );
 
     if (!videoContainer) {
-      throw new VideoContainerNotFoundError();
+      throw new ElementNotFoundError(this.video_container_id);
     }
 
     return videoContainer;
@@ -142,6 +158,38 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
   }
 
   /**
+   * Get message container that appears alongside the video element.
+   *
+   * @param display - HTML element for experiment.
+   * @returns Message container div element.
+   */
+  private getMessageContainer(display: HTMLElement) {
+    const msgContainer = display.querySelector<HTMLDivElement>(
+      `div#${this.msg_container_id}`,
+    );
+
+    if (!msgContainer) {
+      throw new ElementNotFoundError(this.msg_container_id);
+    }
+
+    return msgContainer;
+  }
+
+  /**
+   * Add HTML-formatted message alongside the video feed, e.g. for waiting
+   * periods during webcam feed transitions (starting, stopping/uploading). This
+   * will also replace an existing message with the new one. To clear any
+   * existing messages, pass an empty string.
+   *
+   * @param display - HTML element for experiment.
+   * @param message - HTML content for message div.
+   */
+  private addMessage(display: HTMLElement, message: string) {
+    const msgContainer = this.getMessageContainer(display);
+    msgContainer.innerHTML = message;
+  }
+
+  /**
    * Put back the webcam feed once the video recording has ended. This is used
    * with the "ended" Event.
    *
@@ -155,6 +203,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
       const record = this.getButton(display, "record");
 
       this.recordFeed(display);
+      this.addMessage(display, this.notRecordingMsg!);
       next.disabled = false;
       play.disabled = false;
       record.disabled = false;
@@ -174,7 +223,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
   ) {
     const btn = display.querySelector<HTMLButtonElement>(`button#${id}`);
     if (!btn) {
-      throw new ButtonNotFoundError(id);
+      throw new ElementNotFoundError(id);
     }
     return btn;
   }
@@ -208,12 +257,14 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     const next = this.getButton(display, "next");
 
     record.addEventListener("click", async () => {
+      this.addMessage(display, this.startingMsg!);
       record.disabled = true;
       stop.disabled = false;
       play.disabled = true;
       next.disabled = true;
       this.getImg(display, "record-icon").style.visibility = "visible";
       await this.recorder.start(true, VideoConsentPlugin.info.name);
+      this.addMessage(display, this.recordingMsg!);
     });
   }
 
@@ -246,10 +297,13 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     stop.addEventListener("click", async () => {
       stop.disabled = true;
       record.disabled = false;
+      this.addMessage(display, this.uploadingMsg!);
       await this.recorder.stop();
       play.disabled = false;
       this.recorder.reset();
       this.recordFeed(display);
+      this.getImg(display, "record-icon").style.visibility = "hidden";
+      this.addMessage(display, this.notRecordingMsg!);
     });
   }
   /**
