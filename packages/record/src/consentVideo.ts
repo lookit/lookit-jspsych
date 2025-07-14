@@ -154,7 +154,10 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
    */
   private playbackFeed(display: HTMLElement) {
     const videoContainer = this.getVideoContainer(display);
-    this.recorder.insertPlaybackFeed(videoContainer, this.onEnded(display));
+    this.recorder.insertPlaybackFeed(
+      videoContainer,
+      this.onPlaybackEnded(display),
+    );
   }
 
   /**
@@ -190,13 +193,13 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
   }
 
   /**
-   * Put back the webcam feed once the video recording has ended. This is used
-   * with the "ended" Event.
+   * Put back the webcam feed once the video recording playback has ended. This
+   * is used with the "ended" Event.
    *
    * @param display - JsPsych display HTML element.
    * @returns Event function
    */
-  private onEnded(display: HTMLElement) {
+  private onPlaybackEnded(display: HTMLElement) {
     return () => {
       const next = this.getButton(display, "next");
       const play = this.getButton(display, "play");
