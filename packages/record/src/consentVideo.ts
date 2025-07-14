@@ -130,7 +130,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     );
 
     if (!videoContainer) {
-      throw new ElementNotFoundError(this.video_container_id);
+      throw new ElementNotFoundError(this.video_container_id, "div");
     }
 
     return videoContainer;
@@ -172,7 +172,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     );
 
     if (!msgContainer) {
-      throw new ElementNotFoundError(this.msg_container_id);
+      throw new ElementNotFoundError(this.msg_container_id, "div");
     }
 
     return msgContainer;
@@ -226,7 +226,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
   ) {
     const btn = display.querySelector<HTMLButtonElement>(`button#${id}`);
     if (!btn) {
-      throw new ElementNotFoundError(id);
+      throw new ElementNotFoundError(id, "button");
     }
     return btn;
   }
@@ -242,7 +242,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     const img = display.querySelector<HTMLImageElement>(`img#${id}`);
 
     if (!img) {
-      throw new ElementNotFoundError(id);
+      throw new ElementNotFoundError(id, "img");
     }
 
     return img;

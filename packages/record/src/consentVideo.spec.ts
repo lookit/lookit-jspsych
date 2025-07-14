@@ -66,7 +66,7 @@ test("GetVideoContainer error when no container", () => {
   ).toThrow(ElementNotFoundError);
   expect(() =>
     plugin["getVideoContainer"](document.createElement("div")),
-  ).toThrow(`"${plugin["video_container_id"]}" not found.`);
+  ).toThrow(`"${plugin["video_container_id"]}" div not found.`);
 });
 
 test("getMessageContainer error when no container", () => {
@@ -77,7 +77,7 @@ test("getMessageContainer error when no container", () => {
   ).toThrow(ElementNotFoundError);
   expect(() =>
     plugin["getMessageContainer"](document.createElement("div")),
-  ).toThrow(`"${plugin["msg_container_id"]}" not found.`);
+  ).toThrow(`"${plugin["msg_container_id"]}" div not found.`);
 });
 
 test("GetVideoContainer", () => {
@@ -198,7 +198,7 @@ test("getButton error when button not found", () => {
     ElementNotFoundError,
   );
   expect(() => plugin["getButton"](display, "next")).toThrow(
-    `"next" not found.`,
+    `"next" button not found.`,
   );
 });
 
@@ -208,6 +208,9 @@ test("getImg error when image not found", () => {
   const display = document.createElement("div");
   expect(() => plugin["getImg"](display, "record-icon")).toThrow(
     ElementNotFoundError,
+  );
+  expect(() => plugin["getImg"](display, "record-icon")).toThrow(
+    `"record-icon" img not found.`,
   );
 });
 

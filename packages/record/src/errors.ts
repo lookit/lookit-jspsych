@@ -202,9 +202,10 @@ export class ElementNotFoundError extends Error {
    * Element couldn't be found by ID field.
    *
    * @param id - HTML ID parameter.
+   * @param tag - HTML tag of the element.
    */
-  public constructor(id: string) {
-    super(`"${id}" not found.`);
+  public constructor(id: string, tag: string) {
+    super(`"${id}" ${tag} not found.`);
     this.name = "ElementNotFoundError";
   }
 }
