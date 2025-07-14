@@ -103,7 +103,7 @@ test("playbackFeed", () => {
   const vidContainer = "some video container";
 
   plugin["getVideoContainer"] = jest.fn().mockReturnValue(vidContainer);
-  plugin["onEnded"] = jest.fn().mockReturnValue("some func");
+  plugin["onPlaybackEnded"] = jest.fn().mockReturnValue("some func");
   plugin["playbackFeed"](display);
 
   expect(Recorder.prototype.insertPlaybackFeed).toHaveBeenCalledWith(
@@ -112,7 +112,7 @@ test("playbackFeed", () => {
   );
 });
 
-test("onEnded", () => {
+test("onPlaybackEnded", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
@@ -145,7 +145,7 @@ test("onEnded", () => {
     return "";
   });
 
-  plugin["onEnded"](display)();
+  plugin["onPlaybackEnded"](display)();
 
   expect(plugin["recordFeed"]).toHaveBeenCalledWith(display);
   expect(plugin["recordFeed"]).toHaveBeenCalledTimes(1);
