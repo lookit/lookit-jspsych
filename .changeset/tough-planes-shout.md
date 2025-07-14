@@ -12,3 +12,4 @@
     starting, recording, stopping/uploading
   - wait to enable/diable certain buttons until recorder has fully
     started/stopped
+- Style: add CSS for the video-consent plugin's message container
