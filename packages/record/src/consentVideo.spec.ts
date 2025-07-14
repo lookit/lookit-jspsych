@@ -6,7 +6,7 @@ import { initJsPsych, PluginInfo, TrialType } from "jspsych";
 import playbackFeed from "../hbs/playback-feed.hbs";
 import recordFeed from "../hbs/record-feed.hbs";
 import { VideoConsentPlugin } from "./consentVideo";
-import { ElementNotFoundError, ImageNotFoundError } from "./errors";
+import { ElementNotFoundError } from "./errors";
 import Recorder from "./recorder";
 
 declare const window: LookitWindow;
@@ -207,7 +207,7 @@ test("getImg error when image not found", () => {
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
   expect(() => plugin["getImg"](display, "record-icon")).toThrow(
-    ImageNotFoundError,
+    ElementNotFoundError,
   );
 });
 

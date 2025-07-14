@@ -208,15 +208,3 @@ export class ElementNotFoundError extends Error {
     this.name = "ElementNotFoundError";
   }
 }
-
-/** Throw Error when image couldn't be found. */
-export class ImageNotFoundError extends Error {
-  /**
-   * Error when image couldn't be found by ID field.
-   *
-   * @param id - HTML ID parameter
-   */
-  public constructor(id: string) {
-    super(`"${id}" image not found.`);
-  }
-}

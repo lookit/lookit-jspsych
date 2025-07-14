@@ -3,7 +3,7 @@ import { LookitWindow } from "@lookit/data/dist/types";
 import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import { version } from "../package.json";
-import { ElementNotFoundError, ImageNotFoundError } from "./errors";
+import { ElementNotFoundError } from "./errors";
 import Recorder from "./recorder";
 
 declare const window: LookitWindow;
@@ -242,7 +242,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     const img = display.querySelector<HTMLImageElement>(`img#${id}`);
 
     if (!img) {
-      throw new ImageNotFoundError(id);
+      throw new ElementNotFoundError(id);
     }
 
     return img;
