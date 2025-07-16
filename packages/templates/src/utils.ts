@@ -92,3 +92,15 @@ Handlebars.registerHelper("t", (context, { hash }) => {
   const txt = String(i18next.t(context, hash));
   return hash.htmlSafe ? new Handlebars.SafeString(txt) : txt;
 });
+
+/**
+ * Public method for directly translating a string, without a corresponding
+ * template.
+ *
+ * @param messageIdStr - Message ID string to be looked up in the translation
+ *   files.
+ * @returns Translated string
+ */
+export const translateString = (messageIdStr: string) => {
+  return i18next.t(messageIdStr);
+};

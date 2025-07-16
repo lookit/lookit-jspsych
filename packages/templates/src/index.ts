@@ -1,6 +1,13 @@
 import { consentVideo } from "./consentVideoTemplate";
 import { exitSurvey } from "./exitSurveyTemplate";
 import { uploadingVideo } from "./uploadingVideoTemplate";
+import { translateString } from "./utils";
 import { videoConfig } from "./videoConfigTemplate";
 
-export default { consentVideo, videoConfig, uploadingVideo, exitSurvey };
+export default {
+  consentVideo,
+  videoConfig,
+  uploadingVideo,
+  exitSurvey,
+  translateString,
+};

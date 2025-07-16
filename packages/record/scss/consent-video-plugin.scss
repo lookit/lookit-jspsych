@@ -61,6 +61,13 @@ div#consent-video-trial {
     text-align: justify;
   }
 
+  #lookit-jspsych-video-msg-container {
+    min-height: 1lh;
+    text-align: center;
+    font-weight: bold;
+    color: red;
+  }
+
   #lookit-jspsych-video-container {
     position: relative;
     margin: auto;
