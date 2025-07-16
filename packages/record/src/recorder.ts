@@ -276,13 +276,19 @@ export default class Recorder {
    * tracks, clear the webcam feed element (if there is one), and return the
    * stop promise. This should only be called after recording has started.
    *
+   * @param maintain_container_size - Optional boolean indicating whether or not
+   *   to maintain the current size of the webcam feed container when removing
+   *   the video element. Default is false. If true, the container will be
+   *   resized to match the dimensions of the video element before it is
+   *   removed. This is useful for avoiding layout jumps when the webcam
+   *   container will be re-used during the trial.
    * @returns Promise that resolves after the media recorder has stopped and
    *   final 'dataavailable' event has occurred, when the "stop" event-related
    *   callback function is called.
    */
-  public stop() {
+  public stop(maintain_container_size: boolean = false) {
+    this.clearWebcamFeed(maintain_container_size);
     this.stopTracks();
-    this.clearWebcamFeed();
 
     if (!this.stopPromise) {
       throw new NoStopPromiseError();
@@ -353,12 +359,30 @@ export default class Recorder {
     }
   }
 
-  /** Private helper to clear the webcam feed, if there is one. */
-  private clearWebcamFeed() {
+  /**
+   * Private helper to clear the webcam feed, if there is one. If remove is
+   * false, the video element source attribute is cleared and the parent div
+   * will be set to the same dimensions. This is useful for avoiding layout
+   * jumps when the webcam container and video element will be re-used during
+   * the trial.
+   *
+   * @param maintain_container_size - Boolean indicating whether or not to set
+   *   the webcam feed container size before removing the video element
+   */
+  private clearWebcamFeed(maintain_container_size: boolean) {
     const webcam_feed_element = document.querySelector(
       `#${this.webcam_element_id}`,
     ) as HTMLVideoElement;
     if (webcam_feed_element) {
+      if (maintain_container_size) {
+        const parent_div = webcam_feed_element.parentElement as HTMLDivElement;
+        if (parent_div) {
+          const width = webcam_feed_element.offsetWidth;
+          const height = webcam_feed_element.offsetHeight;
+          parent_div.style.height = `${height}px`;
+          parent_div.style.width = `${width}px`;
+        }
+      }
       webcam_feed_element.remove();
     }
   }

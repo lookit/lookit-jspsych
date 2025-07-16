@@ -300,7 +300,7 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     stop.addEventListener("click", async () => {
       stop.disabled = true;
       this.addMessage(display, this.uploadingMsg!);
-      await this.recorder.stop();
+      await this.recorder.stop(true);
       this.recorder.reset();
       this.recordFeed(display);
       this.getImg(display, "record-icon").style.visibility = "hidden";

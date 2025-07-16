@@ -9256,4 +9256,5 @@ div#lookit-jspsych-video-config img.lookit-jspsych-checkmark {
 
 video.webcam-feed {
   transform: rotateY(180deg);
+  display: block;
 }
