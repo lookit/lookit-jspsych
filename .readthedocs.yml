@@ -13,8 +13,7 @@ build:
     post_create_environment:
       - pip install uv
     post_install:
-      - source $READTHEDOCS_VIRTUALENV_PATH/bin/activate && uv sync --frozen
-        --active
+      - . $READTHEDOCS_VIRTUALENV_PATH/bin/activate && uv sync --frozen --active
 
 mkdocs:
   configuration: mkdocs.yml
