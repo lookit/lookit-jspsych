@@ -1,5 +1,30 @@
 # @lookit/record
 
+## 4.0.0
+
+### Minor Changes
+
+- 372f713: - Templates:
+  - add message container to video consent template
+  - add public `translateString` method for translating string directly
+  - Record:
+    - add translated status messages to the video consent plugin: not recording,
+      starting, recording, stopping/uploading
+    - wait to enable/disable certain buttons until recorder has fully
+      started/stopped
+    - refactor error messages to use a single ElementNotFound with ID/tag
+      arguments
+  - Style: add CSS for the video-consent plugin's message container
+
+### Patch Changes
+
+- e9255bd: Fixes a problem with the consent video plugin in which the user can
+  try to replay a video recording before the it has fully stopped.
+- 21f05bc: Fix the webcam feed layout jump in video-consent trials when
+  recording stops.
+- Updated dependencies [372f713]
+  - @lookit/templates@2.1.0
+
 ## 3.0.1
 
 ### Patch Changes
