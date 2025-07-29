@@ -9083,6 +9083,12 @@ div#consent-video-trial .consent-statement {
   border-radius: 4px;
   text-align: justify;
 }
+div#consent-video-trial #lookit-jspsych-video-msg-container {
+  min-height: 1lh;
+  text-align: center;
+  font-weight: bold;
+  color: red;
+}
 div#consent-video-trial #lookit-jspsych-video-container {
   position: relative;
   margin: auto;
@@ -9250,4 +9256,5 @@ div#lookit-jspsych-video-config img.lookit-jspsych-checkmark {
 
 video.webcam-feed {
   transform: rotateY(180deg);
+  display: block;
 }

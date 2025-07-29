@@ -123,6 +123,7 @@ test("Recorder no stop promise", () => {
 
   expect(async () => await rec.stop()).rejects.toThrow(NoStopPromiseError);
 });
+
 test("Recorder initialize error", () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
@@ -272,6 +273,125 @@ test("Webcam feed is removed when stream access stops", async () => {
 
   // Reset the document body.
   document.body.innerHTML = "";
+});
+
+test("Webcam feed container maintains size with recorder.stop(true)", async () => {
+  // Add webcam container to document body.
+  const webcam_container_id = "webcam-container";
+  document.body.innerHTML = `<div id="${webcam_container_id}"></div>`;
+  const webcam_div = document.getElementById(
+    webcam_container_id,
+  ) as HTMLDivElement;
+
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const stopPromise = Promise.resolve();
+
+  rec["stopPromise"] = stopPromise;
+  rec.insertWebcamFeed(webcam_div);
+
+  // Mock the return values for the video element's offsetHeight/offsetWidth, which are used to set the container size
+  jest
+    .spyOn(document.getElementsByTagName("video")[0], "offsetWidth", "get")
+    .mockImplementation(() => 400);
+  jest
+    .spyOn(document.getElementsByTagName("video")[0], "offsetHeight", "get")
+    .mockImplementation(() => 300);
+
+  await rec.stop(true);
+
+  // Container div's dimensions should match the video element dimensions
+  expect(
+    (document.getElementById(webcam_container_id) as HTMLDivElement).style
+      .width,
+  ).toBe("400px");
+  expect(
+    (document.getElementById(webcam_container_id) as HTMLDivElement).style
+      .height,
+  ).toBe("300px");
+
+  document.body.innerHTML = "";
+  // restore the offsetWidth/offsetHeight getters
+  jest.restoreAllMocks();
+});
+
+test("Webcam feed container size is not maintained with recorder.stop(false)", async () => {
+  // Add webcam container to document body.
+  const webcam_container_id = "webcam-container";
+  document.body.innerHTML = `<div id="${webcam_container_id}"></div>`;
+  const webcam_div = document.getElementById(
+    webcam_container_id,
+  ) as HTMLDivElement;
+
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const stopPromise = Promise.resolve();
+
+  rec["stopPromise"] = stopPromise;
+  rec.insertWebcamFeed(webcam_div);
+
+  // Mock the return values for the video element offsetHeight/offsetWidth, which are used to set the container size
+  jest
+    .spyOn(document.getElementsByTagName("video")[0], "offsetWidth", "get")
+    .mockImplementation(() => 400);
+  jest
+    .spyOn(document.getElementsByTagName("video")[0], "offsetHeight", "get")
+    .mockImplementation(() => 300);
+
+  await rec.stop(false);
+
+  // Container div's dimensions should not be set
+  expect(
+    (document.getElementById(webcam_container_id) as HTMLDivElement).style
+      .width,
+  ).toBe("");
+  expect(
+    (document.getElementById(webcam_container_id) as HTMLDivElement).style
+      .height,
+  ).toBe("");
+
+  document.body.innerHTML = "";
+  // restore the offsetWidth/offsetHeight getters
+  jest.restoreAllMocks();
+});
+
+test("Webcam feed container size is not maintained with recorder.stop()", async () => {
+  // Add webcam container to document body.
+  const webcam_container_id = "webcam-container";
+  document.body.innerHTML = `<div id="${webcam_container_id}"></div>`;
+  const webcam_div = document.getElementById(
+    webcam_container_id,
+  ) as HTMLDivElement;
+
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const stopPromise = Promise.resolve();
+
+  rec["stopPromise"] = stopPromise;
+  rec.insertWebcamFeed(webcam_div);
+
+  // Mock the return values for the video element offsetHeight/offsetWidth, which are used to set the container size
+  jest
+    .spyOn(document.getElementsByTagName("video")[0], "offsetWidth", "get")
+    .mockImplementation(() => 400);
+  jest
+    .spyOn(document.getElementsByTagName("video")[0], "offsetHeight", "get")
+    .mockImplementation(() => 300);
+
+  await rec.stop();
+
+  // Container div's dimensions should not be set
+  expect(
+    (document.getElementById(webcam_container_id) as HTMLDivElement).style
+      .width,
+  ).toBe("");
+  expect(
+    (document.getElementById(webcam_container_id) as HTMLDivElement).style
+      .height,
+  ).toBe("");
+
+  document.body.innerHTML = "";
+  jest.restoreAllMocks();
 });
 
 test("Recorder initializeRecorder", () => {

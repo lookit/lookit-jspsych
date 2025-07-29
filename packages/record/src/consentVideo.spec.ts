@@ -6,11 +6,7 @@ import { initJsPsych, PluginInfo, TrialType } from "jspsych";
 import playbackFeed from "../hbs/playback-feed.hbs";
 import recordFeed from "../hbs/record-feed.hbs";
 import { VideoConsentPlugin } from "./consentVideo";
-import {
-  ButtonNotFoundError,
-  ImageNotFoundError,
-  VideoContainerNotFoundError,
-} from "./errors";
+import { ElementNotFoundError } from "./errors";
 import Recorder from "./recorder";
 
 declare const window: LookitWindow;
@@ -67,7 +63,21 @@ test("GetVideoContainer error when no container", () => {
   const plugin = new VideoConsentPlugin(jsPsych);
   expect(() =>
     plugin["getVideoContainer"](document.createElement("div")),
-  ).toThrow(VideoContainerNotFoundError);
+  ).toThrow(ElementNotFoundError);
+  expect(() =>
+    plugin["getVideoContainer"](document.createElement("div")),
+  ).toThrow(`"${plugin["video_container_id"]}" div not found.`);
+});
+
+test("getMessageContainer error when no container", () => {
+  const jsPsych = initJsPsych();
+  const plugin = new VideoConsentPlugin(jsPsych);
+  expect(() =>
+    plugin["getMessageContainer"](document.createElement("div")),
+  ).toThrow(ElementNotFoundError);
+  expect(() =>
+    plugin["getMessageContainer"](document.createElement("div")),
+  ).toThrow(`"${plugin["msg_container_id"]}" div not found.`);
 });
 
 test("GetVideoContainer", () => {
@@ -79,6 +89,17 @@ test("GetVideoContainer", () => {
 
   const html = plugin["getVideoContainer"](display).outerHTML;
   expect(html).toBe(`<div id="lookit-jspsych-video-container"></div>`);
+});
+
+test("getMessageContainer", () => {
+  const jsPsych = initJsPsych();
+  const plugin = new VideoConsentPlugin(jsPsych);
+  const display = document.createElement("div");
+
+  display.innerHTML = `<div id="${plugin["msg_container_id"]}"></div>`;
+
+  const html = plugin["getMessageContainer"](display).outerHTML;
+  expect(html).toBe(`<div id="lookit-jspsych-video-msg-container"></div>`);
 });
 
 test("recordFeed", () => {
@@ -103,7 +124,7 @@ test("playbackFeed", () => {
   const vidContainer = "some video container";
 
   plugin["getVideoContainer"] = jest.fn().mockReturnValue(vidContainer);
-  plugin["onEnded"] = jest.fn().mockReturnValue("some func");
+  plugin["onPlaybackEnded"] = jest.fn().mockReturnValue("some func");
   plugin["playbackFeed"](display);
 
   expect(Recorder.prototype.insertPlaybackFeed).toHaveBeenCalledWith(
@@ -112,7 +133,7 @@ test("playbackFeed", () => {
   );
 });
 
-test("onEnded", () => {
+test("onPlaybackEnded", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
@@ -145,7 +166,7 @@ test("onEnded", () => {
     return "";
   });
 
-  plugin["onEnded"](display)();
+  plugin["onPlaybackEnded"](display)();
 
   expect(plugin["recordFeed"]).toHaveBeenCalledWith(display);
   expect(plugin["recordFeed"]).toHaveBeenCalledTimes(1);
@@ -174,7 +195,10 @@ test("getButton error when button not found", () => {
   const display = document.createElement("div");
 
   expect(() => plugin["getButton"](display, "next")).toThrow(
-    ButtonNotFoundError,
+    ElementNotFoundError,
+  );
+  expect(() => plugin["getButton"](display, "next")).toThrow(
+    `"next" button not found.`,
   );
 });
 
@@ -183,7 +207,10 @@ test("getImg error when image not found", () => {
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
   expect(() => plugin["getImg"](display, "record-icon")).toThrow(
-    ImageNotFoundError,
+    ElementNotFoundError,
+  );
+  expect(() => plugin["getImg"](display, "record-icon")).toThrow(
+    `"record-icon" img not found.`,
   );
 });
 
