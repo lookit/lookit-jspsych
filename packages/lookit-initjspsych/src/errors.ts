@@ -40,3 +40,19 @@ export class UndefinedTimelineError extends Error {
     );
   }
 }
+
+/**
+ * Error when the jsPsych instance is not accessible in the on data update
+ * callback closure.
+ */
+export class NoJsPsychInstanceError extends Error {
+  /**
+   * Error when the jsPsych instance is not available in the on data update
+   * callback closure. The instance needs to be passed into the actual
+   * on_data_update callback in order to get all of the experiment data.
+   */
+  public constructor() {
+    super("No jsPsych instance availale for on_data_update.");
+    this.name = "NoJsPsychInstanceError";
+  }
+}
