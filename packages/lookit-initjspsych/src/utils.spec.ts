@@ -1,4 +1,4 @@
-import { DataCollection } from "jspsych";
+import { DataCollection, JsPsych } from "jspsych";
 
 import { Child, JsPsychExpData, Study } from "@lookit/data/dist/types";
 import { SequenceExpDataError } from "./errors";
@@ -9,9 +9,34 @@ global.window = Object.create(window);
 global.window.location = { replace: jest.fn() };
 
 test("jsPsych's on_data_update with some exp_data", async () => {
+  // mock jsPsych data
+  const mockTrialData = [
+    { trial_index: 0, trial_type: "test" },
+    { trial_index: 1, trial_type: "survey" },
+  ];
+  const jsPsychMock = {
+    data: {
+      /**
+       * Mocked jsPsych.data.get() function used in on_data_update
+       *
+       * @returns JsPsych data collection
+       */
+      get: () => ({
+        /**
+         * Mocked jsPsych.data.get().values() function used in on_data_update
+         *
+         * @returns Values from jsPsych data collection
+         */
+        values: () => mockTrialData,
+      }),
+    },
+  };
+  expect(jsPsychMock.data.get().values()).toEqual(mockTrialData);
+
+  // mock lookit API data
   const jsonData = {
     data: {
-      attributes: { exp_data: ["some data"], sequence: ["0-first-trial"] },
+      attributes: { sequence: ["0-first-trial"] },
     },
   };
   const response = {
@@ -29,15 +54,40 @@ test("jsPsych's on_data_update with some exp_data", async () => {
   global.fetch = jest.fn(() => Promise.resolve(response));
   global.Request = jest.fn();
 
-  expect(await on_data_update("some id", userFn)(data)).toBeUndefined();
+  expect(
+    await on_data_update(jsPsychMock as JsPsych, "some id", userFn)(data),
+  ).toBeUndefined();
   expect(userFn).toHaveBeenCalledTimes(1);
+  expect(userFn).toHaveBeenCalledWith(data);
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(Request).toHaveBeenCalledTimes(2);
 });
 
 test("jsPsych's on_data_update with no exp_data", async () => {
+  // mock jsPsych data
+  const mockTrialData = [] as JsPsychExpData[];
+  const jsPsychMock = {
+    data: {
+      /**
+       * Mocked jsPsych.data.get() function used in on_data_update
+       *
+       * @returns JsPsych data collection
+       */
+      get: () => ({
+        /**
+         * Mocked jsPsych.data.get().values() function used in on_data_update
+         *
+         * @returns Values from jsPsych data collection
+         */
+        values: () => mockTrialData,
+      }),
+    },
+  };
+  expect(jsPsychMock.data.get().values()).toEqual(mockTrialData);
+
+  // mock lookit API data
   const jsonData = {
-    data: { attributes: { exp_data: undefined, sequence: undefined } },
+    data: { attributes: { sequence: undefined } },
   };
   const response = {
     /**
@@ -54,7 +104,9 @@ test("jsPsych's on_data_update with no exp_data", async () => {
   global.fetch = jest.fn(() => Promise.resolve(response));
   global.Request = jest.fn();
 
-  expect(await on_data_update("some id", userFn)(data)).toBeUndefined();
+  expect(
+    await on_data_update(jsPsychMock as JsPsych, "some id", userFn)(data),
+  ).toBeUndefined();
   expect(userFn).toHaveBeenCalledTimes(1);
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(Request).toHaveBeenCalledTimes(2);
@@ -99,6 +151,7 @@ test("jsPsych's on_finish", async () => {
 
   expect(await on_finish("some id", userFn)(data)).toBeUndefined();
   expect(userFn).toHaveBeenCalledTimes(1);
+  expect(userFn).toHaveBeenCalledWith(data);
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(Request).toHaveBeenCalledTimes(2);
 });
