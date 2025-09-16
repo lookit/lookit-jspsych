@@ -1,7 +1,7 @@
 import { DataCollection, JsPsych } from "jspsych";
 
 import { Child, JsPsychExpData, Study } from "@lookit/data/dist/types";
-import { SequenceExpDataError } from "./errors";
+import { NoJsPsychInstanceError, SequenceExpDataError } from "./errors";
 import { on_data_update, on_finish } from "./utils";
 
 delete global.window.location;
@@ -110,6 +110,37 @@ test("jsPsych's on_data_update with no exp_data", async () => {
   expect(userFn).toHaveBeenCalledTimes(1);
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(Request).toHaveBeenCalledTimes(2);
+});
+
+test("Error throws if no jsPsych instance is found", () => {
+  const jsPsychInstance: JsPsych | null = null;
+
+  // mock lookit API data
+  const jsonData = {
+    data: { attributes: { sequence: undefined } },
+  };
+  const response = {
+    /**
+     * Mocked json function used in API calls.
+     *
+     * @returns Promise containing mocked json data.
+     */
+    json: () => Promise.resolve(jsonData),
+    ok: true,
+  } as Response;
+  const data = {} as JsPsychExpData;
+
+  const userFn = jest.fn();
+  global.fetch = jest.fn(() => Promise.resolve(response));
+  global.Request = jest.fn();
+
+  expect(async () => {
+    await on_data_update(
+      jsPsychInstance as unknown as JsPsych,
+      "some id",
+      userFn,
+    )(data);
+  }).rejects.toThrow(NoJsPsychInstanceError);
 });
 
 test("jsPsych's on_finish", async () => {
