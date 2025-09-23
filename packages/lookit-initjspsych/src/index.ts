@@ -2,11 +2,7 @@ import { JsPsychExpData } from "@lookit/data/dist/types";
 import type { JsPsych as JsPsychType } from "jspsych";
 import * as jspsychModule from "jspsych";
 import type { TimelineArray } from "jspsych/src/timeline";
-import {
-  NoJsPsychInstanceError,
-  UndefinedTimelineError,
-  UndefinedTypeError,
-} from "./errors";
+import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
 import type {
   ChsJsPsych,
   ChsTimelineArray,
@@ -83,16 +79,14 @@ const lookitInitJsPsych = (responseUuid: string) => {
      * @returns The on_data_update function to be used
      */
     const onDataUpdate = (...args: [JsPsychExpData]) => {
-      if (jsPsychInstance) {
-        // Call the custom CHS on_data_update fn with the jsPsych instance, response UUID,
-        // and the user-defined on_data_update function if it exists (our on_data_update fn handles the undefined case).
-        return on_data_update(
-          jsPsychInstance,
-          responseUuid,
-          userOnDataUpdate,
-        )(...args);
-      }
-      throw new NoJsPsychInstanceError();
+      // Call the custom CHS on_data_update fn with the jsPsych instance, response UUID,
+      // and the user-defined on_data_update function if it exists.
+      // No checks for jsPsychInstance here because on_data_update handles that.
+      return on_data_update(
+        jsPsychInstance,
+        responseUuid,
+        userOnDataUpdate,
+      )(...args);
     };
 
     // Create the jsPsych instance and pass in the callbacks
