@@ -112,8 +112,39 @@ test("jsPsych's on_data_update with no exp_data", async () => {
   expect(Request).toHaveBeenCalledTimes(2);
 });
 
-test("Error throws if no jsPsych instance is found", () => {
+test("Error throws if jsPsych instance is null", () => {
   const jsPsychInstance: JsPsych | null = null;
+
+  // mock lookit API data
+  const jsonData = {
+    data: { attributes: { sequence: undefined } },
+  };
+  const response = {
+    /**
+     * Mocked json function used in API calls.
+     *
+     * @returns Promise containing mocked json data.
+     */
+    json: () => Promise.resolve(jsonData),
+    ok: true,
+  } as Response;
+  const data = {} as JsPsychExpData;
+
+  const userFn = jest.fn();
+  global.fetch = jest.fn(() => Promise.resolve(response));
+  global.Request = jest.fn();
+
+  expect(async () => {
+    await on_data_update(
+      jsPsychInstance as unknown as JsPsych,
+      "some id",
+      userFn,
+    )(data);
+  }).rejects.toThrow(NoJsPsychInstanceError);
+});
+
+test("Error throws if jsPsych instance is undefined", () => {
+  const jsPsychInstance: JsPsych | undefined = undefined;
 
   // mock lookit API data
   const jsonData = {
