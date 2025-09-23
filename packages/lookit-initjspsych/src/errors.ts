@@ -52,7 +52,7 @@ export class NoJsPsychInstanceError extends Error {
    * on_data_update callback in order to get all of the experiment data.
    */
   public constructor() {
-    super("No jsPsych instance availale for on_data_update.");
+    super("No jsPsych instance available for on_data_update.");
     this.name = "NoJsPsychInstanceError";
   }
 }
