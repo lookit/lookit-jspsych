@@ -1,4 +1,4 @@
-import { JsPsych } from "jspsych";
+import * as jspsychModule from "jspsych";
 import TestPlugin from "../fixtures/TestPlugin";
 import lookitInitJsPsych from "./";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
@@ -8,33 +8,31 @@ import type {
   ChsTrialDescription,
 } from "./types";
 
-describe("lookit-initjspsych", () => {
+describe("lookit-initjspsych initializes and runs", () => {
   beforeEach(() => {
     TestPlugin.reset();
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  test("Does lookitInitJsPsych return an instance of jspsych?", () => {
+  test("lookitInitJsPsych returns an instance of jspsych", () => {
     const jsPsych = lookitInitJsPsych("uuid-string");
     const opts = {
       on_data_update: jest.fn(),
       on_finish: jest.fn(),
     };
-    expect(jsPsych(opts)).toBeInstanceOf(JsPsych);
+    expect(jsPsych(opts)).toBeInstanceOf(jspsychModule.JsPsych);
   });
 
-  test("Is jspsych's run called?", async () => {
+  test("jsPsych's run is called", async () => {
     const mockRun = jest.fn();
-    jest.spyOn(JsPsych.prototype, "run").mockImplementation(mockRun);
+    jest
+      .spyOn(jspsychModule.JsPsych.prototype, "run")
+      .mockImplementation(mockRun);
     const jsPsych = lookitInitJsPsych("some id");
     await jsPsych({}).run([]);
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
-  test("Is experiment data injected into timeline w/o data?", async () => {
+  test("Experiment data is injected into timeline w/o data", async () => {
     const jsPsych = lookitInitJsPsych("some id");
     const trial: ChsTrialDescription = { type: TestPlugin };
     const t: ChsTimelineArray = [trial];
@@ -46,7 +44,7 @@ describe("lookit-initjspsych", () => {
     });
   });
 
-  test("Is experiment data injected into timeline w/ data?", async () => {
+  test("Experiment data is injected into timeline w/ data", async () => {
     const jsPsych = lookitInitJsPsych("some id");
     const trial: ChsTrialDescription = {
       type: TestPlugin,
@@ -59,6 +57,12 @@ describe("lookit-initjspsych", () => {
       chs_type: "test",
       other: "data",
     });
+  });
+});
+
+describe("lookit-initjspsych timeline/trial handling", () => {
+  beforeEach(() => {
+    TestPlugin.reset();
   });
 
   test("Throws UndefinedTypeError when trial description has no type", () => {
