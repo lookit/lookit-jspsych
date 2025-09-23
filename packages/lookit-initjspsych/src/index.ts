@@ -1,5 +1,6 @@
 import { JsPsychExpData } from "@lookit/data/dist/types";
-import { initJsPsych as origInitJsPsych, JsPsych } from "jspsych";
+import type { JsPsych as JsPsychType } from "jspsych";
+import * as jspsychModule from "jspsych";
 import type { TimelineArray } from "jspsych/src/timeline";
 import {
   NoJsPsychInstanceError,
@@ -72,7 +73,7 @@ const lookitInitJsPsych = (responseUuid: string) => {
     const { on_data_update: userOnDataUpdate, ...otherOpts } = opts || {};
 
     // Create a placeholder for the instance - needed for use in the onDataUpdate closure.
-    let jsPsychInstance: JsPsych | null = null;
+    let jsPsychInstance: JsPsychType | null = null;
 
     /**
      * Closure to return the on_data_update function, with the actual instance,
@@ -95,7 +96,7 @@ const lookitInitJsPsych = (responseUuid: string) => {
     };
 
     // Create the jsPsych instance and pass in the callbacks
-    const jsPsych = origInitJsPsych({
+    const jsPsych = jspsychModule.initJsPsych({
       ...otherOpts,
       on_data_update: onDataUpdate,
       on_finish: on_finish(responseUuid, opts?.on_finish),
