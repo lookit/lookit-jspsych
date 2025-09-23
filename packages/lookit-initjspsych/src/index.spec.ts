@@ -114,6 +114,70 @@ describe("lookit-initjspsych initializes and runs", () => {
       expect(typeof callArgs!.on_data_update).toBe("function");
     });
   });
+
+  test("After initializing, when jsPsych data updates, onDataUpdate closure returns the on_data_update function with correct arguments", async () => {
+    jest.doMock("jspsych", () => ({
+      __esModule: true,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      initJsPsych: jest.fn((opts?: JsPsychOptions) => ({
+        data: {
+          /**
+           * Mock jsPsych.data.get in the returned instance
+           *
+           * @returns Data collection with a values() method
+           */
+          get: () => ({
+            /**
+             * Mock jsPsych.data.get().values() in the returned instance
+             *
+             * @returns Mocked data array
+             */
+            values: () => [] as JsPsychExpData[],
+          }),
+        },
+        run: jest.fn(),
+      })),
+    }));
+
+    // Track API mocks separately so we can assert on them
+    const mockRetrieveResponse = jest.fn().mockResolvedValue({
+      attributes: { sequence: [], exp_data: [] },
+    });
+    const mockUpdateResponse = jest.fn().mockResolvedValue(undefined);
+    const mockFinish = jest.fn().mockResolvedValue(undefined);
+
+    // Mock Api from @lookit/data
+    jest.doMock("@lookit/data", () => ({
+      __esModule: true,
+      default: {
+        retrieveResponse: mockRetrieveResponse,
+        updateResponse: mockUpdateResponse,
+        finish: mockFinish,
+      },
+    }));
+
+    // use jest.isolateModulesAsync to ensure that the mocks are applied before index.ts and its imports are loaded
+    await jest.isolateModulesAsync(async () => {
+      const { default: lookitInitJsPsych } = await import("./index");
+      const { initJsPsych } = await import("jspsych");
+
+      lookitInitJsPsych("uuid")({});
+
+      const callArgs = (initJsPsych as jest.Mock).mock.calls[0][0];
+      const onDataUpdate = callArgs.on_data_update!;
+
+      // Simulate jsPsych calling onDataUpdate/on_data_update with trial data
+      await expect(
+        onDataUpdate({ trial_index: 0, trial_type: "test" } as unknown),
+      ).resolves.not.toThrow();
+      expect(mockRetrieveResponse).toHaveBeenCalledWith("uuid");
+      expect(mockUpdateResponse).toHaveBeenCalledWith("uuid", {
+        exp_data: [], // from jsPsych.data.get().values()
+        sequence: ["0-test"], // sequence should contain the trial info
+      });
+      expect(mockFinish).toHaveBeenCalled();
+    });
+  });
 });
 
 describe("lookit-initjspsych data handling", () => {
