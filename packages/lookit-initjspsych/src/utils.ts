@@ -19,7 +19,7 @@ declare let window: LookitWindow;
  * @returns On data update function.
  */
 export const on_data_update = (
-  jsPsychInstance: JsPsych,
+  jsPsychInstance: JsPsych | undefined | null,
   responseUuid: string,
   userFunc?: UserFuncOnDataUpdate,
 ) => {
