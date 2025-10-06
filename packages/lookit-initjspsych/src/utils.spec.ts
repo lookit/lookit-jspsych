@@ -59,8 +59,7 @@ test("jsPsych's on_data_update with some exp_data", async () => {
   ).toBeUndefined();
   expect(userFn).toHaveBeenCalledTimes(1);
   expect(userFn).toHaveBeenCalledWith(data);
-  expect(fetch).toHaveBeenCalledTimes(2);
-  expect(Request).toHaveBeenCalledTimes(2);
+  expect(Request).toHaveBeenCalledTimes(1);
 });
 
 test("jsPsych's on_data_update with no exp_data", async () => {
@@ -108,30 +107,15 @@ test("jsPsych's on_data_update with no exp_data", async () => {
     await on_data_update(jsPsychMock as JsPsych, "some id", userFn)(data),
   ).toBeUndefined();
   expect(userFn).toHaveBeenCalledTimes(1);
-  expect(fetch).toHaveBeenCalledTimes(2);
-  expect(Request).toHaveBeenCalledTimes(2);
+  expect(Request).toHaveBeenCalledTimes(1);
 });
 
 test("Error throws if jsPsych instance is null", () => {
   const jsPsychInstance: JsPsych | null = null;
 
-  // mock lookit API data
-  const jsonData = {
-    data: { attributes: { sequence: undefined } },
-  };
-  const response = {
-    /**
-     * Mocked json function used in API calls.
-     *
-     * @returns Promise containing mocked json data.
-     */
-    json: () => Promise.resolve(jsonData),
-    ok: true,
-  } as Response;
   const data = {} as JsPsychExpData;
 
   const userFn = jest.fn();
-  global.fetch = jest.fn(() => Promise.resolve(response));
   global.Request = jest.fn();
 
   expect(async () => {
@@ -146,23 +130,9 @@ test("Error throws if jsPsych instance is null", () => {
 test("Error throws if jsPsych instance is undefined", () => {
   const jsPsychInstance: JsPsych | undefined = undefined;
 
-  // mock lookit API data
-  const jsonData = {
-    data: { attributes: { sequence: undefined } },
-  };
-  const response = {
-    /**
-     * Mocked json function used in API calls.
-     *
-     * @returns Promise containing mocked json data.
-     */
-    json: () => Promise.resolve(jsonData),
-    ok: true,
-  } as Response;
   const data = {} as JsPsychExpData;
 
   const userFn = jest.fn();
-  global.fetch = jest.fn(() => Promise.resolve(response));
   global.Request = jest.fn();
 
   expect(async () => {
