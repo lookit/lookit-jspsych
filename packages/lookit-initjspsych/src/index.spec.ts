@@ -170,10 +170,9 @@ describe("lookit-initjspsych initializes and runs", () => {
       await expect(
         onDataUpdate({ trial_index: 0, trial_type: "test" } as unknown),
       ).resolves.not.toThrow();
-      expect(mockRetrieveResponse).toHaveBeenCalledWith("uuid");
+      expect(mockRetrieveResponse).not.toHaveBeenCalled();
       expect(mockUpdateResponse).toHaveBeenCalledWith("uuid", {
         exp_data: [], // from jsPsych.data.get().values()
-        sequence: ["0-test"], // sequence should contain the trial info
       });
       expect(mockFinish).toHaveBeenCalled();
     });
