@@ -28,12 +28,8 @@ export const on_data_update = (
       throw new NoJsPsychInstanceError();
     }
 
-    const { attributes } = await Api.retrieveResponse(responseUuid);
-    const sequence = attributes.sequence ? attributes.sequence : [];
-
     await Api.updateResponse(responseUuid, {
       exp_data: jsPsychInstance.data.get().values() as JsPsychExpData[],
-      sequence: [...sequence, `${data.trial_index}-${data.trial_type}`],
     });
     await Api.finish();
 
