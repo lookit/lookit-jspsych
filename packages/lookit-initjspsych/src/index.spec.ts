@@ -141,7 +141,7 @@ describe("lookit-initjspsych initializes and runs", () => {
 
     // Track API mocks separately so we can assert on them
     const mockRetrieveResponse = jest.fn().mockResolvedValue({
-      attributes: { sequence: [], exp_data: [] },
+      attributes: { exp_data: [] },
     });
     const mockUpdateResponse = jest.fn().mockResolvedValue(undefined);
     const mockFinish = jest.fn().mockResolvedValue(undefined);
