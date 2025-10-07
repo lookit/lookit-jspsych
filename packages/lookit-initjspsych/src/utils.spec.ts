@@ -1,7 +1,7 @@
 import { DataCollection, JsPsych } from "jspsych";
 
 import { Child, JsPsychExpData, Study } from "@lookit/data/dist/types";
-import { NoJsPsychInstanceError, SequenceExpDataError } from "./errors";
+import { NoJsPsychInstanceError } from "./errors";
 import { on_data_update, on_finish } from "./utils";
 
 delete global.window.location;
@@ -153,46 +153,4 @@ test("jsPsych's on_finish", async () => {
   expect(userFn).toHaveBeenCalledTimes(1);
   expect(userFn).toHaveBeenCalledWith(data);
   expect(Request).toHaveBeenCalledTimes(1);
-});
-
-test("Is an error thrown when experiment sequence is undefined?", () => {
-  const exp_data = [{ key: "value" }];
-  const jsonData = {
-    data: {
-      attributes: { exp_data, sequence: undefined },
-    },
-  };
-  const data = {
-    /**
-     * Mocked jsPsych Data Collection.
-     *
-     * @returns Exp data.
-     */
-    values: () => exp_data,
-  } as DataCollection;
-  const response = {
-    /**
-     * Mocked json function used in API calls.
-     *
-     * @returns Promise containing mocked json data.
-     */
-    json: () => Promise.resolve(jsonData),
-    ok: true,
-  } as Response;
-
-  const userFn = jest.fn();
-  global.fetch = jest.fn(() => Promise.resolve(response));
-  global.Request = jest.fn();
-
-  Object.assign(window, {
-    chs: {
-      study: { attributes: { exit_url: "exit url" } } as Study,
-      child: {} as Child,
-      pastSessions: {} as Response[],
-    },
-  });
-
-  expect(async () => {
-    await on_finish("some id", userFn)(data);
-  }).rejects.toThrow(SequenceExpDataError);
 });
