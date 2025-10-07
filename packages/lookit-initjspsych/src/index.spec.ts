@@ -141,7 +141,7 @@ describe("lookit-initjspsych initializes and runs", () => {
 
     // Track API mocks separately so we can assert on them
     const mockRetrieveResponse = jest.fn().mockResolvedValue({
-      attributes: { sequence: [], exp_data: [] },
+      attributes: { exp_data: [] },
     });
     const mockUpdateResponse = jest.fn().mockResolvedValue(undefined);
     const mockFinish = jest.fn().mockResolvedValue(undefined);
@@ -170,10 +170,9 @@ describe("lookit-initjspsych initializes and runs", () => {
       await expect(
         onDataUpdate({ trial_index: 0, trial_type: "test" } as unknown),
       ).resolves.not.toThrow();
-      expect(mockRetrieveResponse).toHaveBeenCalledWith("uuid");
+      expect(mockRetrieveResponse).not.toHaveBeenCalled();
       expect(mockUpdateResponse).toHaveBeenCalledWith("uuid", {
         exp_data: [], // from jsPsych.data.get().values()
-        sequence: ["0-test"], // sequence should contain the trial info
       });
       expect(mockFinish).toHaveBeenCalled();
     });

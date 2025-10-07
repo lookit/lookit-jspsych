@@ -1,7 +1,7 @@
 import Api from "@lookit/data";
 import { JsPsychExpData, LookitWindow } from "@lookit/data/dist/types";
 import { DataCollection, JsPsych } from "jspsych";
-import { NoJsPsychInstanceError, SequenceExpDataError } from "./errors";
+import { NoJsPsychInstanceError } from "./errors";
 import { UserFuncOnDataUpdate, UserFuncOnFinish } from "./types";
 
 declare let window: LookitWindow;
@@ -28,12 +28,8 @@ export const on_data_update = (
       throw new NoJsPsychInstanceError();
     }
 
-    const { attributes } = await Api.retrieveResponse(responseUuid);
-    const sequence = attributes.sequence ? attributes.sequence : [];
-
     await Api.updateResponse(responseUuid, {
       exp_data: jsPsychInstance.data.get().values() as JsPsychExpData[],
-      sequence: [...sequence, `${data.trial_index}-${data.trial_type}`],
     });
     await Api.finish();
 
@@ -61,18 +57,9 @@ export const on_finish = (
   userFunc?: UserFuncOnFinish,
 ) => {
   return async function (data: DataCollection) {
-    const {
-      attributes: { sequence },
-    } = await Api.retrieveResponse(responseUuid);
-
     const exp_data: JsPsychExpData[] = data.values();
 
-    if (!Array.isArray(sequence)) {
-      throw new SequenceExpDataError();
-    }
-
     const { exit_url } = window.chs.study.attributes;
-    const last_exp = exp_data[exp_data.length - 1];
 
     // Don't call the function if not defined by user.
     if (typeof userFunc === "function") {
@@ -81,7 +68,6 @@ export const on_finish = (
 
     await Api.updateResponse(responseUuid, {
       exp_data,
-      sequence: [...sequence, `${last_exp.trial_index}-${last_exp.trial_type}`],
       completed: true,
     })
       .then(() => Api.finish())
