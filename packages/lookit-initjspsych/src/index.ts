@@ -1,4 +1,6 @@
-import { initJsPsych as origInitJsPsych } from "jspsych";
+import { JsPsychExpData } from "@lookit/data/dist/types";
+import type { JsPsych as JsPsychType } from "jspsych";
+import * as jspsychModule from "jspsych";
 import type { TimelineArray } from "jspsych/src/timeline";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
 import type {
@@ -60,12 +62,43 @@ const isTrialWithType = (
  * @returns InitJsPsych function.
  */
 const lookitInitJsPsych = (responseUuid: string) => {
-  return function (opts: JsPsychOptions): ChsJsPsych {
-    const jsPsych = origInitJsPsych({
-      ...opts,
-      on_data_update: on_data_update(responseUuid, opts?.on_data_update),
+  return function (opts?: JsPsychOptions): ChsJsPsych {
+    // Omit on_data_update from user-defined options that will be passed into origInitJsPsych.
+    // We are using a closure in the on_data_update function so that we can reference the jsPsych instance,
+    // and the user-defined function will be passed in through that closure.
+    const { on_data_update: userOnDataUpdate, ...otherOpts } = opts || {};
+
+    // Create a placeholder for the instance - needed for use in the onDataUpdate closure.
+    let jsPsychInstance: JsPsychType | null = null;
+
+    /**
+     * Closure to return the on_data_update function, with the actual instance,
+     * once the instance is created.
+     *
+     * @param args - Arguments passed to onDataUpdate
+     * @returns The on_data_update function to be used
+     */
+    const onDataUpdate = (...args: [JsPsychExpData]) => {
+      // Call the custom CHS on_data_update fn with the jsPsych instance, response UUID,
+      // and the user-defined on_data_update function if it exists.
+      // No checks for jsPsychInstance here because on_data_update handles that.
+      return on_data_update(
+        jsPsychInstance,
+        responseUuid,
+        userOnDataUpdate,
+      )(...args);
+    };
+
+    // Create the jsPsych instance and pass in the callbacks
+    const jsPsych = jspsychModule.initJsPsych({
+      ...otherOpts,
+      on_data_update: onDataUpdate,
       on_finish: on_finish(responseUuid, opts?.on_finish),
     });
+
+    // Now set the instance variable to the actual instance, so that it is referenced inside onDataUpdate.
+    jsPsychInstance = jsPsych;
+
     const origJsPsychRun = jsPsych.run;
 
     const lookitJsPsych = jsPsych as ChsJsPsych;
