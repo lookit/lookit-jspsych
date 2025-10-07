@@ -1,5 +1,18 @@
 # @lookit/lookit-initjspsych
 
+## 2.1.0
+
+### Minor Changes
+
+- be1549c: Modify the on_data_update and on_finish (experiment) callbacks so
+  that they do not retrieve the response sequence from the lookit-api and send
+  it back with the response update request. The response sequence is now
+  computed server-side, and no response retrieval is needed on each data
+  update/save.
+- d350fb6: Modify the data update callback to send all experiment data back to
+  the lookit-api endpoint on each data update, rather than retrieving the
+  existing data from lookit-api and appending new data to the result.
+
 ## 2.0.1
 
 ### Patch Changes
