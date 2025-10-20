@@ -202,11 +202,6 @@ To run a development server:
 npm run dev -w @lookit/<name of package>
 ```
 
-When the server has started, you should see something very similar to
-`<script src="http://127.0.0.1:10001/index.browser.js"></script>` printed out.
-Add this html to `web/templates/web/jspsych-study-detail.html` in the Django
-lookit api project to test the package in your local development environment.
-
 ### Serve multiple packages
 
 The above command will serve a single package and wait for changes. If you need
@@ -231,6 +226,27 @@ lookit-surveys: npm run dev -w @lookit/surveys
 
 This method is optional (Honcho should not be added to the project dependencies,
 and Procfile has been added to our gitignore).
+
+### Run with lookit-api
+
+When the server has started, for each package you should see console output
+similar to
+
+```sh
+lookit-<package> | <script src="http://127.0.0.1:10001/index.browser.js"></script>
+```
+
+In the lookit-api Django project, navigate to
+`web/templates/web/jspsych-study-detail.html` and replace the existing package
+link with this new html, as seen below. This will allow you to test the package
+in your local development environment.
+
+```html
+<!-- <script src="https://unpkg.com/@lookit/<package_name>@0.2.0"
+        integrity="sha384-iMjDaQDmCTXe6XO59EktLBsg7KmDZZvT5jN/QMiP+ctA8YfQDT/hATDKM1EtoxBQ"
+        crossorigin="anonymous"></script> -->
+<script src="http://127.0.0.1:10001/index.browser.js"></script>
+```
 
 ## Documentation
 
