@@ -1,7 +1,7 @@
 import Data from "@lookit/data";
 import { LookitWindow } from "@lookit/data/dist/types";
 import Handlebars from "handlebars";
-import { initJsPsych } from "jspsych";
+import { initJsPsych, JsPsych } from "jspsych";
 import playbackFeed from "../hbs/playback-feed.hbs";
 import recordFeed from "../hbs/record-feed.hbs";
 import webcamFeed from "../hbs/webcam-feed.hbs";
@@ -143,29 +143,73 @@ test("Recorder initialize error", () => {
 });
 
 test("Recorder handleStop", async () => {
-  const rec = new Recorder(initJsPsych());
+  // Define a custom mockStream so that we can dynamically modify active value
+  const mockStream = {
+    active: true,
+    clone: jest.fn(),
+    getTracks: jest.fn().mockReturnValue([{ stop: jest.fn() }]),
+  };
+  mockStream.clone = jest.fn().mockReturnValue(mockStream);
+  // We need a mock MediaRecorder object that uses the custom mockStream
+  const mockRecorder = {
+    addEventListener: jest.fn(),
+    mimeType: "video/webm",
+    start: jest.fn(),
+    stop: jest.fn(),
+    stream: mockStream,
+  };
+
+  // Minimal fake jsPsych object to pass to the Recorder constructor
+  const jsPsych = {
+    pluginAPI: {
+      getCameraRecorder: jest.fn().mockReturnValue(mockRecorder),
+      initializeCameraRecorder: jest.fn().mockReturnValue(mockRecorder),
+    },
+    data: {
+      getLastTrialData: jest.fn().mockReturnValue({
+        values: jest.fn().mockReturnValue([]),
+      }),
+    },
+  } as unknown as JsPsych;
+
+  const rec = new Recorder(jsPsych);
+
   const download = jest.fn();
   const resolve = jest.fn();
-  const handleStop = rec["handleStop"](resolve);
+  // This allows us to keep strict typing and avoid use of 'any'
+  const resetSpy = jest.spyOn(rec, "reset" satisfies keyof typeof rec);
 
-  // manual mock
+  // Manual mock
   rec["download"] = download;
   rec["blobs"] = ["some recorded data" as unknown as Blob];
   URL.createObjectURL = jest.fn();
 
-  // let's download the file locally
+  // Download the file locally
   rec["localDownload"] = true;
 
+  // Stream cannot be active when handleStop/reset is called
+  mockStream.active = false;
+
+  const handleStop = rec["handleStop"](resolve);
+
   await handleStop();
+
+  expect(download).toHaveBeenCalledTimes(1);
+  expect(resetSpy).toHaveBeenCalledTimes(1);
 
   // Upload the file to s3
   rec["localDownload"] = false;
   rec["_s3"] = new Data.LookitS3("some key");
 
+  // The first 'handleStop' resets the recorder, which resets blobs to [], so we need to fake the blob data again.
+  rec["blobs"] = ["some recorded data" as unknown as Blob];
+
   await handleStop();
 
-  expect(download).toHaveBeenCalledTimes(1);
   expect(Data.LookitS3.prototype.completeUpload).toHaveBeenCalledTimes(1);
+  expect(resetSpy).toHaveBeenCalledTimes(2);
+
+  resetSpy.mockRestore();
 });
 
 test("Recorder handleStop error with no url", () => {
