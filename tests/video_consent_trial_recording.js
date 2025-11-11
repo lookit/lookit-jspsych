@@ -57,4 +57,4 @@ const exitSurvey = {
   type: chsSurvey.ExitSurveyPlugin,
 };
 
-jsPsych.run([videoConfig, videoConsent, trial, exitSurvey]);
+jsPsych.run([videoConfig, videoConsent, trial, trial, exitSurvey]);
