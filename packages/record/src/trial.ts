@@ -43,8 +43,8 @@ export default class TrialRecordExtension implements JsPsychExtension {
    *
    * @returns Trial data.
    */
-  public on_finish() {
-    this.recorder?.stop();
+  public async on_finish() {
+    await this.recorder?.stop();
     return {};
   }
 
