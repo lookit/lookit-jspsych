@@ -1,6 +1,7 @@
 import { LookitWindow } from "@lookit/data/dist/types";
 import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
+import { version } from "../package.json";
 import { NoSessionRecordingError } from "./errors";
 import Recorder from "./recorder";
 
@@ -8,6 +9,7 @@ declare let window: LookitWindow;
 
 const info = <const>{
   name: "stop-record-plugin",
+  version,
   parameters: {
     locale: { type: ParameterType.STRING, default: "en-us" },
   },

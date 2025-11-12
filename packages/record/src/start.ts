@@ -1,11 +1,16 @@
 import { LookitWindow } from "@lookit/data/dist/types";
 import { JsPsych, JsPsychPlugin } from "jspsych";
+import { version } from "../package.json";
 import { ExistingRecordingError } from "./errors";
 import Recorder from "./recorder";
 
 declare let window: LookitWindow;
 
-const info = <const>{ name: "start-record-plugin", parameters: {} };
+const info = <const>{
+  name: "start-record-plugin",
+  version,
+  parameters: {},
+};
 type Info = typeof info;
 
 /** Start recording. Used by researchers who want to record across trials. */

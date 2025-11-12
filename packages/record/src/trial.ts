@@ -1,5 +1,6 @@
 import autoBind from "auto-bind";
 import { JsPsych, JsPsychExtension, JsPsychExtensionInfo } from "jspsych";
+import { version } from "../package.json";
 import Recorder from "./recorder";
 import { jsPsychPluginWithInfo } from "./types";
 
@@ -7,6 +8,7 @@ import { jsPsychPluginWithInfo } from "./types";
 export default class TrialRecordExtension implements JsPsychExtension {
   public static readonly info: JsPsychExtensionInfo = {
     name: "chs-trial-record-extension",
+    version,
   };
 
   private recorder?: Recorder;
