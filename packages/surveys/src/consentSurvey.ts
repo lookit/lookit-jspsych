@@ -11,6 +11,12 @@ const info = <const>{
       default: "en-us",
     },
   },
+  data: {
+    ...SurveyPlugin.info.data,
+    chs_type: {
+      type: ParameterType.STRING,
+    },
+  },
 };
 
 type Info = typeof info;

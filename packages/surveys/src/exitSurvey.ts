@@ -32,6 +32,12 @@ const info = <const>{
       pretty_name: "Additional video privacy text",
     },
   },
+  data: {
+    ...SurveyPlugin.info.data,
+    chs_type: {
+      type: ParameterType.STRING,
+    },
+  },
 };
 
 type Info = typeof info;
