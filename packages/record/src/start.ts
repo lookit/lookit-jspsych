@@ -10,6 +10,7 @@ const info = <const>{
   name: "start-record-plugin",
   version,
   parameters: {},
+  data: {},
 };
 type Info = typeof info;
 

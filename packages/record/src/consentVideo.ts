@@ -59,6 +59,7 @@ const info = <const>{
     consent_statement_text: { type: ParameterType.STRING, default: "" },
     omit_injury_phrase: { type: ParameterType.BOOL, default: false },
   },
+  data: {},
 };
 type Info = typeof info;
 

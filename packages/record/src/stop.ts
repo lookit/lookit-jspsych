@@ -13,6 +13,7 @@ const info = <const>{
   parameters: {
     locale: { type: ParameterType.STRING, default: "en-us" },
   },
+  data: {},
 };
 type Info = typeof info;
 

@@ -9,6 +9,7 @@ export default class TrialRecordExtension implements JsPsychExtension {
   public static readonly info: JsPsychExtensionInfo = {
     name: "chs-trial-record-extension",
     version,
+    data: {},
   };
 
   private recorder?: Recorder;
