@@ -1,5 +1,6 @@
 import SurveyPlugin from "@jspsych/plugin-survey";
 import { ParameterType, TrialType } from "jspsych";
+import { version } from "../package.json";
 import { consentSurveyFunction } from "./utils";
 
 const info = <const>{
@@ -9,6 +10,12 @@ const info = <const>{
     locale: {
       type: ParameterType.STRING,
       default: "en-us",
+    },
+  },
+  data: {
+    ...SurveyPlugin.info.data,
+    chs_type: {
+      type: ParameterType.STRING,
     },
   },
 };
@@ -40,6 +47,6 @@ export class ConsentSurveyPlugin extends SurveyPlugin {
    * @returns Object containing CHS type.
    */
   public static chsData() {
-    return { chs_type: "consent" };
+    return { chs_type: "consent", chs_version: version };
   }
 }

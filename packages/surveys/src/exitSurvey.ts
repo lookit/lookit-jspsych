@@ -1,6 +1,7 @@
 import SurveyPlugin from "@jspsych/plugin-survey";
 import chsTemplates from "@lookit/templates";
 import { ParameterType, TrialType } from "jspsych";
+import { version } from "../package.json";
 import { exitSurveyFunction } from "./utils";
 
 const info = <const>{
@@ -30,6 +31,12 @@ const info = <const>{
       type: ParameterType.STRING,
       default: "",
       pretty_name: "Additional video privacy text",
+    },
+  },
+  data: {
+    ...SurveyPlugin.info.data,
+    chs_type: {
+      type: ParameterType.STRING,
     },
   },
 };
@@ -64,6 +71,6 @@ export class ExitSurveyPlugin extends SurveyPlugin {
    * @returns Object containing CHS type.
    */
   public static chsData() {
-    return { chs_type: "exit" };
+    return { chs_type: "exit", chs_version: version };
   }
 }
