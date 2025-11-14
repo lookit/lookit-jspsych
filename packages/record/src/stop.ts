@@ -11,7 +11,28 @@ const info = <const>{
   name: "stop-record-plugin",
   version,
   parameters: {
-    locale: { type: ParameterType.STRING, default: "en-us" },
+    /**
+     * This string can contain HTML markup. Any content provided will be
+     * displayed while the recording is uploading. If null (the default), then
+     * the default 'uploading video, please wait' (or appropriate translation
+     * based on 'locale') will be displayed. Use a blank string for no
+     * message/content.
+     */
+    wait_for_upload_message: {
+      type: ParameterType.HTML_STRING,
+      default: null as null | string,
+    },
+    /**
+     * Locale code used for translating the default 'uploading video, please
+     * wait' message. This code must be present in the translation files. If the
+     * code is not found then English will be used. If the
+     * 'wait_for_upload_message' parameter is specified then this value is
+     * ignored.
+     */
+    locale: {
+      type: ParameterType.STRING,
+      default: "en-us",
+    },
   },
   data: {},
 };
@@ -44,7 +65,11 @@ export default class StopRecordPlugin implements JsPsychPlugin<Info> {
    * @param trial - Trial object with parameters/values.
    */
   public trial(display_element: HTMLElement, trial: TrialType<Info>): void {
-    display_element.innerHTML = chsTemplates.uploadingVideo(trial);
+    if (trial.wait_for_upload_message == null) {
+      display_element.innerHTML = chsTemplates.uploadingVideo(trial);
+    } else {
+      display_element.innerHTML = trial.wait_for_upload_message;
+    }
     this.recorder.stop().then(() => {
       window.chs.sessionRecorder = null;
       display_element.innerHTML = "";
