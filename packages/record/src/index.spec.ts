@@ -233,3 +233,42 @@ test("Stop recording with custom uploading message", async () => {
   expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
   expect(window.chs.sessionRecorder).toBeNull();
 });
+
+test("Stop recording rejection path (failure during upload)", async () => {
+  // Create a controlled promise and capture the reject function
+  let rejectStop!: (err: unknown) => void;
+  const stopPromise = new Promise<void>((_, reject) => {
+    rejectStop = reject;
+  });
+
+  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+
+  const jsPsych = initJsPsych();
+  setCHSValue({ sessionRecorder: new Recorder(jsPsych) });
+
+  const stop_rec_plugin = new Rec.StopRecordPlugin(jsPsych);
+  const display_element = document.createElement("div");
+
+  const trial = {
+    type: Rec.StopRecordPlugin.info.name,
+    locale: "en-us",
+    wait_for_upload_message: "Wait…",
+  } as unknown as TrialType<PluginInfo>; // need to cast here because the "type" param is a string and should be a class
+
+  stop_rec_plugin.trial(display_element, trial);
+
+  // Should show initial wait for upload message
+  expect(display_element.innerHTML).toBe("Wait…");
+
+  // Reject stop
+  rejectStop(new Error("upload failed"));
+
+  // Wait for plugin's `.catch()` handler to run
+  await Promise.resolve();
+
+  // Trial doesn't end and the cleanup tasks don't run.
+  // TO DO: modify the plugin code to display translated error msg and/or researcher contact info
+  expect(display_element.innerHTML).toBe("Wait…");
+  expect(jsPsych.finishTrial).not.toHaveBeenCalled();
+  expect(window.chs.sessionRecorder).not.toBeNull();
+});
