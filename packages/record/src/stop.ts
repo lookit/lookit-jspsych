@@ -70,10 +70,16 @@ export default class StopRecordPlugin implements JsPsychPlugin<Info> {
     } else {
       display_element.innerHTML = trial.wait_for_upload_message;
     }
-    this.recorder.stop().then(() => {
-      window.chs.sessionRecorder = null;
-      display_element.innerHTML = "";
-      this.jsPsych.finishTrial();
-    });
+    this.recorder
+      .stop()
+      .then(() => {
+        window.chs.sessionRecorder = null;
+        display_element.innerHTML = "";
+        this.jsPsych.finishTrial();
+      })
+      .catch((err) => {
+        console.error("StopRecordPlugin: recorder stop/upload failed.", err);
+        // TO DO: display translated error msg and/or researcher contact info
+      });
   }
 }
