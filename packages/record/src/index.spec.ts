@@ -1,4 +1,5 @@
 import { LookitWindow } from "@lookit/data/dist/types";
+import chsTemplates from "@lookit/templates";
 import { initJsPsych, PluginInfo, TrialType } from "jspsych";
 import { ExistingRecordingError, NoSessionRecordingError } from "./errors";
 import Rec from "./index";
@@ -36,6 +37,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  jest.restoreAllMocks();
   jest.clearAllMocks();
 });
 
@@ -111,4 +113,123 @@ test("Stop Recording", async () => {
   expect(async () => await new Rec.StopRecordPlugin(jsPsych)).rejects.toThrow(
     NoSessionRecordingError,
   );
+});
+
+test("Stop recording should display default uploading msg in English", async () => {
+  // control the recorder stop promise so that we can inspect the display before it resolves
+  let resolveStop!: () => void;
+  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+
+  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+
+  const jsPsych = initJsPsych();
+
+  setCHSValue({
+    sessionRecorder: new Recorder(jsPsych),
+  });
+
+  const stop_rec_plugin = new Rec.StopRecordPlugin(jsPsych);
+  const display_element = document.createElement("div");
+
+  const trial = {
+    type: Rec.StopRecordPlugin.info.name,
+    locale: "en-us",
+    wait_for_upload_message: null,
+  } as unknown as TrialType<PluginInfo>; // need to cast here because the "type" param is a string and should be a class
+
+  // call trial but don't await so that we can inspect before it resolves
+  stop_rec_plugin.trial(display_element, trial);
+
+  expect(display_element.innerHTML).toBe(chsTemplates.uploadingVideo(trial));
+  expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
+
+  // resolve the stop promise
+  resolveStop();
+  await stopPromise;
+  await Promise.resolve();
+
+  // check the cleanup tasks after the trial method has resolved
+  expect(display_element.innerHTML).toBe("");
+  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+  expect(window.chs.sessionRecorder).toBeNull();
+});
+
+test("Stop Recording with different locale should display default uploading msg in specified language", async () => {
+  // control the recorder stop promise so that we can inspect the display before it resolves
+  let resolveStop!: () => void;
+  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+
+  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+
+  const jsPsych = initJsPsych();
+
+  setCHSValue({
+    sessionRecorder: new Recorder(jsPsych),
+  });
+
+  const stop_rec_plugin = new Rec.StopRecordPlugin(jsPsych);
+  const display_element = document.createElement("div");
+
+  // set locale to fr
+  const trial = {
+    type: Rec.StopRecordPlugin.info.name,
+    locale: "fr",
+    wait_for_upload_message: null,
+  } as unknown as TrialType<PluginInfo>; // need to cast here because the "type" param is a string and should be a class
+
+  // call trial but don't await so that we can inspect before it resolves
+  stop_rec_plugin.trial(display_element, trial);
+
+  const fr_uploading_msg = chsTemplates.uploadingVideo(trial);
+
+  // check that fr translation is used
+  expect(fr_uploading_msg).toBe(
+    "<div>téléchargement video en cours, veuillez attendre...</div>",
+  );
+  expect(display_element.innerHTML).toBe(fr_uploading_msg);
+  expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
+
+  // resolve the stop promise
+  resolveStop();
+  await stopPromise;
+  await Promise.resolve();
+
+  // check the cleanup tasks after the trial method has resolved
+  expect(display_element.innerHTML).toBe("");
+  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+  expect(window.chs.sessionRecorder).toBeNull();
+});
+
+test("Stop recording with custom uploading message", async () => {
+  // control the recorder stop promise so that we can inspect the display before it resolves
+  let resolveStop!: () => void;
+  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+
+  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+
+  const jsPsych = initJsPsych();
+  setCHSValue({ sessionRecorder: new Recorder(jsPsych) });
+
+  const stop_rec_plugin = new Rec.StopRecordPlugin(jsPsych);
+  const display_element = document.createElement("div");
+
+  const trial = {
+    type: Rec.StopRecordPlugin.info.name,
+    locale: "en-us",
+    wait_for_upload_message: "<p>Custom message…</p>",
+  } as unknown as TrialType<PluginInfo>; // need to cast here because the "type" param is a string and should be a class
+
+  stop_rec_plugin.trial(display_element, trial);
+
+  // check display before stop is resolved
+  expect(display_element.innerHTML).toBe("<p>Custom message…</p>");
+
+  resolveStop();
+  await stopPromise;
+  await Promise.resolve();
+
+  // check the cleanup tasks after the trial method has resolved
+  expect(display_element.innerHTML).toBe("");
+  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+  expect(window.chs.sessionRecorder).toBeNull();
 });
