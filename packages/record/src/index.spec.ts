@@ -25,10 +25,10 @@ jest.mock("jspsych", () => ({
  * @param chs - Contents of chs storage.
  */
 const setCHSValue = (chs = {}) => {
-  Object.defineProperty(global, "window", {
-    value: {
-      chs,
-    },
+  Object.defineProperty(window, "chs", {
+    value: chs,
+    configurable: true,
+    writable: true,
   });
 };
 
