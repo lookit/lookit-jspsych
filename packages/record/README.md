@@ -425,10 +425,31 @@ The plugin to stop session recording is called `chsRecord.StopRecordPlugin`.
 const stopRec = { type: chsRecord.StopRecordPlugin };
 ```
 
+When the trial starts, by default, this plugin will display "uploading video,
+please wait...", or the appropriate translation based on the locale parameter.
+This message can be customized using the `wait_for_upload_message` parameter,
+which is the HTML-formatted string to be displayed while the session recording
+is uploading.
+
+```javascript
+const stopRec = {
+  type: chsRecord.StopRecordPlugin,
+  wait_for_upload_message: "<p>Please wait while we upload your video.</p>",
+};
+```
+
 #### Parameters
 
-This plugin does not accept any parameters, other those available in all
-plugins.
+**`wait_for_upload_message` [`null` or HTML string | `null` ]**
+
+This parameter determines what content should be displayed while the session
+recording is uploading. If `null` (the default), then the message 'uploading
+video, please wait...' (or appropriate translation based on `locale`) will be
+displayed. Otherwise this parameter can be set to a custom string and can
+contain HTML markup. If you want to embed images/video/audio in this HTML
+string, be sure to preload the media files with the `preload` plugin and
+[manual preloading](https://www.jspsych.org/latest/overview/media-preloading/#manual-preloading).
+Use a blank string (`""`) for no message/content.
 
 ### Example
 
