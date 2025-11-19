@@ -7,15 +7,22 @@ import Recorder from "./recorder";
 
 declare const window: LookitWindow;
 
+let global_display_el: HTMLDivElement;
+
 jest.mock("./recorder");
 jest.mock("@lookit/data");
 jest.mock("jspsych", () => ({
   ...jest.requireActual("jspsych"),
-  initJsPsych: jest.fn().mockReturnValue({
-    finishTrial: jest.fn().mockImplementation(),
-    getCurrentTrial: jest
-      .fn()
-      .mockReturnValue({ type: { info: { name: "test-type" } } }),
+  initJsPsych: jest.fn().mockImplementation(() => {
+    // create a new display element for each jsPsych instance
+    global_display_el = document.createElement("div");
+    return {
+      finishTrial: jest.fn().mockImplementation(),
+      getCurrentTrial: jest
+        .fn()
+        .mockReturnValue({ type: { info: { name: "test-type" } } }),
+      getDisplayElement: jest.fn(() => global_display_el),
+    };
   }),
 }));
 
@@ -59,15 +66,223 @@ test("Trial recording", () => {
   expect(getCurrentPluginNameSpy).toHaveBeenCalledTimes(1);
 });
 
-test("Trial recording's initialize does nothing", async () => {
+test("Trial recording's initialize with no parameters", async () => {
   const jsPsych = initJsPsych();
   const trialRec = new Rec.TrialRecordExtension(jsPsych);
 
   expect(await trialRec.initialize()).toBeUndefined();
+  expect(trialRec["uploadMsg"]).toBeNull;
+  expect(trialRec["locale"]).toBe("en-us");
   expect(Recorder).toHaveBeenCalledTimes(0);
 });
 
-test("Start Recording", async () => {
+test("Trial recording's initialize with locale parameter", async () => {
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  expect(await trialRec.initialize({ locale: "fr" })).toBeUndefined();
+  expect(trialRec["locale"]).toBe("fr");
+  expect(trialRec["uploadMsg"]).toBeNull;
+  expect(Recorder).toHaveBeenCalledTimes(0);
+});
+
+test("Trial recording's initialize with wait_for_upload_message parameter", async () => {
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  expect(
+    await trialRec.initialize({ wait_for_upload_message: "Please wait..." }),
+  ).toBeUndefined();
+  expect(trialRec["uploadMsg"]).toBe("Please wait...");
+  expect(trialRec["locale"]).toBe("en-us");
+  expect(Recorder).toHaveBeenCalledTimes(0);
+});
+
+test("Trial recording start with locale parameter", async () => {
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  await trialRec.initialize();
+
+  expect(trialRec["uploadMsg"]).toBeNull;
+  expect(trialRec["locale"]).toBe("en-us");
+  expect(Recorder).toHaveBeenCalledTimes(0);
+
+  trialRec.on_start({ locale: "fr" });
+
+  expect(trialRec["uploadMsg"]).toBeNull;
+  expect(trialRec["locale"]).toBe("fr");
+  expect(Recorder).toHaveBeenCalledTimes(1);
+});
+
+test("Trial recording start with wait_for_upload_message parameter", async () => {
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  await trialRec.initialize();
+
+  expect(trialRec["uploadMsg"]).toBeNull;
+  expect(trialRec["locale"]).toBe("en-us");
+  expect(Recorder).toHaveBeenCalledTimes(0);
+
+  trialRec.on_start({ wait_for_upload_message: "Please wait..." });
+
+  expect(trialRec["uploadMsg"]).toBe("Please wait...");
+  expect(trialRec["locale"]).toBe("en-us");
+  expect(Recorder).toHaveBeenCalledTimes(1);
+});
+
+test("Trial recording stop/finish with default uploading msg in English", async () => {
+  // control the recorder stop promise so that we can inspect the display before it resolves
+  let resolveStop!: () => void;
+  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+
+  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  const params = {
+    locale: "en-us",
+    wait_for_upload_message: null,
+  };
+  await trialRec.initialize(params);
+  trialRec.on_start();
+  trialRec.on_load();
+
+  // call on_finish but don't await so that we can inspect before it resolves
+  trialRec.on_finish();
+
+  expect(global_display_el.innerHTML).toBe(
+    chsTemplates.uploadingVideo({
+      type: jsPsych.getCurrentTrial().type,
+      locale: params.locale,
+    } as TrialType<PluginInfo>),
+  );
+  expect(global_display_el.innerHTML).toBe(
+    "<div>uploading video, please wait...</div>",
+  );
+  //expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
+
+  // resolve the stop promise
+  resolveStop();
+  await stopPromise;
+  await Promise.resolve();
+
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop/finish with different locale should display default uploading msg in specified language", async () => {
+  // control the recorder stop promise so that we can inspect the display before it resolves
+  let resolveStop!: () => void;
+  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+
+  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  const params = {
+    locale: "fr",
+    wait_for_upload_message: null,
+  };
+  await trialRec.initialize(params);
+  trialRec.on_start();
+  trialRec.on_load();
+
+  // call on_finish but don't await so that we can inspect before it resolves
+  trialRec.on_finish();
+
+  expect(global_display_el.innerHTML).toBe(
+    chsTemplates.uploadingVideo({
+      type: jsPsych.getCurrentTrial().type,
+      locale: params.locale,
+    } as TrialType<PluginInfo>),
+  );
+  expect(global_display_el.innerHTML).toBe(
+    "<div>téléchargement video en cours, veuillez attendre...</div>",
+  );
+  //expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
+
+  // resolve the stop promise
+  resolveStop();
+  await stopPromise;
+  await Promise.resolve();
+
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop/finish with custom uploading message", async () => {
+  // control the recorder stop promise so that we can inspect the display before it resolves
+  let resolveStop!: () => void;
+  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+
+  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  const params = {
+    wait_for_upload_message: "Wait!",
+  };
+  await trialRec.initialize(params);
+  trialRec.on_start();
+  trialRec.on_load();
+
+  // call on_finish but don't await so that we can inspect before it resolves
+  trialRec.on_finish();
+
+  expect(global_display_el.innerHTML).toBe("Wait!");
+  //expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
+
+  // resolve the stop promise
+  resolveStop();
+  await stopPromise;
+  await Promise.resolve();
+
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording rejection path (failure during upload)", async () => {
+  // Create a controlled promise and capture the reject function
+  let rejectStop!: (err: unknown) => void;
+  const stopPromise = new Promise<void>((_, reject) => {
+    rejectStop = reject;
+  });
+
+  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  await trialRec.initialize();
+  trialRec.on_start();
+  trialRec.on_load();
+
+  // call on_finish but don't await so that we can inspect before it resolves
+  trialRec.on_finish();
+
+  // Should show initial wait for upload message
+  expect(global_display_el.innerHTML).toBe(
+    "<div>uploading video, please wait...</div>",
+  );
+
+  // Reject stop
+  rejectStop(new Error("upload failed"));
+
+  // Wait for plugin's `.catch()` handler to run
+  await Promise.resolve();
+
+  // TO DO: modify the trial extension code to display translated error msg and/or researcher contact info
+  expect(global_display_el.innerHTML).toBe(
+    "<div>uploading video, please wait...</div>",
+  );
+});
+
+test("Start session recording", async () => {
   const mockRecStart = jest.spyOn(Recorder.prototype, "start");
   const jsPsych = initJsPsych();
   const startRec = new Rec.StartRecordPlugin(jsPsych);
@@ -83,7 +298,7 @@ test("Start Recording", async () => {
   }).toThrow(ExistingRecordingError);
 });
 
-test("Stop Recording", async () => {
+test("Stop session recording", async () => {
   const mockRecStop = jest.spyOn(Recorder.prototype, "stop");
   const jsPsych = initJsPsych();
 
@@ -115,7 +330,7 @@ test("Stop Recording", async () => {
   );
 });
 
-test("Stop recording should display default uploading msg in English", async () => {
+test("Stop session recording should display default uploading msg in English", async () => {
   // control the recorder stop promise so that we can inspect the display before it resolves
   let resolveStop!: () => void;
   const stopPromise = new Promise<void>((res) => (resolveStop = res));
@@ -154,7 +369,7 @@ test("Stop recording should display default uploading msg in English", async () 
   expect(window.chs.sessionRecorder).toBeNull();
 });
 
-test("Stop Recording with different locale should display default uploading msg in specified language", async () => {
+test("Stop session recording with different locale should display default uploading msg in specified language", async () => {
   // control the recorder stop promise so that we can inspect the display before it resolves
   let resolveStop!: () => void;
   const stopPromise = new Promise<void>((res) => (resolveStop = res));
@@ -200,7 +415,7 @@ test("Stop Recording with different locale should display default uploading msg 
   expect(window.chs.sessionRecorder).toBeNull();
 });
 
-test("Stop recording with custom uploading message", async () => {
+test("Stop session recording with custom uploading message", async () => {
   // control the recorder stop promise so that we can inspect the display before it resolves
   let resolveStop!: () => void;
   const stopPromise = new Promise<void>((res) => (resolveStop = res));
