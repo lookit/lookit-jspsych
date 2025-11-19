@@ -122,6 +122,25 @@ Then, build all packages.
 npm run build
 ```
 
+### Troubleshooting
+
+- Check your local versions of Node.js and `npm` against the versions listed in
+  `package.json` to ensure that you are using compatible versions.
+
+- The `npm ci` step may commonly fail when trying to install node-canvas. You
+  can fix the problem by running the following, then repeating the build steps
+  above. See the
+  [node-canvas documentation](https://github.com/Automattic/node-canvas?tab=readme-ov-file#compiling)
+  for more details.
+
+```sh
+# masOS
+brew install pkg-config cairo pango libpng jpeg giflib librsvg pixman python-setuptools
+
+# linux
+sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+```
+
 ## Linting/formating
 
 Lint and formatting is done at the monorepo level.
@@ -183,11 +202,6 @@ To run a development server:
 npm run dev -w @lookit/<name of package>
 ```
 
-When the server has started, you should see something very similar to
-`<script src="http://127.0.0.1:10001/index.browser.js"></script>` printed out.
-Add this html to `web/templates/web/jspsych-study-detail.html` in the Django
-lookit api project to test the package in your local development environment.
-
 ### Serve multiple packages
 
 The above command will serve a single package and wait for changes. If you need
@@ -202,13 +216,37 @@ label you want to give it (to identify the print statements associated with each
 package in the terminal).
 
 ```
+lookit-data: npm run dev -w @lookit/data
+lookit-templates: npm run dev -w @lookit/templates
 lookit-initjspsych: npm run dev -w @lookit/lookit-initjspsych
-lookit-api: npm run dev -w @lookit/lookit-api
-lookit-helpers: npm run dev -w @lookit/lookit-helpers
+lookit-record: npm run dev -w @lookit/record
+lookit-style: npm run dev -w @lookit/style
+lookit-surveys: npm run dev -w @lookit/surveys
 ```
 
 This method is optional (Honcho should not be added to the project dependencies,
 and Procfile has been added to our gitignore).
+
+### Run with lookit-api
+
+When the server has started, for each package you should see console output
+similar to
+
+```sh
+lookit-<package> | <script src="http://127.0.0.1:10001/index.browser.js"></script>
+```
+
+In the lookit-api Django project, navigate to
+`web/templates/web/jspsych-study-detail.html` and replace the existing package
+link with this new html, as seen below. This will allow you to test the package
+in your local development environment.
+
+```html
+<!-- <script src="https://unpkg.com/@lookit/<package_name>@0.2.0"
+        integrity="sha384-iMjDaQDmCTXe6XO59EktLBsg7KmDZZvT5jN/QMiP+ctA8YfQDT/hATDKM1EtoxBQ"
+        crossorigin="anonymous"></script> -->
+<script src="http://127.0.0.1:10001/index.browser.js"></script>
+```
 
 ## Documentation
 

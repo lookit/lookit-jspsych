@@ -109,7 +109,13 @@ export default class Recorder {
     this.jsPsych.pluginAPI.initializeCameraRecorder(stream, recorder_options);
   }
 
-  /** Reset the recorder to be used again. */
+  /**
+   * Reset the recorder. This is used internally after stopping/uploading a
+   * recording, in order to create a new active stream that can be used by a new
+   * Recorder instance. This can also be used by the consuming plugin/extension
+   * when a recorder needs to be reset without the stop/upload events (e.g. in
+   * the video config plugin).
+   */
   public reset() {
     if (this.stream.active) {
       throw new StreamActiveOnResetError();
@@ -332,6 +338,8 @@ export default class Recorder {
       } else {
         await this.s3.completeUpload();
       }
+      // Reset the recorder. This is necessary to create another active media stream from the stream clone, because the current stream is fully stopped/inactive and cannot be used again.
+      this.reset();
 
       resolve();
     };

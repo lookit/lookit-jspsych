@@ -59,6 +59,11 @@ const info = <const>{
     consent_statement_text: { type: ParameterType.STRING, default: "" },
     omit_injury_phrase: { type: ParameterType.BOOL, default: false },
   },
+  data: {
+    chs_type: {
+      type: ParameterType.STRING,
+    },
+  },
 };
 type Info = typeof info;
 
@@ -301,7 +306,6 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
       stop.disabled = true;
       this.addMessage(display, this.uploadingMsg!);
       await this.recorder.stop(true);
-      this.recorder.reset();
       this.recordFeed(display);
       this.getImg(display, "record-icon").style.visibility = "hidden";
       this.addMessage(display, this.notRecordingMsg!);

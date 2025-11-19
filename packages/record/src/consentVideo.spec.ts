@@ -310,7 +310,6 @@ test("stopButton", async () => {
     .forEach((button) => expect(button.disabled).toBeFalsy());
   expect(stopButton!.disabled).toBeTruthy();
   expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
-  expect(Recorder.prototype.reset).toHaveBeenCalledTimes(1);
   expect(plugin["recordFeed"]).toHaveBeenCalledTimes(1);
   expect(plugin["recordFeed"]).toHaveBeenCalledWith(display);
 });
