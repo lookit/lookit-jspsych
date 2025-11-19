@@ -22,6 +22,6 @@
     "@lookit/surveys": "^3.0.0",
     "rollup-plugin-scss": "^4.0.0",
     "sass": "^1.78.0",
-    "trash-cli": "^5.0.0"
+    "trash-cli": "^7.0.0"
   }
 }
