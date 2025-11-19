@@ -492,7 +492,7 @@ const stopRec = { type: chsRecord.StopRecordPlugin };
 ```
 
 When the trial starts, by default, this plugin will display "uploading video,
-please wait...", or the appropriate translation based on the locale parameter.
+please wait...", or the appropriate translation based on the `locale` parameter.
 This message can be customized using the `wait_for_upload_message` parameter,
 which is the HTML-formatted string to be displayed while the session recording
 is uploading.
@@ -520,6 +520,8 @@ Use a blank string (`""`) for no message/content. If a value is provided then
 the `locale` parameter will be ignored.
 
 ### Examples
+
+**Basic usage**
 
 First, make sure that you've added a video config trial to your experiment
 timeline. Then, create your start and stop recording trials:
@@ -564,4 +566,32 @@ jsPsych.run([
   night,
   stopRec,
 ]);
+```
+
+**Setting parameters**
+
+By default, the stop session recording plugin will display "uploading video,
+please wait..." while the session recording is uploading. You can set the
+`locale` parameter value to translate this message to another language. For
+example, the trial below will display the Brazilian Portuguese translation of
+this message. If the locale string does not match any of the translation codes
+that we support, then the message will be displayed in English.
+
+```javascript
+const stopRec = {
+  type: chsRecord.StopRecordPlugin,
+  locale: "pt-br",
+};
+```
+
+You can also set custom content to be displayed while the session recording file
+is uploading. The value must be a string. It can include HTML-formatted content,
+which means that you can embed audio, video, images etc. (be sure to preload any
+media files!).
+
+```javascript
+const stopRec = {
+  type: chsRecord.StopRecordPlugin,
+  wait_for_upload_message: "<p style='color:red;'>Hang on a sec!</p>",
+};
 ```
