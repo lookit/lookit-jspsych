@@ -356,9 +356,21 @@ To use the CHS trial recording extension, you need to:
 
 ### Parameters
 
-This extension does not accept any parameters.
+**`wait_for_upload_message` [`null` or HTML string | `null` ]**
 
-### Example
+This parameter determines what content should be displayed while the trial
+recording is uploading. If `null` (the default), then the message 'uploading
+video, please wait...' (or appropriate translation based on `locale`) will be
+displayed. Otherwise this parameter can be set to a custom string and can
+contain HTML markup. If you want to embed images/video/audio in this HTML
+string, be sure to preload the media files with the `preload` plugin and
+[manual preloading](https://www.jspsych.org/latest/overview/media-preloading/#manual-preloading).
+Use a blank string (`""`) for no message/content. If a value is provided then
+the `locale` parameter will be ignored.
+
+### Examples
+
+**Basic usage**
 
 To record a single trial, you will have to first load the extension in
 `initJsPsych`.
@@ -375,7 +387,7 @@ record any trial you design.
 
 ```javascript
 const trialRec = {
-  // ... Other trial paramters ...
+  // ... Other trial parameters ...
   extensions: [{ type: chsRecord.TrialRecordExtension }],
 };
 ```
@@ -384,6 +396,60 @@ Finally, insert the trials into the timeline.
 
 ```javascript
 jsPsych.run([videoConfig, trialRec]);
+```
+
+**Setting parameters**
+
+You can set the trial extension parameters when you load the extension with
+`initJsPsych`.
+
+In the example below, the default "uploading video, please wait..." message will
+be displayed in French while a trial recording is uploading at the end of the
+trial.
+
+```javascript
+const jsPsych = initJsPsych({
+  extensions: [
+    {
+      type: chsRecord.TrialRecordExtension,
+      params: { locale: "fr" },
+    },
+  ],
+});
+```
+
+And in this example, the custom message "Please wait!" will be displayed while
+the trial recording is uploading. You can include any HTML-formatted content in
+this string, which means you can display images, videos, animations etc.
+
+```javascript
+const jsPsych = initJsPsych({
+  extensions: [
+    {
+      type: chsRecord.TrialRecordExtension,
+      params: { wait_for_upload_message: "<div>Please wait!</div>" },
+    },
+  ],
+});
+```
+
+You can also set the parameters within individual trials. This will override any
+parameters set during the extension initialization (in `initJsPsych`), which can
+be useful if you want to change the parameter values during the experiment. In
+this example, the `wait_for_upload_message` is set to an empty string, which
+will prevent the default "uploading video, please wait..." message from
+appearing after the trial finishes.
+
+```javascript
+const trialRec = {
+  // ... Other trial parameters ...
+  extensions: [
+    {
+      type: chsRecord.TrialRecordExtension,
+      params: { wait_for_upload_message: "" },
+    },
+  ],
+};
 ```
 
 ## Session Recording
@@ -434,7 +500,8 @@ is uploading.
 ```javascript
 const stopRec = {
   type: chsRecord.StopRecordPlugin,
-  wait_for_upload_message: "<p>Please wait while we upload your video.</p>",
+  wait_for_upload_message:
+    "<p style='color:red;'>Please wait while we upload your video.</p>",
 };
 ```
 
@@ -449,9 +516,10 @@ displayed. Otherwise this parameter can be set to a custom string and can
 contain HTML markup. If you want to embed images/video/audio in this HTML
 string, be sure to preload the media files with the `preload` plugin and
 [manual preloading](https://www.jspsych.org/latest/overview/media-preloading/#manual-preloading).
-Use a blank string (`""`) for no message/content.
+Use a blank string (`""`) for no message/content. If a value is provided then
+the `locale` parameter will be ignored.
 
-### Example
+### Examples
 
 First, make sure that you've added a video config trial to your experiment
 timeline. Then, create your start and stop recording trials:
