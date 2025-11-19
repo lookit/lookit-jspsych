@@ -1,5 +1,39 @@
 # @lookit/record
 
+## 4.1.0
+
+### Minor Changes
+
+- a51ef72: Updates `chsRecord.TrialRecordExtension` to include options for
+  updating the page content after the trial finishes, while the trial recording
+  is uploading.
+
+  - By default, the trial recording extension will now display the default
+    uploading message ("uploading video, please wait...").
+  - This adds support for the `locale` parameter to translate the default
+    message to another supported language.
+  - This adds a new parameter called `wait_for_upload_message` which can be used
+    to display custom HTML content while the trial recording is uploading. This
+    parameter takes precedence over `locale`. Use a blank string (`""`) for no
+    message/content.
+
+- a51ef72: Adds a new parameter to the `chsRecord.StopRecordPlugin` called
+  `wait_for_upload_message`. Use this parameter to display custom HTML content
+  while the session recording is uploading. Leave unset (`null`, the default)
+  for the default message: "uploading video, please wait..." (or the appropriate
+  translation based on the `locale` parameter).
+
+### Patch Changes
+
+- dc1708c: Fix runtime errors that occurred when the experiment contained
+  multiple trial recordings or session recordings.
+- 96a53f6: Add version and data to plugin/extension info. This adds the plugin
+  version number ("plugin_version") to the trial data, and fixes the console
+  warnings about missing version/data when the experiment loads. Also add
+  "chs_version" to data for CHS Survey plugins. The CHS Survey plugins extend
+  the core survey plugin and therefore already contain that "plugin_version"
+  value in the data.
+
 ## 4.0.0
 
 ### Minor Changes
