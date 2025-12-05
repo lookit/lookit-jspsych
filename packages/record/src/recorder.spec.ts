@@ -99,7 +99,7 @@ test("Recorder start", async () => {
 test("Recorder stop", async () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
-  const stopPromise = Promise.resolve();
+  const stopPromise = Promise.resolve("url");
   const media = jsPsych.pluginAPI.getCameraRecorder();
 
   // manual mocks
@@ -306,7 +306,7 @@ test("Webcam feed is removed when stream access stops", async () => {
 
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
-  const stopPromise = Promise.resolve();
+  const stopPromise = Promise.resolve("url");
 
   rec["stopPromise"] = stopPromise;
   rec.insertWebcamFeed(webcam_div);
@@ -329,7 +329,7 @@ test("Webcam feed container maintains size with recorder.stop(true)", async () =
 
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
-  const stopPromise = Promise.resolve();
+  const stopPromise = Promise.resolve("url");
 
   rec["stopPromise"] = stopPromise;
   rec.insertWebcamFeed(webcam_div);
@@ -342,7 +342,9 @@ test("Webcam feed container maintains size with recorder.stop(true)", async () =
     .spyOn(document.getElementsByTagName("video")[0], "offsetHeight", "get")
     .mockImplementation(() => 300);
 
-  await rec.stop(true);
+  const { stopped } = rec.stop();
+  console.log("stopped: ", stopped);
+  await stopped;
 
   // Container div's dimensions should match the video element dimensions
   expect(
@@ -369,7 +371,7 @@ test("Webcam feed container size is not maintained with recorder.stop(false)", a
 
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
-  const stopPromise = Promise.resolve();
+  const stopPromise = Promise.resolve("url");
 
   rec["stopPromise"] = stopPromise;
   rec.insertWebcamFeed(webcam_div);
@@ -382,7 +384,7 @@ test("Webcam feed container size is not maintained with recorder.stop(false)", a
     .spyOn(document.getElementsByTagName("video")[0], "offsetHeight", "get")
     .mockImplementation(() => 300);
 
-  await rec.stop(false);
+  await rec.stop();
 
   // Container div's dimensions should not be set
   expect(
@@ -409,7 +411,7 @@ test("Webcam feed container size is not maintained with recorder.stop()", async 
 
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
-  const stopPromise = Promise.resolve();
+  const stopPromise = Promise.resolve("url");
 
   rec["stopPromise"] = stopPromise;
   rec.insertWebcamFeed(webcam_div);
@@ -477,12 +479,10 @@ test("Recorder initializeRecorder", () => {
 
 test("Recorder download", () => {
   const rec = new Recorder(initJsPsych());
-  rec["url"] = "some url";
-  rec["filename"] = "some filename";
   const download = rec["download"];
   const click = jest.spyOn(HTMLAnchorElement.prototype, "click");
 
-  download();
+  download("some filename", "some url");
 
   expect(click).toHaveBeenCalledTimes(1);
 });
