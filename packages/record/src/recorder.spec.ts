@@ -331,7 +331,7 @@ test("Webcam feed is removed when stream access stops", async () => {
   document.body.innerHTML = "";
 });
 
-test("Webcam feed container maintains size with recorder.stop(true)", async () => {
+test("Webcam feed container maintains size with maintain_container_size: true passed to recorder.stop", async () => {
   // Add webcam container to document body.
   const webcam_container_id = "webcam-container";
   document.body.innerHTML = `<div id="${webcam_container_id}"></div>`;
@@ -358,7 +358,7 @@ test("Webcam feed container maintains size with recorder.stop(true)", async () =
     .spyOn(document.getElementsByTagName("video")[0], "offsetHeight", "get")
     .mockImplementation(() => 300);
 
-  const { stopped } = rec.stop();
+  const { stopped } = rec.stop({ maintain_container_size: true });
   await stopped;
 
   // Container div's dimensions should match the video element dimensions
