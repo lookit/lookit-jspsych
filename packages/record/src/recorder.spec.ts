@@ -29,7 +29,8 @@ window.chs = {
   response: {
     id: "456",
   },
-} as typeof window.chs;
+  pendingUploads: [],
+} as unknown as typeof window.chs;
 
 let originalDate: DateConstructor;
 
