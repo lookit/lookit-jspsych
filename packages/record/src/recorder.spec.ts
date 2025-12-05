@@ -101,6 +101,7 @@ test("Recorder stop", async () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
   const stopPromise = Promise.resolve("url");
+  const uploadPromise = Promise.resolve();
   const media = jsPsych.pluginAPI.getCameraRecorder();
 
   // manual mocks
@@ -108,8 +109,11 @@ test("Recorder stop", async () => {
   rec["filename"] = "fakename";
   rec["stopPromise"] = stopPromise;
 
-  // check that the "stop promise" is returned on stop
-  expect(rec.stop()).toStrictEqual(stopPromise);
+  // check that the stop and upload promises are returned on stop
+  expect(rec.stop()).toStrictEqual({
+    stopped: stopPromise,
+    uploaded: uploadPromise,
+  });
 
   await rec.stop();
 
