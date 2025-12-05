@@ -103,6 +103,8 @@ test("Recorder stop", async () => {
   const media = jsPsych.pluginAPI.getCameraRecorder();
 
   // manual mocks
+  rec["_s3"] = new Data.LookitS3("some key");
+  rec["filename"] = "fakename";
   rec["stopPromise"] = stopPromise;
 
   // check that the "stop promise" is returned on stop
@@ -200,6 +202,7 @@ test("Recorder handleStop", async () => {
   // Upload the file to s3
   rec["localDownload"] = false;
   rec["_s3"] = new Data.LookitS3("some key");
+  rec["filename"] = "fakename";
 
   // The first 'handleStop' resets the recorder, which resets blobs to [], so we need to fake the blob data again.
   rec["blobs"] = ["some recorded data" as unknown as Blob];
@@ -308,7 +311,11 @@ test("Webcam feed is removed when stream access stops", async () => {
   const rec = new Recorder(jsPsych);
   const stopPromise = Promise.resolve("url");
 
+  // manual mocks
+  rec["_s3"] = new Data.LookitS3("some key");
+  rec["filename"] = "fakename";
   rec["stopPromise"] = stopPromise;
+
   rec.insertWebcamFeed(webcam_div);
   expect(document.body.innerHTML).toContain("<video");
 
@@ -331,7 +338,11 @@ test("Webcam feed container maintains size with recorder.stop(true)", async () =
   const rec = new Recorder(jsPsych);
   const stopPromise = Promise.resolve("url");
 
+  // manual mocks
+  rec["_s3"] = new Data.LookitS3("some key");
+  rec["filename"] = "fakename";
   rec["stopPromise"] = stopPromise;
+
   rec.insertWebcamFeed(webcam_div);
 
   // Mock the return values for the video element's offsetHeight/offsetWidth, which are used to set the container size
@@ -343,7 +354,6 @@ test("Webcam feed container maintains size with recorder.stop(true)", async () =
     .mockImplementation(() => 300);
 
   const { stopped } = rec.stop();
-  console.log("stopped: ", stopped);
   await stopped;
 
   // Container div's dimensions should match the video element dimensions
@@ -373,7 +383,11 @@ test("Webcam feed container size is not maintained with recorder.stop(false)", a
   const rec = new Recorder(jsPsych);
   const stopPromise = Promise.resolve("url");
 
+  // manual mocks
+  rec["_s3"] = new Data.LookitS3("some key");
+  rec["filename"] = "fakename";
   rec["stopPromise"] = stopPromise;
+
   rec.insertWebcamFeed(webcam_div);
 
   // Mock the return values for the video element offsetHeight/offsetWidth, which are used to set the container size
@@ -413,7 +427,11 @@ test("Webcam feed container size is not maintained with recorder.stop()", async 
   const rec = new Recorder(jsPsych);
   const stopPromise = Promise.resolve("url");
 
+  // manual mocks
+  rec["_s3"] = new Data.LookitS3("some key");
+  rec["filename"] = "fakename";
   rec["stopPromise"] = stopPromise;
+
   rec.insertWebcamFeed(webcam_div);
 
   // Mock the return values for the video element offsetHeight/offsetWidth, which are used to set the container size
