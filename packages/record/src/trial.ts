@@ -76,8 +76,6 @@ export default class TrialRecordExtension implements JsPsychExtension {
         ? params.wait_for_upload_message
         : null;
       this.locale = params?.locale ? params.locale : "en-us";
-      console.log(this.uploadMsg);
-      console.log(this.locale);
       resolve();
     });
   }
@@ -97,8 +95,6 @@ export default class TrialRecordExtension implements JsPsychExtension {
     if (startParams?.locale) {
       this.locale = startParams.locale;
     }
-    console.log(this.uploadMsg);
-    console.log(this.locale);
     this.recorder = new Recorder(this.jsPsych);
   }
 
