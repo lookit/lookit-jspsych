@@ -24,5 +24,6 @@ test("Load data for this study into window.chs", async () => {
     child: "Child",
     pastSessions: "PastSessions",
     response: "Response",
+    pendingUploads: [],
   });
 });

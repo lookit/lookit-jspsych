@@ -138,6 +138,7 @@ export interface LookitWindow extends Window {
     pastSessions: Response[];
     response: Response;
     sessionRecorder: unknown;
+    pendingUploads: Promise<void>[];
   };
 }
 
