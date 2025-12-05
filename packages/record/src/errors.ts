@@ -155,6 +155,21 @@ export class S3UndefinedError extends Error {
 }
 
 /**
+ * Error thrown when a filename does not exist but is needed for upload or local
+ * download.
+ */
+export class NoFileNameError extends Error {
+  /**
+   * Provide information when the recorder attempts to upload/download the
+   * recording but there is no file name.
+   */
+  public constructor() {
+    super("No filename found for recording.");
+    this.name = "NoFileNameError";
+  }
+}
+
+/**
  * Error thrown when attempting to reset recorder, but its stream is still
  * active.
  */
