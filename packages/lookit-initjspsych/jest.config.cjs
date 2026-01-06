@@ -4,7 +4,7 @@ module.exports = {
   coveragePathIgnorePatterns: ["fixtures"],
   transformIgnorePatterns: ["node_modules/(?!jspsych)"],
   moduleNameMapper: {
-    "^jspsych/src/(.*)$": "<rootDir>/node_modules/jspsych/src/$1",
+    "^jspsych/src/(.*)$": "<rootDir>../../node_modules/jspsych/src/$1",
   },
   testEnvironmentOptions: {
     ...config.testEnvironmentOptions,
