@@ -432,9 +432,6 @@ export default class Recorder {
     if (!this.stopPromise) {
       throw new NoStopPromiseError();
     }
-    if (!this.s3) {
-      throw new S3UndefinedError();
-    }
     if (!this.filename) {
       throw new NoFileNameError();
     }
