@@ -26,8 +26,14 @@ export interface StopOptions {
 
 /** Result returned by the stop method */
 export interface StopResult {
-  /** Promise that resolves with the URL when the recorder has fully stopped */
+  /**
+   * Promise that resolves with the URL when the recorder has fully stopped.
+   * Returns a string with either the completion URL or "timeout".
+   */
   stopped: Promise<string>;
-  /** Promise that resolves when the upload (or local download) completes */
-  uploaded: Promise<void>;
+  /**
+   * Promise that resolves when the upload (or local download) completes.
+   * Returns void if succeeds or "timeout" if times out.
+   */
+  uploaded: Promise<void | string>;
 }
