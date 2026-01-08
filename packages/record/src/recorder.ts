@@ -19,6 +19,7 @@ import {
   StreamActiveOnResetError,
   StreamDataInitializeError,
   StreamInactiveInitializeError,
+  TimeoutError,
 } from "./errors";
 import { CSSWidthHeight, StopOptions, StopResult } from "./types";
 import { promiseWithTimeout } from "./utils";
@@ -355,7 +356,17 @@ export default class Recorder {
 
     // Create the upload (or local download) promise
     const uploadPromise: Promise<void> = (async () => {
-      const url = await stopped;
+      let url: string;
+      try {
+        url = await stopped;
+        if (url == "timeout") {
+          // Stop failed, throw so that the upload promise reflects this failure
+          throw new TimeoutError("Recorder stop timed out.");
+        }
+      } catch (err) {
+        console.warn("Upload failed because recorder stop timed out");
+        throw err;
+      }
       snapshot.url = url;
       if (snapshot.localDownload) {
         try {
