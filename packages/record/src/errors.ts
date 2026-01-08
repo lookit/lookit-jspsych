@@ -224,3 +224,16 @@ export class ElementNotFoundError extends Error {
     this.name = "ElementNotFoundError";
   }
 }
+
+/** Thrown when the timeout duration is reached. */
+export class TimeoutError extends Error {
+  /**
+   * String passed in with more info about the event that timed out.
+   *
+   * @param msg - Timeout error message string.
+   */
+  public constructor(msg: string) {
+    super(`${msg}`);
+    this.name = "TimeoutError";
+  }
+}
