@@ -541,11 +541,6 @@ export default class Recorder {
   private createTimeoutHandler(eventName: string) {
     return () => {
       console.warn(`Recorder ${eventName} timed out`);
-      try {
-        this.reset();
-      } catch (err) {
-        console.error(`Error while resetting after ${eventName} timeout:`, err);
-      }
     };
   }
 }
