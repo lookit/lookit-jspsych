@@ -329,7 +329,7 @@ export default class Recorder {
     // Snapshot anything needed for upload before the Recorder instance is reset.
     // URL is placeholder because it will not be defined until after the stop promise is resolved.
     const snapshot = {
-      s3: this.s3,
+      s3: !this.localDownload ? this.s3 : null,
       filename: this.filename,
       localDownload: this.localDownload,
       url: "null",
