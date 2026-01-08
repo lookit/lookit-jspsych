@@ -21,7 +21,7 @@ import {
   StreamInactiveInitializeError,
 } from "./errors";
 import { CSSWidthHeight, StopOptions, StopResult } from "./types";
-import { awaitWithTimeout } from "./utils";
+import { promiseWithTimeout } from "./utils";
 
 declare const window: LookitWindow;
 
@@ -306,12 +306,8 @@ export default class Recorder {
    *   container will be re-used during the trial.
    * @param options.stop_timeout_ms - Number of seconds to wait for the stop
    *   process to complete.
-   * @param options.stop_timeout_message - Message to log in the event that the
-   *   stop process times out.
    * @param options.upload_timeout_ms - Number of seconds to wait for the upload
    *   process to complete.
-   * @param options.upload_timeout_message - Message to log in the event that
-   *   the upload process times out.
    * @returns Object with two promises:
    *
    *   - Stopped: Promise<void> - Promise that resolves after the media recorder has
@@ -323,9 +319,7 @@ export default class Recorder {
   public stop({
     maintain_container_size = false,
     stop_timeout_ms = null,
-    stop_timeout_message = "Recorder stop timed out",
     upload_timeout_ms = 10000,
-    upload_timeout_message = "Upload timed out",
   }: StopOptions = {}): StopResult {
     this.preStopCheck();
     this.clearWebcamFeed(maintain_container_size);
@@ -342,17 +336,17 @@ export default class Recorder {
 
     // Wrap the existing stopPromise with timeout if needed, otherwise return as is.
     const stopped: Promise<string> = stop_timeout_ms
-      ? awaitWithTimeout(
+      ? promiseWithTimeout(
           this.stopPromise!,
           stop_timeout_ms,
-          stop_timeout_message,
           this.createTimeoutHandler("stop"),
         )
       : this.stopPromise!;
 
-    // Chain reset off the stop promise. It's safe to reset as long as the recording is fully stopped and S3 info has been snapshotted.
-    stopped.then(() => {
+    // Chain reset off the stop promise, which is either the original stop promise or a promise race with the timeout.
+    stopped.finally(() => {
       try {
+        // It's safe to reset because recording is fully stopped and S3 info has been snapshotted.
         this.reset();
       } catch (err) {
         console.error("Error while resetting recorder after stop: ", err);
@@ -382,11 +376,10 @@ export default class Recorder {
     })();
 
     // Wrap the upload promise in a timeout if needed, otherwise return as is.
-    const uploaded: Promise<void> = upload_timeout_ms
-      ? awaitWithTimeout(
+    const uploaded: Promise<void | string> = upload_timeout_ms
+      ? promiseWithTimeout(
           uploadPromise,
           upload_timeout_ms,
-          upload_timeout_message,
           this.createTimeoutHandler("upload"),
         )
       : uploadPromise;
