@@ -10,6 +10,22 @@ declare const window: LookitWindow;
 
 let global_display_el: HTMLDivElement;
 
+let consoleLogSpy: jest.SpyInstance<
+  void,
+  [message?: unknown, ...optionalParams: unknown[]],
+  unknown
+>;
+let consoleWarnSpy: jest.SpyInstance<
+  void,
+  [message?: unknown, ...optionalParams: unknown[]],
+  unknown
+>;
+let consoleErrorSpy: jest.SpyInstance<
+  void,
+  [message?: unknown, ...optionalParams: unknown[]],
+  unknown
+>;
+
 jest.mock("./recorder");
 jest.mock("@lookit/data");
 jest.mock("jspsych", () => ({
@@ -42,21 +58,27 @@ const setCHSValue = (chs = {}) => {
 
 beforeEach(() => {
   setCHSValue();
+  // Hide the console output during tests. Tests can still assert on these spies to check console calls.
+  consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+  consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+  consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
 afterEach(() => {
   jest.restoreAllMocks();
   jest.clearAllMocks();
+
+  consoleLogSpy.mockRestore();
+  consoleWarnSpy.mockRestore();
+  consoleErrorSpy.mockRestore();
 });
 
 test("Trial recording", async () => {
   const mockRecStart = jest.spyOn(Recorder.prototype, "start");
-  const mockRecStop = jest
-    .spyOn(Recorder.prototype, "stop")
-    .mockReturnValue({
-      stopped: Promise.resolve("url"),
-      uploaded: Promise.resolve(),
-    });
+  const mockRecStop = jest.spyOn(Recorder.prototype, "stop").mockReturnValue({
+    stopped: Promise.resolve("url"),
+    uploaded: Promise.resolve(),
+  });
   const jsPsych = initJsPsych();
   const trialRec = new Rec.TrialRecordExtension(jsPsych);
   const getCurrentPluginNameSpy = jest.spyOn(trialRec, "getCurrentPluginName");
@@ -312,6 +334,11 @@ test("Trial recording stop with failure during upload", async () => {
   // Reject stop
   rejectStop(new Error("upload failed"));
 
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "TrialRecordExtension: recorder stop/upload failed.",
+    Error("upload failed"),
+  );
+
   // Wait for plugin's `.catch()` handler to run
   await Promise.resolve();
 
@@ -526,7 +553,7 @@ test("Stop session recording with custom uploading message", async () => {
   expect(window.chs.sessionRecorder).toBeNull();
 });
 
-test("Stop recording rejection path (failure during upload)", async () => {
+test("Stop recording stop with failure during upload", async () => {
   // Create a controlled promise and capture the reject function
   let rejectStop!: (err: unknown) => void;
   const stopPromise = new Promise<string>((_, reject) => {
@@ -570,4 +597,8 @@ test("Stop recording rejection path (failure during upload)", async () => {
   expect(display_element.innerHTML).toBe("Wait…");
   expect(jsPsych.finishTrial).not.toHaveBeenCalled();
   expect(window.chs.sessionRecorder).not.toBeNull();
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "StopRecordPlugin: recorder stop/upload failed.",
+    Error("upload failed"),
+  );
 });
