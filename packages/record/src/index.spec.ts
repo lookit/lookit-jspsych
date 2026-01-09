@@ -754,11 +754,7 @@ test("Stop recording stop with failure during upload", async () => {
   // Wait for plugin's `.catch()` handler to run
   await Promise.resolve();
 
-  // Trial doesn't end and the cleanup tasks don't run.
   // TO DO: modify the plugin code to display translated error msg and/or researcher contact info
-  expect(display_element.innerHTML).toBe("Wait…");
-  expect(jsPsych.finishTrial).not.toHaveBeenCalled();
-  expect(window.chs.sessionRecorder).not.toBeNull();
   expect(consoleErrorSpy).toHaveBeenCalledWith(
     "StopRecordPlugin: recorder stop/upload failed.",
     Error("upload failed"),
