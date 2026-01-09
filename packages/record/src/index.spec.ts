@@ -300,6 +300,133 @@ test("Trial recording stop/finish with custom uploading message", async () => {
   expect(global_display_el.innerHTML).toBe("");
 });
 
+test("Trial recording stop/finish timeout with default parameters", async () => {
+  // simulate a resolved stop promise and timeout upload promise
+  const stopPromise = new Promise<string>((res) => res("url"));
+  const uploadPromise = new Promise<string>((res) => res("timeout"));
+
+  const recStopSpy = jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  await trialRec.initialize();
+  trialRec.on_start();
+  trialRec.on_load();
+
+  await trialRec.on_finish();
+
+  // recorder.stop should be called with the default max upload duration
+  expect(recStopSpy).toHaveBeenCalledWith({
+    upload_timeout_ms: 10000,
+    upload_timeout_message: "Trial recording upload timed out",
+  });
+
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop/finish with max upload duration initialize parameter", async () => {
+  // simulate a resolved stop promise and timeout upload promise
+  const stopPromise = new Promise<string>((res) => res("url"));
+  const uploadPromise = new Promise<string>((res) => res("timeout"));
+
+  const recStopSpy = jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  const params = {
+    max_upload_seconds: 20,
+  };
+
+  await trialRec.initialize(params);
+  trialRec.on_start();
+  trialRec.on_load();
+
+  await trialRec.on_finish();
+
+  // recorder.stop should be called with 20 seconds as the max upload duration
+  expect(recStopSpy).toHaveBeenCalledWith({
+    upload_timeout_ms: 20000,
+    upload_timeout_message: "Trial recording upload timed out",
+  });
+
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop/finish with max upload duration start parameter", async () => {
+  // simulate a resolved stop promise and timeout upload promise
+  const stopPromise = new Promise<string>((res) => res("url"));
+  const uploadPromise = new Promise<string>((res) => res("timeout"));
+
+  const recStopSpy = jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  const initParams = {
+    max_upload_seconds: null,
+  };
+  const startParams = {
+    max_upload_seconds: 20,
+  };
+
+  await trialRec.initialize(initParams);
+  trialRec.on_start(startParams);
+  trialRec.on_load();
+
+  await trialRec.on_finish();
+
+  // recorder.stop should be called with 20 seconds as the max upload duration
+  expect(recStopSpy).toHaveBeenCalledWith({
+    upload_timeout_ms: 20000,
+    upload_timeout_message: "Trial recording upload timed out",
+  });
+
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop/finish with null max upload duration", async () => {
+  // simulate a resolved stop promise and resolved upload promise
+  const stopPromise = new Promise<string>((res) => res("url"));
+  const uploadPromise = new Promise<void>((res) => res());
+
+  const recStopSpy = jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  const params = {
+    max_upload_seconds: null,
+  };
+
+  await trialRec.initialize();
+  trialRec.on_start(params);
+  trialRec.on_load();
+
+  await trialRec.on_finish();
+
+  // recorder.stop should be called with null as the max upload duration
+  expect(recStopSpy).toHaveBeenCalledWith({
+    upload_timeout_ms: null,
+    upload_timeout_message: "Trial recording upload timed out",
+  });
+
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
 test("Trial recording stop with failure during upload", async () => {
   // Create a controlled promise and capture the reject function
   let rejectStop!: (err: unknown) => void;
@@ -343,9 +470,7 @@ test("Trial recording stop with failure during upload", async () => {
   await Promise.resolve();
 
   // TO DO: modify the trial extension code to display translated error msg and/or researcher contact info
-  expect(global_display_el.innerHTML).toBe(
-    "<div>uploading video, please wait...</div>",
-  );
+  expect(global_display_el.innerHTML).toBe("");
 });
 
 test("Start session recording", async () => {
@@ -551,6 +676,43 @@ test("Stop session recording with custom uploading message", async () => {
   expect(display_element.innerHTML).toBe("");
   expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
   expect(window.chs.sessionRecorder).toBeNull();
+});
+
+test("Stop session recording with no upload timeout", async () => {
+  const mockRecStop = jest.spyOn(Recorder.prototype, "stop");
+  const jsPsych = initJsPsych();
+
+  setCHSValue({
+    sessionRecorder: new Recorder(jsPsych),
+  });
+
+  const stopRec = new Rec.StopRecordPlugin(jsPsych);
+  const display_element = jest
+    .fn()
+    .mockImplementation() as unknown as HTMLElement;
+
+  mockRecStop.mockImplementation(
+    (): StopResult => ({
+      stopped: Promise.resolve("mock-url"),
+      uploaded: Promise.resolve(),
+    }),
+  );
+
+  const trial = {
+    locale: "en-us",
+  } as unknown as TrialType<PluginInfo>;
+
+  await stopRec.trial(display_element, trial);
+
+  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+  expect(window.chs.sessionRecorder).toBeNull();
+  expect(display_element.innerHTML).toStrictEqual("");
+
+  setCHSValue();
+
+  expect(async () => await new Rec.StopRecordPlugin(jsPsych)).rejects.toThrow(
+    NoSessionRecordingError,
+  );
 });
 
 test("Stop recording stop with failure during upload", async () => {
