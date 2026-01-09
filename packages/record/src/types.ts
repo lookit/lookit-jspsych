@@ -19,9 +19,7 @@ export type CSSWidthHeight =
 export interface StopOptions {
   maintain_container_size?: boolean;
   stop_timeout_ms?: number | null;
-  stop_timeout_message?: string;
   upload_timeout_ms?: number | null;
-  upload_timeout_message?: string;
 }
 
 /** Result returned by the stop method */

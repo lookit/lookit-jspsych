@@ -321,7 +321,6 @@ test("Trial recording stop/finish timeout with default parameters", async () => 
   // recorder.stop should be called with the default max upload duration
   expect(recStopSpy).toHaveBeenCalledWith({
     upload_timeout_ms: 10000,
-    upload_timeout_message: "Trial recording upload timed out",
   });
 
   // check the display cleanup
@@ -353,7 +352,6 @@ test("Trial recording stop/finish with max upload duration initialize parameter"
   // recorder.stop should be called with 20 seconds as the max upload duration
   expect(recStopSpy).toHaveBeenCalledWith({
     upload_timeout_ms: 20000,
-    upload_timeout_message: "Trial recording upload timed out",
   });
 
   // check the display cleanup
@@ -388,7 +386,6 @@ test("Trial recording stop/finish with max upload duration start parameter", asy
   // recorder.stop should be called with 20 seconds as the max upload duration
   expect(recStopSpy).toHaveBeenCalledWith({
     upload_timeout_ms: 20000,
-    upload_timeout_message: "Trial recording upload timed out",
   });
 
   // check the display cleanup
@@ -420,7 +417,6 @@ test("Trial recording stop/finish with null max upload duration", async () => {
   // recorder.stop should be called with null as the max upload duration
   expect(recStopSpy).toHaveBeenCalledWith({
     upload_timeout_ms: null,
-    upload_timeout_message: "Trial recording upload timed out",
   });
 
   // check the display cleanup

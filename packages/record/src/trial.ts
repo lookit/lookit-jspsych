@@ -141,7 +141,6 @@ export default class TrialRecordExtension implements JsPsychExtension {
       const { stopped, uploaded } = this.recorder.stop({
         upload_timeout_ms:
           this.maxUploadSeconds !== null ? this.maxUploadSeconds! * 1000 : null,
-        upload_timeout_message: "Trial recording upload timed out",
       });
       try {
         await stopped;
