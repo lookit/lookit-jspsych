@@ -477,11 +477,17 @@ test("Start session recording", async () => {
   const mockRecStart = jest.spyOn(Recorder.prototype, "start");
   const jsPsych = initJsPsych();
   const startRec = new Rec.StartRecordPlugin(jsPsych);
+  const display_element = jest
+    .fn()
+    .mockImplementation() as unknown as HTMLElement;
+  const trial = {
+    locale: "en-us",
+  } as unknown as TrialType<PluginInfo>;
 
   // manual mock
   mockRecStart.mockImplementation(jest.fn().mockReturnValue(Promise.resolve()));
 
-  await startRec.trial();
+  await startRec.trial(display_element, trial);
 
   expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
   expect(() => {
