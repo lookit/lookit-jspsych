@@ -427,7 +427,7 @@ test("Trial recording stop/finish with null max upload duration", async () => {
   expect(global_display_el.innerHTML).toBe("");
 });
 
-test("Trial recording stop with failure during upload", async () => {
+test("Trial recording stop with failure during stop", async () => {
   // Create a controlled promise and capture the reject function
   let rejectStop!: (err: unknown) => void;
   const stopPromise = new Promise<string>((_, reject) => {
@@ -459,15 +459,66 @@ test("Trial recording stop with failure during upload", async () => {
   );
 
   // Reject stop
-  rejectStop(new Error("upload failed"));
+  rejectStop(new Error("stop failed"));
+
+  // Wait for plugin's `.catch()` handler to run
+  await Promise.resolve();
+
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "TrialRecordExtension: recorder stop/upload failed.",
+    Error("stop failed"),
+  );
+
+  // Wait for plugin's `.catch()` handler to run
+  await Promise.resolve();
+
+  // TO DO: modify the trial extension code to display translated error msg and/or researcher contact info
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop with failure during upload", async () => {
+  let resolveStop!: (value: string) => void;
+  const stopPromise = new Promise<string>((res) => {
+    resolveStop = res;
+  });
+  // Create a controlled promise and capture the reject function
+  let rejectUpload!: (err: unknown) => void;
+  const uploadPromise = new Promise<string>((_, reject) => {
+    rejectUpload = reject;
+  });
+
+  jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  await trialRec.initialize();
+  trialRec.on_start();
+  trialRec.on_load();
+
+  // call on_finish but don't await so that we can inspect before it resolves
+  trialRec.on_finish();
+
+  // Should show initial wait for upload message
+  expect(global_display_el.innerHTML).toBe(
+    "<div>uploading video, please wait...</div>",
+  );
+
+  // Resolve stop
+  resolveStop("url");
+  // Reject upload
+  rejectUpload(new Error("upload failed"));
+
+  // Wait for plugin's `.catch()` handler to run and flush microtasks
+  await Promise.resolve();
+  await Promise.resolve();
 
   expect(consoleErrorSpy).toHaveBeenCalledWith(
     "TrialRecordExtension: recorder stop/upload failed.",
     Error("upload failed"),
   );
-
-  // Wait for plugin's `.catch()` handler to run
-  await Promise.resolve();
 
   // TO DO: modify the trial extension code to display translated error msg and/or researcher contact info
   expect(global_display_el.innerHTML).toBe("");
