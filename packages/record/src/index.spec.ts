@@ -546,6 +546,67 @@ test("Start session recording", async () => {
   }).toThrow(ExistingRecordingError);
 });
 
+test("Start session recording with default wait for connection message", async () => {
+  let resolveMockStart!: () => void;
+  const startRecPromise = new Promise<void>((res) => {
+    resolveMockStart = res;
+  });
+  const mockRecStart = jest.spyOn(Recorder.prototype, "start");
+  mockRecStart.mockImplementation(jest.fn().mockReturnValue(startRecPromise));
+
+  const jsPsych = initJsPsych();
+  const startRec = new Rec.StartRecordPlugin(jsPsych);
+  const display_element = jest
+    .fn()
+    .mockImplementation() as unknown as HTMLElement;
+  const trial = {} as unknown as TrialType<PluginInfo>;
+
+  // call trial but don't await so that we can inspect display element
+  startRec.trial(display_element, trial);
+  expect(display_element.innerHTML).toBe(
+    "Initializing recorder, please wait...",
+  );
+
+  // now resolve start promise and await
+  resolveMockStart();
+  await startRecPromise;
+
+  // clean up tasks should run
+  expect(display_element.innerHTML).toBe("");
+  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+});
+
+test("Start session recording with custom wait for connection message", async () => {
+  let resolveMockStart!: () => void;
+  const startRecPromise = new Promise<void>((res) => {
+    resolveMockStart = res;
+  });
+  const mockRecStart = jest.spyOn(Recorder.prototype, "start");
+  mockRecStart.mockImplementation(jest.fn().mockReturnValue(startRecPromise));
+
+  const jsPsych = initJsPsych();
+  const startRec = new Rec.StartRecordPlugin(jsPsych);
+  const display_element = jest
+    .fn()
+    .mockImplementation() as unknown as HTMLElement;
+  const trial = {
+    wait_for_connection_message: "Hello!",
+    locale: "de", // should be ignored
+  } as unknown as TrialType<PluginInfo>;
+
+  // call trial but don't await so that we can inspect display element
+  startRec.trial(display_element, trial);
+  expect(display_element.innerHTML).toBe("Hello!");
+
+  // now resolve start promise and await
+  resolveMockStart();
+  await startRecPromise;
+
+  // clean up tasks should run
+  expect(display_element.innerHTML).toBe("");
+  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+});
+
 test("Stop session recording", async () => {
   const mockRecStop = jest.spyOn(Recorder.prototype, "stop");
   const jsPsych = initJsPsych();
