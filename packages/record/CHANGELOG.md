@@ -1,5 +1,72 @@
 # @lookit/record
 
+## 4.1.0
+
+### Minor Changes
+
+- a51ef72: Updates `chsRecord.TrialRecordExtension` to include options for
+  updating the page content after the trial finishes, while the trial recording
+  is uploading.
+
+  - By default, the trial recording extension will now display the default
+    uploading message ("uploading video, please wait...").
+  - This adds support for the `locale` parameter to translate the default
+    message to another supported language.
+  - This adds a new parameter called `wait_for_upload_message` which can be used
+    to display custom HTML content while the trial recording is uploading. This
+    parameter takes precedence over `locale`. Use a blank string (`""`) for no
+    message/content.
+
+- a51ef72: Adds a new parameter to the `chsRecord.StopRecordPlugin` called
+  `wait_for_upload_message`. Use this parameter to display custom HTML content
+  while the session recording is uploading. Leave unset (`null`, the default)
+  for the default message: "uploading video, please wait..." (or the appropriate
+  translation based on the `locale` parameter).
+
+### Patch Changes
+
+- dc1708c: Fix runtime errors that occurred when the experiment contained
+  multiple trial recordings or session recordings.
+- 96a53f6: Add version and data to plugin/extension info. This adds the plugin
+  version number ("plugin_version") to the trial data, and fixes the console
+  warnings about missing version/data when the experiment loads. Also add
+  "chs_version" to data for CHS Survey plugins. The CHS Survey plugins extend
+  the core survey plugin and therefore already contain that "plugin_version"
+  value in the data.
+
+## 4.0.0
+
+### Minor Changes
+
+- 372f713: - Templates:
+  - add message container to video consent template
+  - add public `translateString` method for translating string directly
+  - Record:
+    - add translated status messages to the video consent plugin: not recording,
+      starting, recording, stopping/uploading
+    - wait to enable/disable certain buttons until recorder has fully
+      started/stopped
+    - refactor error messages to use a single ElementNotFound with ID/tag
+      arguments
+  - Style: add CSS for the video-consent plugin's message container
+
+### Patch Changes
+
+- e9255bd: Fixes a problem with the consent video plugin in which the user can
+  try to replay a video recording before the it has fully stopped.
+- 21f05bc: Fix the webcam feed layout jump in video-consent trials when
+  recording stops.
+- Updated dependencies [372f713]
+  - @lookit/templates@2.1.0
+
+## 3.0.1
+
+### Patch Changes
+
+- 5ec0b66: Fix recording playback issues, which were caused by not specifying
+  codecs in the recorder mime type.
+- 1f7afa1: Update the documentation.
+
 ## 3.0.0
 
 ### Minor Changes

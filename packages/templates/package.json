@@ -1,6 +1,6 @@
 {
   "name": "@lookit/templates",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "CHS jsPsych trial templates and their translations",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
