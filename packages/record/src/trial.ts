@@ -37,10 +37,8 @@ interface Parameters {
    */
   locale?: string;
   /**
-   * This string can contain HTML markup. Any content provided will be displayed
-   * while the recording is uploading. If null (the default), then the default
-   * 'uploading video, please wait' (or appropriate translation based on
-   * 'locale') will be displayed. Use a blank string for no message/content.
+   * Maximum duration (in seconds) to wait for the trial recording to finish
+   * uploading before continuing with the experiment.
    */
   max_upload_seconds?: null | number;
 }
