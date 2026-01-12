@@ -33,6 +33,14 @@ const info = <const>{
       type: ParameterType.STRING,
       default: "en-us",
     },
+    /**
+     * Maximum duration (in seconds) to wait for the session recording to finish
+     * uploading before continuing with the experiment.
+     */
+    max_upload_seconds: {
+      type: ParameterType.INT,
+      default: 10,
+    },
   },
   data: {},
 };
@@ -64,22 +72,28 @@ export default class StopRecordPlugin implements JsPsychPlugin<Info> {
    *   plugin's trial method via jsPsych core).
    * @param trial - Trial object with parameters/values.
    */
-  public trial(display_element: HTMLElement, trial: TrialType<Info>): void {
+  public async trial(
+    display_element: HTMLElement,
+    trial: TrialType<Info>,
+  ): Promise<void> {
     if (trial.wait_for_upload_message == null) {
       display_element.innerHTML = chsTemplates.uploadingVideo(trial);
     } else {
       display_element.innerHTML = trial.wait_for_upload_message;
     }
-    this.recorder
-      .stop()
-      .then(() => {
-        window.chs.sessionRecorder = null;
-        display_element.innerHTML = "";
-        this.jsPsych.finishTrial();
-      })
-      .catch((err) => {
-        console.error("StopRecordPlugin: recorder stop/upload failed.", err);
-        // TO DO: display translated error msg and/or researcher contact info
-      });
+    const { stopped, uploaded } = this.recorder.stop({
+      upload_timeout_ms: trial.max_upload_seconds! * 1000,
+    });
+    try {
+      await stopped;
+      await uploaded;
+    } catch (err) {
+      console.error("StopRecordPlugin: recorder stop/upload failed.", err);
+      // TO DO: display translated error msg and/or researcher contact info
+    } finally {
+      window.chs.sessionRecorder = null;
+      display_element.innerHTML = "";
+      this.jsPsych.finishTrial();
+    }
   }
 }
