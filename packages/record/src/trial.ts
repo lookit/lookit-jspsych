@@ -38,7 +38,8 @@ interface Parameters {
   locale?: string;
   /**
    * Maximum duration (in seconds) to wait for the trial recording to finish
-   * uploading before continuing with the experiment.
+   * uploading before continuing with the experiment. Default is 10 seconds (set
+   * during initialize).
    */
   max_upload_seconds?: null | number;
 }
