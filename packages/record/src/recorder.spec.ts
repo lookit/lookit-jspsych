@@ -11,6 +11,7 @@ import play_icon from "../img/play-icon.svg";
 import record_icon from "../img/record-icon.svg";
 import {
   CreateURLError,
+  NoFileNameError,
   NoStopPromiseError,
   NoWebCamElementError,
   RecorderInitializeError,
@@ -18,6 +19,7 @@ import {
   StreamActiveOnResetError,
   StreamDataInitializeError,
   StreamInactiveInitializeError,
+  TimeoutError,
 } from "./errors";
 import Recorder from "./recorder";
 import { CSSWidthHeight } from "./types";
@@ -256,17 +258,275 @@ test("Recorder stop", async () => {
   expect(window.chs.pendingUploads[0]).toBeInstanceOf(Promise);
 });
 
-test("Recorder no stop promise", () => {
+test("Recorder stop with no stop promise", () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
 
   // no stop promise
   rec["stopPromise"] = undefined;
 
-  expect(async () => await rec.stop()).rejects.toThrow(NoStopPromiseError);
+  // throws immediately - no need to await the returned promises
+  expect(rec.stop).toThrow(NoStopPromiseError);
 });
 
-test("Recorder initialize error", () => {
+test("Recorder stop and upload promises resolve", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  // stop promise will resolve
+  rec["stopPromise"] = Promise.resolve("url");
+
+  // completeUpload will resolve
+  rec["_s3"] = { completeUpload: jest.fn(() => Promise.resolve()) } as any;
+
+  // manual mocks to simulate having started recording
+  rec["filename"] = "fakename";
+
+  const { stopped, uploaded } = rec.stop({
+    stop_timeout_ms: 100,
+  });
+
+  await jest.advanceTimersByTimeAsync(101);
+
+  await expect(stopped).resolves.toBe("url");
+  await expect(uploaded).resolves.toBeUndefined();
+  // make sure timeouts are cleared
+  expect(jest.getTimerCount()).toEqual(0);
+});
+
+test("Recorder stop promise times out", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  // create a stop promise that never resolves
+  rec["stopPromise"] = new Promise<string>(() => {});
+
+  // manual mocks to simulate having started recording
+  rec["_s3"] = {
+    completeUpload: jest.fn().mockResolvedValue(undefined),
+  } as any;
+  rec["filename"] = "fakename";
+
+  const { stopped, uploaded } = rec.stop({
+    stop_timeout_ms: 100,
+  });
+
+  const stoppedObserved = stopped.catch((e) => e);
+  const uploadedObserved = uploaded.catch((e) => e);
+
+  await jest.advanceTimersByTimeAsync(101);
+
+  await expect(stoppedObserved).resolves.toBe("timeout");
+  await expect(uploadedObserved).resolves.toThrow(TimeoutError);
+  expect(consoleWarnSpy).toHaveBeenCalledWith("Recorder stop timed out");
+  expect(consoleWarnSpy).toHaveBeenCalledWith(
+    "Upload failed because recorder stop timed out",
+  );
+});
+
+test("Recorder upload timeout with default duration", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  // stop promise will resolve
+  rec["stopPromise"] = Promise.resolve("url");
+  rec["filename"] = "fakename";
+
+  // completeUpload never resolves - upload promise will timeout
+  const never = new Promise<void>(() => {});
+  rec["_s3"] = { completeUpload: jest.fn(() => never) } as any;
+
+  // default upload_timeout_ms is 10000
+  const { stopped, uploaded } = rec.stop();
+
+  // stop promise should resolve with the url
+  const url = await stopped;
+  expect(url).toBe("url");
+
+  // advance time by 10000 ms to trigger timeout
+  await jest.advanceTimersByTimeAsync(10000);
+
+  await expect(uploaded).resolves.toBe("timeout");
+  expect(consoleWarnSpy).toHaveBeenCalledWith("Recorder upload timed out");
+});
+
+test("Recorder upload promise times out with duration parameter", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  // stop promise will resolve
+  rec["stopPromise"] = Promise.resolve("url");
+  rec["filename"] = "fakename";
+
+  // completeUpload never resolves - upload promise will timeout
+  const never = new Promise<void>(() => {});
+  rec["_s3"] = { completeUpload: jest.fn(() => never) } as any;
+
+  const { stopped, uploaded } = rec.stop({
+    upload_timeout_ms: 100,
+  });
+
+  // stop promise should resolve with the url
+  await expect(stopped).resolves.toBe("url");
+
+  // advance fake timers so that the timeout triggers
+  await jest.advanceTimersByTimeAsync(100);
+  await expect(uploaded).resolves.toBe("timeout");
+  expect(consoleWarnSpy).toHaveBeenCalledWith("Recorder upload timed out");
+});
+
+test("Recorder stop with local download", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const stopPromise = Promise.resolve("url");
+  const uploadPromise = Promise.resolve();
+
+  // Download the file locally
+  rec["localDownload"] = true;
+
+  // manual mocks to simulate having started recording
+  // s3 is not defined when localDownload is true
+  rec["filename"] = "fakename";
+  rec["stopPromise"] = stopPromise;
+  const download = jest.fn();
+  rec["download"] = download;
+
+  expect(window.chs.pendingUploads).toStrictEqual([]);
+
+  const { stopped, uploaded } = rec.stop();
+
+  await uploaded;
+
+  // upload promise should call download
+  expect(download).toHaveBeenCalledTimes(1);
+  expect(download).toHaveBeenCalledWith(rec["filename"], "url");
+
+  // check that the stop and upload promises are returned from recorder.stop
+  expect({ stopped, uploaded }).toStrictEqual({
+    stopped: stopPromise,
+    uploaded: uploadPromise,
+  });
+
+  // adds promise to window.chs.pendingUploads
+  expect(window.chs.pendingUploads.length).toBe(1);
+  expect(window.chs.pendingUploads[0]).toBeInstanceOf(Promise);
+});
+
+test("Recorder stop with no filename", () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const stopPromise = Promise.resolve("url");
+
+  // manual mocks to simulate having started recording
+  rec["stopPromise"] = stopPromise;
+  rec["_s3"] = new Data.LookitS3("some key");
+
+  // no filename
+  rec["filename"] = undefined;
+
+  expect(rec.stop).toThrow(NoFileNameError);
+});
+
+test("Recorder stop throws with inactive stream", () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const stopPromise = Promise.resolve("url");
+
+  // manual mocks to simulate having started recording
+  rec["stopPromise"] = stopPromise;
+  rec["_s3"] = new Data.LookitS3("some key");
+  rec["filename"] = "filename";
+
+  // de-activate stream
+  (
+    jsPsych.pluginAPI.getCameraRecorder().stream as unknown as MockStream
+  ).__forceStop();
+
+  expect(rec.stop).toThrow(StreamInactiveInitializeError);
+});
+
+test("Recorder stop catches error in local download", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const stopPromise = Promise.resolve("url");
+
+  // Download the file locally
+  rec["localDownload"] = true;
+
+  // manual mocks to simulate having started recording
+  // s3 is not defined when localDownload is true
+  rec["filename"] = "fakename";
+  rec["stopPromise"] = stopPromise;
+  const download = jest.fn().mockImplementation(() => {
+    throw new Error("Something went wrong.");
+  });
+  rec["download"] = download;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { stopped, uploaded } = rec.stop();
+
+  await expect(uploaded).rejects.toThrow("Something went wrong.");
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "Local download failed: ",
+    Error("Something went wrong."),
+  );
+});
+
+test("Recorder stop catches error in upload", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const stopPromise = Promise.resolve("url");
+
+  // set the s3 completeUpload function to resolve
+  rec["_s3"] = { completeUpload: jest.fn() } as any;
+  jest.spyOn(rec["_s3"] as any, "completeUpload").mockImplementation(() => {
+    throw new Error("Something broke.");
+  });
+
+  // manual mocks to simulate having started recording
+  rec["filename"] = "fakename";
+  rec["stopPromise"] = stopPromise;
+
+  expect(window.chs.pendingUploads).toStrictEqual([]);
+
+  const { stopped, uploaded } = rec.stop();
+
+  await stopped;
+
+  await expect(uploaded).rejects.toThrow("Something broke.");
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "Upload failed: ",
+    Error("Something broke."),
+  );
+});
+
+test("Recorder stop tries to reset after stopping and handles error", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const stopPromise = Promise.resolve("url");
+
+  // manual mocks to simulate having started recording
+  rec["filename"] = "fakename";
+  rec["stopPromise"] = stopPromise;
+  rec["_s3"] = new Data.LookitS3("some key");
+
+  const reset = jest.fn().mockImplementation(() => {
+    throw new Error("Reset failed.");
+  });
+  rec["reset"] = reset;
+
+  const { stopped } = rec.stop();
+
+  await stopped;
+
+  expect(reset).toHaveBeenCalledTimes(1);
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "Error while resetting recorder after stop: ",
+    Error("Reset failed."),
+  );
+});
+
+test("Recorder initialize error throws from recorder start", () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
   const getCameraRecorder = jsPsych.pluginAPI.getCameraRecorder;
@@ -289,7 +549,7 @@ test("Recorder initialize error throws from recorder stop", () => {
   const rec = new Recorder(jsPsych);
   const getCameraRecorder = jsPsych.pluginAPI.getCameraRecorder;
 
-  // satisfy other requirements for recorder.stop
+  // fy other requirements for recorder.stop
   rec["stopPromise"] = new Promise<string>(() => {});
   rec["_s3"] = new Data.LookitS3("some key");
   rec["filename"] = "fakename";
@@ -309,7 +569,7 @@ test("S3 undefined error throws from recorder stop", () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
 
-  // satisty other requirements for recorder.stop
+  // satisfy other requirements for recorder.stop
   rec["stopPromise"] = new Promise<string>(() => {});
   rec["filename"] = "fakename";
 
@@ -921,4 +1181,19 @@ test("New recorder uses a default mime type if none is set already", () => {
   expect(rec["mimeType"]).toBe("video/webm");
 
   jsPsych.pluginAPI.initializeCameraRecorder = originalInitializeCameraRecorder;
+});
+
+test("Recorder generates a timeout handler function with the event that is being awaited", () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  const timeout_fn = rec["createTimeoutHandler"]("long process");
+
+  expect(timeout_fn).toBeInstanceOf(Function);
+
+  timeout_fn();
+
+  expect(consoleWarnSpy).toHaveBeenCalledWith(
+    "Recorder long process timed out",
+  );
 });
