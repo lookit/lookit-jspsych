@@ -64,8 +64,6 @@ export default class StartRecordPlugin implements JsPsychPlugin<Info> {
    *   plugin's trial method via jsPsych core).
    * @param trial - Trial object with parameters/values.
    */
-  // TO DO: remove the eslint disable line once trial parameters are being used
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async trial(
     display_element: HTMLElement,
     trial: TrialType<Info>,
