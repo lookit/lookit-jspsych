@@ -17,26 +17,23 @@ export const promiseWithTimeout = <T>(
 
   const timeout = new Promise<T | string>((resolve) => {
     timeoutHandle = setTimeout(() => {
-      Promise.resolve().then(() => {
-        onTimeoutCleanup?.();
-        resolve("timeout");
-      });
+      onTimeoutCleanup?.();
+      resolve("timeout");
     }, timeoutMs);
   });
 
   // Return *immediately* a race promise.
   // No async/await — so this function synchronously produces the final promise.
-  return Promise.race([
-    promise.then(
-      (value) => {
+  return Promise.race([promise, timeout]).then(
+    (value) => {
+      if (value !== "timeout") {
         clearTimeout(timeoutHandle);
-        return value;
-      },
-      (err) => {
-        clearTimeout(timeoutHandle);
-        throw err;
-      },
-    ),
-    timeout,
-  ]);
+      }
+      return value;
+    },
+    (err) => {
+      clearTimeout(timeoutHandle);
+      throw err;
+    },
+  );
 };
