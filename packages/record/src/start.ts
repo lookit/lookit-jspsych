@@ -1,4 +1,5 @@
 import { LookitWindow } from "@lookit/data/dist/types";
+import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import { version } from "../package.json";
 import { ExistingRecordingError } from "./errors";
@@ -68,9 +69,11 @@ export default class StartRecordPlugin implements JsPsychPlugin<Info> {
     display_element: HTMLElement,
     trial: TrialType<Info>,
   ): Promise<void> {
-    display_element.innerHTML = trial.wait_for_connection_message
-      ? trial.wait_for_connection_message
-      : "Initializing recorder, please wait...";
+    if (trial.wait_for_connection_message == null) {
+      display_element.innerHTML = chsTemplates.establishingConnection(trial);
+    } else {
+      display_element.innerHTML = trial.wait_for_connection_message;
+    }
     await this.recorder
       .start(false, `${StartRecordPlugin.info.name}-multiframe`)
       .then(() => {

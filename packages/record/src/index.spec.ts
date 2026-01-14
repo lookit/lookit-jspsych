@@ -555,12 +555,42 @@ test("Start session recording with default wait for connection message", async (
   const display_element = jest
     .fn()
     .mockImplementation() as unknown as HTMLElement;
-  const trial = {} as unknown as TrialType<PluginInfo>;
+  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
 
   // call trial but don't await so that we can inspect display element
   startRec.trial(display_element, trial);
   expect(display_element.innerHTML).toBe(
-    "Initializing recorder, please wait...",
+    "<div>establishing video connection, please wait...</div>",
+  );
+
+  // now resolve start promise and await
+  resolveMockStart();
+  await startRecPromise;
+
+  // clean up tasks should run
+  expect(display_element.innerHTML).toBe("");
+  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+});
+
+test("Start session recording with translated connection message", async () => {
+  let resolveMockStart!: () => void;
+  const startRecPromise = new Promise<void>((res) => {
+    resolveMockStart = res;
+  });
+  const mockRecStart = jest.spyOn(Recorder.prototype, "start");
+  mockRecStart.mockImplementation(jest.fn().mockReturnValue(startRecPromise));
+
+  const jsPsych = initJsPsych();
+  const startRec = new Rec.StartRecordPlugin(jsPsych);
+  const display_element = jest
+    .fn()
+    .mockImplementation() as unknown as HTMLElement;
+  const trial = { locale: "fr" } as unknown as TrialType<PluginInfo>;
+
+  // call trial but don't await so that we can inspect display element
+  startRec.trial(display_element, trial);
+  expect(display_element.innerHTML).toBe(
+    "<div>en attente de connection video, veuillez attendre...</div>",
   );
 
   // now resolve start promise and await
