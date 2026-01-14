@@ -1,8 +1,39 @@
 import { promiseWithTimeout } from "./utils";
 
-test("Promise with timeout: promise wins", async () => {
-  jest.useRealTimers();
+let consoleLogSpy: jest.SpyInstance<
+  void,
+  [message?: unknown, ...optionalParams: unknown[]],
+  unknown
+>;
+let consoleWarnSpy: jest.SpyInstance<
+  void,
+  [message?: unknown, ...optionalParams: unknown[]],
+  unknown
+>;
+let consoleErrorSpy: jest.SpyInstance<
+  void,
+  [message?: unknown, ...optionalParams: unknown[]],
+  unknown
+>;
 
+beforeEach(() => {
+  jest.useRealTimers();
+  // Hide the console output during tests. Tests can still assert on these spies to check console calls.
+  consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+  consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+  consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
+  jest.clearAllMocks();
+
+  consoleLogSpy.mockRestore();
+  consoleWarnSpy.mockRestore();
+  consoleErrorSpy.mockRestore();
+});
+
+test("Promise with timeout: promise wins", async () => {
   // clears the timeout handle
   const promise = Promise.resolve("url");
   const timeout_handler = jest.fn();
@@ -21,11 +52,10 @@ test("Promise with timeout: promise wins", async () => {
 
   expect(promise).resolves;
   expect(timeout_handler).not.toHaveBeenCalled();
+  expect(consoleLogSpy).toHaveBeenCalledWith("Upload for promiseId completed.");
 });
 
 test("Promise with timeout: promise wins and no timeout callback", async () => {
-  jest.useRealTimers();
-
   // clears the timeout handle
   const promise = Promise.resolve("url");
 
@@ -37,6 +67,7 @@ test("Promise with timeout: promise wins and no timeout callback", async () => {
   await promiseRace;
 
   expect(promise).resolves;
+  expect(consoleLogSpy).toHaveBeenCalledWith("Upload for promiseId completed.");
 });
 
 test("Promise with timeout: timeout wins", async () => {
