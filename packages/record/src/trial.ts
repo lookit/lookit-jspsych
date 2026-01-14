@@ -144,17 +144,20 @@ export default class TrialRecordExtension implements JsPsychExtension {
       try {
         await stopped;
         await uploaded;
+        displayEl.innerHTML = "";
+        return {};
       } catch (err) {
         console.error(
           "TrialRecordExtension: recorder stop/upload failed.",
           err,
         );
-        // TO DO: display translated error msg and/or researcher contact info
-      } finally {
         displayEl.innerHTML = "";
+        return {};
+        // TO DO: display translated error msg and/or researcher contact info
       }
+    } else {
+      return {};
     }
-    return {};
   }
 
   /**
