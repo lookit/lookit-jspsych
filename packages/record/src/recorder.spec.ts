@@ -318,7 +318,9 @@ test("Recorder stop promise times out", async () => {
 
   await expect(stoppedObserved).resolves.toBe("timeout");
   await expect(uploadedObserved).resolves.toThrow(TimeoutError);
-  expect(consoleWarnSpy).toHaveBeenCalledWith("Recorder stop timed out");
+  expect(consoleWarnSpy).toHaveBeenCalledWith(
+    "Recorder stop timed out: fakename",
+  );
   expect(consoleWarnSpy).toHaveBeenCalledWith(
     "Upload failed because recorder stop timed out",
   );
@@ -347,7 +349,9 @@ test("Recorder upload timeout with default duration", async () => {
   await jest.advanceTimersByTimeAsync(10000);
 
   await expect(uploaded).resolves.toBe("timeout");
-  expect(consoleWarnSpy).toHaveBeenCalledWith("Recorder upload timed out");
+  expect(consoleWarnSpy).toHaveBeenCalledWith(
+    "Recorder upload timed out: fakename",
+  );
 });
 
 test("Recorder upload promise times out with duration parameter", async () => {
@@ -372,7 +376,9 @@ test("Recorder upload promise times out with duration parameter", async () => {
   // advance fake timers so that the timeout triggers
   await jest.advanceTimersByTimeAsync(100);
   await expect(uploaded).resolves.toBe("timeout");
-  expect(consoleWarnSpy).toHaveBeenCalledWith("Recorder upload timed out");
+  expect(consoleWarnSpy).toHaveBeenCalledWith(
+    "Recorder upload timed out: fakename",
+  );
 });
 
 test("Recorder stop with local download", async () => {
@@ -1187,13 +1193,13 @@ test("Recorder generates a timeout handler function with the event that is being
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
 
-  const timeout_fn = rec["createTimeoutHandler"]("long process");
+  const timeout_fn = rec["createTimeoutHandler"]("long process", "fakename");
 
   expect(timeout_fn).toBeInstanceOf(Function);
 
   timeout_fn();
 
   expect(consoleWarnSpy).toHaveBeenCalledWith(
-    "Recorder long process timed out",
+    "Recorder long process timed out: fakename",
   );
 });
