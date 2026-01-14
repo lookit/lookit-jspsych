@@ -406,6 +406,41 @@ test("Recorder upload promise times out with duration parameter", async () => {
   expect(settled).toBe(false);
 });
 
+test("Recorder upload promise with no timeout", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  // stop promise will resolve
+  rec["stopPromise"] = Promise.resolve("url");
+  rec["filename"] = "fakename";
+
+  // completeUpload never resolves
+  const never = new Promise<void>(() => {});
+  rec["_s3"] = { completeUpload: jest.fn(() => never) } as any;
+
+  const { stopped, uploaded } = rec.stop({
+    upload_timeout_ms: null,
+  });
+
+  // stop promise should resolve with the url
+  await expect(stopped).resolves.toBe("url");
+
+  // advance fake timers to make sure that the default timeout does not trigger resolution
+  await jest.advanceTimersByTimeAsync(10000);
+  expect(uploaded).toStrictEqual(never);
+
+  // Assert background upload is original upload promise
+  expect(window.chs.pendingUploads).toHaveLength(1);
+  expect(window.chs.pendingUploads[0]).toStrictEqual(uploaded);
+  // Promise should still be pending
+  let settled = false;
+  window.chs.pendingUploads[0].finally(() => {
+    settled = true;
+  });
+  await Promise.resolve(); // flush microtasks
+  expect(settled).toBe(false);
+});
+
 test("Recorder stop with local download", async () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
