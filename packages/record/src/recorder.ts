@@ -552,6 +552,14 @@ export default class Recorder {
   private createTimeoutHandler(eventName: string, id: string) {
     return () => {
       console.warn(`Recorder ${eventName} timed out: ${id}`);
+      // check if reset is needed
+      if (!this.stream.active) {
+        try {
+          this.reset();
+        } catch (err) {
+          console.error("Error while resetting recorder after timeout: ", err);
+        }
+      }
     };
   }
 }
