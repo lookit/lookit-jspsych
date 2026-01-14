@@ -156,6 +156,7 @@ export default class TrialRecordExtension implements JsPsychExtension {
         // TO DO: display translated error msg and/or researcher contact info
       }
     } else {
+      displayEl.innerHTML = "";
       return {};
     }
   }
