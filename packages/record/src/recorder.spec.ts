@@ -1240,3 +1240,32 @@ test("Recorder generates a timeout handler function with the event that is being
     "Recorder long process timed out: fakename",
   );
 });
+
+test("Recorder createTimeoutHandler catches error when trying to reset recorder after timeout", () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  // mock error thrown from Recorder.reset
+  jest.spyOn(rec, "reset").mockImplementation(() => {
+    throw new Error("Could not reset.");
+  });
+
+  // de-activate stream
+  (
+    jsPsych.pluginAPI.getCameraRecorder().stream as unknown as MockStream
+  ).__forceStop();
+
+  const timeout_fn = rec["createTimeoutHandler"]("upload", "fakename");
+
+  expect(timeout_fn).toBeInstanceOf(Function);
+
+  timeout_fn();
+
+  expect(consoleWarnSpy).toHaveBeenCalledWith(
+    "Recorder upload timed out: fakename",
+  );
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "Error while resetting recorder after timeout: ",
+    new Error("Could not reset."),
+  );
+});
