@@ -520,6 +520,15 @@ test("Trial recording stop with failure during upload", async () => {
   expect(global_display_el.innerHTML).toBe("");
 });
 
+test("Trial recording stop with no recorder", async () => {
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  // no recorder - extension should clean up display and immediately resolve on_finish
+  await trialRec.on_finish();
+  expect(global_display_el.innerHTML).toBe("");
+});
+
 test("Start session recording", async () => {
   const mockRecStart = jest.spyOn(Recorder.prototype, "start");
   const jsPsych = initJsPsych();
