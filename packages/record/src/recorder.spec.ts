@@ -256,6 +256,7 @@ test("Recorder stop", async () => {
   // adds promise to window.chs.pendingUploads
   expect(window.chs.pendingUploads.length).toBe(1);
   expect(window.chs.pendingUploads[0]).toBeInstanceOf(Promise);
+  expect(window.chs.pendingUploads).toStrictEqual([uploadPromise]);
 });
 
 test("Recorder stop with no stop promise", () => {
@@ -324,6 +325,12 @@ test("Recorder stop promise times out", async () => {
   expect(consoleWarnSpy).toHaveBeenCalledWith(
     "Upload failed because recorder stop timed out",
   );
+  const settled = await Promise.race([
+    Promise.allSettled(window.chs.pendingUploads),
+    Promise.resolve("still-pending"),
+  ]);
+  // The uploaded promise race is settled, but the upload promise in window.chs.pendingUploads should NOT be resolved - it should still be pending
+  expect(settled).toBe("still-pending");
 });
 
 test("Recorder upload timeout with default duration", async () => {
@@ -352,6 +359,15 @@ test("Recorder upload timeout with default duration", async () => {
   expect(consoleWarnSpy).toHaveBeenCalledWith(
     "Recorder upload timed out: fakename",
   );
+
+  // Assert background upload is still pending
+  expect(window.chs.pendingUploads).toHaveLength(1);
+  let settled = false;
+  window.chs.pendingUploads[0].finally(() => {
+    settled = true;
+  });
+  await Promise.resolve(); // flush microtasks
+  expect(settled).toBe(false);
 });
 
 test("Recorder upload promise times out with duration parameter", async () => {
@@ -379,6 +395,15 @@ test("Recorder upload promise times out with duration parameter", async () => {
   expect(consoleWarnSpy).toHaveBeenCalledWith(
     "Recorder upload timed out: fakename",
   );
+
+  // Assert background upload is still pending
+  expect(window.chs.pendingUploads).toHaveLength(1);
+  let settled = false;
+  window.chs.pendingUploads[0].finally(() => {
+    settled = true;
+  });
+  await Promise.resolve(); // flush microtasks
+  expect(settled).toBe(false);
 });
 
 test("Recorder stop with local download", async () => {
@@ -504,6 +529,16 @@ test("Recorder stop catches error in upload", async () => {
     "Upload failed: ",
     Error("Something broke."),
   );
+  expect(window.chs.pendingUploads.length).toBe(1);
+  expect(window.chs.pendingUploads[0]).toBeInstanceOf(Promise);
+  await expect(
+    Promise.allSettled(window.chs.pendingUploads),
+  ).resolves.toStrictEqual([
+    {
+      status: "rejected",
+      reason: new Error("Something broke."),
+    },
+  ]);
 });
 
 test("Recorder stop tries to reset after stopping and handles error", async () => {
@@ -569,6 +604,7 @@ test("Recorder initialize error throws from recorder stop", () => {
   expect(rec.stop).toThrow(RecorderInitializeError);
 
   jsPsych.pluginAPI.getCameraRecorder = getCameraRecorder;
+  expect(window.chs.pendingUploads.length).toBe(0);
 });
 
 test("S3 undefined error throws from recorder stop", () => {
@@ -585,6 +621,7 @@ test("S3 undefined error throws from recorder stop", () => {
   rec["localDownload"] = false;
 
   expect(rec.stop).toThrow(S3UndefinedError);
+  expect(window.chs.pendingUploads.length).toBe(0);
 });
 
 test("S3 undefined error does not throw from recorder stop with local download", () => {
