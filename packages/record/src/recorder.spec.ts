@@ -246,6 +246,9 @@ test("Recorder stop", async () => {
   await uploaded;
 
   expect(rec["s3"].completeUpload).toHaveBeenCalledTimes(1);
+  expect(consoleLogSpy).toHaveBeenCalledWith(
+    "Upload for fakename-uploaded completed.",
+  );
 
   // check that the stop and upload promises are returned on stop
   expect({ stopped, uploaded }).toStrictEqual({
@@ -293,6 +296,9 @@ test("Recorder stop and upload promises resolve", async () => {
   await expect(uploaded).resolves.toBeUndefined();
   // make sure timeouts are cleared
   expect(jest.getTimerCount()).toEqual(0);
+  expect(consoleLogSpy).toHaveBeenCalledWith(
+    "Upload for fakename-uploaded completed.",
+  );
 });
 
 test("Recorder stop promise times out", async () => {
@@ -466,6 +472,9 @@ test("Recorder stop with local download", async () => {
   // upload promise should call download
   expect(download).toHaveBeenCalledTimes(1);
   expect(download).toHaveBeenCalledWith(rec["filename"], "url");
+  expect(consoleLogSpy).toHaveBeenCalledWith(
+    "Upload for fakename-uploaded completed.",
+  );
 
   // check that the stop and upload promises are returned from recorder.stop
   expect({ stopped, uploaded }).toStrictEqual({
