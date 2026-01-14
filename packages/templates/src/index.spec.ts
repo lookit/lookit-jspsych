@@ -127,3 +127,19 @@ test("exit survey template in French", () => {
     "Nous vous demandons à nouveau en cas d'erreur lors de l'enregistrement ou de sélection par erreur d'un enfant différent au début de l'étude.",
   );
 });
+
+test("estabilshing connection template", () => {
+  const trial = getTrial();
+
+  expect(chsTemplate.establishingConnection(trial)).toContain(
+    "<div>establishing video connection, please wait...</div>",
+  );
+});
+
+test("establishing connection template in French", () => {
+  const trial = getTrial({ locale: "fr" });
+
+  expect(chsTemplate.establishingConnection(trial)).toContain(
+    "<div>en attente de connection video, veuillez attendre...</div>",
+  );
+});
