@@ -339,8 +339,9 @@ export default class Recorder {
     const stopped: Promise<string> = stop_timeout_ms
       ? promiseWithTimeout(
           this.stopPromise!,
+          `${snapshot.filename}-stopped`,
           stop_timeout_ms,
-          this.createTimeoutHandler("stop"),
+          this.createTimeoutHandler("stop", snapshot.filename!),
         )
       : this.stopPromise!;
 
@@ -390,8 +391,9 @@ export default class Recorder {
     const uploaded: Promise<void | string> = upload_timeout_ms
       ? promiseWithTimeout(
           uploadPromise,
+          `${snapshot.filename}-uploaded`,
           upload_timeout_ms,
-          this.createTimeoutHandler("upload"),
+          this.createTimeoutHandler("upload", snapshot.filename!),
         )
       : uploadPromise;
 
@@ -544,11 +546,12 @@ export default class Recorder {
    * timeout.
    *
    * @param eventName - Name of the event we're awaiting, e.g. 'stop', 'upload'
+   * @param id - String to identify the promise that we're awaiting.
    * @returns Callback function if the event promise times out.
    */
-  private createTimeoutHandler(eventName: string) {
+  private createTimeoutHandler(eventName: string, id: string) {
     return () => {
-      console.warn(`Recorder ${eventName} timed out`);
+      console.warn(`Recorder ${eventName} timed out: ${id}`);
     };
   }
 }
