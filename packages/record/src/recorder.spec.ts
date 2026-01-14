@@ -813,7 +813,8 @@ test("Webcam feed is removed when stream access stops", async () => {
   rec.insertWebcamFeed(webcam_div);
   expect(document.body.innerHTML).toContain("<video");
 
-  await rec.stop();
+  const { stopped } = rec.stop();
+  await stopped;
   expect(document.body.innerHTML).not.toContain("<video");
 
   // Reset the document body.
@@ -892,7 +893,8 @@ test("Webcam feed container size is not maintained with recorder.stop(false)", a
     .spyOn(document.getElementsByTagName("video")[0], "offsetHeight", "get")
     .mockImplementation(() => 300);
 
-  await rec.stop();
+  const { stopped } = rec.stop();
+  await stopped;
 
   // Container div's dimensions should not be set
   expect(
