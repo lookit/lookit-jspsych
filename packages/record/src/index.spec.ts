@@ -196,7 +196,7 @@ test("Trial recording stop/finish with default uploading msg in English", async 
     } as TrialType<PluginInfo>),
   );
   expect(global_display_el.innerHTML).toBe(
-    "<div>uploading video, please wait...</div>",
+    `<div id="lookit-uploading-video-msg-container"><div>uploading video, please wait...</div><div class="loader"></div></div>`,
   );
 
   // resolve the stop promise
@@ -246,7 +246,7 @@ test("Trial recording stop/finish with different locale should display default u
     } as TrialType<PluginInfo>),
   );
   expect(global_display_el.innerHTML).toBe(
-    "<div>téléchargement video en cours, veuillez attendre...</div>",
+    `<div id="lookit-uploading-video-msg-container"><div>téléchargement video en cours, veuillez attendre...</div><div class="loader"></div></div>`,
   );
 
   // resolve the stop promise
@@ -451,7 +451,7 @@ test("Trial recording stop with failure during stop", async () => {
 
   // Should show initial wait for upload message
   expect(global_display_el.innerHTML).toBe(
-    "<div>uploading video, please wait...</div>",
+    `<div id="lookit-uploading-video-msg-container"><div>uploading video, please wait...</div><div class="loader"></div></div>`,
   );
 
   // Reject stop
@@ -499,7 +499,7 @@ test("Trial recording stop with failure during upload", async () => {
 
   // Should show initial wait for upload message
   expect(global_display_el.innerHTML).toBe(
-    "<div>uploading video, please wait...</div>",
+    `<div id="lookit-uploading-video-msg-container"><div>uploading video, please wait...</div><div class="loader"></div></div>`,
   );
 
   // Resolve stop
@@ -569,7 +569,7 @@ test("Start session recording with default wait for connection message", async (
   // call trial but don't await so that we can inspect display element
   startRec.trial(display_element, trial);
   expect(display_element.innerHTML).toBe(
-    "<div>establishing video connection, please wait...</div>",
+    `<div id="lookit-establishing-connection-msg"><div>establishing video connection, please wait...</div><div class="loader"></div></div>`,
   );
 
   // now resolve start promise and await
@@ -599,7 +599,7 @@ test("Start session recording with translated connection message", async () => {
   // call trial but don't await so that we can inspect display element
   startRec.trial(display_element, trial);
   expect(display_element.innerHTML).toBe(
-    "<div>en attente de connection video, veuillez attendre...</div>",
+    `<div id="lookit-establishing-connection-msg"><div>en attente de connection video, veuillez attendre...</div><div class="loader"></div></div>`,
   );
 
   // now resolve start promise and await
@@ -712,7 +712,13 @@ test("Stop session recording should display default uploading msg in English", a
   // call trial but don't await so that we can inspect before it resolves
   stop_rec_plugin.trial(display_element, trial);
 
-  expect(display_element.innerHTML).toBe(chsTemplates.uploadingVideo(trial));
+  const en_uploading_msg = chsTemplates.uploadingVideo(trial);
+
+  // check that en (default) is used
+  expect(en_uploading_msg).toBe(
+    `<div id="lookit-uploading-video-msg-container"><div>uploading video, please wait...</div><div class="loader"></div></div>`,
+  );
+  expect(display_element.innerHTML).toBe(en_uploading_msg);
   expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
 
   // resolve the stop promise and upload promise
@@ -767,7 +773,7 @@ test("Stop session recording with different locale should display default upload
 
   // check that fr translation is used
   expect(fr_uploading_msg).toBe(
-    "<div>téléchargement video en cours, veuillez attendre...</div>",
+    `<div id="lookit-uploading-video-msg-container"><div>téléchargement video en cours, veuillez attendre...</div><div class="loader"></div></div>`,
   );
   expect(display_element.innerHTML).toBe(fr_uploading_msg);
   expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
