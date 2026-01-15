@@ -112,13 +112,12 @@ export default class TrialRecordExtension implements JsPsychExtension {
       this.maxUploadSeconds = startParams?.max_upload_seconds;
     }
     this.recorder = new Recorder(this.jsPsych);
+    this.pluginName = this.getCurrentPluginName();
+    this.recorder.start(false, `${this.pluginName}`);
   }
 
   /** Runs when the trial has loaded. */
-  public on_load() {
-    this.pluginName = this.getCurrentPluginName();
-    this.recorder?.start(false, `${this.pluginName}`);
-  }
+  public on_load() {}
 
   /**
    * Runs when trial has finished.
