@@ -399,7 +399,10 @@ export default class Recorder {
 
     // Track background uploads in case the consuming plugin is not awaiting the upload.
     // We don't want the timeout version because this one can continue in the background.
-    window.chs.pendingUploads.push(uploadPromise);
+    window.chs.pendingUploads.push({
+      promise: uploadPromise,
+      file: snapshot.filename!,
+    });
 
     // Return the pair of promises so that the calling plugin can await them.
     return { stopped, uploaded };

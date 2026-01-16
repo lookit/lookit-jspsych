@@ -258,8 +258,10 @@ test("Recorder stop", async () => {
 
   // adds promise to window.chs.pendingUploads
   expect(window.chs.pendingUploads.length).toBe(1);
-  expect(window.chs.pendingUploads[0]).toBeInstanceOf(Promise);
-  expect(window.chs.pendingUploads).toStrictEqual([uploadPromise]);
+  expect(window.chs.pendingUploads[0].promise).toBeInstanceOf(Promise);
+  expect(window.chs.pendingUploads).toStrictEqual([
+    { promise: uploadPromise, file: "fakename" },
+  ]);
 });
 
 test("Recorder stop with no stop promise", () => {
@@ -332,7 +334,7 @@ test("Recorder stop promise times out", async () => {
     "Upload failed because recorder stop timed out",
   );
   const settled = await Promise.race([
-    Promise.allSettled(window.chs.pendingUploads),
+    Promise.allSettled(window.chs.pendingUploads.map((u) => u.promise)),
     Promise.resolve("still-pending"),
   ]);
   // The uploaded promise race is settled, but the upload promise in window.chs.pendingUploads should NOT be resolved - it should still be pending
@@ -369,7 +371,7 @@ test("Recorder upload timeout with default duration", async () => {
   // Assert background upload is still pending
   expect(window.chs.pendingUploads).toHaveLength(1);
   let settled = false;
-  window.chs.pendingUploads[0].finally(() => {
+  window.chs.pendingUploads[0].promise.finally(() => {
     settled = true;
   });
   await Promise.resolve(); // flush microtasks
@@ -405,7 +407,7 @@ test("Recorder upload promise times out with duration parameter", async () => {
   // Assert background upload is still pending
   expect(window.chs.pendingUploads).toHaveLength(1);
   let settled = false;
-  window.chs.pendingUploads[0].finally(() => {
+  window.chs.pendingUploads[0].promise.finally(() => {
     settled = true;
   });
   await Promise.resolve(); // flush microtasks
@@ -437,10 +439,10 @@ test("Recorder upload promise with no timeout", async () => {
 
   // Assert background upload is original upload promise
   expect(window.chs.pendingUploads).toHaveLength(1);
-  expect(window.chs.pendingUploads[0]).toStrictEqual(uploaded);
+  expect(window.chs.pendingUploads[0].promise).toStrictEqual(uploaded);
   // Promise should still be pending
   let settled = false;
-  window.chs.pendingUploads[0].finally(() => {
+  window.chs.pendingUploads[0].promise.finally(() => {
     settled = true;
   });
   await Promise.resolve(); // flush microtasks
@@ -484,7 +486,7 @@ test("Recorder stop with local download", async () => {
 
   // adds promise to window.chs.pendingUploads
   expect(window.chs.pendingUploads.length).toBe(1);
-  expect(window.chs.pendingUploads[0]).toBeInstanceOf(Promise);
+  expect(window.chs.pendingUploads[0].promise).toBeInstanceOf(Promise);
 });
 
 test("Recorder stop with no filename", () => {
@@ -574,9 +576,9 @@ test("Recorder stop catches error in upload", async () => {
     Error("Something broke."),
   );
   expect(window.chs.pendingUploads.length).toBe(1);
-  expect(window.chs.pendingUploads[0]).toBeInstanceOf(Promise);
+  expect(window.chs.pendingUploads[0].promise).toBeInstanceOf(Promise);
   await expect(
-    Promise.allSettled(window.chs.pendingUploads),
+    Promise.allSettled(window.chs.pendingUploads.map((u) => u.promise)),
   ).resolves.toStrictEqual([
     {
       status: "rejected",
