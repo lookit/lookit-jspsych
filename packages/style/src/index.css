@@ -9254,8 +9254,7 @@ div#lookit-jspsych-video-config img.lookit-jspsych-checkmark {
   max-width: 20px;
 }
 
-div#lookit-uploading-video-msg-container,
-div#lookit-establishing-connection-msg {
+div#lookit-loader-container {
   text-align: center;
   width: auto;
   height: auto;
@@ -9263,8 +9262,7 @@ div#lookit-establishing-connection-msg {
   padding: 10px;
   position: relative;
 }
-div#lookit-uploading-video-msg-container div.loader,
-div#lookit-establishing-connection-msg div.loader {
+div#lookit-loader-container div.loader {
   border: 16px solid #f3f3f3; /* Light grey */
   border-top: 16px solid #3498db; /* Blue */
   border-radius: 50%;
