@@ -357,7 +357,7 @@ test("jsPsych's on_finish catches and logs errors while awaiting pending uploads
   expect(userFn).toHaveBeenCalledWith(data);
 
   expect(consoleErrorSpy).toHaveBeenCalledWith(
-    "Error while finish the experiment and saving data/video: ",
+    "Error while finishing the experiment and saving data/video: ",
     error,
   );
 });
