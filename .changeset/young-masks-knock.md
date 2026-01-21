@@ -8,55 +8,54 @@
 
 **Major/breaking changes**
 
-`record`, `templates`, `style`:
+`StartRecordPlugin`, `TrialRecordExtension`:
 
-- `StartRecordPlugin`: Adds HTML content while the recorder is initializing
-  during the start session recording trial. If the value is `null` (the
-  default), then the message 'establishing video connection, please wait...'
-  will be displayed, or the appropriate translation of this message based on the
-  `locale` parameter. This content can be overridden with any custom HTML
-  content using the `wait_for_connection_message` parameter. **Set this
-  parameter to an empty string (`""`) if you want to keep the behavior or
-  previous versions (i.e. blank screen).**
+- Adds HTML content while the recorder is initializing. If the value of the new
+  `wait_for_connection_message` parameter is `null` (the default), then the
+  message 'establishing video connection, please wait...' will be displayed, or
+  the appropriate translation of this message based on the `locale` parameter.
+  This content can be overridden with any custom HTML content using the
+  `wait_for_connection_message` parameter. **Set this parameter to an empty
+  string (`""`) if you want to keep the behavior of previous versions** (i.e.
+  blank screen while recording initializes).
 
-`record`:
+`StopRecordPlugin`, `TrialRecordExtension`:
 
-- `StopRecordPlugin`, `TrialRecordExtension`: Adds a default upload timeout of
-  10 seconds before continuing with the experiment. If the timeout druation is
-  reached and the experiment continues, the upload will still continue in the
-  background. This duration can be changed using the `max_upload_seconds`
-  parameter. **Set this parameter to to keep the behavior or previous versions
-  (i.e. ).**
+- Adds a default upload timeout of 10 seconds before continuing with the
+  experiment. If the timeout duration is reached and the experiment moves on,
+  the upload will still continue in the background. This duration can be changed
+  using the `max_upload_seconds` parameter. **Set this parameter to `null` to
+  keep the behavior of previous versions** (i.e. no upload timeout - the
+  experiment should wait indefinitely until the upload finishes before moving
+  on).
 
 **New features and minor changes**
 
-`record`, `templates`, `style`:
+`StartRecordPlugin`, `StopRecordPlugin`, `TrialRecordExtension`:
 
-- `StartRecordPlugin`, `StopRecordPlugin`, `TrialRecordExtension`: Adds a
-  loading animation (spinning circle) under the text when the defaults are used
-  for the `wait_for_connection_message` and `wait_for_upload_message`.
-
-`record`:
-
-- `StartRecordPlugin`, `StopRecordPlugin`, `TrialRecordExtension`: Adds
-  information to the browser console about timeouts and errors for the
+- Adds a loading animation (spinning circle) under the text when the defaults
+  are used for the `wait_for_connection_message` and `wait_for_upload_message`.
+- Adds information to the browser console about timeouts and errors for the
   recorder's stop and upload events.
-- `TrialRecordExtension`: Trial recording now starts at the start of the trial,
-  rather than when the trial loads. This makes it less likely to miss the start
-  of the trial. (Note that this is still possible, especially for participants
-  on slow/unstable internet connections. We will address this issue in future
-  updates as the full fix requires an update to jsPsych core.) This also means
-  that trial recordings may be slightly longer than before, as they will now
-  include the time between the trial's start and load events.
 
-`lookit-initjspsych`:
+`TrialRecordExtension`:
+
+Trial recording now starts at the start of the trial, rather than when the trial
+loads. This makes it less likely for the recording to miss the start of the
+trial. (Note that this is still possible, especially for participants on
+slow/unstable internet connections. We will address this issue in future updates
+as the full fix requires an update to jsPsych core.) This also means that trial
+recordings may be slightly longer than before, as they will now include the time
+between the trial's start and load events.
+
+`initJsPsych` (`lookit-initjspsych`):
 
 - The experiment `on_finish` callback function that CHS adds to all experiments
   now waits for all uploads to finish before ending the experiment (redirecting
   to the exit URL), and displays a loading animation (no text) while waiting for
   uploads to finish.
 
-**Developer-facing**
+**Developer notes**
 
 `record`
 
@@ -79,6 +78,9 @@
 - The change to the experiment `on_finish` callback function added by CHS
   required a switch to creating the function as a closure so that it has access
   to the jsPsych instance.
+- The updated `on_finish` functionality that waits for pending uploads requires
+  that `window.chs.pendingUploads` exists, though it does check first for better
+  backwards compatibility with the `data` package.
 
 `templates`
 
@@ -86,3 +88,7 @@
   `establishing-connection` templates.
 - The `loader` partial can also be rendered directly via the new
   `loadingAnimation` export.
+
+`style`
+
+- Adds CSS for the `loader` template (imported from `record` package scss).
