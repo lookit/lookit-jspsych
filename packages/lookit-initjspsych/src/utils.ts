@@ -61,7 +61,7 @@ export const on_finish = (
 ) => {
   return async function (data: DataCollection) {
     // add loading animation while data/video saving finishes
-    if (!jsPsychInstance || !jsPsychInstance.data) {
+    if (!jsPsychInstance || !jsPsychInstance.getDisplayElement) {
       throw new NoJsPsychInstanceError();
     }
     jsPsychInstance.getDisplayElement().innerHTML =
@@ -76,14 +76,19 @@ export const on_finish = (
       userFunc(data);
     }
 
-    await Api.updateResponse(responseUuid, {
-      exp_data,
-      completed: true,
-    })
-      .then(() => Api.finish())
-      .then(() => {
-        Promise.allSettled(window.chs.pendingUploads.map((u) => u.promise));
-      })
-      .then(() => exit_url && window.location.replace(exit_url));
+    try {
+      await Api.updateResponse(responseUuid, {
+        exp_data,
+        completed: true,
+      });
+      await Api.finish();
+      await Promise.allSettled(window.chs.pendingUploads.map((u) => u.promise));
+      if (exit_url) window.location.replace(exit_url);
+    } catch (err) {
+      console.error(
+        "Error while finishing the experiment and saving data/video: ",
+        err,
+      );
+    }
   };
 };
