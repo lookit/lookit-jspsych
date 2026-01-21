@@ -450,6 +450,52 @@ test("on_finish shows loading animation before uploads complete", async () => {
   await finishPromise;
 });
 
+test("jsPsych's on_finish with no pendingUploads property on window.chs", async () => {
+  Object.assign(window, {
+    chs: {
+      study: { attributes: { exit_url: "exit url" } } as Study,
+      child: {} as Child,
+      pastSessions: {} as Response[],
+    },
+  });
+
+  // mock jsPsych getDisplayElement
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    /**
+     * Mock for getDisplayElement
+     *
+     * @returns Object with an innerHTML property
+     */
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+  expect(jsPsychMock.getDisplayElement().innerHTML).toBe("");
+
+  const exp_data = [{ key: "value" }];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as DataCollection;
+
+  const userFn = jest.fn();
+  global.Request = jest.fn();
+
+  await expect(
+    on_finish(jsPsychMock as unknown as JsPsych, "some id", userFn)(data),
+  ).resolves.toBeUndefined();
+  expect(jsPsychMock.getDisplayElement).toHaveBeenCalledTimes(2); // once to check initial state, once to modify
+  expect(displayElement.innerHTML).toContain(chsTemplates.loadingAnimation());
+  expect(userFn).toHaveBeenCalledTimes(1);
+  expect(userFn).toHaveBeenCalledWith(data);
+  expect(Request).toHaveBeenCalledTimes(1);
+  expect(global.window.location.replace).toHaveBeenCalledTimes(1);
+  expect(global.window.location.replace).toHaveBeenCalledWith("exit url");
+});
+
 test("on_finish throws error if jsPsych instance is null", () => {
   const jsPsychInstance: JsPsych | null = null;
 

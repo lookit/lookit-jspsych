@@ -82,7 +82,11 @@ export const on_finish = (
         completed: true,
       });
       await Api.finish();
-      await Promise.allSettled(window.chs.pendingUploads.map((u) => u.promise));
+      if (window.chs.pendingUploads) {
+        await Promise.allSettled(
+          window.chs.pendingUploads.map((u) => u.promise),
+        );
+      }
       if (exit_url) window.location.replace(exit_url);
     } catch (err) {
       console.error(
