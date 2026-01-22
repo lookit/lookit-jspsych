@@ -8,7 +8,7 @@
 
 **Major/breaking changes**
 
-`StartRecordPlugin`, `TrialRecordExtension`:
+`StartRecordPlugin`:
 
 - Adds HTML content while the recorder is initializing. If the value of the new
   `wait_for_connection_message` parameter is `null` (the default), then the
@@ -34,19 +34,20 @@
 `StartRecordPlugin`, `StopRecordPlugin`, `TrialRecordExtension`:
 
 - Adds a loading animation (spinning circle) under the text when the defaults
-  are used for the `wait_for_connection_message` and `wait_for_upload_message`.
+  are used for the `wait_for_connection_message` (`StartRecordPlugin`) and
+  `wait_for_upload_message` (`StopRecordPlugin`, `TrialRecordExtension`).
 - Adds information to the browser console about timeouts and errors for the
   recorder's stop and upload events.
 
 `TrialRecordExtension`:
 
-Trial recording now starts at the start of the trial, rather than when the trial
-loads. This makes it less likely for the recording to miss the start of the
-trial. (Note that this is still possible, especially for participants on
-slow/unstable internet connections. We will address this issue in future updates
-as the full fix requires an update to jsPsych core.) This also means that trial
-recordings may be slightly longer than before, as they will now include the time
-between the trial's start and load events.
+- Trial recording now starts at the start of the trial, rather than when the
+  trial loads. This makes it less likely for the recording to miss the start of
+  the trial. (Note that this is still possible, especially for participants on
+  slow/unstable internet connections. We will address this issue in future
+  updates as the full fix requires an update to jsPsych core.) This also means
+  that trial recordings may be slightly longer than before, as they will now
+  include the time between the trial's start and load events.
 
 `initJsPsych` (`lookit-initjspsych`):
 
