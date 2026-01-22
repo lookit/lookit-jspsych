@@ -853,41 +853,36 @@ test("Stop session recording with custom uploading message", async () => {
   expect(window.chs.sessionRecorder).toBeNull();
 });
 
-test("Stop session recording with no upload timeout", async () => {
-  const mockRecStop = jest.spyOn(Recorder.prototype, "stop");
+test("Session recording stop with null as max upload seconds (no upload timeout)", () => {
+  // simulate a resolved stop promise and upload promise
+  const stopPromise = new Promise<string>((res) => res("url"));
+  const uploadPromise = new Promise<void>((res) => res());
+
+  const recStopSpy = jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
   const jsPsych = initJsPsych();
+  setCHSValue({ sessionRecorder: new Recorder(jsPsych) });
 
-  setCHSValue({
-    sessionRecorder: new Recorder(jsPsych),
-  });
-
-  const stopRec = new Rec.StopRecordPlugin(jsPsych);
-  const display_element = jest
-    .fn()
-    .mockImplementation() as unknown as HTMLElement;
-
-  mockRecStop.mockImplementation(
-    (): StopResult => ({
-      stopped: Promise.resolve("mock-url"),
-      uploaded: Promise.resolve(),
-    }),
-  );
+  const stop_rec_plugin = new Rec.StopRecordPlugin(jsPsych);
+  const display_element = document.createElement("div");
 
   const trial = {
+    type: Rec.StopRecordPlugin.info.name,
     locale: "en-us",
-  } as unknown as TrialType<PluginInfo>;
+    max_upload_seconds: null,
+  } as unknown as TrialType<PluginInfo>; // need to cast here because the "type" param is a string and should be a class
 
-  await stopRec.trial(display_element, trial);
+  stop_rec_plugin.trial(display_element, trial);
 
-  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
-  expect(window.chs.sessionRecorder).toBeNull();
-  expect(display_element.innerHTML).toStrictEqual("");
+  // recorder.stop should be called with null as the max upload duration
+  expect(recStopSpy).toHaveBeenCalledWith({
+    upload_timeout_ms: null,
+  });
 
-  setCHSValue();
-
-  expect(async () => await new Rec.StopRecordPlugin(jsPsych)).rejects.toThrow(
-    NoSessionRecordingError,
-  );
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
 });
 
 test("Stop recording stop with failure during upload", async () => {
