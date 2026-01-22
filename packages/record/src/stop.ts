@@ -82,7 +82,10 @@ export default class StopRecordPlugin implements JsPsychPlugin<Info> {
       display_element.innerHTML = trial.wait_for_upload_message;
     }
     const { stopped, uploaded } = this.recorder.stop({
-      upload_timeout_ms: trial.max_upload_seconds! * 1000,
+      upload_timeout_ms:
+        trial.max_upload_seconds !== null
+          ? trial.max_upload_seconds! * 1000
+          : null,
     });
     try {
       await stopped;
