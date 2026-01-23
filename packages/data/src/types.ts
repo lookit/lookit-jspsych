@@ -11,6 +11,11 @@ export type Attributes = {
   readonly url?: string;
 };
 
+export type uploadRecord = {
+  promise: Promise<void>;
+  file: string;
+};
+
 export interface Relationships {}
 
 export interface StudyAttrs extends Attributes {
@@ -138,6 +143,7 @@ export interface LookitWindow extends Window {
     pastSessions: Response[];
     response: Response;
     sessionRecorder: unknown;
+    pendingUploads: uploadRecord[];
   };
 }
 

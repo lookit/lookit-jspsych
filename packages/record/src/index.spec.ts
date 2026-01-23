@@ -4,10 +4,27 @@ import { initJsPsych, PluginInfo, TrialType } from "jspsych";
 import { ExistingRecordingError, NoSessionRecordingError } from "./errors";
 import Rec from "./index";
 import Recorder from "./recorder";
+import type { StopResult } from "./types";
 
 declare const window: LookitWindow;
 
 let global_display_el: HTMLDivElement;
+
+let consoleLogSpy: jest.SpyInstance<
+  void,
+  [message?: unknown, ...optionalParams: unknown[]],
+  unknown
+>;
+let consoleWarnSpy: jest.SpyInstance<
+  void,
+  [message?: unknown, ...optionalParams: unknown[]],
+  unknown
+>;
+let consoleErrorSpy: jest.SpyInstance<
+  void,
+  [message?: unknown, ...optionalParams: unknown[]],
+  unknown
+>;
 
 jest.mock("./recorder");
 jest.mock("@lookit/data");
@@ -41,23 +58,34 @@ const setCHSValue = (chs = {}) => {
 
 beforeEach(() => {
   setCHSValue();
+  // Hide the console output during tests. Tests can still assert on these spies to check console calls.
+  consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+  consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+  consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
 afterEach(() => {
   jest.restoreAllMocks();
   jest.clearAllMocks();
+
+  consoleLogSpy.mockRestore();
+  consoleWarnSpy.mockRestore();
+  consoleErrorSpy.mockRestore();
 });
 
-test("Trial recording", () => {
+test("Trial recording", async () => {
   const mockRecStart = jest.spyOn(Recorder.prototype, "start");
-  const mockRecStop = jest.spyOn(Recorder.prototype, "stop");
+  const mockRecStop = jest.spyOn(Recorder.prototype, "stop").mockReturnValue({
+    stopped: Promise.resolve("url"),
+    uploaded: Promise.resolve(),
+  });
   const jsPsych = initJsPsych();
   const trialRec = new Rec.TrialRecordExtension(jsPsych);
   const getCurrentPluginNameSpy = jest.spyOn(trialRec, "getCurrentPluginName");
 
   trialRec.on_start();
   trialRec.on_load();
-  trialRec.on_finish();
+  await trialRec.on_finish();
 
   expect(Recorder).toHaveBeenCalledTimes(1);
   expect(mockRecStart).toHaveBeenCalledTimes(1);
@@ -134,10 +162,18 @@ test("Trial recording start with wait_for_upload_message parameter", async () =>
 
 test("Trial recording stop/finish with default uploading msg in English", async () => {
   // control the recorder stop promise so that we can inspect the display before it resolves
-  let resolveStop!: () => void;
-  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+  let resolveStop!: (value: string) => void;
+  let resolveUpload!: () => void;
+  const stopPromise = new Promise<string>((res) => {
+    resolveStop = res;
+  });
+  const uploadPromise = new Promise<void>((res) => {
+    resolveUpload = res;
+  });
 
-  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+  jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
 
   const jsPsych = initJsPsych();
   const trialRec = new Rec.TrialRecordExtension(jsPsych);
@@ -160,14 +196,17 @@ test("Trial recording stop/finish with default uploading msg in English", async 
     } as TrialType<PluginInfo>),
   );
   expect(global_display_el.innerHTML).toBe(
-    "<div>uploading video, please wait...</div>",
+    `<div id="lookit-uploading-video-msg-container">
+    <div>uploading video, please wait...</div>
+    <div id="lookit-loader-container"><div class="loader"></div></div></div>`,
   );
-  //expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
 
   // resolve the stop promise
-  resolveStop();
+  resolveStop("url");
   await stopPromise;
-  await Promise.resolve();
+  // resolve the upload promise
+  resolveUpload();
+  await uploadPromise;
 
   // check the display cleanup
   expect(global_display_el.innerHTML).toBe("");
@@ -175,10 +214,18 @@ test("Trial recording stop/finish with default uploading msg in English", async 
 
 test("Trial recording stop/finish with different locale should display default uploading msg in specified language", async () => {
   // control the recorder stop promise so that we can inspect the display before it resolves
-  let resolveStop!: () => void;
-  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+  let resolveStop!: (value: string) => void;
+  let resolveUpload!: () => void;
+  const stopPromise = new Promise<string>((res) => {
+    resolveStop = res;
+  });
+  const uploadPromise = new Promise<void>((res) => {
+    resolveUpload = res;
+  });
 
-  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+  jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
 
   const jsPsych = initJsPsych();
   const trialRec = new Rec.TrialRecordExtension(jsPsych);
@@ -201,14 +248,17 @@ test("Trial recording stop/finish with different locale should display default u
     } as TrialType<PluginInfo>),
   );
   expect(global_display_el.innerHTML).toBe(
-    "<div>téléchargement video en cours, veuillez attendre...</div>",
+    `<div id="lookit-uploading-video-msg-container">
+    <div>téléchargement video en cours, veuillez attendre...</div>
+    <div id="lookit-loader-container"><div class="loader"></div></div></div>`,
   );
-  //expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
 
   // resolve the stop promise
-  resolveStop();
+  resolveStop("url");
   await stopPromise;
-  await Promise.resolve();
+  // resolve the upload promise
+  resolveUpload();
+  await uploadPromise;
 
   // check the display cleanup
   expect(global_display_el.innerHTML).toBe("");
@@ -216,10 +266,18 @@ test("Trial recording stop/finish with different locale should display default u
 
 test("Trial recording stop/finish with custom uploading message", async () => {
   // control the recorder stop promise so that we can inspect the display before it resolves
-  let resolveStop!: () => void;
-  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+  let resolveStop!: (value: string) => void;
+  let resolveUpload!: () => void;
+  const stopPromise = new Promise<string>((res) => {
+    resolveStop = res;
+  });
+  const uploadPromise = new Promise<void>((res) => {
+    resolveUpload = res;
+  });
 
-  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+  jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
 
   const jsPsych = initJsPsych();
   const trialRec = new Rec.TrialRecordExtension(jsPsych);
@@ -235,25 +293,155 @@ test("Trial recording stop/finish with custom uploading message", async () => {
   trialRec.on_finish();
 
   expect(global_display_el.innerHTML).toBe("Wait!");
-  //expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
 
   // resolve the stop promise
-  resolveStop();
+  resolveStop("url");
   await stopPromise;
-  await Promise.resolve();
+  resolveUpload();
+  await uploadPromise;
 
   // check the display cleanup
   expect(global_display_el.innerHTML).toBe("");
 });
 
-test("Trial recording rejection path (failure during upload)", async () => {
-  // Create a controlled promise and capture the reject function
-  let rejectStop!: (err: unknown) => void;
-  const stopPromise = new Promise<void>((_, reject) => {
-    rejectStop = reject;
+test("Trial recording stop/finish timeout with default parameters", async () => {
+  // simulate a resolved stop promise and timeout upload promise
+  const stopPromise = new Promise<string>((res) => res("url"));
+  const uploadPromise = new Promise<string>((res) => res("timeout"));
+
+  const recStopSpy = jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  await trialRec.initialize();
+  trialRec.on_start();
+  trialRec.on_load();
+
+  await trialRec.on_finish();
+
+  // recorder.stop should be called with the default max upload duration
+  expect(recStopSpy).toHaveBeenCalledWith({
+    upload_timeout_ms: 10000,
   });
 
-  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop/finish with max upload duration initialize parameter", async () => {
+  // simulate a resolved stop promise and timeout upload promise
+  const stopPromise = new Promise<string>((res) => res("url"));
+  const uploadPromise = new Promise<string>((res) => res("timeout"));
+
+  const recStopSpy = jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  const params = {
+    max_upload_seconds: 20,
+  };
+
+  await trialRec.initialize(params);
+  trialRec.on_start();
+  trialRec.on_load();
+
+  await trialRec.on_finish();
+
+  // recorder.stop should be called with 20 seconds as the max upload duration
+  expect(recStopSpy).toHaveBeenCalledWith({
+    upload_timeout_ms: 20000,
+  });
+
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop/finish with max upload duration start parameter", async () => {
+  // simulate a resolved stop promise and timeout upload promise
+  const stopPromise = new Promise<string>((res) => res("url"));
+  const uploadPromise = new Promise<string>((res) => res("timeout"));
+
+  const recStopSpy = jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  const initParams = {
+    max_upload_seconds: null,
+  };
+  const startParams = {
+    max_upload_seconds: 20,
+  };
+
+  await trialRec.initialize(initParams);
+  trialRec.on_start(startParams);
+  trialRec.on_load();
+
+  await trialRec.on_finish();
+
+  // recorder.stop should be called with 20 seconds as the max upload duration
+  expect(recStopSpy).toHaveBeenCalledWith({
+    upload_timeout_ms: 20000,
+  });
+
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop/finish with null max upload duration", async () => {
+  // simulate a resolved stop promise and resolved upload promise
+  const stopPromise = new Promise<string>((res) => res("url"));
+  const uploadPromise = new Promise<void>((res) => res());
+
+  const recStopSpy = jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  const params = {
+    max_upload_seconds: null,
+  };
+
+  await trialRec.initialize();
+  trialRec.on_start(params);
+  trialRec.on_load();
+
+  await trialRec.on_finish();
+
+  // recorder.stop should be called with null as the max upload duration
+  expect(recStopSpy).toHaveBeenCalledWith({
+    upload_timeout_ms: null,
+  });
+
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop with failure during stop", async () => {
+  // Create a controlled promise and capture the reject function
+  let rejectStop!: (err: unknown) => void;
+  const stopPromise = new Promise<string>((_, reject) => {
+    rejectStop = reject;
+  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let resolveUpload!: () => void;
+  const uploadPromise = new Promise<void>((res) => {
+    resolveUpload = res;
+  });
+
+  jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
 
   const jsPsych = initJsPsych();
   const trialRec = new Rec.TrialRecordExtension(jsPsych);
@@ -267,35 +455,203 @@ test("Trial recording rejection path (failure during upload)", async () => {
 
   // Should show initial wait for upload message
   expect(global_display_el.innerHTML).toBe(
-    "<div>uploading video, please wait...</div>",
+    `<div id="lookit-uploading-video-msg-container">
+    <div>uploading video, please wait...</div>
+    <div id="lookit-loader-container"><div class="loader"></div></div></div>`,
   );
 
   // Reject stop
-  rejectStop(new Error("upload failed"));
+  rejectStop(new Error("stop failed"));
+
+  // Wait for plugin's `.catch()` handler to run
+  await Promise.resolve();
+
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "TrialRecordExtension: recorder stop/upload failed.",
+    Error("stop failed"),
+  );
 
   // Wait for plugin's `.catch()` handler to run
   await Promise.resolve();
 
   // TO DO: modify the trial extension code to display translated error msg and/or researcher contact info
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop with failure during upload", async () => {
+  let resolveStop!: (value: string) => void;
+  const stopPromise = new Promise<string>((res) => {
+    resolveStop = res;
+  });
+  // Create a controlled promise and capture the reject function
+  let rejectUpload!: (err: unknown) => void;
+  const uploadPromise = new Promise<string>((_, reject) => {
+    rejectUpload = reject;
+  });
+
+  jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  await trialRec.initialize();
+  trialRec.on_start();
+  trialRec.on_load();
+
+  // call on_finish but don't await so that we can inspect before it resolves
+  trialRec.on_finish();
+
+  // Should show initial wait for upload message
   expect(global_display_el.innerHTML).toBe(
-    "<div>uploading video, please wait...</div>",
+    `<div id="lookit-uploading-video-msg-container">
+    <div>uploading video, please wait...</div>
+    <div id="lookit-loader-container"><div class="loader"></div></div></div>`,
   );
+
+  // Resolve stop
+  resolveStop("url");
+  // Reject upload
+  rejectUpload(new Error("upload failed"));
+
+  // Wait for plugin's `.catch()` handler to run and flush microtasks
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "TrialRecordExtension: recorder stop/upload failed.",
+    Error("upload failed"),
+  );
+
+  // TO DO: modify the trial extension code to display translated error msg and/or researcher contact info
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Trial recording stop with no recorder", async () => {
+  const jsPsych = initJsPsych();
+  const trialRec = new Rec.TrialRecordExtension(jsPsych);
+
+  // no recorder - extension should clean up display and immediately resolve on_finish
+  await trialRec.on_finish();
+  expect(global_display_el.innerHTML).toBe("");
 });
 
 test("Start session recording", async () => {
   const mockRecStart = jest.spyOn(Recorder.prototype, "start");
   const jsPsych = initJsPsych();
   const startRec = new Rec.StartRecordPlugin(jsPsych);
+  const display_element = jest
+    .fn()
+    .mockImplementation() as unknown as HTMLElement;
+  const trial = {
+    locale: "en-us",
+  } as unknown as TrialType<PluginInfo>;
 
   // manual mock
   mockRecStart.mockImplementation(jest.fn().mockReturnValue(Promise.resolve()));
 
-  await startRec.trial();
+  await startRec.trial(display_element, trial);
 
   expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
   expect(() => {
     new Rec.StartRecordPlugin(jsPsych);
   }).toThrow(ExistingRecordingError);
+});
+
+test("Start session recording with default wait for connection message", async () => {
+  let resolveMockStart!: () => void;
+  const startRecPromise = new Promise<void>((res) => {
+    resolveMockStart = res;
+  });
+  const mockRecStart = jest.spyOn(Recorder.prototype, "start");
+  mockRecStart.mockImplementation(jest.fn().mockReturnValue(startRecPromise));
+
+  const jsPsych = initJsPsych();
+  const startRec = new Rec.StartRecordPlugin(jsPsych);
+  const display_element = jest
+    .fn()
+    .mockImplementation() as unknown as HTMLElement;
+  const trial = { locale: "en-us" } as unknown as TrialType<PluginInfo>;
+
+  // call trial but don't await so that we can inspect display element
+  startRec.trial(display_element, trial);
+  expect(display_element.innerHTML).toBe(
+    `<div id="lookit-establishing-connection-msg">
+    <div>establishing video connection, please wait...</div>
+    <div id="lookit-loader-container"><div class="loader"></div></div></div>`,
+  );
+
+  // now resolve start promise and await
+  resolveMockStart();
+  await startRecPromise;
+
+  // clean up tasks should run
+  expect(display_element.innerHTML).toBe("");
+  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+});
+
+test("Start session recording with translated connection message", async () => {
+  let resolveMockStart!: () => void;
+  const startRecPromise = new Promise<void>((res) => {
+    resolveMockStart = res;
+  });
+  const mockRecStart = jest.spyOn(Recorder.prototype, "start");
+  mockRecStart.mockImplementation(jest.fn().mockReturnValue(startRecPromise));
+
+  const jsPsych = initJsPsych();
+  const startRec = new Rec.StartRecordPlugin(jsPsych);
+  const display_element = jest
+    .fn()
+    .mockImplementation() as unknown as HTMLElement;
+  const trial = { locale: "fr" } as unknown as TrialType<PluginInfo>;
+
+  // call trial but don't await so that we can inspect display element
+  startRec.trial(display_element, trial);
+  expect(display_element.innerHTML).toBe(
+    `<div id="lookit-establishing-connection-msg">
+    <div>en attente de connection video, veuillez attendre...</div>
+    <div id="lookit-loader-container"><div class="loader"></div></div></div>`,
+  );
+
+  // now resolve start promise and await
+  resolveMockStart();
+  await startRecPromise;
+
+  // clean up tasks should run
+  expect(display_element.innerHTML).toBe("");
+  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+});
+
+test("Start session recording with custom wait for connection message", async () => {
+  let resolveMockStart!: () => void;
+  const startRecPromise = new Promise<void>((res) => {
+    resolveMockStart = res;
+  });
+  const mockRecStart = jest.spyOn(Recorder.prototype, "start");
+  mockRecStart.mockImplementation(jest.fn().mockReturnValue(startRecPromise));
+
+  const jsPsych = initJsPsych();
+  const startRec = new Rec.StartRecordPlugin(jsPsych);
+  const display_element = jest
+    .fn()
+    .mockImplementation() as unknown as HTMLElement;
+  const trial = {
+    wait_for_connection_message: "Hello!",
+    locale: "de", // should be ignored
+  } as unknown as TrialType<PluginInfo>;
+
+  // call trial but don't await so that we can inspect display element
+  startRec.trial(display_element, trial);
+  expect(display_element.innerHTML).toBe("Hello!");
+
+  // now resolve start promise and await
+  resolveMockStart();
+  await startRecPromise;
+
+  // clean up tasks should run
+  expect(display_element.innerHTML).toBe("");
+  expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
 });
 
 test("Stop session recording", async () => {
@@ -311,7 +667,12 @@ test("Stop session recording", async () => {
     .fn()
     .mockImplementation() as unknown as HTMLElement;
 
-  mockRecStop.mockImplementation(jest.fn().mockReturnValue(Promise.resolve()));
+  mockRecStop.mockImplementation(
+    (): StopResult => ({
+      stopped: Promise.resolve("mock-url"),
+      uploaded: Promise.resolve(),
+    }),
+  );
 
   const trial = {
     locale: "en-us",
@@ -332,10 +693,18 @@ test("Stop session recording", async () => {
 
 test("Stop session recording should display default uploading msg in English", async () => {
   // control the recorder stop promise so that we can inspect the display before it resolves
-  let resolveStop!: () => void;
-  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+  let resolveStop!: (value: string) => void;
+  let resolveUpload!: () => void;
+  const stopPromise = new Promise<string>((res) => {
+    resolveStop = res;
+  });
+  const uploadPromise = new Promise<void>((res) => {
+    resolveUpload = res;
+  });
 
-  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+  jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
 
   const jsPsych = initJsPsych();
 
@@ -355,12 +724,23 @@ test("Stop session recording should display default uploading msg in English", a
   // call trial but don't await so that we can inspect before it resolves
   stop_rec_plugin.trial(display_element, trial);
 
-  expect(display_element.innerHTML).toBe(chsTemplates.uploadingVideo(trial));
+  const en_uploading_msg = chsTemplates.uploadingVideo(trial);
+
+  // check that en (default) is used
+  expect(en_uploading_msg).toBe(
+    `<div id="lookit-uploading-video-msg-container">
+    <div>uploading video, please wait...</div>
+    <div id="lookit-loader-container"><div class="loader"></div></div></div>`,
+  );
+  expect(display_element.innerHTML).toBe(en_uploading_msg);
   expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
 
-  // resolve the stop promise
-  resolveStop();
+  // resolve the stop promise and upload promise
+  resolveStop("url");
   await stopPromise;
+  await Promise.resolve();
+  resolveUpload();
+  await uploadPromise;
   await Promise.resolve();
 
   // check the cleanup tasks after the trial method has resolved
@@ -371,10 +751,18 @@ test("Stop session recording should display default uploading msg in English", a
 
 test("Stop session recording with different locale should display default uploading msg in specified language", async () => {
   // control the recorder stop promise so that we can inspect the display before it resolves
-  let resolveStop!: () => void;
-  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+  let resolveStop!: (value: string) => void;
+  let resolveUpload!: () => void;
+  const stopPromise = new Promise<string>((res) => {
+    resolveStop = res;
+  });
+  const uploadPromise = new Promise<void>((res) => {
+    resolveUpload = res;
+  });
 
-  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+  jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
 
   const jsPsych = initJsPsych();
 
@@ -399,14 +787,19 @@ test("Stop session recording with different locale should display default upload
 
   // check that fr translation is used
   expect(fr_uploading_msg).toBe(
-    "<div>téléchargement video en cours, veuillez attendre...</div>",
+    `<div id="lookit-uploading-video-msg-container">
+    <div>téléchargement video en cours, veuillez attendre...</div>
+    <div id="lookit-loader-container"><div class="loader"></div></div></div>`,
   );
   expect(display_element.innerHTML).toBe(fr_uploading_msg);
   expect(Recorder.prototype.stop).toHaveBeenCalledTimes(1);
 
-  // resolve the stop promise
-  resolveStop();
+  // resolve the stop promise and upload promise
+  resolveStop("url");
   await stopPromise;
+  await Promise.resolve();
+  resolveUpload();
+  await uploadPromise;
   await Promise.resolve();
 
   // check the cleanup tasks after the trial method has resolved
@@ -417,10 +810,18 @@ test("Stop session recording with different locale should display default upload
 
 test("Stop session recording with custom uploading message", async () => {
   // control the recorder stop promise so that we can inspect the display before it resolves
-  let resolveStop!: () => void;
-  const stopPromise = new Promise<void>((res) => (resolveStop = res));
+  let resolveStop!: (value: string) => void;
+  let resolveUpload!: () => void;
+  const stopPromise = new Promise<string>((res) => {
+    resolveStop = res;
+  });
+  const uploadPromise = new Promise<void>((res) => {
+    resolveUpload = res;
+  });
 
-  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+  jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
 
   const jsPsych = initJsPsych();
   setCHSValue({ sessionRecorder: new Recorder(jsPsych) });
@@ -439,8 +840,11 @@ test("Stop session recording with custom uploading message", async () => {
   // check display before stop is resolved
   expect(display_element.innerHTML).toBe("<p>Custom message…</p>");
 
-  resolveStop();
+  resolveStop("url");
   await stopPromise;
+  await Promise.resolve();
+  resolveUpload();
+  await uploadPromise;
   await Promise.resolve();
 
   // check the cleanup tasks after the trial method has resolved
@@ -449,14 +853,53 @@ test("Stop session recording with custom uploading message", async () => {
   expect(window.chs.sessionRecorder).toBeNull();
 });
 
-test("Stop recording rejection path (failure during upload)", async () => {
-  // Create a controlled promise and capture the reject function
-  let rejectStop!: (err: unknown) => void;
-  const stopPromise = new Promise<void>((_, reject) => {
-    rejectStop = reject;
+test("Session recording stop with null as max upload seconds (no upload timeout)", () => {
+  // simulate a resolved stop promise and upload promise
+  const stopPromise = new Promise<string>((res) => res("url"));
+  const uploadPromise = new Promise<void>((res) => res());
+
+  const recStopSpy = jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
+
+  const jsPsych = initJsPsych();
+  setCHSValue({ sessionRecorder: new Recorder(jsPsych) });
+
+  const stop_rec_plugin = new Rec.StopRecordPlugin(jsPsych);
+  const display_element = document.createElement("div");
+
+  const trial = {
+    type: Rec.StopRecordPlugin.info.name,
+    locale: "en-us",
+    max_upload_seconds: null,
+  } as unknown as TrialType<PluginInfo>; // need to cast here because the "type" param is a string and should be a class
+
+  stop_rec_plugin.trial(display_element, trial);
+
+  // recorder.stop should be called with null as the max upload duration
+  expect(recStopSpy).toHaveBeenCalledWith({
+    upload_timeout_ms: null,
   });
 
-  jest.spyOn(Recorder.prototype, "stop").mockReturnValue(stopPromise);
+  // check the display cleanup
+  expect(global_display_el.innerHTML).toBe("");
+});
+
+test("Stop recording stop with failure during upload", async () => {
+  // Create a controlled promise and capture the reject function
+  let rejectStop!: (err: unknown) => void;
+  const stopPromise = new Promise<string>((_, reject) => {
+    rejectStop = reject;
+  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let resolveUpload!: () => void;
+  const uploadPromise = new Promise<void>((res) => {
+    resolveUpload = res;
+  });
+
+  jest
+    .spyOn(Recorder.prototype, "stop")
+    .mockReturnValue({ stopped: stopPromise, uploaded: uploadPromise });
 
   const jsPsych = initJsPsych();
   setCHSValue({ sessionRecorder: new Recorder(jsPsych) });
@@ -481,9 +924,9 @@ test("Stop recording rejection path (failure during upload)", async () => {
   // Wait for plugin's `.catch()` handler to run
   await Promise.resolve();
 
-  // Trial doesn't end and the cleanup tasks don't run.
   // TO DO: modify the plugin code to display translated error msg and/or researcher contact info
-  expect(display_element.innerHTML).toBe("Wait…");
-  expect(jsPsych.finishTrial).not.toHaveBeenCalled();
-  expect(window.chs.sessionRecorder).not.toBeNull();
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "StopRecordPlugin: recorder stop/upload failed.",
+    Error("upload failed"),
+  );
 });

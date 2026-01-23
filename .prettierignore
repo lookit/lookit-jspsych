@@ -1,2 +1,3 @@
 packages/style/src/index.css
 .venv
+packages/templates/hbs/**/*.hbs

@@ -155,6 +155,21 @@ export class S3UndefinedError extends Error {
 }
 
 /**
+ * Error thrown when a filename does not exist but is needed for upload or local
+ * download.
+ */
+export class NoFileNameError extends Error {
+  /**
+   * Provide information when the recorder attempts to upload/download the
+   * recording but there is no file name.
+   */
+  public constructor() {
+    super("No filename found for recording.");
+    this.name = "NoFileNameError";
+  }
+}
+
+/**
  * Error thrown when attempting to reset recorder, but its stream is still
  * active.
  */
@@ -207,5 +222,18 @@ export class ElementNotFoundError extends Error {
   public constructor(id: string, tag: string) {
     super(`"${id}" ${tag} not found.`);
     this.name = "ElementNotFoundError";
+  }
+}
+
+/** Thrown when the timeout duration is reached. */
+export class TimeoutError extends Error {
+  /**
+   * String passed in with more info about the event that timed out.
+   *
+   * @param msg - Timeout error message string.
+   */
+  public constructor(msg: string) {
+    super(`${msg}`);
+    this.name = "TimeoutError";
   }
 }

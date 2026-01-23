@@ -11,6 +11,7 @@ import play_icon from "../img/play-icon.svg";
 import record_icon from "../img/record-icon.svg";
 import {
   CreateURLError,
+  NoFileNameError,
   NoStopPromiseError,
   NoWebCamElementError,
   RecorderInitializeError,
@@ -18,8 +19,10 @@ import {
   StreamActiveOnResetError,
   StreamDataInitializeError,
   StreamInactiveInitializeError,
+  TimeoutError,
 } from "./errors";
-import { CSSWidthHeight } from "./types";
+import { CSSWidthHeight, StopOptions, StopResult } from "./types";
+import { promiseWithTimeout } from "./utils";
 
 declare const window: LookitWindow;
 
@@ -32,10 +35,11 @@ export default class Recorder {
   private localDownload: boolean =
     process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
   private filename?: string;
-  private stopPromise?: Promise<void>;
+  private stopPromise?: Promise<string>;
   private webcam_element_id = "lookit-jspsych-webcam";
   private mimeType = "video/webm";
 
+  // persistent clone of the original stream so we can re-initialize
   private streamClone: MediaStream;
 
   /**
@@ -117,11 +121,15 @@ export default class Recorder {
    * the video config plugin).
    */
   public reset() {
+    // Reset can only be called after the current stream has been fully stopped.
     if (this.stream.active) {
       throw new StreamActiveOnResetError();
     }
+    // Ensure later recordings have a valid active stream.
     this.initializeRecorder(this.streamClone.clone());
+    // Clear blob buffer (any pending uploads are handled by LookitS3 instances and tracked globally)
     this.blobs = [];
+    // TO DO: reset S3/filename/URL?
   }
 
   /**
@@ -255,7 +263,7 @@ export default class Recorder {
 
     // create a stop promise and pass the resolve function as an argument to the stop event callback,
     // so that the stop event handler can resolve the stop promise
-    this.stopPromise = new Promise((resolve) => {
+    this.stopPromise = new Promise<string>((resolve) => {
       this.recorder.addEventListener("stop", this.handleStop(resolve));
     });
 
@@ -282,24 +290,122 @@ export default class Recorder {
    * tracks, clear the webcam feed element (if there is one), and return the
    * stop promise. This should only be called after recording has started.
    *
-   * @param maintain_container_size - Optional boolean indicating whether or not
-   *   to maintain the current size of the webcam feed container when removing
-   *   the video element. Default is false. If true, the container will be
-   *   resized to match the dimensions of the video element before it is
+   * When calling recorder.stop, plugins may:
+   *
+   * - Await the 'stopped' promise
+   * - Await the 'uploaded' promise to wait for the upload to finish before
+   *   continuing
+   * - Not await either promise to continue immediately and regardless of the
+   *   stop/upload outcomes
+   *
+   * @param options - Object with the following:
+   * @param options.maintain_container_size - Optional boolean indicating
+   *   whether or not to maintain the current size of the webcam feed container
+   *   when removing the video element. Default is false. If true, the container
+   *   will be resized to match the dimensions of the video element before it is
    *   removed. This is useful for avoiding layout jumps when the webcam
    *   container will be re-used during the trial.
-   * @returns Promise that resolves after the media recorder has stopped and
-   *   final 'dataavailable' event has occurred, when the "stop" event-related
-   *   callback function is called.
+   * @param options.stop_timeout_ms - Number of seconds to wait for the stop
+   *   process to complete.
+   * @param options.upload_timeout_ms - Number of seconds to wait for the upload
+   *   process to complete.
+   * @returns Object with two promises:
+   *
+   *   - Stopped: Promise<void> - Promise that resolves after the media recorder has
+   *       stopped and final 'dataavailable' event has occurred, when the "stop"
+   *       event-related callback function is called.
+   *   - Uploaded: Promise<void> - Promise that resolves when the S3 upload
+   *       completes.
    */
-  public stop(maintain_container_size: boolean = false) {
+  public stop({
+    maintain_container_size = false,
+    stop_timeout_ms = null,
+    upload_timeout_ms = 10000,
+  }: StopOptions = {}): StopResult {
+    this.preStopCheck();
     this.clearWebcamFeed(maintain_container_size);
     this.stopTracks();
 
-    if (!this.stopPromise) {
-      throw new NoStopPromiseError();
-    }
-    return this.stopPromise;
+    // Snapshot anything needed for upload before the Recorder instance is reset.
+    // URL is placeholder because it will not be defined until after the stop promise is resolved.
+    const snapshot = {
+      s3: !this.localDownload ? this.s3 : null,
+      filename: this.filename,
+      localDownload: this.localDownload,
+      url: "null",
+    };
+
+    // Wrap the existing stopPromise with timeout if needed, otherwise return as is.
+    const stopped: Promise<string> = stop_timeout_ms
+      ? promiseWithTimeout(
+          this.stopPromise!,
+          `${snapshot.filename}-stopped`,
+          stop_timeout_ms,
+          this.createTimeoutHandler("stop", snapshot.filename!),
+        )
+      : this.stopPromise!;
+
+    // Chain reset off the stop promise, which is either the original stop promise or a promise race with the timeout.
+    stopped.finally(() => {
+      try {
+        // It's safe to reset because recording is fully stopped and S3 info has been snapshotted.
+        this.reset();
+      } catch (err) {
+        console.error("Error while resetting recorder after stop: ", err);
+      }
+    });
+
+    // Create the upload (or local download) promise
+    const uploadPromise: Promise<void> = (async () => {
+      let url: string;
+      try {
+        url = await stopped;
+        if (url == "timeout") {
+          // Stop failed, throw so that the upload promise reflects this failure
+          throw new TimeoutError("Recorder stop timed out.");
+        }
+      } catch (err) {
+        console.warn("Upload failed because recorder stop timed out");
+        throw err;
+      }
+      snapshot.url = url;
+      if (snapshot.localDownload) {
+        try {
+          this.download(snapshot.filename!, snapshot.url);
+          await Promise.resolve();
+        } catch (err) {
+          console.error("Local download failed: ", err);
+          throw err;
+        }
+      } else {
+        try {
+          await snapshot.s3!.completeUpload();
+        } catch (err) {
+          console.error("Upload failed: ", err);
+          throw err;
+        }
+      }
+    })();
+
+    // Wrap the upload promise in a timeout if needed, otherwise return as is.
+    const uploaded: Promise<void | string> = upload_timeout_ms
+      ? promiseWithTimeout(
+          uploadPromise,
+          `${snapshot.filename}-uploaded`,
+          upload_timeout_ms,
+          this.createTimeoutHandler("upload", snapshot.filename!),
+        )
+      : uploadPromise;
+
+    // Track background uploads in case the consuming plugin is not awaiting the upload.
+    // We don't want the timeout version because this one can continue in the background.
+    window.chs.pendingUploads.push({
+      promise: uploadPromise,
+      file: snapshot.filename!,
+    });
+
+    // Return the pair of promises so that the calling plugin can await them.
+    return { stopped, uploaded };
   }
 
   /** Throw Error if there isn't a recorder provided by jsPsych. */
@@ -318,30 +424,41 @@ export default class Recorder {
   }
 
   /**
+   * Check for necessary conditions before stop/upload process, and throw errors
+   * if needed.
+   */
+  private preStopCheck() {
+    if (!this.recorder) {
+      throw new RecorderInitializeError();
+    }
+    if (!this.stream.active) {
+      throw new StreamInactiveInitializeError();
+    }
+    if (!this.stopPromise) {
+      throw new NoStopPromiseError();
+    }
+    if (!this.filename) {
+      throw new NoFileNameError();
+    }
+  }
+
+  /**
    * Handle the recorder's stop event. This is a function that takes the stop
    * promise's 'resolve' as an argument and returns a function that resolves
-   * that stop promise. The function that is returned is used as the recorder's
-   * "stop" event-related callback function.
+   * that stop promise with the URL that is created from the recording.
    *
-   * @param resolve - Promise resolve function.
-   * @returns Function that is called on the recorder's "stop" event.
+   * @param resolve - Resolve function that resolves the stop promise that was
+   *   created upon the start of recording.
+   * @returns Function that is called on the recorder's "stop" event. This
+   *   function resolves the stop promise for this recording with a URL.
    */
-  private handleStop(resolve: () => void) {
-    return async () => {
+  private handleStop(resolve: (value: string | PromiseLike<string>) => void) {
+    return () => {
       if (this.blobs.length === 0) {
         throw new CreateURLError();
       }
       this.url = URL.createObjectURL(new Blob(this.blobs));
-
-      if (this.localDownload) {
-        this.download();
-      } else {
-        await this.s3.completeUpload();
-      }
-      // Reset the recorder. This is necessary to create another active media stream from the stream clone, because the current stream is fully stopped/inactive and cannot be used again.
-      this.reset();
-
-      resolve();
+      resolve(this.url);
     };
   }
 
@@ -351,18 +468,27 @@ export default class Recorder {
    * @param event - Event containing blob data.
    */
   private handleDataAvailable(event: BlobEvent) {
+    // Store locally for URL creation
     this.blobs.push(event.data);
     if (!this.localDownload) {
+      // Forward to LookitS3 instance, which manages uploading
       this.s3.onDataAvailable(event.data);
     }
   }
 
-  /** Download data url used in local development. */
-  private download() {
-    if (this.filename && this.url) {
+  /**
+   * Download data url used in local development. This can be used on
+   * snapshotted recordings after the recorder has been reset, so we need to
+   * pass in the filename and URL rather than relying on this.
+   *
+   * @param filename - Filename for the recording that will be downloaded.
+   * @param url - URL containing the file data to be downloaded.
+   */
+  private download(filename: string, url: string) {
+    if (filename && url) {
       const link = document.createElement("a");
-      link.href = this.url;
-      link.download = this.filename;
+      link.href = url;
+      link.download = filename;
       link.click();
     }
   }
@@ -416,5 +542,27 @@ export default class Recorder {
     const trial_id = `${curr_trial_index}-${trial_type}`;
     const rand_digits = Math.floor(Math.random() * 1000);
     return `${prefix}_${window.chs.study.id}_${trial_id}_${window.chs.response.id}_${new Date().getTime()}_${rand_digits}.webm`;
+  }
+
+  /**
+   * Create the timeout handler function for events that we're awaiting with a
+   * timeout.
+   *
+   * @param eventName - Name of the event we're awaiting, e.g. 'stop', 'upload'
+   * @param id - String to identify the promise that we're awaiting.
+   * @returns Callback function if the event promise times out.
+   */
+  private createTimeoutHandler(eventName: string, id: string) {
+    return () => {
+      console.warn(`Recorder ${eventName} timed out: ${id}`);
+      // check if reset is needed
+      if (!this.stream.active) {
+        try {
+          this.reset();
+        } catch (err) {
+          console.error("Error while resetting recorder after timeout: ", err);
+        }
+      }
+    };
   }
 }

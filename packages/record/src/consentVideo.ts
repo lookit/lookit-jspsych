@@ -305,7 +305,11 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     stop.addEventListener("click", async () => {
       stop.disabled = true;
       this.addMessage(display, this.uploadingMsg!);
-      await this.recorder.stop(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { stopped, uploaded } = this.recorder.stop({
+        maintain_container_size: true,
+      });
+      await stopped;
       this.recordFeed(display);
       this.getImg(display, "record-icon").style.visibility = "hidden";
       this.addMessage(display, this.notRecordingMsg!);

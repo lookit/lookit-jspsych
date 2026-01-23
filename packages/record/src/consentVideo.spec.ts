@@ -8,6 +8,7 @@ import recordFeed from "../hbs/record-feed.hbs";
 import { VideoConsentPlugin } from "./consentVideo";
 import { ElementNotFoundError } from "./errors";
 import Recorder from "./recorder";
+import type { StopOptions, StopResult } from "./types";
 
 declare const window: LookitWindow;
 
@@ -288,6 +289,14 @@ test("playButton", () => {
 });
 
 test("stopButton", async () => {
+  // We need to mock the return values for Recorder.stop because it is called in the stop button's callback function
+  (
+    Recorder.prototype.stop as jest.Mock<StopResult, [StopOptions?]>
+  ).mockImplementation(() => ({
+    stopped: Promise.resolve("mock-url"),
+    uploaded: Promise.resolve(),
+  }));
+
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   const display = document.createElement("div");
