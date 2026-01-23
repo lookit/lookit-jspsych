@@ -30,12 +30,18 @@ interface Parameters {
    * Locale code used for translating the default 'uploading video, please
    * wait...' message. This code must be present in the translation files. If
    * the code is not found then English will be used. If the
-   * 'wait_for_upload_message' parameter is specified then this value
-   * isignored.
+   * 'wait_for_upload_message' parameter is specified then this value is
+   * ignored.
    *
    * @default "en-us"
    */
   locale?: string;
+  /**
+   * Maximum duration (in seconds) to wait for the trial recording to finish
+   * uploading before continuing with the experiment. Default is 10 seconds (set
+   * during initialize).
+   */
+  max_upload_seconds?: null | number;
 }
 
 /** This extension allows researchers to record webcam audio/video during trials. */
@@ -50,6 +56,7 @@ export default class TrialRecordExtension implements JsPsychExtension {
   private pluginName: string | undefined;
   private uploadMsg: null | string = null;
   private locale: string = "en-us";
+  private maxUploadSeconds: undefined | null | number = undefined;
 
   /**
    * Video recording extension.
@@ -72,12 +79,16 @@ export default class TrialRecordExtension implements JsPsychExtension {
    */
   public async initialize(params?: Parameters) {
     await new Promise<void>((resolve) => {
+      // set parameter defaults
       this.uploadMsg = params?.wait_for_upload_message
         ? params.wait_for_upload_message
         : null;
       this.locale = params?.locale ? params.locale : "en-us";
-      console.log(this.uploadMsg);
-      console.log(this.locale);
+      // null is a valid value - only set default if no parameter value was provided
+      this.maxUploadSeconds =
+        params?.max_upload_seconds === undefined
+          ? 10
+          : params.max_upload_seconds;
       resolve();
     });
   }
@@ -97,16 +108,16 @@ export default class TrialRecordExtension implements JsPsychExtension {
     if (startParams?.locale) {
       this.locale = startParams.locale;
     }
-    console.log(this.uploadMsg);
-    console.log(this.locale);
+    if (startParams?.max_upload_seconds !== undefined) {
+      this.maxUploadSeconds = startParams?.max_upload_seconds;
+    }
     this.recorder = new Recorder(this.jsPsych);
+    this.pluginName = this.getCurrentPluginName();
+    this.recorder.start(false, `${this.pluginName}`);
   }
 
   /** Runs when the trial has loaded. */
-  public on_load() {
-    this.pluginName = this.getCurrentPluginName();
-    this.recorder?.start(false, `${this.pluginName}`);
-  }
+  public on_load() {}
 
   /**
    * Runs when trial has finished.
@@ -124,14 +135,29 @@ export default class TrialRecordExtension implements JsPsychExtension {
     } else {
       displayEl.innerHTML = this.uploadMsg;
     }
-    try {
-      await this.recorder?.stop();
+    if (this.recorder) {
+      const { stopped, uploaded } = this.recorder.stop({
+        upload_timeout_ms:
+          this.maxUploadSeconds !== null ? this.maxUploadSeconds! * 1000 : null,
+      });
+      try {
+        await stopped;
+        await uploaded;
+        displayEl.innerHTML = "";
+        return {};
+      } catch (err) {
+        console.error(
+          "TrialRecordExtension: recorder stop/upload failed.",
+          err,
+        );
+        displayEl.innerHTML = "";
+        return {};
+        // TO DO: display translated error msg and/or researcher contact info
+      }
+    } else {
       displayEl.innerHTML = "";
-    } catch (err) {
-      console.error("TrialRecordExtension: recorder stop/upload failed.", err);
-      // TO DO: display translated error msg and/or researcher contact info
+      return {};
     }
-    return {};
   }
 
   /**

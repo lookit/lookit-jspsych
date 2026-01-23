@@ -28,6 +28,7 @@ const load = async (response_uuid: string) => {
         pastSessions: await retrievePastSessions(response_uuid),
         response: await retrieveResponse(response_uuid),
         sessionRecorder: undefined,
+        pendingUploads: [],
       },
     });
     //deepFreeze(window.chs);

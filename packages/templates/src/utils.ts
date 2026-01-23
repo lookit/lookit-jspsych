@@ -3,6 +3,7 @@ import i18next from "i18next";
 import ICU from "i18next-icu";
 import Yaml from "js-yaml";
 import { PluginInfo, TrialType } from "jspsych";
+import loaderPartial from "../hbs/partials/loader.hbs";
 import en_us from "../i18n/en-us.yaml";
 import eu from "../i18n/eu.yaml";
 import fr from "../i18n/fr.yaml";
@@ -93,6 +94,9 @@ Handlebars.registerHelper("t", (context, { hash }) => {
   return hash.htmlSafe ? new Handlebars.SafeString(txt) : txt;
 });
 
+// Register Handlebars partials
+Handlebars.registerPartial("loader", loaderPartial);
+
 /**
  * Public method for directly translating a string, without a corresponding
  * template.
@@ -104,3 +108,6 @@ Handlebars.registerHelper("t", (context, { hash }) => {
 export const translateString = (messageIdStr: string) => {
   return i18next.t(messageIdStr);
 };
+
+// This just renders the animation from the loader partial template. No parameters, so just export it here.
+export const loadingAnimation = Handlebars.compile(loaderPartial);

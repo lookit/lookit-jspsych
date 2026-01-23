@@ -1,4 +1,5 @@
-import { JsPsychExpData } from "@lookit/data/dist/types";
+import { Child, JsPsychExpData, Study } from "@lookit/data/dist/types";
+import type { DataCollection } from "jspsych";
 import * as jspsychModule from "jspsych";
 import TestPlugin from "../fixtures/TestPlugin";
 import lookitInitJsPsych from "./";
@@ -177,6 +178,179 @@ describe("lookit-initjspsych initializes and runs", () => {
       expect(mockFinish).toHaveBeenCalled();
     });
   });
+
+  test("jsPsych initializes with onFinish/on_finish when no init opts are provided", async () => {
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const mockInitJsPsych = jest.fn((opts?: JsPsychOptions) => ({
+        /**
+         * Mock for getDisplayElement
+         *
+         * @returns Object with an innerHTML property
+         */
+        getDisplayElement: () => ({
+          /**
+           * Mocked jsPsych.getDisplayElement().innerHTML used in on_finish
+           *
+           * @returns Empty string
+           */
+          innerHTML: "",
+        }),
+        run: jest.fn(),
+      }));
+
+      jest.mock("jspsych", () => ({
+        initJsPsych: mockInitJsPsych,
+      }));
+
+      // Dynamically import lookitInitJsPsych after mocking jsPsych/initJsPsych
+      const { default: lookitInitJsPsych } = await import("./index");
+
+      // Call with no user-defined init options
+      lookitInitJsPsych("uuid")();
+
+      expect(mockInitJsPsych).toHaveBeenCalled();
+      const callArgs = mockInitJsPsych.mock.calls[0][0];
+      // The original initJsPsych function should be called with an on_finish function
+      // even though it was not passed in by the user (no opts argument)
+      expect(typeof callArgs!.on_finish).toBe("function");
+    });
+  });
+
+  test("jsPsych initializes with onFinish/on_finish when init opts is empty", async () => {
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const mockInitJsPsych = jest.fn((opts?: JsPsychOptions) => ({
+        /**
+         * Mock for getDisplayElement
+         *
+         * @returns Object with an innerHTML property
+         */
+        getDisplayElement: () => ({
+          /**
+           * Mocked jsPsych.getDisplayElement().innerHTML used in on_finish
+           *
+           * @returns Empty string
+           */
+          innerHTML: "",
+        }),
+        run: jest.fn(),
+      }));
+
+      jest.mock("jspsych", () => ({
+        initJsPsych: mockInitJsPsych,
+      }));
+
+      // Dynamically import lookitInitJsPsych after mocking jsPsych/initJsPsych
+      const { default: lookitInitJsPsych } = await import("./index");
+
+      // call with empty opts object
+      const opts: JsPsychOptions = {};
+      lookitInitJsPsych("uuid")(opts);
+
+      expect(mockInitJsPsych).toHaveBeenCalled();
+      const callArgs = mockInitJsPsych.mock.calls[0][0];
+      // The original initJsPsych function should be called with an on_finish function
+      // even though it was not passed in by the user (empty opts argument)
+      expect(typeof callArgs!.on_finish).toBe("function");
+    });
+  });
+
+  test("After initializing, when jsPsych finishes, onFinish closure returns the on_finish function with correct arguments", async () => {
+    // needed to stub out the window.location.replace call inside on_finish
+    Object.defineProperty(window, "location", {
+      value: {
+        ...window.location,
+        replace: jest.fn(),
+      },
+      writable: true,
+    });
+
+    Object.assign(window, {
+      chs: {
+        study: { attributes: { exit_url: "exit url" } } as Study,
+        child: {} as Child,
+        pastSessions: {} as Response[],
+        pendingUploads: [],
+      },
+    });
+
+    const exp_data = [{ key: "value" }];
+    const data = {
+      /**
+       * Mocked jsPsych Data Collection.
+       *
+       * @returns Exp data.
+       */
+      values: () => exp_data,
+    } as DataCollection;
+
+    jest.doMock("jspsych", () => ({
+      __esModule: true,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      initJsPsych: jest.fn((opts?: JsPsychOptions) => ({
+        data: {
+          /**
+           * Mock jsPsych.data.get in the returned instance
+           *
+           * @returns Data collection with a values() method
+           */
+          get: () => data,
+        },
+        /**
+         * Mock for getDisplayElement
+         *
+         * @returns Object with an innerHTML property
+         */
+        getDisplayElement: () => ({
+          /**
+           * Mocked jsPsych.getDisplayElement().innerHTML used in on_finish
+           *
+           * @returns Empty string
+           */
+          innerHTML: "",
+        }),
+        run: jest.fn(),
+      })),
+    }));
+
+    // Track API mocks separately so we can assert on them
+    const mockRetrieveResponse = jest.fn().mockResolvedValue({
+      attributes: { exp_data: [] },
+    });
+    const mockUpdateResponse = jest.fn().mockResolvedValue(undefined);
+    const mockFinish = jest.fn().mockResolvedValue(undefined);
+
+    // Mock Api from @lookit/data
+    jest.doMock("@lookit/data", () => ({
+      __esModule: true,
+      default: {
+        retrieveResponse: mockRetrieveResponse,
+        updateResponse: mockUpdateResponse,
+        finish: mockFinish,
+      },
+    }));
+
+    // use jest.isolateModulesAsync to ensure that the mocks are applied before index.ts and its imports are loaded
+    await jest.isolateModulesAsync(async () => {
+      const { default: lookitInitJsPsych } = await import("./index");
+      const { initJsPsych } = await import("jspsych");
+
+      lookitInitJsPsych("uuid")({});
+
+      const callArgs = (initJsPsych as jest.Mock).mock.calls[0][0];
+      const onFinish = callArgs.on_finish!;
+
+      // Simulate jsPsych calling onFinish/on_finish with data collection
+      await expect(onFinish(data)).resolves.not.toThrow();
+      expect(mockRetrieveResponse).not.toHaveBeenCalled();
+      expect(mockUpdateResponse).toHaveBeenCalledWith("uuid", {
+        exp_data: [{ key: "value" }], // from mocked data.values()
+        completed: true,
+      });
+      expect(mockFinish).toHaveBeenCalled();
+    });
+  });
 });
 
 describe("lookit-initjspsych data handling", () => {
@@ -243,7 +417,7 @@ describe("lookit-initjspsych data handling", () => {
       const userOnDataUpdate = jest.fn();
 
       // Any extra user-specified initJsPsych options that should be passed directly to the original initJsPsych
-      const otherInitOptions = { on_finish: jest.fn() };
+      const otherInitOptions = { default_iti: 500 };
 
       const opts: JsPsychOptions = {
         on_data_update: userOnDataUpdate,
@@ -261,7 +435,61 @@ describe("lookit-initjspsych data handling", () => {
       expect(typeof callArgs!.on_data_update).toBe("function");
 
       // (2) Any other user-specified init options are passed through untouched
+      expect(callArgs!.default_iti).toBe(500);
+    });
+  });
+
+  test("User on_finish and other options are passed through to initJsPsych", async () => {
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const mockInitJsPsych = jest.fn((opts?: JsPsychOptions) => ({
+        data: {
+          /**
+           * Mock jsPsych.data.get in the returned instance
+           *
+           * @returns Data collection with a values() method
+           */
+          get: () => ({
+            /**
+             * Mock jsPsych.data.get().values() in the returned instance
+             *
+             * @returns Mocked data array
+             */
+            values: () => [] as JsPsychExpData[],
+          }),
+        },
+        run: jest.fn(),
+      }));
+
+      jest.mock("jspsych", () => ({
+        initJsPsych: mockInitJsPsych,
+      }));
+
+      const { default: lookitInitJsPsych } = await import("./index");
+
+      // User-specified on_finish
+      const userOnFinish = jest.fn();
+
+      // Any extra user-specified initJsPsych options that should be passed directly to the original initJsPsych
+      const otherInitOptions = { default_iti: 500 } as JsPsychOptions;
+
+      const opts: JsPsychOptions = {
+        on_finish: userOnFinish,
+        ...otherInitOptions,
+      } as JsPsychOptions;
+
+      lookitInitJsPsych("uuid")(opts);
+
+      expect(mockInitJsPsych).toHaveBeenCalled();
+      const callArgs = mockInitJsPsych.mock.calls[0][0];
+
+      // (1) We always replace on_finish with a closure in the original initJsPsych,
+      // so that parameter will exist and not match the user-defined function
+      expect(callArgs!.on_finish).not.toBe(userOnFinish);
       expect(typeof callArgs!.on_finish).toBe("function");
+
+      // (2) Any other user-specified init options are passed through untouched
+      expect(callArgs!.default_iti).toBe(500);
     });
   });
 });

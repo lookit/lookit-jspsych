@@ -368,6 +368,13 @@ string, be sure to preload the media files with the `preload` plugin and
 Use a blank string (`""`) for no message/content. If a value is provided then
 the `locale` parameter will be ignored.
 
+**`max_upload_seconds` [ Integer | 10 ]**
+
+Maximum duration (in seconds) to wait for the trial recording to finish
+uploading before continuing with the experiment. If the maximum upload duration
+is reached and the upload has not finished, then the experiment will move on and
+the trial recording upload will continue in the background.
+
 ### Examples
 
 **Basic usage**
@@ -452,6 +459,27 @@ const trialRec = {
 };
 ```
 
+By default, the trial recording extension will wait up to 10 seconds for the
+recording to finish uploading before moving on to the next trial. If the upload
+does not finish in that time, it will continue to upload in the background. You
+can adjust this duration with the `max_upload_seconds` parameter. You may want
+to increase or decrease this duration depending on the duration of your recorded
+trials, or you expect that some participants may have slow/unreliable internet
+connections. This example decreases the maximum upload duration from 10 to 5
+seconds:
+
+```javascript
+const trialRec = {
+  // ... Other trial parameters ...
+  extensions: [
+    {
+      type: chsRecord.TrialRecordExtension,
+      params: { max_upload_seconds: 5 },
+    },
+  ],
+};
+```
+
 ## Session Recording
 
 You might prefer to record across multiple trials in a study session. This can
@@ -480,8 +508,18 @@ const startRec = { type: chsRecord.StartRecordPlugin };
 
 #### Parameters
 
-This plugin does not accept any parameters, other those available in all
-plugins.
+**`wait_for_connection_message` [`null` or HTML string | `null` ]**
+
+This parameter determines what content should be displayed while the session
+recording is initializing. If `null` (the default), then the message
+'establishing video connection, please wait' (or appropriate translation based
+on `locale`) will be displayed. Otherwise this parameter can be set to a custom
+string and can contain HTML markup. If you want to embed images/video/audio in
+this HTML string, be sure to preload the media files with the `preload` plugin
+and
+[manual preloading](https://www.jspsych.org/latest/overview/media-preloading/#manual-preloading).
+Use a blank string (`""`) for no message/content. If a value is provided then
+the `locale` parameter will be ignored.
 
 ### Stop Recording Plugin
 
@@ -518,6 +556,13 @@ string, be sure to preload the media files with the `preload` plugin and
 [manual preloading](https://www.jspsych.org/latest/overview/media-preloading/#manual-preloading).
 Use a blank string (`""`) for no message/content. If a value is provided then
 the `locale` parameter will be ignored.
+
+**`max_upload_seconds` [ Integer | 10 ]**
+
+Maximum duration (in seconds) to wait for the session recording to finish
+uploading before continuing with the experiment. If the maximum upload duration
+is reached and the upload has not finished, then the experiment will move on and
+the session recording upload will continue in the background.
 
 ### Examples
 
@@ -570,28 +615,55 @@ jsPsych.run([
 
 **Setting parameters**
 
-By default, the stop session recording plugin will display "uploading video,
-please wait..." while the session recording is uploading. You can set the
-`locale` parameter value to translate this message to another language. For
-example, the trial below will display the Brazilian Portuguese translation of
-this message. If the locale string does not match any of the translation codes
-that we support, then the message will be displayed in English.
+By default, the start session recording plugin will display "establishing video
+connection, please wait" while establishing the connection to our video storage,
+and the stop session recording plugin will display "uploading video, please
+wait..." while the session recording is uploading. You can set the `locale`
+parameter value to translate these messages to another language. For example,
+the trial below will display the Brazilian Portuguese translation of these
+messages. If the locale string does not match any of the translation codes that
+we support, then the message will be displayed in English.
 
 ```javascript
+const startpRec = {
+  type: type: chsRecord.StartRecordPlugin,
+  locale: "pt-br",
+};
 const stopRec = {
   type: chsRecord.StopRecordPlugin,
   locale: "pt-br",
 };
 ```
 
-You can also set custom content to be displayed while the session recording file
-is uploading. The value must be a string. It can include HTML-formatted content,
+You can also set custom content to be displayed at the start of the session
+recording, while it is initializing, and/or at the end, when the file is
+uploading. The value must be a string. It can include HTML-formatted content,
 which means that you can embed audio, video, images etc. (be sure to preload any
 media files!).
 
 ```javascript
+const startpRec = {
+  type: type: chsRecord.StartRecordPlugin,
+  wait_for_connection_message: "<p style='color:green;>Please wait...</p>"
+};
 const stopRec = {
   type: chsRecord.StopRecordPlugin,
   wait_for_upload_message: "<p style='color:red;'>Hang on a sec!</p>",
+};
+```
+
+By default, the stop session recording plugin will wait up to 10 seconds for the
+session recording to finish uploading before moving on with the experiment. If
+the upload does not finish in that time, it will continue to upload in the
+background. You can adjust this duration with the `max_upload_seconds`
+parameter. You may want to increase this duration if, for example, your
+experiment creates a very long session recording, or you expect that some
+participants may have slow/unreliable internet connections. This example
+increases the maximum upload duration from 10 to 20 seconds:
+
+```javascript
+const stopRec = {
+  type: chsRecord.StopRecordPlugin,
+  max_upload_seconds: 20,
 };
 ```

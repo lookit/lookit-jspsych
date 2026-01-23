@@ -1,7 +1,8 @@
 import { consentVideo } from "./consentVideoTemplate";
+import { establishingConnection } from "./establishingConnectionTemplate";
 import { exitSurvey } from "./exitSurveyTemplate";
 import { uploadingVideo } from "./uploadingVideoTemplate";
-import { translateString } from "./utils";
+import { loadingAnimation, translateString } from "./utils";
 import { videoConfig } from "./videoConfigTemplate";
 
 export default {
@@ -10,4 +11,6 @@ export default {
   uploadingVideo,
   exitSurvey,
   translateString,
+  establishingConnection,
+  loadingAnimation,
 };

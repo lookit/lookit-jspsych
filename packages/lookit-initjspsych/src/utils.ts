@@ -1,5 +1,6 @@
 import Api from "@lookit/data";
 import { JsPsychExpData, LookitWindow } from "@lookit/data/dist/types";
+import chsTemplates from "@lookit/templates";
 import { DataCollection, JsPsych } from "jspsych";
 import { NoJsPsychInstanceError } from "./errors";
 import { UserFuncOnDataUpdate, UserFuncOnFinish } from "./types";
@@ -48,15 +49,24 @@ export const on_data_update = (
  * collected data. Once the user function has been ran, this will redirect to
  * the study's exit url.
  *
+ * @param jsPsychInstance - JsPsych instance
  * @param responseUuid - Response UUID.
  * @param userFunc - "on finish" function provided by the researcher.
  * @returns On finish function.
  */
 export const on_finish = (
+  jsPsychInstance: JsPsych | undefined | null,
   responseUuid: string,
   userFunc?: UserFuncOnFinish,
 ) => {
   return async function (data: DataCollection) {
+    // add loading animation while data/video saving finishes
+    if (!jsPsychInstance || !jsPsychInstance.getDisplayElement) {
+      throw new NoJsPsychInstanceError();
+    }
+    jsPsychInstance.getDisplayElement().innerHTML =
+      chsTemplates.loadingAnimation();
+
     const exp_data: JsPsychExpData[] = data.values();
 
     const { exit_url } = window.chs.study.attributes;
@@ -66,11 +76,23 @@ export const on_finish = (
       userFunc(data);
     }
 
-    await Api.updateResponse(responseUuid, {
-      exp_data,
-      completed: true,
-    })
-      .then(() => Api.finish())
-      .then(() => exit_url && window.location.replace(exit_url));
+    try {
+      await Api.updateResponse(responseUuid, {
+        exp_data,
+        completed: true,
+      });
+      await Api.finish();
+      if (window.chs.pendingUploads) {
+        await Promise.allSettled(
+          window.chs.pendingUploads.map((u) => u.promise),
+        );
+      }
+      if (exit_url) window.location.replace(exit_url);
+    } catch (err) {
+      console.error(
+        "Error while finishing the experiment and saving data/video: ",
+        err,
+      );
+    }
   };
 };
