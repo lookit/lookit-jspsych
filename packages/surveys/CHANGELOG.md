@@ -1,5 +1,13 @@
 # @lookit/surveys
 
+## 5.0.0
+
+### Patch Changes
+
+- Updated dependencies [21a5a0a]
+  - @lookit/templates@3.0.0
+  - @lookit/data@0.3.0
+
 ## 4.0.1
 
 ### Patch Changes
