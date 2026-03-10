@@ -11,6 +11,10 @@ on:
     branches:
       - main
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   release:
     name: Release
@@ -46,6 +50,3 @@ jobs:
           version: npx changeset version
           publish: npx changeset publish
           commit: "chore(release): version packages"
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
