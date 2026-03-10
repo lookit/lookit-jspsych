@@ -74,6 +74,55 @@ test("consent garden template", () => {
   expect(chsTemplate.consentVideo(trial)).toContain("Project GARDEN");
 });
 
+test("consent video with consent-recording-only template", () => {
+  const trial = getTrial({ template: "consent-recording-only" });
+  const name = "some name";
+  window.chs = {
+    study: {
+      attributes: {
+        name,
+        duration: "duration",
+      },
+    },
+  } as typeof window.chs;
+
+  expect(chsTemplate.consentVideo(trial)).toContain(
+    '<div id="consent-video-trial">',
+  );
+  expect(chsTemplate.consentVideo(trial)).toContain(
+    `You and your child will be recorded by your computer&#x27;s webcam and microphone only while providing verbal consent.`,
+  );
+  expect(chsTemplate.consentVideo(trial)).toContain(
+    `This webcam recording and other data collected on the CHS/Lookit website are sent securely to the Lookit platform.`,
+  );
+});
+
+test("consent video with consent-recording-only template and only consent on CHS", () => {
+  const trial = getTrial({
+    template: "consent-recording-only",
+    only_consent_on_chs: true,
+  });
+  const name = "some name";
+  window.chs = {
+    study: {
+      attributes: {
+        name,
+        duration: "duration",
+      },
+    },
+  } as typeof window.chs;
+
+  expect(chsTemplate.consentVideo(trial)).toContain(
+    '<div id="consent-video-trial">',
+  );
+  expect(chsTemplate.consentVideo(trial)).toContain(
+    `You and your child will be recorded by your computer&#x27;s webcam and microphone only while providing verbal consent.`,
+  );
+  expect(chsTemplate.consentVideo(trial)).toContain(
+    `This webcam recording is sent securely to the Lookit platform.`,
+  );
+});
+
 test("video config template", () => {
   const trial = getTrial();
 
