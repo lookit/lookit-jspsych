@@ -581,6 +581,63 @@ consent-garden:
     child have any questions or concerns about the Lookit platform, please
     contact Lookit staff at lookit@mit.edu.
 
+consent-recording-only:
+  data-collection-1:
+    You {only_adult, select, true {} other {and your child}} will be recorded by
+    your computer's webcam and microphone only while providing verbal consent.
+  data-collection-2:
+    This webcam recording {only_consent_on_chs, select, true {is} other {and
+    other data collected on the CHS/Lookit website are}} sent securely to the
+    Lookit platform. You can view your past consent recordings on Lookit at any
+    time.
+  data-collection-3:
+    Recordings {only_consent_on_chs, select, true {} other {and data collected
+    on this website}} are stored securely on Lookit servers and by researchers,
+    and are only shared as described in this document. However, there is always
+    a small risk that data transmitted over the internet may be intercepted or
+    that the security of stored data may be compromised.
+  video-privacy-consent:
+    We will first check that you really agreed to participate by watching your
+    consent recording.
+  video-privacy-private-description:
+    Because this study only uses video recording for consent, your video data
+    will be treated as "Private" by default, which means that the researchers
+    with access to your recordings will not share them with anyone else.
+  data-use-researchers-item-1:
+    webcam consent recordings {only_consent_on_chs, select, true {} other {and
+    other data collected on CHS/Lookit during this session}}
+  data-use-researchers-item-2: your account profile and demographic survey
+  data-use-researchers-item-3:
+    the {only_adult, select, true {} other {child}} profile for the {only_adult,
+    select, true {family member} other {child}} who is participating
+  data-use-researchers-content-2:
+    This includes changes you make in the future to any of this information. We
+    may put different types of information together to learn more about child
+    development. For instance, if {only_adult, select, true {you participate}
+    other {your child participates}} in multiple studies from our group, we may
+    look at how {only_adult, select, true {your} other {his or her}} responses
+    compare across studies, or we may look at {only_adult, select, true {how
+    your responses relate to other family members''} other {whether siblings
+    tend to respond similarly}}. We may also study connections between
+    {only_adult, select, true {your} other {children''s}} responses and family
+    demographic survey data.
+  data-use-Lookit-content:
+    The Lookit core team at MIT will also have access to your consent data
+    {only_consent_on_chs, select, true {} other {and other data collected on
+    CHS/Lookit during this session }}in addition to your account data. They use
+    this data to run and improve Lookit, for instance to provide technical
+    support, check how well data collection is working, or see whether Lookit is
+    reaching a diverse group of families. Lookit stores data indefinitely unless
+    you withdraw your recordings at the end of the study.
+  publication-content:
+    The results of this study may be presented at scientific meetings or
+    published in scientific journals. We may publish individual responses that
+    cannot identify {only_adult, select, true {you} other
+    {children}}{only_consent_on_chs, select, true {} other {, like looking times
+    or sequences of button presses}}. We never publish {only_adult, select, true
+    {} other {children''s}} birthdates or names. We never publish information
+    that would make it possible to link recordings with your demographic data.
+
 exp-lookit-observation:
   Hide: Hide
   Show: Show

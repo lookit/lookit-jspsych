@@ -140,11 +140,23 @@ whether babies love cats because of their soft fur or their twitchy tails.”
 
 #### Optional
 
-**`template` [String | "consent-template-5"]**
+**`template` [String option | "consent-template-5"]**
 
-Which consent document template to use. If you are setting up a new study, we
-recommend using the most recent (highest number) of these options. Options:
-`consent-template-5`, `consent-garden`.
+Which consent document template to use. Options: `consent-template-5`,
+`consent-garden`, `consent-recording-only`.
+
+Most studies should use `consent-template-5` (the default).
+
+If you are running a study that ONLY uses webcam recording for the consent
+statement (nothing else is recording during the session), then you should use
+the `consent-recording-only` template. This version removes/modifies some text
+that references additional webcam recordings during the session.
+
+By default, the `consent-recording-only` plugin assumes that, in addition to a
+consent trial, you are using CHS to collect other data/responses. If you are not
+collecting any other data on CHS (for instance, because the rest of the study
+takes place on a different platform), then you should change this using the
+`only_consent_on_chs` parameter (see below).
 
 **`additional_video_privacy_statement` [String | ""]**
 
@@ -219,6 +231,18 @@ risks if you participate?”.
 Optional additional text for under header “Participation is voluntary”. E.g.,
 “There are two sessions in this study; you will be invited to complete another
 session next month. It is okay not to do both sessions!”
+
+**`only_consent_on_chs` [Boolean | false]**
+
+This parameter is only relevant to the `consent-recording-only` template. If a
+different template is used, this parameter will be ignored.
+
+Whether or not the consent trial is the ONLY data being collected about the
+participant on CHS (e.g. the study redirects to an external URL after the
+consent trial). If `false` (the default), then the consent template will contain
+information about how CHS handles data/responses. If `true`, then the template
+will only reference the consent recording, and any statements about CHS access
+to data/responses are omitted.
 
 #### Additional customization available if REQUIRED by your IRB
 
@@ -297,7 +321,9 @@ Replace the default spoken consent statement with your custom text.
 Whether to omit the phrase “or in the very unlikely event of a research-related
 injury” from the contact section. (This was required by the Northwestern IRB.)
 
-### Example
+### Examples
+
+**Standard use case**
 
 ```javascript
 const videoConsent = {
@@ -329,6 +355,51 @@ const videoConsent = {
       text: "[EXAMPLE ONLY, PLEASE REMOVE ADDITIONAL_SEGMENTS UNLESS YOU NEED THEM.] Lookit is a U.S. organization and all information gathered from the website is stored on servers based in the U.S. Therefore, your video recordings are subject to U.S. laws, such as the US Patriot Act. This act allows authorities access to the records of internet service providers. If you choose to participate in this study, you understand that your video recording will be stored and accessed in the USA. The security and privacy policy for Lookit can be found at the following link: <a href='https://lookit.mit.edu/privacy/' target='_blank' rel='noopener'>https://lookit.mit.edu/privacy/</a>.",
     },
   ],
+};
+```
+
+**Study only uses webcam recording for consent**
+
+Use the `"consent-recording-only"` template when the study collects (some or
+all) data/responses on CHS, but webcam recording is only used for the consent
+statement (nothing else is recorded).
+
+```javascript
+const videoConsentRecOnly = {
+  type: chsRecord.VideoConsentPlugin,
+  template: "consent-recording-only",
+  PIName: "Jane Smith",
+  institution: "Science University",
+  PIContact: "Jane Smith at 123 456 7890",
+  purpose:
+    "Why do babies love cats? This study will help us find out whether babies love cats because of their soft fur or their twitchy tails.",
+  procedures:
+    "Your child will be shown pictures of lots of different cats, along with noises that cats make like meowing and purring. We are interested in which pictures and sounds make your child smile. We will ask you (the parent) to turn around to avoid influencing your child's responses.",
+  payment:
+    "After you finish the study, we will email you a $5 BabyStore gift card within approximately three days. To be eligible for the gift card your child must be in the age range for this study, you need to submit a valid consent statement, and we need to see that there is a child with you. But we will send a gift card even if you do not finish the whole study or we are not able to use your child's data! There are no other direct benefits to you or your child from participating, but we hope you will enjoy the experience.",
+};
+```
+
+**CHS study is only used for a consent recording**
+
+Use the `"consent-recording-only"` template with `only_consent_on_chs: true`
+when webcam recording is only used for the consent statement and no other
+data/responses are collected on CHS.
+
+```javascript
+const videoConsentRecOnly = {
+  type: chsRecord.VideoConsentPlugin,
+  template: "consent-recording-only",
+  only_consent_on_chs: true, // set this to true
+  PIName: "Jane Smith",
+  institution: "Science University",
+  PIContact: "Jane Smith at 123 456 7890",
+  purpose:
+    "Why do babies love cats? This study will help us find out whether babies love cats because of their soft fur or their twitchy tails.",
+  procedures:
+    "Your child will be shown pictures of lots of different cats, along with noises that cats make like meowing and purring. We are interested in which pictures and sounds make your child smile. We will ask you (the parent) to turn around to avoid influencing your child's responses.",
+  payment:
+    "After you finish the study, we will email you a $5 BabyStore gift card within approximately three days. To be eligible for the gift card your child must be in the age range for this study, you need to submit a valid consent statement, and we need to see that there is a child with you. But we will send a gift card even if you do not finish the whole study or we are not able to use your child's data! There are no other direct benefits to you or your child from participating, but we hope you will enjoy the experience.",
 };
 ```
 
