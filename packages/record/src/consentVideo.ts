@@ -12,7 +12,15 @@ const info = <const>{
   name: "consent-video",
   version,
   parameters: {
-    template: { type: ParameterType.STRING, default: "consent-template-5" },
+    template: {
+      type: ParameterType.SELECT,
+      options: [
+        "consent-template-5",
+        "consent-garden",
+        "consent-recording-only",
+      ],
+      default: "consent-template-5",
+    },
     locale: { type: ParameterType.STRING, default: "en-us" },
     additional_video_privacy_statement: {
       type: ParameterType.STRING,
@@ -58,6 +66,16 @@ const info = <const>{
     prompt_only_adults: { type: ParameterType.BOOL, default: false },
     consent_statement_text: { type: ParameterType.STRING, default: "" },
     omit_injury_phrase: { type: ParameterType.BOOL, default: false },
+    /**
+     * This parameter is only relevant for the consent-recording-only template.
+     * If a different template is used, this parameter will be ignored. Whether
+     * or not the consent trial is the only data being collected on CHS (i.e.
+     * the study redirects to an external URL immediately after the consent
+     * trial). If false (the default), the consent template contains information
+     * about how CHS handles data/responses. If true, any statements about
+     * session data/responses are omitted.
+     */
+    only_consent_on_chs: { type: ParameterType.BOOL, default: false },
   },
   data: {
     chs_type: {

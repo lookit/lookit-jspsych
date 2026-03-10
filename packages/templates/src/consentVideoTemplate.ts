@@ -2,6 +2,7 @@ import { LookitWindow } from "@lookit/data/dist/types";
 import Handlebars from "handlebars";
 import { PluginInfo, TrialType } from "jspsych";
 import consent_garden from "../hbs/consent-garden.hbs";
+import consent_recording_only from "../hbs/consent-recording-only.hbs";
 import consent_template_5 from "../hbs/consent-template-5.hbs";
 import consentVideoTrialTemplate from "../hbs/consent-video-trial.hbs";
 import { ConsentTemplateNotFound } from "./errors";
@@ -53,6 +54,8 @@ const consentDocument = (trial: TrialType<PluginInfo>) => {
       return consent_template_5;
     case "consent-garden":
       return consent_garden;
+    case "consent-recording-only":
+      return consent_recording_only;
     default:
       throw new ConsentTemplateNotFound(trial.template);
   }
