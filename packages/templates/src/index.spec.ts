@@ -95,6 +95,9 @@ test("consent video with consent-recording-only template", () => {
   expect(chsTemplate.consentVideo(trial)).toContain(
     `This webcam recording and other data collected on the CHS/Lookit website are sent securely to the Lookit platform.`,
   );
+  expect(chsTemplate.consentVideo(trial)).not.toContain(
+    `You will also have the option to withdraw your recordings. If you do, only your consent recording will be kept and all other recordings will be deleted.`,
+  );
 });
 
 test("consent video with consent-recording-only template and only consent on CHS", () => {
@@ -120,6 +123,37 @@ test("consent video with consent-recording-only template and only consent on CHS
   );
   expect(chsTemplate.consentVideo(trial)).toContain(
     `This webcam recording is sent securely to the Lookit platform.`,
+  );
+  expect(chsTemplate.consentVideo(trial)).not.toContain(
+    `You will also have the option to withdraw your recordings. If you do, only your consent recording will be kept and all other recordings will be deleted.`,
+  );
+});
+
+test("video consent param only_consent_on_chs is ignored when the template is not consent-recording-only", () => {
+  const trial = getTrial({
+    only_consent_on_chs: true,
+  });
+  const name = "some name";
+  window.chs = {
+    study: {
+      attributes: {
+        name,
+        duration: "duration",
+      },
+    },
+  } as typeof window.chs;
+
+  expect(chsTemplate.consentVideo(trial)).toContain(
+    '<div id="consent-video-trial">',
+  );
+  expect(chsTemplate.consentVideo(trial)).not.toContain(
+    `You and your child will be recorded by your computer&#x27;s webcam and microphone only while providing verbal consent.`,
+  );
+  expect(chsTemplate.consentVideo(trial)).not.toContain(
+    `This webcam recording is sent securely to the Lookit platform.`,
+  );
+  expect(chsTemplate.consentVideo(trial)).toContain(
+    `You will also have the option to withdraw your recordings. If you do, only your consent recording will be kept and all other recordings will be deleted.`,
   );
 });
 
