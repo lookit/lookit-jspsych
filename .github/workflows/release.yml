@@ -49,7 +49,7 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          version: npx changeset version && npm install
+          version: npm run changeset:version
           publish: npx changeset publish
           commit: "chore(release): version packages"
           createGithubReleases: true
