@@ -14,6 +14,7 @@ on:
 permissions:
   id-token: write
   contents: write
+  pull-requests: write
   packages: write
 
 jobs:
@@ -51,3 +52,4 @@ jobs:
           version: npx changeset version
           publish: npx changeset publish
           commit: "chore(release): version packages"
+          createGithubReleases: true
