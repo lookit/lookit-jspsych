@@ -1,6 +1,6 @@
 {
   "name": "@lookit/surveys",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "A survey plugin for lookit studies.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
@@ -36,7 +36,7 @@
   },
   "peerDependencies": {
     "@lookit/data": "^0.3.0",
-    "@lookit/templates": "^3.0.0",
+    "@lookit/templates": "^3.1.0",
     "jspsych": "^8.0.3"
   }
 }
