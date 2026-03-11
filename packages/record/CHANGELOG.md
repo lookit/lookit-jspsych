@@ -1,5 +1,25 @@
 # @lookit/record
 
+## 6.0.0
+
+### Minor Changes
+
+- cb41e72: - Adds new template option for the video-consent plugin:
+  "consent-recording-only". This applies to studies that only use webcam
+  recording for the consent statement.
+  - Adds new parameter for the video-consent plugin: `only_consent_on_chs`. This
+    is used to determine whether or not to include template language around
+    data/responses collected on CHS (`false`, the default) vs just the consent
+    recording and no other responses/data (`true`).
+  - Updates documentation
+  - Adds tests
+
+### Patch Changes
+
+- f541d09: Changes to workflow files.
+- Updated dependencies [cb41e72]
+  - @lookit/templates@3.1.0
+
 ## 5.0.0
 
 ### Major Changes
