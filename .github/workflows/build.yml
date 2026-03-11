@@ -23,7 +23,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libpango1.0-dev
 
       - name: Install NPM dependencies
-        run: npm install --package-lock
+        run: npm ci
 
       - name: Lint project
         run: npm run lint
