@@ -87,7 +87,21 @@ export const on_finish = (
           window.chs.pendingUploads.map((u) => u.promise),
         );
       }
-      if (exit_url) window.location.replace(exit_url);
+      if (exit_url) {
+        let url: URL;
+        try {
+          url = new URL(exit_url);
+        } catch {
+          try {
+            url = new URL(`https://${exit_url}`);
+          } catch {
+            url = new URL(window.location.origin);
+          }
+        }
+        url.searchParams.set("child", window.chs.child.id);
+        url.searchParams.set("response", window.chs.response.id);
+        window.location.replace(url.toString());
+      }
     } catch (err) {
       console.error(
         "Error while finishing the experiment and saving data/video: ",
