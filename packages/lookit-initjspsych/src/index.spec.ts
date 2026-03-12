@@ -272,7 +272,10 @@ describe("lookit-initjspsych initializes and runs", () => {
           attributes: { exit_url: "https://example.com/exit" },
         } as Study,
         child: { id: "child-id" } as Child,
-        response: { id: "response-uuid" },
+        response: {
+          id: "response-uuid",
+          attributes: { hash_child_id: "hash-child-id" },
+        },
         pastSessions: {} as Response[],
         pendingUploads: [],
       },

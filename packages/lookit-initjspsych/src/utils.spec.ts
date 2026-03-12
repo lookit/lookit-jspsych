@@ -191,7 +191,10 @@ test("jsPsych's on_finish", async () => {
     chs: {
       study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
       child: { id: "child-id" } as Child,
-      response: { id: "response-uuid" },
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [],
     },
@@ -214,7 +217,10 @@ test("jsPsych's on_finish with successful pending uploads", async () => {
     chs: {
       study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
       child: { id: "child-id" } as Child,
-      response: { id: "response-uuid" },
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [{ filename: "video1", promise: successfulUpload }],
     },
@@ -255,7 +261,7 @@ test("jsPsych's on_finish with successful pending uploads", async () => {
   expect(Request).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledWith(
-    "https://example.com/exit?child=child-id&response=response-uuid",
+    "https://example.com/exit?child=hash-child-id&response=response-uuid",
   );
 });
 
@@ -266,7 +272,10 @@ test("jsPsych's on_finish with a rejected pending upload", async () => {
     chs: {
       study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
       child: { id: "child-id" } as Child,
-      response: { id: "response-uuid" },
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [{ filename: "video1", promise: rejectedUpload }],
     },
@@ -307,7 +316,7 @@ test("jsPsych's on_finish with a rejected pending upload", async () => {
   expect(Request).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledWith(
-    "https://example.com/exit?child=child-id&response=response-uuid",
+    "https://example.com/exit?child=hash-child-id&response=response-uuid",
   );
 });
 
@@ -345,7 +354,10 @@ test("jsPsych's on_finish catches and logs errors while awaiting pending uploads
     chs: {
       study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
       child: { id: "child-id" } as Child,
-      response: { id: "response-uuid" },
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [],
     },
@@ -400,7 +412,10 @@ test("jsPsych's on_finish with no recording or pending uploads", async () => {
     chs: {
       study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
       child: { id: "child-id" } as Child,
-      response: { id: "response-uuid" },
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [],
     },
@@ -441,7 +456,10 @@ test("on_finish shows loading animation before uploads complete", async () => {
     chs: {
       study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
       child: { id: "child-id" } as Child,
-      response: { id: "response-uuid" },
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [{ promise: pendingUpload, filename: "video.webm" }],
     },
@@ -465,7 +483,10 @@ test("jsPsych's on_finish with no pendingUploads property on window.chs", async 
     chs: {
       study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
       child: { id: "child-id" } as Child,
-      response: { id: "response-uuid" },
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
     },
   });
@@ -505,7 +526,7 @@ test("jsPsych's on_finish with no pendingUploads property on window.chs", async 
   expect(Request).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledWith(
-    "https://example.com/exit?child=child-id&response=response-uuid",
+    "https://example.com/exit?child=hash-child-id&response=response-uuid",
   );
 });
 
@@ -538,7 +559,10 @@ test("on_finish appends child and response IDs to exit_url that already has quer
         attributes: { exit_url: "https://example.com/exit?existing=param" },
       } as Study,
       child: { id: "child-id" } as Child,
-      response: { id: "response-uuid" },
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [],
     },
@@ -546,7 +570,7 @@ test("on_finish appends child and response IDs to exit_url that already has quer
 
   await on_finish(jsPsychMock as unknown as JsPsych, "some id")(data);
   expect(global.window.location.replace).toHaveBeenCalledWith(
-    "https://example.com/exit?existing=param&child=child-id&response=response-uuid",
+    "https://example.com/exit?existing=param&child=hash-child-id&response=response-uuid",
   );
 });
 
@@ -577,7 +601,10 @@ test("on_finish falls back to window.location.origin if the URL is invalid", asy
     chs: {
       study: { attributes: { exit_url: "not a valid url" } } as Study,
       child: { id: "child-id" } as Child,
-      response: { id: "response-uuid" },
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [],
     },
@@ -585,7 +612,7 @@ test("on_finish falls back to window.location.origin if the URL is invalid", asy
 
   await on_finish(jsPsychMock as unknown as JsPsych, "some id")(data);
   expect(global.window.location.replace).toHaveBeenCalledWith(
-    "http://localhost/?child=child-id&response=response-uuid",
+    "http://localhost/?child=hash-child-id&response=response-uuid",
   );
 });
 
@@ -616,7 +643,10 @@ test("on_finish handles exit URLs without the https prefix", async () => {
     chs: {
       study: { attributes: { exit_url: "done.com" } } as Study,
       child: { id: "child-id" } as Child,
-      response: { id: "response-uuid" },
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [],
     },
@@ -624,7 +654,7 @@ test("on_finish handles exit URLs without the https prefix", async () => {
 
   await on_finish(jsPsychMock as unknown as JsPsych, "some id")(data);
   expect(global.window.location.replace).toHaveBeenCalledWith(
-    "https://done.com/?child=child-id&response=response-uuid",
+    "https://done.com/?child=hash-child-id&response=response-uuid",
   );
 });
 
