@@ -7,7 +7,7 @@ import { on_data_update, on_finish } from "./utils";
 
 delete global.window.location;
 global.window = Object.create(window);
-global.window.location = { replace: jest.fn() };
+global.window.location = { replace: jest.fn(), origin: "http://localhost" };
 // Even though we're not using Api.retrieveResponse in on_data_update/on_finish anymore, we still need to mock fetch because it is used to send the PATCH request.
 global.fetch = jest.fn(() =>
   Promise.resolve({
@@ -189,8 +189,12 @@ test("jsPsych's on_finish", async () => {
 
   Object.assign(window, {
     chs: {
-      study: { attributes: { exit_url: "exit url" } } as Study,
-      child: {} as Child,
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [],
     },
@@ -211,8 +215,12 @@ test("jsPsych's on_finish with successful pending uploads", async () => {
 
   Object.assign(window, {
     chs: {
-      study: { attributes: { exit_url: "exit url" } } as Study,
-      child: {} as Child,
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [{ filename: "video1", promise: successfulUpload }],
     },
@@ -252,7 +260,9 @@ test("jsPsych's on_finish with successful pending uploads", async () => {
   expect(userFn).toHaveBeenCalledWith(data);
   expect(Request).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledTimes(1);
-  expect(global.window.location.replace).toHaveBeenCalledWith("exit url");
+  expect(global.window.location.replace).toHaveBeenCalledWith(
+    "https://example.com/exit?child=hash-child-id&response=response-uuid",
+  );
 });
 
 test("jsPsych's on_finish with a rejected pending upload", async () => {
@@ -260,8 +270,12 @@ test("jsPsych's on_finish with a rejected pending upload", async () => {
 
   Object.assign(window, {
     chs: {
-      study: { attributes: { exit_url: "exit url" } } as Study,
-      child: {} as Child,
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [{ filename: "video1", promise: rejectedUpload }],
     },
@@ -301,7 +315,9 @@ test("jsPsych's on_finish with a rejected pending upload", async () => {
   expect(userFn).toHaveBeenCalledWith(data);
   expect(Request).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledTimes(1);
-  expect(global.window.location.replace).toHaveBeenCalledWith("exit url");
+  expect(global.window.location.replace).toHaveBeenCalledWith(
+    "https://example.com/exit?child=hash-child-id&response=response-uuid",
+  );
 });
 
 test("jsPsych's on_finish catches and logs errors while awaiting pending uploads", async () => {
@@ -336,8 +352,12 @@ test("jsPsych's on_finish catches and logs errors while awaiting pending uploads
 
   Object.assign(window, {
     chs: {
-      study: { attributes: { exit_url: "exit url" } } as Study,
-      child: {} as Child,
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [],
     },
@@ -390,8 +410,12 @@ test("jsPsych's on_finish with no recording or pending uploads", async () => {
 
   Object.assign(window, {
     chs: {
-      study: { attributes: { exit_url: "exit url" } } as Study,
-      child: {} as Child,
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [],
     },
@@ -430,8 +454,12 @@ test("on_finish shows loading animation before uploads complete", async () => {
 
   Object.assign(window, {
     chs: {
-      study: { attributes: { exit_url: "exit url" } } as Study,
-      child: {} as Child,
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
       pendingUploads: [{ promise: pendingUpload, filename: "video.webm" }],
     },
@@ -453,8 +481,12 @@ test("on_finish shows loading animation before uploads complete", async () => {
 test("jsPsych's on_finish with no pendingUploads property on window.chs", async () => {
   Object.assign(window, {
     chs: {
-      study: { attributes: { exit_url: "exit url" } } as Study,
-      child: {} as Child,
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
       pastSessions: {} as Response[],
     },
   });
@@ -493,7 +525,137 @@ test("jsPsych's on_finish with no pendingUploads property on window.chs", async 
   expect(userFn).toHaveBeenCalledWith(data);
   expect(Request).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledTimes(1);
-  expect(global.window.location.replace).toHaveBeenCalledWith("exit url");
+  expect(global.window.location.replace).toHaveBeenCalledWith(
+    "https://example.com/exit?child=hash-child-id&response=response-uuid",
+  );
+});
+
+test("on_finish appends child and response IDs to exit_url that already has query params", async () => {
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    /**
+     * Mock for getDisplayElement
+     *
+     * @returns Object with an innerHTML property
+     */
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+
+  const exp_data = [{ key: "value" }];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as DataCollection;
+
+  global.Request = jest.fn();
+
+  Object.assign(window, {
+    chs: {
+      study: {
+        attributes: { exit_url: "https://example.com/exit?existing=param" },
+      } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
+      pastSessions: {} as Response[],
+      pendingUploads: [],
+    },
+  });
+
+  await on_finish(jsPsychMock as unknown as JsPsych, "some id")(data);
+  expect(global.window.location.replace).toHaveBeenCalledWith(
+    "https://example.com/exit?existing=param&child=hash-child-id&response=response-uuid",
+  );
+});
+
+test("on_finish falls back to window.location.origin if the URL is invalid", async () => {
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    /**
+     * Mock for getDisplayElement
+     *
+     * @returns Object with an innerHTML property
+     */
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+
+  const exp_data = [{ key: "value" }];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as DataCollection;
+
+  global.Request = jest.fn();
+
+  Object.assign(window, {
+    chs: {
+      study: { attributes: { exit_url: "not a valid url" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
+      pastSessions: {} as Response[],
+      pendingUploads: [],
+    },
+  });
+
+  await on_finish(jsPsychMock as unknown as JsPsych, "some id")(data);
+  expect(global.window.location.replace).toHaveBeenCalledWith(
+    "http://localhost/?child=hash-child-id&response=response-uuid",
+  );
+});
+
+test("on_finish handles exit URLs without the https prefix", async () => {
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    /**
+     * Mock for getDisplayElement
+     *
+     * @returns Object with an innerHTML property
+     */
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+
+  const exp_data = [{ key: "value" }];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as DataCollection;
+
+  global.Request = jest.fn();
+
+  Object.assign(window, {
+    chs: {
+      study: { attributes: { exit_url: "done.com" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
+      pastSessions: {} as Response[],
+      pendingUploads: [],
+    },
+  });
+
+  await on_finish(jsPsychMock as unknown as JsPsych, "some id")(data);
+  expect(global.window.location.replace).toHaveBeenCalledWith(
+    "https://done.com/?child=hash-child-id&response=response-uuid",
+  );
 });
 
 test("on_finish throws error if jsPsych instance is null", () => {
