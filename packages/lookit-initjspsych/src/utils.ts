@@ -98,7 +98,8 @@ export const on_finish = (
             url = new URL(window.location.origin);
           }
         }
-        url.searchParams.set("child", window.chs.child.id);
+        const hash_child_id = window.chs.response.attributes.hash_child_id;
+        if (hash_child_id) url.searchParams.set("child", hash_child_id);
         url.searchParams.set("response", window.chs.response.id);
         window.location.replace(url.toString());
       }
