@@ -1,0 +1,31 @@
+<div id="assent-video-trial">
+    <div class="left-column">
+        <div id="{{msg_container_id}}">{{t
+            "exp-lookit-video-consent.Not-recording"
+        }}
+        </div>
+        <div id="{{video_container_id}}" class="jspsych-content"></div>
+        <div id="{{page_container_id}}" class="jspsych-content"></div>
+        <div id="{{pages_nav_container_id}}" >
+            <button id="previous" class="jspsych-btn" disabled>{{prev_btn}}</button>
+            <button id="next" class="jspsych-btn">{{next_btn}}</button>
+        </div>
+    </div>
+    <div class="right-column">
+        <div class="consent-statement">
+                {{participation_question}}
+        </div>
+        <div id="{{resp_btn_container_id}}" >
+            <button id="yes" class="jspsych-btn not-selected" disabled>
+                {{yes_btn}}
+                <img
+                    class="lookit-jspsych-checkmark"
+                    src="{{checkmarkIcon}}"
+                    alt="Green checkmark"
+                    />
+            </button>
+            <button id="no" class="jspsych-btn not-selected" disabled>{{no_btn}}</button>
+        </div>
+        <button id="done" class="jspsych-btn" disabled>{{done_btn}}</button>
+    </div>
+</div>

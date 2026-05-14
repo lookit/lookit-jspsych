@@ -226,3 +226,109 @@ test("establishing connection template in French", () => {
     "<div>en attente de connection video, veuillez attendre...</div>",
   );
 });
+
+const assentIds = {
+  video_container_id: "test-video-container",
+  msg_container_id: "test-msg-container",
+  page_container_id: "test-page-container",
+  resp_btn_container_id: "test-resp-btn-container",
+  pages_nav_container_id: "test-pages-nav-container",
+};
+
+const assentBtnLabels = {
+  yes_btn: "Yes",
+  no_btn: "No",
+  next_btn: "Next",
+  prev_btn: "Previous",
+  done_btn: "Continue",
+};
+
+test("assent video template renders main container", () => {
+  const trial = getTrial({
+    participation_question: "Do you want to participate?",
+  });
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    assentIds,
+    assentBtnLabels,
+  );
+  expect(result).toContain('<div id="assent-video-trial">');
+});
+
+test("assent video template uses provided element IDs", () => {
+  const trial = getTrial();
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    assentIds,
+    assentBtnLabels,
+  );
+  expect(result).toContain('id="test-video-container"');
+  expect(result).toContain('id="test-msg-container"');
+  expect(result).toContain('id="test-page-container"');
+  expect(result).toContain('id="test-resp-btn-container"');
+  expect(result).toContain('id="test-pages-nav-container"');
+});
+
+test("assent video template renders participation_question", () => {
+  const question = "Would you like to be in our study?";
+  const trial = getTrial({ participation_question: question });
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    assentIds,
+    assentBtnLabels,
+  );
+  expect(result).toContain(question);
+});
+
+test("assent video template renders button labels", () => {
+  const customBtns = {
+    ...assentBtnLabels,
+    prev_btn: "Back",
+    next_btn: "Forward",
+  };
+  const trial = getTrial();
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    assentIds,
+    customBtns,
+  );
+  expect(result).toContain("Back");
+  expect(result).toContain("Forward");
+});
+
+test("assent video template includes checkmark icon src", () => {
+  const trial = getTrial();
+  const result = chsTemplate.assentVideo(
+    trial,
+    "my-checkmark.png",
+    assentIds,
+    assentBtnLabels,
+  );
+  expect(result).toContain('src="my-checkmark.png"');
+});
+
+test("assent video template shows not-recording message in English", () => {
+  const trial = getTrial();
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    assentIds,
+    assentBtnLabels,
+  );
+  expect(result).toContain("Not recording");
+});
+
+test("assent video template shows not-recording message in French", () => {
+  const trial = getTrial({ locale: "fr" });
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    assentIds,
+    assentBtnLabels,
+  );
+  expect(result).toContain("Pas en cours d&#x27;enregistrement");
+});

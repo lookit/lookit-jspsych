@@ -1,3 +1,4 @@
+import { assentVideo } from "./assentVideoTemplate";
 import { consentVideo } from "./consentVideoTemplate";
 import { establishingConnection } from "./establishingConnectionTemplate";
 import { exitSurvey } from "./exitSurveyTemplate";
@@ -13,4 +14,5 @@ export default {
   translateString,
   establishingConnection,
   loadingAnimation,
+  assentVideo,
 };

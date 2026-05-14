@@ -1,0 +1,107 @@
+div#assent-video-trial {
+  display: flex;
+
+  img#record-icon {
+    top: 7px;
+    left: 7px;
+    height: 25px;
+    position: absolute;
+  }
+
+  img#record-icon {
+    visibility: "hidden";
+  }
+
+  img.lookit-jspsych-checkmark {
+    width: 25%;
+  }
+
+  > div {
+    padding: 60px 40px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 18px;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+
+  p {
+    font-size: 15px;
+  }
+
+  ol,
+  ul {
+    padding-left: 30px;
+    font-size: 15px;
+  }
+
+  li {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .left-column {
+    align-content: center;
+    width: 40%;
+    max-width: 800px;
+  }
+
+  .right-column {
+    align-content: center;
+    width: 30%;
+    max-width: 600px;
+  }
+
+  #lookit-jspsych-video-msg-container {
+    min-height: 1lh;
+    text-align: center;
+    font-weight: bold;
+    color: red;
+  }
+
+  #lookit-jspsych-video-container {
+    position: relative;
+    margin: auto;
+
+    video {
+      max-width: 400px;
+      min-width: 300px;
+    }
+  }
+
+  button#yes {
+    background-color: lightgreen;
+    border: 2px solid darkgreen;
+    color: darkgreen;
+    font-size: 2em;
+  }
+
+  button#no {
+    background-color: pink;
+    border: 2px solid darkred;
+    color: darkred;
+    font-size: 2em;
+  }
+
+  button#yes.not-selected,
+  button#no.not-selected {
+    filter: opacity(0.4);
+  }
+
+  button#yes.not-selected:hover,
+  button#no.not-selected:hover {
+    filter: opacity(1);
+  }
+
+  button#yes.not-selected:disabled {
+    color: darkgreen;
+  }
+
+  button#no.not-selected:disabled {
+    color: darkred;
+  }
+}
