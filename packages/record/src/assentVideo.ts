@@ -230,16 +230,13 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
     this.displayCurrentPage(display, trial);
 
     // Set event listeners for buttons.
-    this.previousButton(display, trial);
-    this.nextButton(display, trial);
-    this.yesButton(display);
-    this.noButton(display);
+    this.yesButton(display, trial);
+    this.noButton(display, trial);
     this.doneButton(display);
-
-    if (trial.pages.length === 1) {
-      this.setBtnDisabled(display, "next", true);
-      this.setBtnDisabled(display, "yes", false);
-      this.setBtnDisabled(display, "no", false);
+    if (trial.pages.length > 1) {
+      // Display nav buttons if there is more than one page
+      this.previousButton(display, trial);
+      this.nextButton(display, trial);
     }
 
     // Translate and store any messages that may need to be shown. Locale has already been set via the chsTemplates consentVideo method.
