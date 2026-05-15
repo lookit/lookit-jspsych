@@ -127,13 +127,17 @@ div#assent-video-trial {
     filter: opacity(0.4);
   }
 
-  button#yes.not-selected:hover,
-  button#no.not-selected:hover {
+  button#yes.not-selected:not(:disabled):hover,
+  button#no.not-selected:not(:disabled):hover {
     filter: opacity(1);
   }
 
-  button#yes.not-selected:disabled {
-    color: darkgreen;
+  button#yes:disabled,
+  button#no:disabled {
+    background-color: #f0f0f0;
+    border: 2px solid darkgray;
+    color: darkgray;
+    filter: none;
   }
 
   button#done {
