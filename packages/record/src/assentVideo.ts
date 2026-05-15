@@ -268,6 +268,7 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
    */
   private recordFeed(display: HTMLElement) {
     const videoContainer = this.getVideoContainer(display);
+    videoContainer.style.display = "";
     this.recorder.insertRecordFeed(videoContainer);
     this.getImg(display, "record-icon").style.visibility = "hidden";
   }
@@ -279,6 +280,7 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
    */
   private hideRecordFeed(display: HTMLElement) {
     const videoContainer = this.getVideoContainer(display);
+    videoContainer.style.display = "none";
     videoContainer.innerHTML = "";
   }
 
