@@ -7,8 +7,10 @@
         <div id="{{video_container_id}}" class="jspsych-content"></div>
         <div id="{{page_container_id}}" class="jspsych-content"></div>
         <div id="{{pages_nav_container_id}}" >
-            <button id="previous" class="jspsych-btn" disabled>{{prev_btn}}</button>
-            <button id="next" class="jspsych-btn">{{next_btn}}</button>
+            {{#if multiplePages }}
+                <button id="previous" class="jspsych-btn nav-btn" disabled>{{prev_btn}}</button>
+                <button id="next" class="jspsych-btn nav-btn">{{next_btn}}</button>
+            {{/if}}
         </div>
     </div>
     <div class="right-column">

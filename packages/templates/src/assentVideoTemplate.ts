@@ -36,10 +36,13 @@ export const assentVideo = (
 ) => {
   setLocale(trial);
 
+  const multiplePages = trial.pages.length > 2;
+
   return Handlebars.compile(assent_video)({
     ...trial,
     checkmarkIcon,
     ...ids,
     ...btnLabels,
+    multiplePages,
   });
 };

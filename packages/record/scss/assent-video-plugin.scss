@@ -77,14 +77,14 @@ div#assent-video-trial {
     background-color: lightgreen;
     border: 2px solid darkgreen;
     color: darkgreen;
-    font-size: 2em;
+    font-size: 1.2em;
   }
 
   button#no {
     background-color: pink;
     border: 2px solid darkred;
     color: darkred;
-    font-size: 2em;
+    font-size: 1.2em;
   }
 
   button#yes.not-selected,
@@ -101,7 +101,11 @@ div#assent-video-trial {
     color: darkgreen;
   }
 
-  button#no.not-selected:disabled {
-    color: darkred;
+  button#done {
+    font-size: 1.2em;
+  }
+
+  button.nav-btn {
+    font-size: 1.2em;
   }
 }
