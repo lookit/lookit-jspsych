@@ -500,8 +500,9 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
    * Add yes button event listener.
    *
    * @param display - HTML element for experiment.
+   * @param trial - Trial object passed to plugin
    */
-  private yesButton(display: HTMLElement) {
+  private yesButton(display: HTMLElement, trial: TrialType<Info>) {
     const yes = this.getButton(display, "yes");
     yes.addEventListener("click", () => {
       this.response = true;
@@ -510,14 +511,19 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
       no.classList.add("not-selected");
       this.setBtnDisabled(display, "done", false);
     });
+    // If there's only one page, enable the yes button immediately
+    if (trial.pages.length < 2) {
+      this.setBtnDisabled(display, "yes", false);
+    }
   }
 
   /**
    * Add no button event listener.
    *
    * @param display - HTML element for experiment.
+   * @param trial - Trial object passed to plugin
    */
-  private noButton(display: HTMLElement) {
+  private noButton(display: HTMLElement, trial: TrialType<Info>) {
     const no = this.getButton(display, "no");
     no.addEventListener("click", () => {
       this.response = false;
@@ -526,6 +532,10 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
       yes.classList.add("not-selected");
       this.setBtnDisabled(display, "done", false);
     });
+    // If there's only one page, enable the no button immediately
+    if (trial.pages.length < 2) {
+      this.setBtnDisabled(display, "no", false);
+    }
   }
 
   /**
