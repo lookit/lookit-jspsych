@@ -1,5 +1,10 @@
 div#assent-video-trial {
   display: flex;
+  width: 90vw;
+
+  div#lookit-jspsych-video-container video {
+    margin: auto;
+  }
 
   img#record-icon {
     top: 7px;
@@ -45,15 +50,35 @@ div#assent-video-trial {
   }
 
   .left-column {
+    display: flex;
+    flex-direction: column;
     align-content: center;
-    width: 40%;
-    max-width: 800px;
+    flex: 0 0 57%;
+    height: 80vh;
+  }
+
+  div#content-area {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid gray;
+
+    &::before,
+    &::after {
+      content: "";
+      flex: 1;
+    }
+  }
+
+  #lookit-jspsych-assent-pages-nav-container {
+    margin-top: auto;
   }
 
   .right-column {
     align-content: center;
-    width: 30%;
-    max-width: 600px;
+    flex: 0 0 33%;
   }
 
   #lookit-jspsych-video-msg-container {
@@ -66,11 +91,21 @@ div#assent-video-trial {
   #lookit-jspsych-video-container {
     position: relative;
     margin: auto;
+    flex: 0 1 220px;
+    min-height: 100px;
+    overflow: hidden;
 
     video {
+      width: auto;
+      height: 100%;
       max-width: 400px;
-      min-width: 300px;
+      object-fit: contain;
     }
+  }
+
+  #question-container {
+    border: 1px solid gray;
+    padding: 1.5em 0;
   }
 
   button#yes {
