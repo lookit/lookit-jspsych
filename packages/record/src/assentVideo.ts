@@ -285,6 +285,24 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
   }
 
   /**
+   * Show the recording message container
+   *
+   * @param display - HTML element for experiment.
+   */
+  private showMsgContainer(display: HTMLElement) {
+    this.getMessageContainer(display).style.display = "";
+  }
+
+  /**
+   * Hide the recording message container
+   *
+   * @param display - HTML element for experiment.
+   */
+  private hideMsgContainer(display: HTMLElement) {
+    this.getMessageContainer(display).style.display = "none";
+  }
+
+  /**
    * Start recording and update the status message. Sets startPromise so
    * endTrial can await it before stopping.
    *
@@ -316,13 +334,21 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
     const pageContainer = this.getPageContainer(display);
     pageContainer.innerHTML = trial.pages[this.pageIndex].stimulus;
 
+    const willRecord = trial.record_whole_procedure || trial.record_last_page;
+
     if (trial.pages[this.pageIndex].show_webcam) {
+      this.showMsgContainer(display);
       this.recordFeed(display);
       if (this.recordingActive) {
         this.getImg(display, "record-icon").style.visibility = "visible";
       }
     } else {
       this.hideRecordFeed(display);
+      if (willRecord) {
+        this.showMsgContainer(display);
+      } else {
+        this.hideMsgContainer(display);
+      }
     }
   }
 
