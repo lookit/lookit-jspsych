@@ -18,16 +18,22 @@ window.chs = {
 jest.mock("./recorder");
 
 type AssentTrial = {
-  locale: string;
+  locale?: string | undefined;
   pages: Array<{ stimulus: string; show_webcam: boolean }>;
-  min_age_to_assent: number;
-  participation_question: string;
-  next_button: string;
-  previous_button: string;
-  record_whole_procedure: boolean;
-  record_last_page: boolean;
+  min_age_to_assent?: number | undefined;
+  participation_question?: string | undefined;
+  next_button?: string | undefined;
+  previous_button?: string | undefined;
+  yes_button?: string | undefined;
+  no_button?: string | undefined;
+  continue_button?: string | undefined;
+  record_whole_procedure?: boolean | undefined;
+  record_last_page?: boolean | undefined;
 };
 
+// Multiple pages and parameter defaults, but we need to define some of the
+// defaults here because we're calling plugin.trial() directly and bypassing jsPsych.run([trial]),
+// so parameter defaults are not set automatically.
 const defaultTrial: AssentTrial = {
   locale: "en-us",
   pages: [
@@ -35,12 +41,6 @@ const defaultTrial: AssentTrial = {
     { stimulus: "<p>Page 2</p>", show_webcam: false },
     { stimulus: "<p>Page 3</p>", show_webcam: false },
   ],
-  min_age_to_assent: 0,
-  participation_question: "Do you want to participate?",
-  next_button: "Next",
-  previous_button: "Previous",
-  record_whole_procedure: false,
-  record_last_page: false,
 };
 
 /**
@@ -239,6 +239,89 @@ test("Trial renders first page stimulus content", () => {
     "#lookit-jspsych-assent-page-container",
   );
   expect(pageContainer!.innerHTML).toContain("Page 1");
+});
+
+test("Default button labels are used if not set", () => {
+  const { display } = renderTrial({
+    pages: [
+      { stimulus: "<p>Page 1</p>", show_webcam: false },
+      { stimulus: "<p>Page 2</p>", show_webcam: false },
+    ],
+    // omit button label parameters so that defaults are used
+  });
+  expect(display.querySelector("button#yes")!.textContent).toContain("Yes");
+  expect(display.querySelector("button#no")!.textContent).toContain("No");
+  expect(display.querySelector("button#next")!.textContent).toContain("Next");
+  expect(display.querySelector("button#previous")!.textContent).toContain(
+    "Previous",
+  );
+  expect(display.querySelector("button#done")!.textContent).toContain(
+    "Continue",
+  );
+});
+
+test("Default button labels are translated according to locale", () => {
+  const { display } = renderTrial({
+    locale: "fr",
+    pages: [
+      { stimulus: "<p>Page 1</p>", show_webcam: false },
+      { stimulus: "<p>Page 2</p>", show_webcam: false },
+    ],
+    // omit button label parameters so they fall back to translated defaults
+  });
+  expect(display.querySelector("button#yes")!.textContent).toContain("Oui"); // Yes
+  expect(display.querySelector("button#no")!.textContent).toContain("Non"); // No
+  expect(display.querySelector("button#next")!.textContent).toContain(
+    "Prochain",
+  ); // Next
+  expect(display.querySelector("button#previous")!.textContent).toContain(
+    "Précédent",
+  ); // Previous
+  expect(display.querySelector("button#done")!.textContent).toContain(
+    "Continuer",
+  ); // Continue
+});
+
+test("User-defined labels will override defaults in default locale", () => {
+  const { display } = renderTrial({
+    pages: [
+      { stimulus: "<p>Page 1</p>", show_webcam: false },
+      { stimulus: "<p>Page 2</p>", show_webcam: false },
+    ],
+    // custom button yes, next label parameters
+    next_button: ">>",
+    previous_button: "<<",
+  });
+  expect(display.querySelector("button#yes")!.textContent).toContain("Yes");
+  expect(display.querySelector("button#no")!.textContent).toContain("No");
+  expect(display.querySelector("button#next")!.textContent).toContain(">>");
+  expect(display.querySelector("button#previous")!.textContent).toContain("<<");
+  expect(display.querySelector("button#done")!.textContent).toContain(
+    "Continue",
+  );
+});
+
+test("User-defined labels will override defaults in default French", () => {
+  const { display } = renderTrial({
+    locale: "fr",
+    pages: [
+      { stimulus: "<p>Page 1</p>", show_webcam: false },
+      { stimulus: "<p>Page 2</p>", show_webcam: false },
+    ],
+    // custom button no, previous, continue label parameters
+    no_button: "Nah",
+    continue_button: "Done",
+    previous_button: "Back",
+  });
+  expect(display.querySelector("button#yes")!.textContent).toContain("Oui"); // Yes
+  expect(display.querySelector("button#no")!.textContent).toContain("Nah"); // Custom
+  expect(display.querySelector("button#next")!.textContent).toContain(
+    "Prochain",
+  ); // Next
+  expect(display.querySelector("button#previous")!.textContent).toContain(
+    "Back",
+  ); // Custom
+  expect(display.querySelector("button#done")!.textContent).toContain("Done"); // Custom
 });
 
 test("Multi-page trial: yes/no disabled, next enabled, previous disabled on load", () => {
@@ -654,9 +737,7 @@ test("record_whole_procedure does not start recording when false", () => {
   expect(Recorder.prototype.start).not.toHaveBeenCalled();
 });
 
-// ---------------------------------------------------------------------------
 // Recording: record_last_page
-// ---------------------------------------------------------------------------
 
 test("record_last_page starts recording when reaching last page on multi-page trial", () => {
   const { display, plugin } = renderTrial({
