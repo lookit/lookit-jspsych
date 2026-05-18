@@ -553,6 +553,24 @@ const videoAssent = {
 };
 ```
 
+**Custom button labels**
+
+```javascript
+const videoAssent = {
+  type: chsRecord.VideoAssentPlugin,
+  pages: [
+    {
+      stimulus: "<p>In this study, you will see pictures of cats and dogs.</p>",
+    },
+  ],
+  yes_button: "Yep",
+  no_button: "Nope",
+  next_button: ">>",
+  previous_button: "<<",
+  continue_button: "Done",
+};
+```
+
 **Skipping assent for children younger than 7 and recording the whole trial**
 
 ```javascript
