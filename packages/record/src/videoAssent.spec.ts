@@ -534,11 +534,15 @@ test("No button sets response to false and enables done", () => {
     pages: [{ stimulus: "<p>Page 1</p>", show_webcam: false }],
   });
 
-  display
-    .querySelector<HTMLButtonElement>("button#no")!
-    .dispatchEvent(new Event("click"));
+  const yesBtn = display.querySelector<HTMLButtonElement>("button#yes")!;
+  const noBtn = display.querySelector<HTMLButtonElement>("button#no")!;
+
+  noBtn.dispatchEvent(new Event("click"));
 
   expect(plugin["response"]).toBe(false);
+
+  expect(yesBtn.classList.contains("not-selected")).toBe(true);
+  expect(noBtn.classList.contains("not-selected")).toBe(false);
   expect(
     display.querySelector<HTMLButtonElement>("button#done")!.disabled,
   ).toBe(false);
@@ -550,9 +554,6 @@ test("Yes click removes not-selected from yes and adds to no", () => {
   });
   const yesBtn = display.querySelector<HTMLButtonElement>("button#yes")!;
   const noBtn = display.querySelector<HTMLButtonElement>("button#no")!;
-
-  expect(yesBtn.classList.contains("not-selected")).toBe(true);
-  expect(noBtn.classList.contains("not-selected")).toBe(true);
 
   yesBtn.dispatchEvent(new Event("click"));
 
