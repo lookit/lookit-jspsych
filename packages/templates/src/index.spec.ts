@@ -246,6 +246,7 @@ const assentBtnLabels = {
 test("assent video template renders main container", () => {
   const trial = getTrial({
     participation_question: "Do you want to participate?",
+    pages: [{ stimulus: "page 1" }],
   });
   const result = chsTemplate.assentVideo(
     trial,
@@ -258,7 +259,10 @@ test("assent video template renders main container", () => {
 });
 
 test("assent video template uses provided element IDs", () => {
-  const trial = getTrial();
+  // pass at least two pages, otherwise the pages nav container will not be shown
+  const trial = getTrial({
+    pages: [{ stimulus: "page 1" }, { stimulus: "page 2" }],
+  });
   const result = chsTemplate.assentVideo(
     trial,
     "checkmark.png",
@@ -275,7 +279,10 @@ test("assent video template uses provided element IDs", () => {
 
 test("assent video template renders participation_question", () => {
   const question = "Would you like to be in our study?";
-  const trial = getTrial({ participation_question: question });
+  const trial = getTrial({
+    pages: [{ stimulus: "page 1" }],
+    participation_question: question,
+  });
   const result = chsTemplate.assentVideo(
     trial,
     "checkmark.png",
@@ -292,10 +299,14 @@ test("assent video template renders button labels", () => {
     prev_btn: "Back",
     next_btn: "Forward",
   };
-  const trial = getTrial();
+  // pass at least two pages, otherwise the pages nav container will not be shown
+  const trial = getTrial({
+    pages: [{ stimulus: "page 1" }, { stimulus: "page 2" }],
+  });
   const result = chsTemplate.assentVideo(
     trial,
     "checkmark.png",
+    "xmark.png",
     assentIds,
     customBtns,
   );
@@ -304,7 +315,9 @@ test("assent video template renders button labels", () => {
 });
 
 test("assent video template includes checkmark icon src", () => {
-  const trial = getTrial();
+  const trial = getTrial({
+    pages: [{ stimulus: "page 1" }, { stimulus: "page 2" }],
+  });
   const result = chsTemplate.assentVideo(
     trial,
     "my-checkmark.png",
@@ -316,7 +329,9 @@ test("assent video template includes checkmark icon src", () => {
 });
 
 test("assent video template shows not-recording message in English", () => {
-  const trial = getTrial();
+  const trial = getTrial({
+    pages: [{ stimulus: "page 1" }, { stimulus: "page 2" }],
+  });
   const result = chsTemplate.assentVideo(
     trial,
     "checkmark.png",
@@ -328,7 +343,10 @@ test("assent video template shows not-recording message in English", () => {
 });
 
 test("assent video template shows not-recording message in French", () => {
-  const trial = getTrial({ locale: "fr" });
+  const trial = getTrial({
+    locale: "fr",
+    pages: [{ stimulus: "page 1" }, { stimulus: "page 2" }],
+  });
   const result = chsTemplate.assentVideo(
     trial,
     "checkmark.png",
@@ -336,5 +354,5 @@ test("assent video template shows not-recording message in French", () => {
     assentIds,
     assentBtnLabels,
   );
-  expect(result).toContain("Pas en cours d&#x27;enregistrement");
+  expect(result).toContain("Pas en cours d&#x27;enregistrement"); // Not recording
 });
