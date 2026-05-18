@@ -12,7 +12,7 @@ declare const window: LookitWindow;
  * @param values - Object to replace default trial values
  * @returns Trial object
  */
-const getTrial = (values: Record<string, string | boolean> = {}) => {
+const getTrial = (values: Record<string, unknown> = {}) => {
   return {
     locale: "en-us",
     template: "consent-template-5",
@@ -250,6 +250,7 @@ test("assent video template renders main container", () => {
   const result = chsTemplate.assentVideo(
     trial,
     "checkmark.png",
+    "xmark.png",
     assentIds,
     assentBtnLabels,
   );
@@ -261,6 +262,7 @@ test("assent video template uses provided element IDs", () => {
   const result = chsTemplate.assentVideo(
     trial,
     "checkmark.png",
+    "xmark.png",
     assentIds,
     assentBtnLabels,
   );
@@ -277,6 +279,7 @@ test("assent video template renders participation_question", () => {
   const result = chsTemplate.assentVideo(
     trial,
     "checkmark.png",
+    "xmark.png",
     assentIds,
     assentBtnLabels,
   );
@@ -305,6 +308,7 @@ test("assent video template includes checkmark icon src", () => {
   const result = chsTemplate.assentVideo(
     trial,
     "my-checkmark.png",
+    "xmark.png",
     assentIds,
     assentBtnLabels,
   );
@@ -316,6 +320,7 @@ test("assent video template shows not-recording message in English", () => {
   const result = chsTemplate.assentVideo(
     trial,
     "checkmark.png",
+    "xmark.png",
     assentIds,
     assentBtnLabels,
   );
@@ -327,6 +332,7 @@ test("assent video template shows not-recording message in French", () => {
   const result = chsTemplate.assentVideo(
     trial,
     "checkmark.png",
+    "xmark.png",
     assentIds,
     assentBtnLabels,
   );
