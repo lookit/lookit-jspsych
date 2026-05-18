@@ -343,13 +343,12 @@ test("Multi-page trial: yes/no disabled, next enabled, previous disabled on load
   ).toBe(true);
 });
 
-test("Single-page trial: next disabled and yes/no enabled on load", () => {
+test("Single-page trial: no next/prev buttons and yes/no enabled on load", () => {
   const { display } = renderTrial({
     pages: [{ stimulus: "<p>Only page</p>", show_webcam: false }],
   });
-  expect(
-    display.querySelector<HTMLButtonElement>("button#next")!.disabled,
-  ).toBe(true);
+  expect(display.querySelector("button#next")).toBeNull();
+  expect(display.querySelector("button#previous")).toBeNull();
   expect(display.querySelector<HTMLButtonElement>("button#yes")!.disabled).toBe(
     false,
   );
