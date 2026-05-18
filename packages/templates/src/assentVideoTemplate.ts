@@ -38,7 +38,7 @@ export const assentVideo = (
 ) => {
   setLocale(trial);
 
-  const multiplePages = trial.pages.length > 2;
+  const multiplePages = trial.pages.length > 1;
 
   return Handlebars.compile(assent_video)({
     ...trial,
