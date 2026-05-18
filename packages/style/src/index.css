@@ -9296,8 +9296,8 @@ div#assent-video-trial img#record-icon {
 div#assent-video-trial img#record-icon {
   visibility: "hidden";
 }
-div#assent-video-trial img.lookit-jspsych-checkmark {
-  width: 25%;
+div#assent-video-trial img.lookit-jspsych-checkmark, div#assent-video-trial img.lookit-jspsych-xmark {
+  width: 20px;
 }
 div#assent-video-trial > div {
   padding: 60px 40px;
