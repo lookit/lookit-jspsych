@@ -17,8 +17,9 @@ div#assent-video-trial {
     visibility: "hidden";
   }
 
-  img.lookit-jspsych-checkmark {
-    width: 25%;
+  img.lookit-jspsych-checkmark,
+  img.lookit-jspsych-xmark {
+    width: 20px;
   }
 
   > div {

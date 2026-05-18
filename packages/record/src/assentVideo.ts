@@ -2,6 +2,7 @@ import { LookitWindow } from "@lookit/data/dist/types";
 import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import checkmarkIcon from "../img/checkmark-icon.png";
+import xIcon from "../img/xmark.png";
 import { version } from "../package.json";
 import { ElementNotFoundError } from "./errors";
 import Recorder from "./recorder";
@@ -205,6 +206,7 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
     const assentVideo = chsTemplates.assentVideo(
       trial,
       checkmarkIcon,
+      xIcon,
       {
         video_container_id: this.video_container_id,
         msg_container_id: this.msg_container_id,

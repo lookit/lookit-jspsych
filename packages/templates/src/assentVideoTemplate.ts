@@ -24,6 +24,7 @@ export interface AssentVideoBtnLabels {
  *
  * @param trial - JsPsych trial object containing trial params
  * @param checkmarkIcon - Path to the checkmark icon image
+ * @param xIcon - Path to the x mark icon image
  * @param ids - Element ID strings for the containers used in the template
  * @param btnLabels - Labels for the yes, no, next, previous, and done buttons
  * @returns Consent document HTML
@@ -31,6 +32,7 @@ export interface AssentVideoBtnLabels {
 export const assentVideo = (
   trial: TrialType<PluginInfo>,
   checkmarkIcon: string,
+  xIcon: string,
   ids: AssentVideoIds,
   btnLabels: AssentVideoBtnLabels,
 ) => {
@@ -41,6 +43,7 @@ export const assentVideo = (
   return Handlebars.compile(assent_video)({
     ...trial,
     checkmarkIcon,
+    xIcon,
     ...ids,
     ...btnLabels,
     multiplePages,
