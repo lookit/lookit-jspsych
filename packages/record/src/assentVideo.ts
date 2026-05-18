@@ -203,6 +203,7 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
 
     // Get trial HTML string from templates package. This will also set the i18n locale.
     // Translate the default button labels if they have not been set explicitly
+    chsTemplates.setLocale(trial);
     const assentVideo = chsTemplates.assentVideo(
       trial,
       checkmarkIcon,
