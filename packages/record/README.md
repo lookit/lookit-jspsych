@@ -433,14 +433,22 @@ default value is _undefined_, then a value is required for that parameter.
 
 **`pages` [Array | _undefined_]**
 
-Array of page objects. Each page can have the following fields:
+Array of page objects. At least one page must be provided. Each page can have
+the following fields:
 
 - `stimulus` [HTML String | `""`]: HTML content to display on the page.
 - `show_webcam` [Boolean | `false`]: Whether to show the webcam feed on this
   page. Ignored if neither `record_whole_procedure` nor `record_last_page` is
   `true`.
 
-At least one page must be provided.
+You can use the `stimulus` string to embed any kind of HTML-formatted content,
+including images, audio, and video (see examples below). Keep in mind that the
+stimulus content will be displayed in an area that's about 2/3 the height and
+width of the page, which works out to about 715-915px wide x 500-575px high on
+large monitors. If you include the webcam feed (`show_webcam: true`), it will be
+displayed in the same area, above any `stimulus` content. Overflowing content
+will cause a vertical scroll bar. Be sure to test your content on a range of
+monitor/browser sizes
 
 #### Optional
 
@@ -497,6 +505,30 @@ Whether to start recording when the child reaches the final content page and
 record through their response. Use this when you only want to capture the
 child's verbal assent, not the earlier informational pages.
 
+**`parent_intro_text` [String | (see below)]**
+
+**_Default_**:
+`"<h1>Child assent to participate</h1><p>For studies with older children, we need to check that both the parent <em>and</em> the child agree to participate. <strong>This page is for the child!</strong><br>Parents, please help your child read and navigate if needed.</p>"`
+
+This is the HTML-formatted text that should appear at the top of the video
+assent page. This is typically used to let parents know what this trial is for.
+If left unset, the plugin uses the default parent intro text (or appropriate
+translation based on locale). You can also use an empty string (`""`) for no
+parent intro content.
+
+**`no_response_message` [String | (see below)]**
+
+**_Default_**:
+`"You have chosen not to participate. Pressing 'submit' will take you to the main Lookit page."`
+
+This is the message that should be shown under the yes/no buttons if the
+participant clicks the 'no' button. This is intended for a brief message to let
+the participant know that they are choosing _not_ to participate, and it gives
+them a chance to change their response before continuing. If left unset, the
+plugin uses the default confirmation message for a 'no' response (or appropriate
+translation based on locale). You can also use an empty string (`""`) for no
+message.
+
 ### Data
 
 **`response` [Boolean]**
@@ -550,6 +582,24 @@ const videoAssent = {
   ],
   record_last_page: true,
   participation_question: "Do you want to be in our study?",
+};
+```
+
+**Adding images, audio, and video**
+
+```javascript
+const videoAssent = {
+  pages: [
+    {
+      stimulus: `<p>You will see some pictures of cats!</p><img src="https://www.mit.edu/~kimscott/placeholderstimuli/img/two_cats.png" style="height:300px;">`,
+    },
+    {
+      stimulus: `<p>You will hear some people talking. Please play the sound below and adjust your volume if you need to.</p><audio src="https://www.mit.edu/~kimscott/placeholderstimuli/mp3/ready.mp3" controls>`,
+    },
+    {
+      stimulus: `<p>You will see videos like this one.</p><video src="https://www.mit.edu/~kimscott/placeholderstimuli/webm/attentiongrabber.webm" autoplay controls>`,
+    },
+  ],
 };
 ```
 
