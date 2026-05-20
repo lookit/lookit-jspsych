@@ -115,6 +115,25 @@ const info = <const>{
       type: ParameterType.BOOL,
       default: false,
     },
+    /**
+     * Parent intro text. If left unset, the plugin uses the default parent
+     * intro text (or appropriate translation based on locale).
+     */
+    parent_intro_text: {
+      type: ParameterType.HTML_STRING,
+      default: null,
+    },
+    /**
+     * Message that should be shown under the yes/no buttons if the participant
+     * clicks 'no'. This message is intended to let the participant know that
+     * they are choosing not to participate if they click the 'continue' button.
+     * If left unset, the plugin uses the default confirmation message for a
+     * 'no' response (or appropriate translation based on locale).
+     */
+    no_response_message: {
+      type: ParameterType.HTML_STRING,
+      default: null,
+    },
   },
   data: {
     chs_type: {
@@ -155,6 +174,7 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
     "lookit-jspsych-assent-resp-btn-container";
   private readonly pages_nav_container_id =
     "lookit-jspsych-assent-pages-nav-container";
+  private readonly no_resp_msg_container_id = "lookit-jspsych-assent-no-msg";
   private uploadingMsg: string | null = null;
   private startingMsg: string | null = null;
   private recordingMsg: string | null = null;
@@ -204,27 +224,14 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
     // Get trial HTML string from templates package. This will also set the i18n locale.
     // Translate the default button labels if they have not been set explicitly
     chsTemplates.setLocale(trial);
-    const assentVideo = chsTemplates.assentVideo(
-      trial,
-      checkmarkIcon,
-      xIcon,
-      {
-        video_container_id: this.video_container_id,
-        msg_container_id: this.msg_container_id,
-        page_container_id: this.page_container_id,
-        resp_btn_container_id: this.resp_btn_container_id,
-        pages_nav_container_id: this.pages_nav_container_id,
-      },
-      {
-        yes_btn: trial.yes_button ?? chsTemplates.translateString("Yes"),
-        no_btn: trial.no_button ?? chsTemplates.translateString("No"),
-        next_btn: trial.next_button ?? chsTemplates.translateString("Next"),
-        prev_btn:
-          trial.previous_button ?? chsTemplates.translateString("Previous"),
-        done_btn:
-          trial.continue_button ?? chsTemplates.translateString("Continue"),
-      },
-    );
+    const assentVideo = chsTemplates.assentVideo(trial, checkmarkIcon, xIcon, {
+      video_container_id: this.video_container_id,
+      msg_container_id: this.msg_container_id,
+      page_container_id: this.page_container_id,
+      resp_btn_container_id: this.resp_btn_container_id,
+      pages_nav_container_id: this.pages_nav_container_id,
+      no_resp_msg_container_id: this.no_resp_msg_container_id,
+    });
 
     // Add rendered document to display HTML
     display.insertAdjacentHTML("afterbegin", assentVideo);
@@ -406,6 +413,22 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
   }
 
   /**
+   * Retrieve the no-response message container element.
+   *
+   * @param display - HTML element for experiment.
+   * @returns No-response message container div element.
+   */
+  private getNoRespMsgContainer(display: HTMLElement) {
+    const container = display.querySelector<HTMLDivElement>(
+      `div#${this.no_resp_msg_container_id}`,
+    );
+    if (!container) {
+      throw new ElementNotFoundError(this.no_resp_msg_container_id, "div");
+    }
+    return container;
+  }
+
+  /**
    * Retrieve video container element.
    *
    * @param display - HTML element for experiment.
@@ -538,6 +561,7 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
       const no = this.getButton(display, "no");
       no.classList.add("not-selected");
       this.setBtnDisabled(display, "done", false);
+      this.getNoRespMsgContainer(display).style.visibility = "hidden";
     });
     // If there's only one page, enable the yes button immediately
     if (trial.pages.length < 2) {
@@ -559,6 +583,7 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
       const yes = this.getButton(display, "yes");
       yes.classList.add("not-selected");
       this.setBtnDisabled(display, "done", false);
+      this.getNoRespMsgContainer(display).style.visibility = "visible";
     });
     // If there's only one page, enable the no button immediately
     if (trial.pages.length < 2) {

@@ -1,4 +1,5 @@
 <div id="assent-video-trial">
+    <div id="parent-intro">{{{parent_intro_text}}}</div>
     <div class="left-column">
         <div id="{{msg_container_id}}">{{t
             "exp-lookit-video-consent.Not-recording"
@@ -33,6 +34,7 @@
                     {{no_btn}}
                     <img class="lookit-jspsych-xmark" src="{{xIcon}}" alt="Red x"/></button>
             </div>
+            <div id="{{no_resp_msg_container_id}}" style="visibility:hidden">{{{no_response_message}}}</div>
             <button id="done" class="jspsych-btn" disabled>{{done_btn}}</button>
         </div>
     </div>
