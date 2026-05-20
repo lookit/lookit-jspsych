@@ -272,8 +272,6 @@ test("assent video template renders participation_question", () => {
   const question = "Would you like to be in our study?";
   const trial = getTrial({
     pages: [{ stimulus: "page 1" }],
-    previous_button: "Back",
-    next_button: "Forward",
     participation_question: question,
   });
   const result = chsTemplate.assentVideo(
@@ -289,6 +287,8 @@ test("assent video template renders custom button labels from trial params", () 
   // pass at least two pages, otherwise the pages nav container will not be shown
   const trial = getTrial({
     pages: [{ stimulus: "page 1" }, { stimulus: "page 2" }],
+    previous_button: "Back",
+    next_button: "Forward",
   });
   const result = chsTemplate.assentVideo(
     trial,
@@ -304,77 +304,6 @@ test("assent video template includes checkmark icon src", () => {
   const trial = getTrial({
     pages: [{ stimulus: "page 1" }, { stimulus: "page 2" }],
   });
-
-  test("assent video template renders default parent_intro_text in English", () => {
-    const trial = getTrial({ pages: [{ stimulus: "page 1" }] });
-    const result = chsTemplate.assentVideo(
-      trial,
-      "checkmark.png",
-      "xmark.png",
-      assentIds,
-    );
-    expect(result).toContain("This page is for the");
-    expect(result).toContain("Parents, please help your child");
-  });
-
-  test("assent video template renders default parent_intro_text in French", () => {
-    const trial = getTrial({ locale: "fr", pages: [{ stimulus: "page 1" }] });
-    const result = chsTemplate.assentVideo(
-      trial,
-      "checkmark.png",
-      "xmark.png",
-      assentIds,
-    );
-    expect(result).toContain("Cette page est pour l");
-    expect(result).toContain("enfant");
-  });
-
-  test("assent video template uses provided parent_intro_text instead of default", () => {
-    const trial = getTrial({
-      pages: [{ stimulus: "page 1" }],
-      parent_intro_text: "<p>Custom intro for parents.</p>",
-    });
-    const result = chsTemplate.assentVideo(
-      trial,
-      "checkmark.png",
-      "xmark.png",
-      assentIds,
-    );
-    expect(result).toContain("Custom intro for parents.");
-    expect(result).not.toContain("This page is for the");
-  });
-
-  test("assent video template renders default no_response_message hidden in English", () => {
-    const trial = getTrial({ pages: [{ stimulus: "page 1" }] });
-    const result = chsTemplate.assentVideo(
-      trial,
-      "checkmark.png",
-      "xmark.png",
-      assentIds,
-    );
-    expect(result).toContain(
-      '<div id="test-no-resp-msg-container" style="visibility:hidden">',
-    );
-    expect(result).toContain("You have chosen not to participate");
-  });
-
-  test("assent video template uses custom no_response_message instead of default", () => {
-    const trial = getTrial({
-      pages: [{ stimulus: "page 1" }],
-      no_response_message: "<p>Custom no-response message.</p>",
-    });
-    const result = chsTemplate.assentVideo(
-      trial,
-      "checkmark.png",
-      "xmark.png",
-      assentIds,
-    );
-    expect(result).toContain(
-      '<div id="test-no-resp-msg-container" style="visibility:hidden">',
-    );
-    expect(result).toContain("Custom no-response message.");
-    expect(result).not.toContain("You have chosen not to participate");
-  });
   const result = chsTemplate.assentVideo(
     trial,
     "my-checkmark.png",
@@ -382,6 +311,77 @@ test("assent video template includes checkmark icon src", () => {
     assentIds,
   );
   expect(result).toContain('src="my-checkmark.png"');
+});
+
+test("assent video template renders default parent_intro_text in English", () => {
+  const trial = getTrial({ pages: [{ stimulus: "page 1" }] });
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    "xmark.png",
+    assentIds,
+  );
+  expect(result).toContain("This page is for the");
+  expect(result).toContain("Parents, please help your child");
+});
+
+test("assent video template renders default parent_intro_text in French", () => {
+  const trial = getTrial({ locale: "fr", pages: [{ stimulus: "page 1" }] });
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    "xmark.png",
+    assentIds,
+  );
+  expect(result).toContain("Cette page est pour l");
+  expect(result).toContain("enfant");
+});
+
+test("assent video template uses provided parent_intro_text instead of default", () => {
+  const trial = getTrial({
+    pages: [{ stimulus: "page 1" }],
+    parent_intro_text: "<p>Custom intro for parents.</p>",
+  });
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    "xmark.png",
+    assentIds,
+  );
+  expect(result).toContain("Custom intro for parents.");
+  expect(result).not.toContain("This page is for the");
+});
+
+test("assent video template renders default no_response_message hidden in English", () => {
+  const trial = getTrial({ pages: [{ stimulus: "page 1" }] });
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    "xmark.png",
+    assentIds,
+  );
+  expect(result).toContain(
+    '<div id="test-no-resp-msg-container" style="visibility:hidden">',
+  );
+  expect(result).toContain("You have chosen not to participate");
+});
+
+test("assent video template uses custom no_response_message instead of default", () => {
+  const trial = getTrial({
+    pages: [{ stimulus: "page 1" }],
+    no_response_message: "<p>Custom no-response message.</p>",
+  });
+  const result = chsTemplate.assentVideo(
+    trial,
+    "checkmark.png",
+    "xmark.png",
+    assentIds,
+  );
+  expect(result).toContain(
+    '<div id="test-no-resp-msg-container" style="visibility:hidden">',
+  );
+  expect(result).toContain("Custom no-response message.");
+  expect(result).not.toContain("You have chosen not to participate");
 });
 
 test("assent video template shows not-recording message in English", () => {
