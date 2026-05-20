@@ -5,6 +5,7 @@ import TestPlugin from "../fixtures/TestPlugin";
 import lookitInitJsPsych from "./";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
 import type {
+  ChsJsPsychPlugin,
   ChsTimelineArray,
   ChsTimelineDescription,
   ChsTrialDescription,
@@ -630,5 +631,128 @@ describe("lookit-initjspsych timeline/trial handling", () => {
     expect((t[0] as ChsTrialDescription).timeline[1].data).toMatchObject({
       chs_type: "test",
     });
+  });
+});
+
+describe("lookit-initjspsych assent-video abort on 'no' response", () => {
+  // Minimal mock that satisfies jsPsych's plugin interface and has info.name === "assent-video".
+  /** Mock assent-video plugin for testing on_finish wrapping behavior. */
+  class MockAssentVideoPlugin {
+    public static info = {
+      name: "assent-video",
+      version: "0.0.1",
+      parameters: {},
+      data: {},
+    };
+
+    /**
+     * Mock constructor.
+     *
+     * @param _ - JsPsych instance (unused in mock)
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    public constructor(_: unknown) {}
+
+    /**
+     * Immediately resolves the trial.
+     *
+     * @param _display - Display element (unused)
+     * @param _trial - Trial data (unused)
+     * @param on_load - Called when the trial has loaded
+     * @returns Resolved promise.
+     */
+    public trial(_display: HTMLElement, _trial: unknown, on_load: () => void) {
+      on_load();
+      return Promise.resolve();
+    }
+  }
+
+  beforeEach(() => {
+    TestPlugin.reset();
+  });
+
+  test("Wraps on_finish to call abortExperiment when response is false when no user on_finish is defined", async () => {
+    const initFn = lookitInitJsPsych("some id");
+    const jsPsychInstance = initFn({});
+    const abortSpy = jest
+      .spyOn(jsPsychInstance, "abortExperiment")
+      .mockImplementation(() => {});
+
+    const trial: ChsTrialDescription = {
+      type: MockAssentVideoPlugin as unknown as ChsJsPsychPlugin,
+    };
+    await jsPsychInstance.run([trial]);
+
+    expect(typeof trial.on_finish).toBe("function");
+    trial.on_finish!({ response: false });
+    expect(abortSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test("Wraps on_finish to call abortExperiment when response is false, and calls the user's function", async () => {
+    const initFn = lookitInitJsPsych("some id");
+    const jsPsychInstance = initFn({});
+    const abortSpy = jest
+      .spyOn(jsPsychInstance, "abortExperiment")
+      .mockImplementation(() => {});
+    const userOnFinish = jest.fn();
+
+    const trial: ChsTrialDescription = {
+      type: MockAssentVideoPlugin as unknown as ChsJsPsychPlugin,
+      on_finish: userOnFinish,
+    };
+    await jsPsychInstance.run([trial]);
+
+    trial.on_finish!({ response: false });
+    expect(userOnFinish).toHaveBeenCalledWith({ response: false });
+    expect(abortSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test("Does not call abortExperiment when assent-video response is true", async () => {
+    const initFn = lookitInitJsPsych("some id");
+    const jsPsychInstance = initFn({});
+    const abortSpy = jest
+      .spyOn(jsPsychInstance, "abortExperiment")
+      .mockImplementation(() => {});
+
+    const trial: ChsTrialDescription = {
+      type: MockAssentVideoPlugin as unknown as ChsJsPsychPlugin,
+    };
+    await jsPsychInstance.run([trial]);
+
+    trial.on_finish!({ response: true });
+    expect(abortSpy).not.toHaveBeenCalled();
+  });
+
+  test("Still calls a user's on_finish function when assent-video response is true", async () => {
+    const initFn = lookitInitJsPsych("some id");
+    const jsPsychInstance = initFn({});
+    const abortSpy = jest
+      .spyOn(jsPsychInstance, "abortExperiment")
+      .mockImplementation(() => {});
+    const userOnFinish = jest.fn();
+
+    const trial: ChsTrialDescription = {
+      type: MockAssentVideoPlugin as unknown as ChsJsPsychPlugin,
+      on_finish: userOnFinish,
+    };
+    await jsPsychInstance.run([trial]);
+
+    trial.on_finish!({ response: true });
+    expect(userOnFinish).toHaveBeenCalledWith({ response: true });
+    expect(abortSpy).not.toHaveBeenCalled();
+  });
+
+  test("Does not wrap on_finish for non-assent-video plugin types", async () => {
+    const initFn = lookitInitJsPsych("some id");
+    const jsPsychInstance = initFn({});
+    const abortSpy = jest
+      .spyOn(jsPsychInstance, "abortExperiment")
+      .mockImplementation(() => {});
+
+    const trial: ChsTrialDescription = { type: TestPlugin };
+    await jsPsychInstance.run([trial]);
+
+    expect(trial.on_finish).toBeUndefined();
+    expect(abortSpy).not.toHaveBeenCalled();
   });
 });

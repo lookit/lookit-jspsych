@@ -208,6 +208,24 @@ const lookitInitJsPsych = (responseUuid: string) => {
             if (trial.type?.chsData) {
               trial.data = { ...trial.data, ...trial.type.chsData() };
             }
+            if (
+              (trial.type as { info?: { name?: string } })?.info?.name ===
+              "assent-video"
+            ) {
+              const originalOnFinish = trial.on_finish;
+              /**
+               * Wrapped on_finish that aborts the experiment when the child's
+               * assent response is false.
+               *
+               * @param data - Trial data including the response value.
+               */
+              trial.on_finish = (data: Record<string, unknown>) => {
+                originalOnFinish?.(data);
+                if (data["response"] === false) {
+                  jsPsych.abortExperiment();
+                }
+              };
+            }
           }
         },
       );
