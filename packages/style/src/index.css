@@ -9280,9 +9280,19 @@ div#lookit-loader-container div.loader {
   }
 }
 
+.jspsych-content:has(#assent-video-trial) {
+  margin-top: 0;
+}
+
 div#assent-video-trial {
   display: flex;
+  flex-wrap: wrap;
   width: 90vw;
+}
+div#assent-video-trial #parent-intro {
+  width: 100%;
+  padding: 0px 40px;
+  text-align: left;
 }
 div#assent-video-trial div#lookit-jspsych-video-container video {
   margin: auto;
@@ -9301,17 +9311,7 @@ div#assent-video-trial img.lookit-jspsych-xmark {
   width: 20px;
 }
 div#assent-video-trial > div {
-  padding: 60px 40px;
-}
-div#assent-video-trial h1 {
-  text-align: center;
-  font-size: 18px;
-}
-div#assent-video-trial h2 {
-  font-size: 16px;
-}
-div#assent-video-trial p {
-  font-size: 15px;
+  padding: 0px 20px;
 }
 div#assent-video-trial ol,
 div#assent-video-trial ul {
@@ -9327,7 +9327,8 @@ div#assent-video-trial .left-column {
   flex-direction: column;
   align-content: center;
   flex: 0 0 57%;
-  height: 80vh;
+  height: 60vh;
+  min-height: 500px;
 }
 div#assent-video-trial div#content-area {
   flex: 1;
@@ -9403,6 +9404,9 @@ div#assent-video-trial button#done {
 }
 div#assent-video-trial button.nav-btn {
   font-size: 1.2em;
+}
+div#assent-video-trial div#lookit-jspsych-assent-no-msg {
+  color: #626262;
 }
 
 video.webcam-feed {
