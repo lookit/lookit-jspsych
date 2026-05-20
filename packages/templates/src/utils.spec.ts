@@ -1,3 +1,4 @@
+import Handlebars from "handlebars";
 import i18next from "i18next";
 import { PluginInfo, TrialType } from "jspsych";
 import { LocaleNotFoundError } from "./errors";
@@ -19,6 +20,27 @@ test("expFormat convert written text to format well in HTML", () => {
   expect(expFormat("carriage return\r")).toStrictEqual("carriage return<br>");
   expect(expFormat("\tTabbed text")).toStrictEqual(
     "&nbsp;&nbsp;&nbsp;&nbsp;Tabbed text",
+  );
+});
+
+test("exp-format Handlebars helper returns SafeString and preserves HTML in template", () => {
+  // Importing utils registers the helper as a side effect, so it is available here.
+  const helper = Handlebars.helpers["exp-format"] as (
+    context: string,
+  ) => Handlebars.SafeString;
+  expect(helper("text")).toBeInstanceOf(Handlebars.SafeString);
+
+  // Compile a template using double-brace syntax. With SafeString, the <br> and
+  // &nbsp; produced by expFormat are not further escaped by Handlebars.
+  const template = Handlebars.compile("{{exp-format text}}");
+  expect(template({ text: "line1\nline2" })).toBe("line1<br>line2");
+  expect(template({ text: "\tindented" })).toBe(
+    "&nbsp;&nbsp;&nbsp;&nbsp;indented",
+  );
+
+  // HTML tags in the input string are preserved.
+  expect(template({ text: "<strong>bold</strong>" })).toBe(
+    "<strong>bold</strong>",
   );
 });
 
