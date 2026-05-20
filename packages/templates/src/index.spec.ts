@@ -233,14 +233,7 @@ const assentIds = {
   page_container_id: "test-page-container",
   resp_btn_container_id: "test-resp-btn-container",
   pages_nav_container_id: "test-pages-nav-container",
-};
-
-const assentBtnLabels = {
-  yes_btn: "Yes",
-  no_btn: "No",
-  next_btn: "Next",
-  prev_btn: "Previous",
-  done_btn: "Continue",
+  no_resp_msg_container_id: "test-no-resp-msg-container",
 };
 
 test("assent video template renders main container", () => {
@@ -253,7 +246,6 @@ test("assent video template renders main container", () => {
     "checkmark.png",
     "xmark.png",
     assentIds,
-    assentBtnLabels,
   );
   expect(result).toContain('<div id="assent-video-trial">');
 });
@@ -268,7 +260,6 @@ test("assent video template uses provided element IDs", () => {
     "checkmark.png",
     "xmark.png",
     assentIds,
-    assentBtnLabels,
   );
   expect(result).toContain('id="test-video-container"');
   expect(result).toContain('id="test-msg-container"');
@@ -288,17 +279,11 @@ test("assent video template renders participation_question", () => {
     "checkmark.png",
     "xmark.png",
     assentIds,
-    assentBtnLabels,
   );
   expect(result).toContain(question);
 });
 
-test("assent video template renders button labels", () => {
-  const customBtns = {
-    ...assentBtnLabels,
-    prev_btn: "Back",
-    next_btn: "Forward",
-  };
+test("assent video template renders custom button labels from trial params", () => {
   // pass at least two pages, otherwise the pages nav container will not be shown
   const trial = getTrial({
     pages: [{ stimulus: "page 1" }, { stimulus: "page 2" }],
@@ -308,7 +293,6 @@ test("assent video template renders button labels", () => {
     "checkmark.png",
     "xmark.png",
     assentIds,
-    customBtns,
   );
   expect(result).toContain("Back");
   expect(result).toContain("Forward");
@@ -323,7 +307,6 @@ test("assent video template includes checkmark icon src", () => {
     "my-checkmark.png",
     "xmark.png",
     assentIds,
-    assentBtnLabels,
   );
   expect(result).toContain('src="my-checkmark.png"');
 });
@@ -337,7 +320,6 @@ test("assent video template shows not-recording message in English", () => {
     "checkmark.png",
     "xmark.png",
     assentIds,
-    assentBtnLabels,
   );
   expect(result).toContain("Not recording");
 });
@@ -352,7 +334,6 @@ test("assent video template shows not-recording message in French", () => {
     "checkmark.png",
     "xmark.png",
     assentIds,
-    assentBtnLabels,
   );
   expect(result).toContain("Pas en cours d&#x27;enregistrement"); // Not recording
 });
