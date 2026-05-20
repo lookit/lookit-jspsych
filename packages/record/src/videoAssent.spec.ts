@@ -826,6 +826,14 @@ test("No recording started when neither record flag is set", () => {
 
 // Error handling
 
+test("getNoRespMsgContainer throws ElementNotFoundError when container not found", () => {
+  const plugin = new VideoAssentPlugin(makeJsPsych());
+  const display = document.createElement("div");
+  expect(() => plugin["getNoRespMsgContainer"](display)).toThrow(
+    ElementNotFoundError,
+  );
+});
+
 test("getButton throws ElementNotFoundError when button not found", () => {
   const plugin = new VideoAssentPlugin(makeJsPsych());
   const display = document.createElement("div");
@@ -915,6 +923,49 @@ test("displayCurrentPage shows record icon when recording is active and show_web
     display.querySelector<HTMLImageElement>("img#record-icon")!.style
       .visibility,
   ).toBe("visible");
+});
+
+// no_response_message show/hide
+
+test("No-response message is hidden initially", () => {
+  const { display, plugin } = renderTrial({
+    pages: [{ stimulus: "<p>Page 1</p>", show_webcam: false }],
+  });
+  const msgDiv = display.querySelector<HTMLDivElement>(
+    `#${plugin["no_resp_msg_container_id"]}`,
+  )!;
+  expect(msgDiv.style.visibility).toBe("hidden");
+});
+
+test("No button click shows the no-response message", () => {
+  const { display, plugin } = renderTrial({
+    pages: [{ stimulus: "<p>Page 1</p>", show_webcam: false }],
+  });
+  display
+    .querySelector<HTMLButtonElement>("button#no")!
+    .dispatchEvent(new Event("click"));
+  const msgDiv = display.querySelector<HTMLDivElement>(
+    `#${plugin["no_resp_msg_container_id"]}`,
+  )!;
+  expect(msgDiv.style.visibility).toBe("visible");
+});
+
+test("Yes button click hides the no-response message", () => {
+  const { display, plugin } = renderTrial({
+    pages: [{ stimulus: "<p>Page 1</p>", show_webcam: false }],
+  });
+  // show it first
+  display
+    .querySelector<HTMLButtonElement>("button#no")!
+    .dispatchEvent(new Event("click"));
+  // then hide it
+  display
+    .querySelector<HTMLButtonElement>("button#yes")!
+    .dispatchEvent(new Event("click"));
+  const msgDiv = display.querySelector<HTMLDivElement>(
+    `#${plugin["no_resp_msg_container_id"]}`,
+  )!;
+  expect(msgDiv.style.visibility).toBe("hidden");
 });
 
 test("displayCurrentPage does not show record icon when recording is not active", () => {
