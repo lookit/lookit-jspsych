@@ -43,3 +43,22 @@ export const promiseWithTimeout = <T>(
     },
   );
 };
+
+/**
+ * Get a child's current age in years using their date of birth.
+ *
+ * @param childDOB - The child's date of birth, as a date object.
+ * @returns - Age in years (number)
+ */
+export const ageInYears = (childDOB: Date) => {
+  const today = new Date();
+  let beforeBirthday = 0;
+  if (
+    today.getMonth() < childDOB.getMonth() ||
+    (today.getMonth() == childDOB.getMonth() &&
+      today.getDate() < childDOB.getDate())
+  ) {
+    beforeBirthday = 1;
+  }
+  return today.getFullYear() - childDOB.getFullYear() - beforeBirthday;
+};

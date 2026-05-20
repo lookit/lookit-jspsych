@@ -8,3 +8,5 @@ site
 packages/style/**/*.js
 .python-version
 __pycache__
+.claude/
+.vscode/
