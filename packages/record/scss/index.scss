@@ -1,6 +1,7 @@
 @forward "./consent-video-plugin";
 @forward "./video-config-plugin";
 @forward "./loading-animation";
+@forward "./assent-video-plugin";
 
 video.webcam-feed {
   transform: rotateY(180deg);

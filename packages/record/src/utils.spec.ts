@@ -1,4 +1,4 @@
-import { promiseWithTimeout } from "./utils";
+import { ageInYears, promiseWithTimeout } from "./utils";
 
 let consoleLogSpy: jest.SpyInstance<
   void,
@@ -126,4 +126,32 @@ test("Promise with timeout: timeout wins without callback", async () => {
 
   // timeout wins
   await expect(promiseRace).resolves.toBe("timeout");
+});
+
+describe("ageInYears", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test("returns correct age when birthday has already passed this year", () => {
+    jest.setSystemTime(new Date(2026, 5, 15)); // June 15, 2026
+    const dob = new Date(2020, 4, 10); // May 10, 2020 — birthday passed
+    expect(ageInYears(dob)).toBe(6);
+  });
+
+  test("returns correct age when birthday has not yet occurred this year", () => {
+    jest.setSystemTime(new Date(2026, 5, 15)); // June 15, 2026
+    const dob = new Date(2020, 6, 10); // July 10, 2020 — birthday upcoming
+    expect(ageInYears(dob)).toBe(5);
+  });
+
+  test("returns correct age on the birthday itself", () => {
+    jest.setSystemTime(new Date(2026, 5, 15)); // June 15, 2026
+    const dob = new Date(2020, 5, 15); // June 15, 2020 — today is their birthday
+    expect(ageInYears(dob)).toBe(6);
+  });
 });

@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "strict": true
+    "strict": true,
+    "types": ["jest"]
   },
   "extends": "@jspsych/config/tsconfig.json",
   "include": ["src"]

@@ -403,6 +403,240 @@ const videoConsentRecOnly = {
 };
 ```
 
+## Video Assent Plugin
+
+Use this plugin when you want to get assent from the child participant before
+the study begins. The plugin displays researcher-provided content across one or
+more pages that the child can navigate through, then asks the child whether they
+want to participate. The child's response (yes/no) is saved to the trial data.
+
+Optionally, you can record the child's verbal assent response using the webcam.
+
+!!! caution "Don't forget a video config trial!"
+
+    If you are showing the webcam on any of the pages (`show_webcam`) and/or using the recording options (`record_whole_procedure` or
+    `record_last_page`), you MUST have a video config trial in your experiment
+    timeline before the video assent trial.
+
+To create a video assent trial:
+
+```javascript
+const videoAssent = { type: chsRecord.VideoAssentPlugin, ...parameters };
+```
+
+### Parameters
+
+Parameter names are shown below, along with their type and default value. If the
+default value is _undefined_, then a value is required for that parameter.
+
+#### Required
+
+**`pages` [Array | _undefined_]**
+
+Array of page objects. At least one page must be provided. Each page can have
+the following fields:
+
+- `stimulus` [HTML String | `""`]: HTML content to display on the page.
+- `show_webcam` [Boolean | `false`]: Whether to show the webcam feed on this
+  page. Ignored if neither `record_whole_procedure` nor `record_last_page` is
+  `true`.
+
+You can use the `stimulus` string to embed any kind of HTML-formatted content,
+including images, audio, and video (see examples below). Keep in mind that the
+stimulus content will be displayed in an area that's about 2/3 the height and
+width of the page, which works out to about 715-915px wide x 500-575px high on
+large monitors. If you include the webcam feed (`show_webcam: true`), it will be
+displayed in the same area, above any `stimulus` content. Overflowing content
+will cause a vertical scroll bar. Be sure to test your content on a range of
+monitor/browser sizes
+
+#### Optional
+
+**`min_age_to_assent` [Integer | 0]**
+
+Minimum age in years for the child to be prompted for assent. If the child's age
+is known (from their CHS profile) and they are younger than this value, the
+trial is skipped and `skipped: true` is recorded in the data. A value of `0`
+(the default) means all children will be prompted.
+
+**`participation_question` [String | "Do you want to participate in this study?"]**
+
+Question displayed above the yes/no buttons. Can be customized for your study.
+
+**`yes_button` [String | translated "Yes"]**
+
+Label for the button the child clicks to indicate they want to participate. By
+default, the label is automatically translated based on the `locale` parameter.
+Set this to override the translated default.
+
+**`no_button` [String | translated "No"]**
+
+Label for the button the child clicks to indicate they do not want to
+participate. By default, the label is automatically translated based on the
+`locale` parameter. Set this to override the translated default.
+
+**`next_button` [String | translated "Next"]**
+
+Label for the button used to advance to the next page. Only shown when there is
+more than one page. By default, the label is automatically translated based on
+the `locale` parameter. Set this to override the translated default.
+
+**`previous_button` [String | translated "Previous"]**
+
+Label for the button used to go back to the previous page. Only shown when there
+is more than one page. By default, the label is automatically translated based
+on the `locale` parameter. Set this to override the translated default.
+
+**`continue_button` [String | translated "Continue"]**
+
+Label for the button the child clicks to confirm their response and end the
+trial. By default, the label is automatically translated based on the `locale`
+parameter. Set this to override the translated default.
+
+**`record_whole_procedure` [Boolean | false]**
+
+Whether to start recording at the beginning of the trial and record through the
+child's response. If both `record_whole_procedure` and `record_last_page` are
+`true`, `record_whole_procedure` takes precedence.
+
+**`record_last_page` [Boolean | false]**
+
+Whether to start recording when the child reaches the final content page and
+record through their response. Use this when you only want to capture the
+child's verbal assent, not the earlier informational pages.
+
+**`parent_intro_text` [String | (see below)]**
+
+**_Default_**:
+`"<h1>Child assent to participate</h1><p>For studies with older children, we need to check that both the parent <em>and</em> the child agree to participate. <strong>This page is for the child!</strong><br>Parents, please help your child read and navigate if needed.</p>"`
+
+This is the HTML-formatted text that should appear at the top of the video
+assent page. This is typically used to let parents know what this trial is for.
+If left unset, the plugin uses the default parent intro text (or appropriate
+translation based on locale). You can also use an empty string (`""`) for no
+parent intro content.
+
+**`no_response_message` [String | (see below)]**
+
+**_Default_**:
+`"You have chosen not to participate. Pressing 'submit' will take you to the main Lookit page."`
+
+This is the message that should be shown under the yes/no buttons if the
+participant clicks the 'no' button. This is intended for a brief message to let
+the participant know that they are choosing _not_ to participate, and it gives
+them a chance to change their response before continuing. If left unset, the
+plugin uses the default confirmation message for a 'no' response (or appropriate
+translation based on locale). You can also use an empty string (`""`) for no
+message.
+
+### Data
+
+**`response` [Boolean]**
+
+`true` if the child clicked "Yes" (wants to participate), `false` if they
+clicked "No".
+
+**`child_age_years` [Integer]**
+
+The child's age in years at the time of the trial, derived from their CHS
+profile birthday. `null` if the birthday is not set.
+
+**`skipped` [Boolean]**
+
+`true` if the trial was skipped because the child is younger than
+`min_age_to_assent`. Otherwise not present in the data.
+
+### Examples
+
+**Single content page with defaults**
+
+```javascript
+const videoAssent = {
+  type: chsRecord.VideoAssentPlugin,
+  pages: [
+    {
+      stimulus:
+        "<p>We are going to show you some pictures of cats. Is that okay?</p>",
+    },
+  ],
+};
+```
+
+**Multiple pages with recording on the last page**
+
+```javascript
+const videoAssent = {
+  type: chsRecord.VideoAssentPlugin,
+  pages: [
+    {
+      stimulus: "<p>In this study, you will see pictures of cats and dogs.</p>",
+    },
+    {
+      stimulus: "<p>We will record you answering some questions.</p>",
+    },
+    {
+      stimulus:
+        "<p>Please say your answer out loud.<br>Parent: please click the button that corresponds to your child's answer.</p>",
+      show_webcam: true,
+    },
+  ],
+  record_last_page: true,
+  participation_question: "Do you want to be in our study?",
+};
+```
+
+**Adding images, audio, and video**
+
+```javascript
+const videoAssent = {
+  pages: [
+    {
+      stimulus: `<p>You will see some pictures of cats!</p><img src="https://www.mit.edu/~kimscott/placeholderstimuli/img/two_cats.png" style="height:300px;">`,
+    },
+    {
+      stimulus: `<p>You will hear some people talking. Please play the sound below and adjust your volume if you need to.</p><audio src="https://www.mit.edu/~kimscott/placeholderstimuli/mp3/ready.mp3" controls>`,
+    },
+    {
+      stimulus: `<p>You will see videos like this one.</p><video src="https://www.mit.edu/~kimscott/placeholderstimuli/webm/attentiongrabber.webm" autoplay controls>`,
+    },
+  ],
+};
+```
+
+**Custom button labels**
+
+```javascript
+const videoAssent = {
+  type: chsRecord.VideoAssentPlugin,
+  pages: [
+    {
+      stimulus: "<p>In this study, you will see pictures of cats and dogs.</p>",
+    },
+  ],
+  yes_button: "Yep",
+  no_button: "Nope",
+  next_button: ">>",
+  previous_button: "<<",
+  continue_button: "Done",
+};
+```
+
+**Skipping assent for children younger than 7 and recording the whole trial**
+
+```javascript
+const videoAssent = {
+  type: chsRecord.VideoAssentPlugin,
+  min_age_to_assent: 7,
+  pages: [
+    {
+      stimulus: "<p>Hi! We are going to play a game.</p>",
+    },
+  ],
+  record_whole_procedure: true,
+  participation_question: "Do you want to play?",
+};
+```
+
 ## Trial Recording Extension
 
 Trial recording can be added to most jsPsych trials. This is a jsPsych extension
