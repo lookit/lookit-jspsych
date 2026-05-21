@@ -1,5 +1,13 @@
 # @lookit/lookit-initjspsych
 
+## 3.2.0
+
+### Minor Changes
+
+- 8ec309c: The `lookit-initjspsych` package now checks for VideoAssent trials
+  and wraps the on_finish function so that the experiment is aborted if the
+  participant clicks the no button.
+
 ## 3.1.0
 
 ### Minor Changes
