@@ -35,11 +35,12 @@ test("Api call to patch Response", async () => {
 });
 
 test("Check that all calls to API have finished", async () => {
-  expect(await finish()).toStrictEqual([
-    "get response",
-    "get response",
-    "get response",
-    "get response",
-    "patch response",
-  ]);
+  // Prior tests already awaited each call above, so those promises have
+  // already settled and been removed from the pending list.
+  expect(await finish()).toStrictEqual([]);
+});
+
+test("finish() awaits promises still pending at call time", async () => {
+  updateResponse("some uuid", {});
+  expect(await finish()).toStrictEqual(["patch response"]);
 });
