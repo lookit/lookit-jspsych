@@ -21,13 +21,21 @@ import {
   StreamInactiveInitializeError,
   TimeoutError,
 } from "./errors";
-import { CSSWidthHeight, StopOptions, StopResult } from "./types";
+import {
+  CSSWidthHeight,
+  StartTimeSource,
+  StopOptions,
+  StopResult,
+} from "./types";
 import { promiseWithTimeout } from "./utils";
 
 declare const window: LookitWindow;
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
+  // How long to wait for the MediaRecorder "start" event before falling back to the call-site timestamp for the recording's stream-time reference.
+  private static readonly startEventTimeoutMs = 1000;
+
   private url?: string;
   private _s3?: LookitS3;
 
@@ -35,6 +43,11 @@ export default class Recorder {
   private localDownload: boolean =
     process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
   private filename?: string;
+  private consent?: boolean;
+  // Reference point (performance.now() timestamp) for the current recording's stream time. Undefined when no recording is in progress.
+  private recordingStartTime?: number;
+  // How recordingStartTime was determined (start event vs. fallback timestamp). Undefined when no recording is in progress.
+  private startTimeSource?: StartTimeSource;
   private stopPromise?: Promise<string>;
   private webcam_element_id = "lookit-jspsych-webcam";
   private mimeType = "video/webm";
@@ -67,6 +80,17 @@ export default class Recorder {
       this.jsPsych.pluginAPI.getCameraRecorder() ||
       this.jsPsych.pluginAPI.getMicrophoneRecorder()
     );
+  }
+
+  /**
+   * Whether the current recording is camera (video) or microphone (audio only).
+   * Mirrors the fallback logic in the `recorder` getter: if there's a camera
+   * recorder it's a camera recording, otherwise microphone.
+   *
+   * @returns Camera or "microphone".
+   */
+  private get recordingMethod(): "camera" | "microphone" {
+    return this.jsPsych.pluginAPI.getCameraRecorder() ? "camera" : "microphone";
   }
 
   /**
@@ -129,6 +153,9 @@ export default class Recorder {
     this.initializeRecorder(this.streamClone.clone());
     // Clear blob buffer (any pending uploads are handled by LookitS3 instances and tracked globally)
     this.blobs = [];
+    // Clear the stream-time reference; recording is no longer in progress, so getStreamTime() should return null until the next start().
+    this.recordingStartTime = undefined;
+    this.startTimeSource = undefined;
     // TO DO: reset S3/filename/URL?
   }
 
@@ -247,9 +274,20 @@ export default class Recorder {
    *   footage.
    * @param trial_type - Trial type, as saved in the jsPsych data. This comes
    *   from the plugin info "name" value (not the class name).
+   * @returns How the stream-time reference point was determined at the time
+   *   start() resolved: "event" if the "start" event fired within the timeout,
+   *   or "fallback" if the call-site timestamp was used. (A late "start" event
+   *   can subsequently correct a "fallback" to "fallback_corrected"; that later
+   *   state is reflected in getRecordingMetadata(), not in this return value.)
    */
-  public async start(consent: boolean, trial_type: string) {
+  public async start(
+    consent: boolean,
+    trial_type: string,
+  ): Promise<StartTimeSource> {
     this.initializeCheck();
+
+    // Store whether this is consent footage, for the recording metadata.
+    this.consent = consent;
 
     // Set video filename
     this.filename = this.createFileName(consent, trial_type);
@@ -271,7 +309,83 @@ export default class Recorder {
       await this.s3.createUpload();
     }
 
+    // Capture media start time from the recorder's "start" event, which fires when capture actually begins (not from the synchronous recorder.start() call, which returns before recording is truly live). performance.now() is monotonic, and stream time is a good approximation of media time as long as the recorder is never paused.
+    // TO DO: Add handling for recording pause durations once we implement experiment/recording pause/resume functionality.
+    const started = new Promise<void>((resolve) => {
+      this.recorder.addEventListener(
+        "start",
+        () => {
+          // The "start" event is the accurate media t=0, so always adopt it —
+          // even if it fires after the fallback already ran, in which case it
+          // corrects the earlier (inaccurate) fallback reference.
+          this.startTimeSource =
+            this.startTimeSource === "fallback"
+              ? "fallback_corrected"
+              : "event";
+          this.recordingStartTime = performance.now();
+          resolve();
+        },
+        { once: true },
+      );
+    });
+
     this.recorder.start();
+
+    // Wait for the "start" event so recordingStartTime is set (and recording has genuinely begun) before start() resolves and the experiment proceeds.
+    // Don't hang if the event never fires: after a timeout, fall back to the call-site timestamp and continue. If the event does fire later, its callback (above) corrects the reference.
+    let startFallbackTimeout: ReturnType<typeof setTimeout>;
+    const startFallback = new Promise<void>((resolve) => {
+      startFallbackTimeout = setTimeout(() => {
+        if (this.recordingStartTime === undefined) {
+          this.recordingStartTime = performance.now();
+          this.startTimeSource = "fallback";
+        }
+        resolve();
+      }, Recorder.startEventTimeoutMs);
+    });
+
+    await Promise.race([started, startFallback]);
+    clearTimeout(startFallbackTimeout!);
+
+    // At this point one of the two branches above has set the source; it is
+    // "event" or "fallback" here ("fallback_corrected" can only be reached
+    // later, if a slow start event arrives after start() has resolved).
+    return this.startTimeSource!;
+  }
+
+  /**
+   * Metadata describing the current recording, for adding to trial data. Should
+   * be called after `start()`, once the filename and consent flag are set.
+   *
+   * @returns Object with the recording's filename, method (camera/microphone),
+   *   whether it is consent footage, and how the stream-time reference point
+   *   was determined (see StartTimeSource). start_time_source reflects the
+   *   latest known state, so a fallback that was later corrected by a slow
+   *   "start" event reads as "fallback_corrected".
+   */
+  public getRecordingMetadata() {
+    return {
+      filename: this.filename,
+      method: this.recordingMethod,
+      is_consent: this.consent,
+      start_time_source: this.startTimeSource,
+    };
+  }
+
+  /**
+   * The elapsed stream time (in milliseconds) since the current recording
+   * started. Used to timestamp trial events relative to the recording. Returns
+   * null when no recording is in progress. TO DO: Add handling for recording
+   * pause durations once we implement experiment/recording pause/resume
+   * functionality.
+   *
+   * @returns Milliseconds since recording started, or null if not recording.
+   */
+  public getStreamTime(): number | null {
+    if (this.recordingStartTime === undefined) {
+      return null;
+    }
+    return performance.now() - this.recordingStartTime;
   }
 
   /**
