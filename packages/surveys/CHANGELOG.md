@@ -1,5 +1,13 @@
 # @lookit/surveys
 
+## 7.0.0
+
+### Patch Changes
+
+- Updated dependencies [7e9b0b2]
+- Updated dependencies [8ec309c]
+  - @lookit/templates@3.2.0
+
 ## 6.0.0
 
 ### Patch Changes

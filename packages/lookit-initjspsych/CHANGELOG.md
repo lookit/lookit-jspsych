@@ -1,5 +1,23 @@
 # @lookit/lookit-initjspsych
 
+## 3.2.0
+
+### Minor Changes
+
+- 8ec309c: The `lookit-initjspsych` package now checks for VideoAssent trials
+  and wraps the on_finish function so that the experiment is aborted if the
+  participant clicks the no button.
+
+## 3.1.0
+
+### Minor Changes
+
+- ac2c1ed: Adds URL parameters to the study exit URL: 'child', which is the CHS
+  child ID, and 'response', which is the CHS response ID. If the study exit URL
+  is invalid, it checks for a missing `https://` prefix before falling back to
+  the CHS domain. Adds tests for handling invalid URLs and for URLs that have
+  existing query parameters.
+
 ## 3.0.0
 
 ### Minor Changes

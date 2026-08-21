@@ -1,5 +1,38 @@
 # @lookit/record
 
+## 7.0.0
+
+### Minor Changes
+
+- 8ec309c: This update adds the video assent plugin to the `Record` package
+  (`chsRecord.VideoAssentPlugin`). This plugin uses a new assent video template
+  in the `Templates` package, which can be accessed via
+  `chsTemplates.assentVideo`. The style package was updated with the CSS for the
+  video assent plugin. Documentation can be found in the `Record` package
+  section on the CHS jsPsych documentation page:
+  https://lookit.readthedocs.io/projects/chs-jspsych/en/latest/record/. Other
+  minor changes:
+
+  - The `Templates` package now exposes `setLocale`, in case plugins need to
+    translate default text before passing it into a template function.
+    (`setLocale` is still called inside all template functions and does not need
+    to be added when this pre-translation step is not needed.)
+  - Installs Jest types and adds them to TS config files.
+  - Adds tests for new features and changes.
+
+### Patch Changes
+
+- 7e9b0b2: This update fixes a bug where string parameters could not include
+  HTML or markdown-style formatting/characters that should have been converted
+  into HTML. This also standardizes the use of ParameterType.HTML_STRING (rather
+  than STRING) anytime a parameter is rendered with unescaped HTML, and the use
+  of double (vs triple) braces with exp-format text. It adds tests for the
+  exp-format template tag to test the handlebars-rendered version of text,
+  rather than just the output of the helper function.
+- Updated dependencies [7e9b0b2]
+- Updated dependencies [8ec309c]
+  - @lookit/templates@3.2.0
+
 ## 6.0.0
 
 ### Minor Changes
