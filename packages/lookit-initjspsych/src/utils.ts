@@ -1,11 +1,61 @@
 import Api from "@lookit/data";
-import { JsPsychExpData, LookitWindow } from "@lookit/data/dist/types";
+import {
+  ChsRecordingData,
+  JsPsychExpData,
+  LookitWindow,
+} from "@lookit/data/dist/types";
 import chsTemplates from "@lookit/templates";
 import { DataCollection, JsPsych } from "jspsych";
 import { NoJsPsychInstanceError } from "./errors";
 import { UserFuncOnDataUpdate, UserFuncOnFinish } from "./types";
 
 declare let window: LookitWindow;
+
+/**
+ * Minimal shape of the session recorder stored in window.chs.sessionRecorder
+ * that this wrapper needs. Declared locally to avoid a dependency on the record
+ * package (which is what actually constructs it).
+ */
+interface ChsSessionRecorder {
+  getSessionTrialRecordingData: () => ChsRecordingData;
+}
+
+/**
+ * If a session (cross-trial) recording is currently active, capture its
+ * per-trial recording data (filename, is_session_recording, stream time) at the
+ * current moment. Intended to be called at the start of each trial, so the
+ * captured stream time reflects the trial's start.
+ *
+ * @returns The session recording data for this trial, or null if no session
+ *   recording is active.
+ */
+export const get_session_recording_data = (): ChsRecordingData | null => {
+  const sessionRecorder = window.chs.sessionRecorder as
+    | ChsSessionRecorder
+    | null
+    | undefined;
+  return sessionRecorder
+    ? sessionRecorder.getSessionTrialRecordingData()
+    : null;
+};
+
+/**
+ * Attach captured session recording data to a trial's data, unless the trial
+ * already has its own recording data (e.g. a start-record or trial-record
+ * trial, whose block takes precedence).
+ *
+ * @param data - The trial's jsPsych data (mutated in place).
+ * @param recordingData - Session recording data captured at the trial's start,
+ *   or null if there was none.
+ */
+export const add_session_recording_data = (
+  data: JsPsychExpData,
+  recordingData: ChsRecordingData | null,
+): void => {
+  if (recordingData && !data.chs_recording) {
+    data.chs_recording = recordingData;
+  }
+};
 
 /**
  * Retry an async function with exponential backoff. Used for API calls we
@@ -145,17 +195,62 @@ export const on_finish = (
     // after response data saving is complete.)
     try {
       if (window.chs.pendingUploads) {
-        const results = await Promise.allSettled(
-          window.chs.pendingUploads.map((u) => u.promise),
-        );
+        const uploads = window.chs.pendingUploads;
+        const results = await Promise.allSettled(uploads.map((u) => u.promise));
         results.forEach((result, i) => {
           if (result.status === "rejected") {
             console.error(
-              `Pending upload failed for "${window.chs.pendingUploads[i].file}": `,
+              `Pending upload failed for "${uploads[i].file}": `,
               result.reason,
             );
           }
         });
+
+        // Record each upload's outcome in the trial data, matched by filename,
+        // so the saved response shows which recordings uploaded successfully.
+        // This happens after the response data save above because upload
+        // outcomes aren't known until the uploads settle.
+        let annotatedAny = false;
+        uploads.forEach((upload) => {
+          // Require chs_recording to exist so trials without recording data
+          // never match (and so the assignment below is safe) — e.g. a match
+          // between two undefined filenames.
+          const trials = exp_data.filter(
+            (trial) =>
+              trial.chs_recording !== undefined &&
+              trial.chs_recording.filename === upload.file,
+          );
+          if (trials.length === 0) {
+            console.warn(
+              `No trial data found for uploaded recording "${upload.file}"; its upload status was not recorded in the data.`,
+            );
+          }
+          trials.forEach((trial) => {
+            trial.chs_recording!.upload_status = upload.status;
+            if (upload.error_message) {
+              trial.chs_recording!.upload_error = upload.error_message;
+            }
+            annotatedAny = true;
+          });
+        });
+
+        // Persist the upload outcomes in a second write (they weren't known at
+        // the first save). Supplementary, so a single attempt: if it fails, the
+        // full data and completed flag from the first save still stand.
+        if (annotatedAny) {
+          try {
+            await Api.updateResponse(responseUuid, {
+              exp_data,
+              completed: true,
+            });
+            await Api.finish();
+          } catch (err) {
+            console.error(
+              "Error while saving recording upload statuses: ",
+              err,
+            );
+          }
+        }
       }
     } catch (err) {
       console.error("Error while waiting for pending uploads: ", err);
