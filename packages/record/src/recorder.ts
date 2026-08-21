@@ -387,29 +387,41 @@ export default class Recorder {
       stream_time: this.toStreamTimeBlock(stream_time_ms),
       method: this.recordingMethod,
       is_consent: this.consent,
-      // Reflects the latest known state, so a fallback later corrected by a slow
-      // "start" event reads as "fallback_corrected".
+      // The source in effect right now. Callers build this block synchronously
+      // with capturing the stream time (no await in between), so this reflects
+      // the reference actually used for that stream time: a stream time measured
+      // against a fallback reference reports "fallback", and one measured after a
+      // slow "start" event corrected the reference reports "fallback_corrected".
       start_time_source: this.startTimeSource,
     };
   }
 
   /**
    * Assemble the partial CHS recording data block for a trial that occurs
-   * during a session recording but does not itself start or stop it. Only the
-   * always-present fields (filename, is_session_recording, stream_time) are
-   * included; the full metadata block lives on the trial that starts the
-   * recording. Captures the stream time now, so this must be called at the
-   * start of the trial.
+   * during a session recording but does not itself start or stop it. The
+   * recording-level metadata (method, is_consent) lives on the trial that
+   * starts the recording and is not repeated here. The stream time and its
+   * start_time_source are captured now — read together in this synchronous
+   * block, so the source reflects the reference actually used for this stream
+   * time. This must be called at the start of the trial, so the stream time
+   * marks the trial's start.
+   *
+   * Because start_time_source is captured per trial, trials whose stream time
+   * is measured against a fallback reference report "fallback", while trials
+   * after a slow "start" event corrects the reference report
+   * "fallback_corrected" (or "event" when the event was on time). See
+   * {@link getChsRecordingData}.
    *
    * @returns Recording data with the session recording's filename,
-   *   is_session_recording (true), and the stream time at the moment of the
-   *   call.
+   *   is_session_recording (true), the stream time at the moment of the call,
+   *   and the start_time_source in effect for that stream time.
    */
   public getSessionTrialRecordingData(): ChsRecordingData {
     return {
       filename: this.filename!,
       is_session_recording: true,
       stream_time: this.toStreamTimeBlock(this.getStreamTime()),
+      start_time_source: this.startTimeSource,
     };
   }
 

@@ -307,10 +307,13 @@ test("Recorder getSessionTrialRecordingData returns the partial session block wi
   expect(data.filename).toBe(rec["filename"]);
   expect(data.is_session_recording).toBe(true);
   expect(data.stream_time).toStrictEqual({ trial_start_ms: 400 });
-  // Only the always-present fields are included in the partial block.
+  // start_time_source is captured per trial alongside the stream time (the mock
+  // fires the "start" event, so the reference is accurate here).
+  expect(data.start_time_source).toBe("event");
+  // Recording-level metadata (method, is_consent) lives on the start trial and
+  // is not repeated in the per-trial block.
   expect(data.method).toBeUndefined();
   expect(data.is_consent).toBeUndefined();
-  expect(data.start_time_source).toBeUndefined();
 });
 
 test("Recorder getSessionTrialRecordingData records a null stream time as null", () => {
@@ -378,6 +381,42 @@ test("Recorder corrects the stream time reference if a slow start event fires af
   expect(rec.getChsRecordingData(false, null).start_time_source).toBe(
     "fallback_corrected",
   );
+});
+
+test("Recorder getSessionTrialRecordingData reports the source in effect when each trial's stream time is captured", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const media = jsPsych.pluginAPI.getCameraRecorder();
+  // Prevent the mock recorder from firing the "start" event automatically.
+  media.start = jest.fn();
+
+  jest.spyOn(performance, "now").mockReturnValue(3000);
+  const startPromise = rec.start(false, "test-type");
+  await jest.advanceTimersByTimeAsync(1000);
+  await expect(startPromise).resolves.toBe("fallback");
+  expect(rec["recordingStartTime"]).toBe(3000);
+
+  // A trial whose stream time is captured before the correction reports the
+  // fallback reference it was actually measured against.
+  jest.spyOn(performance, "now").mockReturnValue(3500);
+  const duringFallback = rec.getSessionTrialRecordingData();
+  expect(duringFallback.stream_time).toStrictEqual({ trial_start_ms: 500 });
+  expect(duringFallback.start_time_source).toBe("fallback");
+
+  // The real "start" event arrives late and corrects the reference.
+  jest.spyOn(performance, "now").mockReturnValue(3200);
+  const startListener = (media.addEventListener as jest.Mock).mock.calls.find(
+    (call) => call[0] === "start",
+  )![1];
+  startListener();
+  expect(rec["recordingStartTime"]).toBe(3200);
+
+  // A trial whose stream time is captured after the correction reports the
+  // corrected reference, and its stream time is measured against it.
+  jest.spyOn(performance, "now").mockReturnValue(4200);
+  const afterCorrection = rec.getSessionTrialRecordingData();
+  expect(afterCorrection.stream_time).toStrictEqual({ trial_start_ms: 1000 });
+  expect(afterCorrection.start_time_source).toBe("fallback_corrected");
 });
 
 test("Recorder getChsRecordingData reports microphone method when there is no camera recorder", async () => {

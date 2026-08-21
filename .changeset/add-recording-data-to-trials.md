@@ -23,7 +23,9 @@ experiment data, with the following properties:
     small negative value, since a single-trial recording starts slightly after
     the trial begins.
 - `start_time_source`: How the stream-time reference point (i.e the start of
-  recording timestamp) was determined, one of:
+  recording timestamp) was determined. Captured per trial, alongside that
+  trial's stream time, so it describes the reference the trial's stream time was
+  actually measured against. One of:
   - "event": The recorder's start event - most precise.
   - "fallback": A timestamp taken 1 second after attempting to start the
     recording, because the start event did not fire. (This is a precaution to
@@ -31,7 +33,10 @@ experiment data, with the following properties:
     recording - stream_time values may be inaccurate!)
   - "fallback_corrected": The fallback timestamp was used initially to avoid
     blocking the experiment, but the "start" event later fired and corrected the
-    start time.
+    start time, and this trial's stream time was measured against the corrected
+    reference. Because the source is per trial, a single session recording can
+    show "fallback" on a trial captured before the correction and
+    "fallback_corrected" on later trials.
 - `upload_status`: One of: "pending", "success", "failure".
 - `upload_error`: Only included if the upload fails.
 

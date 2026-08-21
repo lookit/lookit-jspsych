@@ -58,12 +58,13 @@ export interface RecordingStreamTime {
  * CHS recording information attached to a trial's jsPsych data under the
  * `chs_recording` key. `filename` and `is_session_recording` are always present
  * when this block exists, since any trial associated with a recording has both.
- * The remaining fields vary by trial: the full metadata block (method,
- * is_consent, start_time_source) is added on the trial that starts a recording;
- * and upload_status/upload_error are added at experiment on_finish once the
- * upload has settled. stream_time is always present but may be null when no
- * stream time was captured for the trial (e.g. the recording's "start" event
- * had not yet fired).
+ * The remaining fields vary by trial: the recording-level metadata (method,
+ * is_consent) is added on the trial that starts a recording; start_time_source
+ * is captured per trial alongside the stream time (so it reflects the reference
+ * actually used for that trial's stream time); and upload_status/upload_error
+ * are added at experiment on_finish once the upload has settled. stream_time is
+ * always present but may be null when no stream time was captured for the trial
+ * (e.g. the recording's "start" event had not yet fired).
  */
 export interface ChsRecordingData {
   /** Video filename for the recording this trial belongs to. */
@@ -79,7 +80,13 @@ export interface ChsRecordingData {
   method?: "camera" | "microphone";
   /** Whether this is consent footage. */
   is_consent?: boolean;
-  /** How the stream-time reference point was determined. */
+  /**
+   * How the stream-time reference point was determined, as of when this trial's
+   * stream time was captured. Because it is captured per trial, a trial whose
+   * stream time was measured before a slow "start" event corrected the
+   * reference reports "fallback", while a later trial reports
+   * "fallback_corrected".
+   */
   start_time_source?: StartTimeSource;
   /**
    * Upload outcome for the recording, added at experiment on_finish once the
