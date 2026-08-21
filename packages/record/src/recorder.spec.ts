@@ -233,6 +233,24 @@ test("Recorder getStreamTime returns null when not recording", () => {
   expect(rec.getStreamTime()).toBeNull();
 });
 
+test("Recorder getStreamTimeAt converts a timestamp to stream time relative to recording start", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  // Not recording yet: any timestamp maps to null.
+  expect(rec.getStreamTimeAt(2000)).toBeNull();
+
+  jest.spyOn(performance, "now").mockReturnValue(1000);
+  await rec.start(false, "test-type");
+  expect(rec["recordingStartTime"]).toBe(1000);
+
+  // A timestamp after recording start is positive...
+  expect(rec.getStreamTimeAt(1600)).toBe(600);
+  // ...and a timestamp before recording start (e.g. a trial that began before
+  // the recording did) is negative.
+  expect(rec.getStreamTimeAt(950)).toBe(-50);
+});
+
 test("Recorder reset clears the stream time reference", () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
@@ -249,18 +267,59 @@ test("Recorder reset clears the stream time reference", () => {
   expect(rec.getStreamTime()).toBeNull();
 });
 
-test("Recorder getRecordingMetadata returns filename, method, consent, and start time source", async () => {
+test("Recorder getChsRecordingData assembles the recording data block", async () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
 
   await rec.start(true, "video-consent");
 
-  const metadata = rec.getRecordingMetadata();
-  expect(metadata.filename).toBe(rec["filename"]);
-  expect(metadata.method).toBe("camera");
-  expect(metadata.is_consent).toBe(true);
+  const data = rec.getChsRecordingData(true, 250);
+  expect(data.filename).toBe(rec["filename"]);
+  expect(data.is_session_recording).toBe(true);
+  expect(data.method).toBe("camera");
+  expect(data.is_consent).toBe(true);
   // The mock fires the "start" event, so the reference is accurate.
-  expect(metadata.start_time_source).toBe("event");
+  expect(data.start_time_source).toBe("event");
+  // A numeric stream time is wrapped into the stream_time object.
+  expect(data.stream_time).toStrictEqual({ trial_start_ms: 250 });
+});
+
+test("Recorder getChsRecordingData records a null stream time as null", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  await rec.start(false, "test-type");
+
+  const data = rec.getChsRecordingData(false, null);
+  expect(data.is_session_recording).toBe(false);
+  expect(data.stream_time).toBeNull();
+});
+
+test("Recorder getSessionTrialRecordingData returns the partial session block with current stream time", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  jest.spyOn(performance, "now").mockReturnValue(1000);
+  await rec.start(false, "test-type");
+  // Advance the clock so the captured stream time is non-zero.
+  jest.spyOn(performance, "now").mockReturnValue(1400);
+
+  const data = rec.getSessionTrialRecordingData();
+  expect(data.filename).toBe(rec["filename"]);
+  expect(data.is_session_recording).toBe(true);
+  expect(data.stream_time).toStrictEqual({ trial_start_ms: 400 });
+  // Only the always-present fields are included in the partial block.
+  expect(data.method).toBeUndefined();
+  expect(data.is_consent).toBeUndefined();
+  expect(data.start_time_source).toBeUndefined();
+});
+
+test("Recorder getSessionTrialRecordingData records a null stream time as null", () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  // Not started, so getStreamTime() is null.
+  const data = rec.getSessionTrialRecordingData();
+  expect(data.stream_time).toBeNull();
+  expect(data.is_session_recording).toBe(true);
 });
 
 test("Recorder start returns 'event' when the start event fires within the timeout", async () => {
@@ -288,7 +347,9 @@ test("Recorder start falls back to a call-site timestamp when the start event do
   await expect(startPromise).resolves.toBe("fallback");
   expect(rec["startTimeSource"]).toBe("fallback");
   expect(rec["recordingStartTime"]).toBe(3000);
-  expect(rec.getRecordingMetadata().start_time_source).toBe("fallback");
+  expect(rec.getChsRecordingData(false, null).start_time_source).toBe(
+    "fallback",
+  );
 });
 
 test("Recorder corrects the stream time reference if a slow start event fires after the fallback", async () => {
@@ -314,12 +375,12 @@ test("Recorder corrects the stream time reference if a slow start event fires af
 
   expect(rec["startTimeSource"]).toBe("fallback_corrected");
   expect(rec["recordingStartTime"]).toBe(3200);
-  expect(rec.getRecordingMetadata().start_time_source).toBe(
+  expect(rec.getChsRecordingData(false, null).start_time_source).toBe(
     "fallback_corrected",
   );
 });
 
-test("Recorder getRecordingMetadata reports microphone method when there is no camera recorder", async () => {
+test("Recorder getChsRecordingData reports microphone method when there is no camera recorder", async () => {
   const jsPsych = initJsPsych();
   const rec = new Recorder(jsPsych);
   await rec.start(false, "test-type");
@@ -327,7 +388,7 @@ test("Recorder getRecordingMetadata reports microphone method when there is no c
   // No camera recorder available: falls back to microphone.
   jsPsych.pluginAPI.getCameraRecorder = jest.fn().mockReturnValue(undefined);
 
-  expect(rec.getRecordingMetadata().method).toBe("microphone");
+  expect(rec.getChsRecordingData(false, null).method).toBe("microphone");
 });
 
 test("Recorder stop", async () => {
@@ -387,8 +448,9 @@ test("Recorder stop", async () => {
   // adds promise to window.chs.pendingUploads
   expect(window.chs.pendingUploads.length).toBe(1);
   expect(window.chs.pendingUploads[0].promise).toBeInstanceOf(Promise);
+  // Upload resolved, so its tracked status has been flipped to "success".
   expect(window.chs.pendingUploads).toStrictEqual([
-    { promise: uploadPromise, file: "fakename" },
+    { promise: uploadPromise, file: "fakename", status: "success" },
   ]);
 });
 
@@ -713,6 +775,34 @@ test("Recorder stop catches error in upload", async () => {
       reason: new Error("Something broke."),
     },
   ]);
+  // The tracked upload record reflects the failure and captures the message.
+  expect(window.chs.pendingUploads[0].status).toBe("failure");
+  expect(window.chs.pendingUploads[0].error_message).toBe("Something broke.");
+});
+
+test("Recorder stop captures a non-Error upload rejection as a string", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const stopPromise = Promise.resolve("url");
+
+  // Reject the upload with a non-Error value.
+  rec["_s3"] = { completeUpload: jest.fn() } as any;
+  jest.spyOn(rec["_s3"] as any, "completeUpload").mockImplementation(() => {
+    throw "plain string failure";
+  });
+
+  rec["filename"] = "fakename";
+  rec["stopPromise"] = stopPromise;
+
+  const { stopped, uploaded } = rec.stop();
+  await stopped;
+  await expect(uploaded).rejects.toBe("plain string failure");
+
+  // The non-Error rejection is stringified into error_message.
+  expect(window.chs.pendingUploads[0].status).toBe("failure");
+  expect(window.chs.pendingUploads[0].error_message).toBe(
+    "plain string failure",
+  );
 });
 
 test("Recorder stop tries to reset after stopping and handles error", async () => {
