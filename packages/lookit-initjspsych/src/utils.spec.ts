@@ -8,7 +8,12 @@ import {
 import chsTemplates from "@lookit/templates";
 import { DataCollection, JsPsych } from "jspsych";
 import { NoJsPsychInstanceError } from "./errors";
-import { on_data_update, on_finish } from "./utils";
+import {
+  add_session_recording_data,
+  get_session_recording_data,
+  on_data_update,
+  on_finish,
+} from "./utils";
 
 delete global.window.location;
 global.window = Object.create(window);
@@ -395,6 +400,204 @@ test("jsPsych's on_finish with all pending uploads rejected", async () => {
     'Pending upload failed for "video2": ',
     new Error("Upload failed: video2"),
   );
+});
+
+test("jsPsych's on_finish records upload outcomes in the trial data and writes them", async () => {
+  const successfulUpload = Promise.resolve();
+  const failedUpload = Promise.reject(new Error("upload boom"));
+
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+
+  const exp_data: JsPsychExpData[] = [
+    {
+      trial_index: 0,
+      trial_type: "start-record-plugin",
+      chs_recording: {
+        filename: "vid-A.webm",
+        is_session_recording: true,
+        stream_time: { trial_start_ms: 0 },
+      },
+    },
+    {
+      trial_index: 1,
+      trial_type: "html-keyboard-response",
+      chs_recording: {
+        filename: "vid-B.webm",
+        is_session_recording: false,
+        stream_time: null,
+      },
+    },
+  ];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as unknown as DataCollection;
+
+  global.Request = jest.fn();
+
+  Object.assign(window, {
+    chs: {
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
+      pastSessions: {} as Response[],
+      pendingUploads: [
+        { file: "vid-A.webm", promise: successfulUpload, status: "success" },
+        {
+          file: "vid-B.webm",
+          promise: failedUpload,
+          status: "failure",
+          error_message: "upload boom",
+        },
+      ],
+    },
+  });
+
+  await on_finish(jsPsychMock as unknown as JsPsych, "response-uuid")(data);
+
+  // Upload outcomes are written into the matching trials' recording data.
+  expect(exp_data[0].chs_recording?.upload_status).toBe("success");
+  expect(exp_data[0].chs_recording?.upload_error).toBeUndefined();
+  expect(exp_data[1].chs_recording?.upload_status).toBe("failure");
+  expect(exp_data[1].chs_recording?.upload_error).toBe("upload boom");
+
+  // Two writes: the initial data save, then a second write with the upload
+  // outcomes (which weren't known at the first save).
+  expect(Request).toHaveBeenCalledTimes(2);
+});
+
+test("jsPsych's on_finish records one recording's outcome on every trial sharing its filename (session recording)", async () => {
+  const successfulUpload = Promise.resolve();
+
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+
+  // A single session recording spans multiple trials, so several trials share
+  // the same filename and all should be annotated from the one upload.
+  const exp_data: JsPsychExpData[] = [
+    {
+      trial_index: 0,
+      trial_type: "start-record-plugin",
+      chs_recording: {
+        filename: "session.webm",
+        is_session_recording: true,
+        stream_time: { trial_start_ms: 0 },
+      },
+    },
+    {
+      trial_index: 1,
+      trial_type: "html-keyboard-response",
+      chs_recording: {
+        filename: "session.webm",
+        is_session_recording: true,
+        stream_time: { trial_start_ms: 1200 },
+      },
+    },
+    {
+      trial_index: 2,
+      trial_type: "survey-html-form",
+      chs_recording: {
+        filename: "session.webm",
+        is_session_recording: true,
+        stream_time: { trial_start_ms: 3400 },
+      },
+    },
+  ];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as unknown as DataCollection;
+
+  global.Request = jest.fn();
+
+  Object.assign(window, {
+    chs: {
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
+      pastSessions: {} as Response[],
+      pendingUploads: [
+        { file: "session.webm", promise: successfulUpload, status: "success" },
+      ],
+    },
+  });
+
+  await on_finish(jsPsychMock as unknown as JsPsych, "response-uuid")(data);
+
+  // Every trial belonging to the session recording is annotated from the one
+  // upload record.
+  exp_data.forEach((trial) => {
+    expect(trial.chs_recording?.upload_status).toBe("success");
+    expect(trial.chs_recording?.upload_error).toBeUndefined();
+  });
+
+  // Still two writes: the initial data save, then a single second write
+  // covering all the annotated trials.
+  expect(Request).toHaveBeenCalledTimes(2);
+});
+
+test("jsPsych's on_finish warns and does not write a second time for an upload with no matching trial", async () => {
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+
+  // Trial data has no recording, so the upload's filename won't match.
+  const exp_data: JsPsychExpData[] = [
+    { trial_index: 0, trial_type: "html-keyboard-response" },
+  ];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as unknown as DataCollection;
+
+  global.Request = jest.fn();
+
+  Object.assign(window, {
+    chs: {
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
+      pastSessions: {} as Response[],
+      pendingUploads: [
+        { file: "orphan.webm", promise: Promise.resolve(), status: "success" },
+      ],
+    },
+  });
+
+  await on_finish(jsPsychMock as unknown as JsPsych, "response-uuid")(data);
+
+  expect(consoleWarnSpy).toHaveBeenCalledWith(
+    'No trial data found for uploaded recording "orphan.webm"; its upload status was not recorded in the data.',
+  );
+  // No trial was annotated, so only the initial data save happens.
+  expect(Request).toHaveBeenCalledTimes(1);
 });
 
 test("jsPsych's on_finish retries the response update, then catches and logs errors after retries are exhausted", async () => {
@@ -931,4 +1134,130 @@ test("on_finish throws error if jsPsych instance is undefined", () => {
       userFn,
     )(data);
   }).rejects.toThrow(NoJsPsychInstanceError);
+});
+
+test("on_finish logs an error if saving the upload statuses (second write) fails", async () => {
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+
+  const exp_data: JsPsychExpData[] = [
+    {
+      trial_index: 0,
+      trial_type: "html-keyboard-response",
+      chs_recording: {
+        filename: "vid.webm",
+        is_session_recording: false,
+        stream_time: null,
+      },
+    },
+  ];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as unknown as DataCollection;
+
+  // First (response data) write succeeds; second (upload statuses) write fails.
+  const updateResponseSpy = jest
+    .spyOn(Api, "updateResponse")
+    .mockResolvedValueOnce({} as ApiResponseData)
+    .mockRejectedValueOnce(new Error("second write failed"));
+  jest.spyOn(Api, "finish").mockResolvedValue([]);
+
+  Object.assign(window, {
+    chs: {
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
+      pastSessions: {} as Response[],
+      pendingUploads: [
+        { file: "vid.webm", promise: Promise.resolve(), status: "success" },
+      ],
+    },
+  });
+
+  await on_finish(jsPsychMock as unknown as JsPsych, "response-uuid")(data);
+
+  // Two writes attempted: the initial save and the upload-status write.
+  expect(updateResponseSpy).toHaveBeenCalledTimes(2);
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "Error while saving recording upload statuses: ",
+    new Error("second write failed"),
+  );
+});
+
+test("get_session_recording_data returns the session recorder's per-trial data when active", () => {
+  const recordingData = {
+    filename: "session.webm",
+    is_session_recording: true,
+    stream_time: { trial_start_ms: 100 },
+  };
+  const getSessionTrialRecordingData = jest.fn().mockReturnValue(recordingData);
+
+  Object.assign(window, {
+    chs: { sessionRecorder: { getSessionTrialRecordingData } },
+  });
+
+  expect(get_session_recording_data()).toBe(recordingData);
+  expect(getSessionTrialRecordingData).toHaveBeenCalledTimes(1);
+});
+
+test("get_session_recording_data returns null when no session recording is active", () => {
+  Object.assign(window, { chs: { sessionRecorder: null } });
+  expect(get_session_recording_data()).toBeNull();
+});
+
+test("add_session_recording_data attaches recording data to a trial", () => {
+  const data = {
+    trial_index: 0,
+    trial_type: "html-keyboard-response",
+  } as JsPsychExpData;
+  const recordingData = {
+    filename: "session.webm",
+    is_session_recording: true as const,
+    stream_time: null,
+  };
+
+  add_session_recording_data(data, recordingData);
+  expect(data.chs_recording).toBe(recordingData);
+});
+
+test("add_session_recording_data does nothing when there is no recording data", () => {
+  const data = {
+    trial_index: 0,
+    trial_type: "html-keyboard-response",
+  } as JsPsychExpData;
+
+  add_session_recording_data(data, null);
+  expect(data.chs_recording).toBeUndefined();
+});
+
+test("add_session_recording_data does not overwrite a trial's own recording data", () => {
+  const existing = {
+    filename: "own.webm",
+    is_session_recording: false as const,
+    stream_time: null,
+  };
+  const data = {
+    trial_index: 0,
+    trial_type: "start-record-plugin",
+    chs_recording: existing,
+  } as JsPsychExpData;
+  const sessionData = {
+    filename: "session.webm",
+    is_session_recording: true as const,
+    stream_time: null,
+  };
+
+  add_session_recording_data(data, sessionData);
+  // The trial's own block is kept.
+  expect(data.chs_recording).toBe(existing);
 });
