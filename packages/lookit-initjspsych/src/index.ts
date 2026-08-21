@@ -1,7 +1,7 @@
-import { JsPsychExpData } from "@lookit/data/dist/types";
+import { ChsRecordingData, JsPsychExpData } from "@lookit/data/dist/types";
 import type { DataCollection, JsPsych as JsPsychType } from "jspsych";
 import * as jspsychModule from "jspsych";
-import type { TimelineArray } from "jspsych/src/timeline";
+import type { TimelineArray, TrialDescription } from "jspsych/src/timeline";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
 import type {
   ChsJsPsych,
@@ -10,7 +10,12 @@ import type {
   ChsTrialDescription,
   JsPsychOptions,
 } from "./types";
-import { on_data_update, on_finish } from "./utils";
+import {
+  add_session_recording_data,
+  get_session_recording_data,
+  on_data_update,
+  on_finish,
+} from "./utils";
 
 /**
  * Checks if the given description is a timeline array or description (node),
@@ -69,11 +74,41 @@ const lookitInitJsPsych = (responseUuid: string) => {
     const {
       on_data_update: userOnDataUpdate,
       on_finish: userOnFinish,
+      on_trial_start: userOnTrialStart,
+      on_trial_finish: userOnTrialFinish,
       ...otherOpts
     } = opts || {};
 
     // Create a placeholder for the instance - needed for use in the onDataUpdate closure.
     let jsPsychInstance: JsPsychType | null = null;
+
+    // Holds the session recording data captured at the current trial's start,
+    // to be written into that trial's data when it finishes.
+    let sessionTrialRecordingData: ChsRecordingData | null = null;
+
+    /**
+     * On_trial_start hook: capture the session recording's stream time at the
+     * start of each trial (if a session recording is active), then run the
+     * user's on_trial_start if provided.
+     *
+     * @param trial - The trial object jsPsych is starting.
+     */
+    const onTrialStart = (trial: TrialDescription) => {
+      sessionTrialRecordingData = get_session_recording_data();
+      userOnTrialStart?.(trial);
+    };
+
+    /**
+     * On_trial_finish hook: attach the captured session recording data to the
+     * finished trial's data, then run the user's on_trial_finish if provided.
+     *
+     * @param data - The finished trial's data.
+     */
+    const onTrialFinish = (data: JsPsychExpData) => {
+      add_session_recording_data(data, sessionTrialRecordingData);
+      sessionTrialRecordingData = null;
+      userOnTrialFinish?.(data);
+    };
 
     /**
      * Closure to return the on_data_update function, with the actual instance,
@@ -112,6 +147,8 @@ const lookitInitJsPsych = (responseUuid: string) => {
       ...otherOpts,
       on_data_update: onDataUpdate,
       on_finish: onFinish,
+      on_trial_start: onTrialStart,
+      on_trial_finish: onTrialFinish,
     });
 
     // Now set the instance variable to the actual instance, so that it is referenced inside onDataUpdate.

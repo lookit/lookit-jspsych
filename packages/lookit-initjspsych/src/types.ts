@@ -15,12 +15,16 @@ import type {
 
 export type UserFuncOnDataUpdate = (data: JsPsychExpData) => void;
 export type UserFuncOnFinish = (data: DataCollection) => void;
+export type UserFuncOnTrialStart = (trial: TrialDescription) => void;
+export type UserFuncOnTrialFinish = (data: JsPsychExpData) => void;
 
 // This should really be a type imported from jsPsych, but it does not exist so we'll add to this as needed
 export type JsPsychOptions = {
   default_iti?: number;
   on_data_update?: UserFuncOnDataUpdate;
   on_finish?: UserFuncOnFinish;
+  on_trial_start?: UserFuncOnTrialStart;
+  on_trial_finish?: UserFuncOnTrialFinish;
 };
 
 // Add chsData to JsPsychPlugin type

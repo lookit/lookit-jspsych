@@ -15,6 +15,11 @@ export type CSSWidthHeight =
   | `${number}${"px" | "cm" | "mm" | "em" | "%"}`
   | "auto";
 
+// Re-exported from @lookit/data (the canonical source, since the recording
+// stream-time reference and its source also feed the chs_recording trial data
+// types defined there). See StartTimeSource in @lookit/data/dist/types.
+export type { StartTimeSource } from "@lookit/data/dist/types";
+
 /** Options for the stop method */
 export interface StopOptions {
   maintain_container_size?: boolean;

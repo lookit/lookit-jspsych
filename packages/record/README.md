@@ -972,3 +972,101 @@ const stopRec = {
   max_upload_seconds: 20,
 };
 ```
+
+## Recording Data
+
+Whenever a trial is associated with a video recording, this package adds a
+`chs_recording` object to that trial's data. This lets you connect each trial in
+your data to the recording it belongs to, see when the trial happened relative
+to the start of the recording, and check whether the video uploaded
+successfully.
+
+You don't need to do anything to turn this on — it is added automatically for
+trials that record. That includes:
+
+- **Consent** trials (`VideoConsentPlugin`), which always record.
+- **Assent** trials (`VideoAssentPlugin`), but only when the trial actually
+  records (`record_whole_procedure` or `record_last_page` is set to `true`).
+- **Single-trial recordings** made with the `TrialRecordExtension`.
+- Every trial that runs **during a session recording** (between a
+  `StartRecordPlugin` and a `StopRecordPlugin`). Each of these trials gets its
+  own `chs_recording` block pointing at the same shared recording.
+
+### The `chs_recording` object
+
+| Field                  | Description                                                                                                                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `filename`             | Name of the video file this recording was saved to.                                                                                                                              |
+| `is_session_recording` | `true` if this is a session recording that spans multiple trials, `false` if it's a single recording (consent, assent, or a single-trial).                                       |
+| `method`               | How the recording was captured: `"camera"` (video/audio) or `"microphone"` (audio only).                                                                                         |
+| `is_consent`           | `true` if this is the consent recording, otherwise `false`.                                                                                                                      |
+| `stream_time`          | Event timestamps relative to the start of the recording (see below). This will either be a value in milliseconds, or `null` if that event timing isn't meaningful for the trial. |
+| `start_time_source`    | How the recording's start time was determined (see below).                                                                                                                       |
+| `upload_status`        | Whether the video file uploaded: `"pending"`, `"success"`, or `"failure"`.                                                                                                       |
+| `upload_error`         | A short description of what went wrong. Only present when `upload_status` is `"failure"`.                                                                                        |
+
+#### `stream_time`
+
+"Stream time" is a timestamp that gives you the time of the event, in
+milliseconds, from the moment the recording started. The `stream_time` field is
+an object with events and timestamps. For now, there is just one event that has
+a stream time value:
+
+- `trial_start_ms`: the recording stream time (in ms) that corresponds to the
+  start of the trial.
+  - For a **session recording**, this is a positive number, since a session
+    recording starts before a given trial. This value tells you how far into the
+    recording the trial began.
+  - For a **trial recording**, this is usually a small **negative** number. A
+    single-trial recording is triggered before the trial begins, but the trial
+    will probably start before the recording has fully begun, so the recording
+    actually gets going a fraction of a second _after_ the trial start.
+  - For **consent** and **assent** recordings, this value is `null` becasue
+    recording starts mid-trial and a trial-start offset isn't meaningful.
+
+#### `start_time_source`
+
+This tells you how reliable _this trial's_ `stream_time` is. It is captured per
+trial, alongside the trial's stream time, so it always describes the reference
+that trial's stream time was actually measured against:
+
+- `"event"`: The start time came from the recorder's own "start" event. This is
+  the most precise, and what you'll usually see. Reliable.
+- `"fallback"`: The start event didn't fire in time, so a timestamp taken ~1
+  second after starting was used instead. This is a safeguard to keep the
+  experiment from hanging — but it means this trial's `stream_time` is less
+  accurate by an unknown amount.
+- `"fallback_corrected"`: The fallback was used at first, but the real "start"
+  event arrived later and corrected the reference. This trial's `stream_time`
+  was measured against the corrected event-based reference, so it is as reliable
+  as `"event"`.
+
+<details>
+<summary>Why do my session recording trials have different `start_time_source` values?</summary>
+
+A single session recording can have trials with both `"fallback"` and
+`"fallback_corrected"` values, because `start_time_source` is checked and
+recorded for each trial (alongside the trial's start timestamp).
+
+This only comes up on the uncommon `"fallback"` path, i.e. when the recording's
+"start" event doesn't fire within a 1-second timeout. When that happens, the
+reference point for the start of recording uses the fallback estimate, and any
+trials that run report `"fallback"`. If the delayed "start" event does arrive,
+then the recording start time reference is corrected from that point on, and
+every trial after it reports `"fallback_corrected"`. (If the event never
+arrives, there's no correction and all trials will be marked `"fallback"`.)
+
+How the trials split between the two depends on when — and whether — that
+delayed "recording start" event fires. Regardless, each trial's value is
+accurate for its own `stream_time`, so you can trust the label on the trial
+you're looking at rather than reasoning about the recording as a whole.
+
+</details>
+
+#### `upload_status` and `upload_error`
+
+Video files upload in the background, so a trial's `upload_status` starts out as
+`"pending"`. Once all trials have finished, the experiment updates each trial's
+`chs_recording` with the final outcome: `"success"` if the file uploaded, or
+`"failure"` (along with an `upload_error` message) if it didn't. This makes it
+easy to spot, in your data, any recordings that may be missing.

@@ -79,19 +79,42 @@ test("Trial recording", async () => {
     stopped: Promise.resolve("url"),
     uploaded: Promise.resolve(),
   });
+  // The stream time at trial start is computed in on_finish from the timestamp
+  // captured at trial start (negative here: the trial began ~30ms before the
+  // recording's first frame).
+  const mockGetStreamTimeAt = jest
+    .spyOn(Recorder.prototype, "getStreamTimeAt")
+    .mockReturnValue(-30);
+  const chsRecordingData = {
+    filename: "videoStream_test.webm",
+    is_session_recording: false,
+    stream_time: { trial_start_ms: -30 },
+    method: "camera" as const,
+    is_consent: false,
+    start_time_source: "event" as const,
+  };
+  const mockGetChsData = jest
+    .spyOn(Recorder.prototype, "getChsRecordingData")
+    .mockReturnValue(chsRecordingData);
   const jsPsych = initJsPsych();
   const trialRec = new Rec.TrialRecordExtension(jsPsych);
   const getCurrentPluginNameSpy = jest.spyOn(trialRec, "getCurrentPluginName");
 
   trialRec.on_start();
   trialRec.on_load();
-  await trialRec.on_finish();
+  const result = await trialRec.on_finish();
 
   expect(Recorder).toHaveBeenCalledTimes(1);
   expect(mockRecStart).toHaveBeenCalledTimes(1);
   expect(mockRecStart).toHaveBeenCalledWith(false, "test-type");
   expect(mockRecStop).toHaveBeenCalledTimes(1);
   expect(getCurrentPluginNameSpy).toHaveBeenCalledTimes(1);
+  // Stream time at trial start is computed from the captured timestamp, and the
+  // non-session recording data is built and returned.
+  expect(mockGetStreamTimeAt).toHaveBeenCalledTimes(1);
+  expect(mockGetStreamTimeAt).toHaveBeenCalledWith(expect.any(Number));
+  expect(mockGetChsData).toHaveBeenCalledWith(false, -30);
+  expect(result).toStrictEqual({ chs_recording: chsRecordingData });
 });
 
 test("Trial recording's initialize with no parameters", async () => {
@@ -539,6 +562,20 @@ test("Trial recording stop with no recorder", async () => {
 
 test("Start session recording", async () => {
   const mockRecStart = jest.spyOn(Recorder.prototype, "start");
+  const mockGetStreamTime = jest
+    .spyOn(Recorder.prototype, "getStreamTime")
+    .mockReturnValue(0);
+  const chsRecordingData = {
+    filename: "videoStream_test.webm",
+    is_session_recording: true,
+    stream_time: { trial_start_ms: 0 },
+    method: "camera" as const,
+    is_consent: false,
+    start_time_source: "event" as const,
+  };
+  const mockGetChsData = jest
+    .spyOn(Recorder.prototype, "getChsRecordingData")
+    .mockReturnValue(chsRecordingData);
   const jsPsych = initJsPsych();
   const startRec = new Rec.StartRecordPlugin(jsPsych);
   const display_element = jest
@@ -553,7 +590,13 @@ test("Start session recording", async () => {
 
   await startRec.trial(display_element, trial);
 
+  // Full session-recording data block is attached to this trial's data.
+  expect(mockGetStreamTime).toHaveBeenCalledTimes(1);
+  expect(mockGetChsData).toHaveBeenCalledWith(true, 0);
   expect(jsPsych.finishTrial).toHaveBeenCalledTimes(1);
+  expect(jsPsych.finishTrial).toHaveBeenCalledWith({
+    chs_recording: chsRecordingData,
+  });
   expect(() => {
     new Rec.StartRecordPlugin(jsPsych);
   }).toThrow(ExistingRecordingError);

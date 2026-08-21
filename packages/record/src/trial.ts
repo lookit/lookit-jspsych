@@ -57,6 +57,11 @@ export default class TrialRecordExtension implements JsPsychExtension {
   private uploadMsg: null | string = null;
   private locale: string = "en-us";
   private maxUploadSeconds: undefined | null | number = undefined;
+  // Wall-clock (performance.now()) timestamp of the trial's start, captured in
+  // on_start. The recording's stream-time reference is not set yet at that
+  // point (start() is not awaited), so the stream time for this timestamp is
+  // computed later, in on_finish, once the reference is known.
+  private trialStartTimestamp: number | null = null;
 
   /**
    * Video recording extension.
@@ -102,6 +107,10 @@ export default class TrialRecordExtension implements JsPsychExtension {
    *   overwrite the value used during initialization.
    */
   public on_start(startParams?: Parameters) {
+    // Capture the trial's start time up front. The stream time for this moment
+    // is computed in on_finish (see trialStartTimestamp), by which point the
+    // recording's stream-time reference has been set.
+    this.trialStartTimestamp = performance.now();
     if (startParams?.wait_for_upload_message) {
       this.uploadMsg = startParams.wait_for_upload_message;
     }
@@ -136,6 +145,20 @@ export default class TrialRecordExtension implements JsPsychExtension {
       displayEl.innerHTML = this.uploadMsg;
     }
     if (this.recorder) {
+      // Compute the stream time at trial start now that the recording's
+      // stream-time reference is set. This is the (typically negative) offset
+      // between the trial's start and when the recording actually began.
+      const trialStartStreamTime =
+        this.trialStartTimestamp === null
+          ? null
+          : this.recorder.getStreamTimeAt(this.trialStartTimestamp);
+      // Assemble the recording data before stopping, since stop() resets the
+      // recorder and clears some fields (e.g. start_time_source). This is a
+      // single-trial (non-session) recording.
+      const chs_recording = this.recorder.getChsRecordingData(
+        false,
+        trialStartStreamTime,
+      );
       const { stopped, uploaded } = this.recorder.stop({
         upload_timeout_ms:
           this.maxUploadSeconds !== null ? this.maxUploadSeconds! * 1000 : null,
@@ -144,14 +167,16 @@ export default class TrialRecordExtension implements JsPsychExtension {
         await stopped;
         await uploaded;
         displayEl.innerHTML = "";
-        return {};
+        return { chs_recording };
       } catch (err) {
         console.error(
           "TrialRecordExtension: recorder stop/upload failed.",
           err,
         );
         displayEl.innerHTML = "";
-        return {};
+        // Still attach the recording data; the upload outcome is recorded
+        // separately at experiment on_finish.
+        return { chs_recording };
         // TO DO: display translated error msg and/or researcher contact info
       }
     } else {

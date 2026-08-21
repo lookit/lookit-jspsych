@@ -1,6 +1,11 @@
 import Data from "@lookit/data";
 import LookitS3 from "@lookit/data/dist/lookitS3";
-import { LookitWindow } from "@lookit/data/dist/types";
+import {
+  ChsRecordingData,
+  LookitWindow,
+  RecordingStreamTime,
+  uploadRecord,
+} from "@lookit/data/dist/types";
 import autoBind from "auto-bind";
 import Handlebars from "handlebars";
 import { JsPsych } from "jspsych";
@@ -21,13 +26,21 @@ import {
   StreamInactiveInitializeError,
   TimeoutError,
 } from "./errors";
-import { CSSWidthHeight, StopOptions, StopResult } from "./types";
+import {
+  CSSWidthHeight,
+  StartTimeSource,
+  StopOptions,
+  StopResult,
+} from "./types";
 import { promiseWithTimeout } from "./utils";
 
 declare const window: LookitWindow;
 
 /** Recorder handles the state of recording and data storage. */
 export default class Recorder {
+  // How long to wait for the MediaRecorder "start" event before falling back to the call-site timestamp for the recording's stream-time reference.
+  private static readonly startEventTimeoutMs = 1000;
+
   private url?: string;
   private _s3?: LookitS3;
 
@@ -35,6 +48,11 @@ export default class Recorder {
   private localDownload: boolean =
     process.env.LOCAL_DOWNLOAD?.toLowerCase() === "true";
   private filename?: string;
+  private consent?: boolean;
+  // Reference point (performance.now() timestamp) for the current recording's stream time. Undefined when no recording is in progress.
+  private recordingStartTime?: number;
+  // How recordingStartTime was determined (start event vs. fallback timestamp). Undefined when no recording is in progress.
+  private startTimeSource?: StartTimeSource;
   private stopPromise?: Promise<string>;
   private webcam_element_id = "lookit-jspsych-webcam";
   private mimeType = "video/webm";
@@ -67,6 +85,17 @@ export default class Recorder {
       this.jsPsych.pluginAPI.getCameraRecorder() ||
       this.jsPsych.pluginAPI.getMicrophoneRecorder()
     );
+  }
+
+  /**
+   * Whether the current recording is camera (video) or microphone (audio only).
+   * Mirrors the fallback logic in the `recorder` getter: if there's a camera
+   * recorder it's a camera recording, otherwise microphone.
+   *
+   * @returns Camera or "microphone".
+   */
+  private get recordingMethod(): "camera" | "microphone" {
+    return this.jsPsych.pluginAPI.getCameraRecorder() ? "camera" : "microphone";
   }
 
   /**
@@ -129,6 +158,9 @@ export default class Recorder {
     this.initializeRecorder(this.streamClone.clone());
     // Clear blob buffer (any pending uploads are handled by LookitS3 instances and tracked globally)
     this.blobs = [];
+    // Clear the stream-time reference; recording is no longer in progress, so getStreamTime() should return null until the next start().
+    this.recordingStartTime = undefined;
+    this.startTimeSource = undefined;
     // TO DO: reset S3/filename/URL?
   }
 
@@ -247,9 +279,20 @@ export default class Recorder {
    *   footage.
    * @param trial_type - Trial type, as saved in the jsPsych data. This comes
    *   from the plugin info "name" value (not the class name).
+   * @returns How the stream-time reference point was determined at the time
+   *   start() resolved: "event" if the "start" event fired within the timeout,
+   *   or "fallback" if the call-site timestamp was used. (A late "start" event
+   *   can subsequently correct a "fallback" to "fallback_corrected"; that later
+   *   state is reflected in getRecordingMetadata(), not in this return value.)
    */
-  public async start(consent: boolean, trial_type: string) {
+  public async start(
+    consent: boolean,
+    trial_type: string,
+  ): Promise<StartTimeSource> {
     this.initializeCheck();
+
+    // Store whether this is consent footage, for the recording metadata.
+    this.consent = consent;
 
     // Set video filename
     this.filename = this.createFileName(consent, trial_type);
@@ -271,7 +314,160 @@ export default class Recorder {
       await this.s3.createUpload();
     }
 
+    // Capture media start time from the recorder's "start" event, which fires when capture actually begins (not from the synchronous recorder.start() call, which returns before recording is truly live). performance.now() is monotonic, and stream time is a good approximation of media time as long as the recorder is never paused.
+    // TO DO: Add handling for recording pause durations once we implement experiment/recording pause/resume functionality.
+    const started = new Promise<void>((resolve) => {
+      this.recorder.addEventListener(
+        "start",
+        () => {
+          // The "start" event is the accurate media t=0, so always adopt it —
+          // even if it fires after the fallback already ran, in which case it
+          // corrects the earlier (inaccurate) fallback reference.
+          this.startTimeSource =
+            this.startTimeSource === "fallback"
+              ? "fallback_corrected"
+              : "event";
+          this.recordingStartTime = performance.now();
+          resolve();
+        },
+        { once: true },
+      );
+    });
+
     this.recorder.start();
+
+    // Wait for the "start" event so recordingStartTime is set (and recording has genuinely begun) before start() resolves and the experiment proceeds.
+    // Don't hang if the event never fires: after a timeout, fall back to the call-site timestamp and continue. If the event does fire later, its callback (above) corrects the reference.
+    let startFallbackTimeout: ReturnType<typeof setTimeout>;
+    const startFallback = new Promise<void>((resolve) => {
+      startFallbackTimeout = setTimeout(() => {
+        if (this.recordingStartTime === undefined) {
+          this.recordingStartTime = performance.now();
+          this.startTimeSource = "fallback";
+        }
+        resolve();
+      }, Recorder.startEventTimeoutMs);
+    });
+
+    await Promise.race([started, startFallback]);
+    clearTimeout(startFallbackTimeout!);
+
+    // At this point one of the two branches above has set the source; it is
+    // "event" or "fallback" here ("fallback_corrected" can only be reached
+    // later, if a slow start event arrives after start() has resolved).
+    return this.startTimeSource!;
+  }
+
+  /**
+   * Assemble the CHS recording data block for a trial's jsPsych data (stored
+   * under the `chs_recording` key). Should be called after `start()`, once the
+   * filename is set, and — to capture accurate metadata — before `stop()`,
+   * which resets the recorder and clears some fields (e.g. start_time_source).
+   *
+   * The stream time is passed in rather than read here, because it must reflect
+   * the moment considered "trial start" (which differs from when this method is
+   * called): for a session recording that's the start of the current trial; for
+   * the trial-record extension it's captured when the trial's recording
+   * begins.
+   *
+   * @param is_session_recording - Whether this is a session (cross-trial)
+   *   recording (true) or a single-trial recording (false).
+   * @param stream_time_ms - Stream time (ms) captured at the trial's start, or
+   *   null if none was captured (e.g. the "start" event had not yet fired).
+   * @returns The recording data block for this trial.
+   */
+  public getChsRecordingData(
+    is_session_recording: boolean,
+    stream_time_ms: number | null,
+  ): ChsRecordingData {
+    return {
+      // filename is always defined once start() has run.
+      filename: this.filename!,
+      is_session_recording,
+      stream_time: this.toStreamTimeBlock(stream_time_ms),
+      method: this.recordingMethod,
+      is_consent: this.consent,
+      // The source in effect right now. Callers build this block synchronously
+      // with capturing the stream time (no await in between), so this reflects
+      // the reference actually used for that stream time: a stream time measured
+      // against a fallback reference reports "fallback", and one measured after a
+      // slow "start" event corrected the reference reports "fallback_corrected".
+      start_time_source: this.startTimeSource,
+    };
+  }
+
+  /**
+   * Assemble the partial CHS recording data block for a trial that occurs
+   * during a session recording but does not itself start or stop it. The
+   * recording-level metadata (method, is_consent) lives on the trial that
+   * starts the recording and is not repeated here. The stream time and its
+   * start_time_source are captured now — read together in this synchronous
+   * block, so the source reflects the reference actually used for this stream
+   * time. This must be called at the start of the trial, so the stream time
+   * marks the trial's start.
+   *
+   * Because start_time_source is captured per trial, trials whose stream time
+   * is measured against a fallback reference report "fallback", while trials
+   * after a slow "start" event corrects the reference report
+   * "fallback_corrected" (or "event" when the event was on time). See
+   * {@link getChsRecordingData}.
+   *
+   * @returns Recording data with the session recording's filename,
+   *   is_session_recording (true), the stream time at the moment of the call,
+   *   and the start_time_source in effect for that stream time.
+   */
+  public getSessionTrialRecordingData(): ChsRecordingData {
+    return {
+      filename: this.filename!,
+      is_session_recording: true,
+      stream_time: this.toStreamTimeBlock(this.getStreamTime()),
+      start_time_source: this.startTimeSource,
+    };
+  }
+
+  /**
+   * Wrap a stream time value (ms) into the stream_time data shape, or null if
+   * no stream time was captured.
+   *
+   * @param stream_time_ms - Stream time in milliseconds, or null.
+   * @returns The stream_time object, or null.
+   */
+  private toStreamTimeBlock(
+    stream_time_ms: number | null,
+  ): RecordingStreamTime | null {
+    return stream_time_ms === null ? null : { trial_start_ms: stream_time_ms };
+  }
+
+  /**
+   * The stream time (in milliseconds since the current recording started) that
+   * corresponds to a given moment. Returns null when no recording is in
+   * progress (the stream-time reference is unknown). The result is negative for
+   * timestamps before the recording began — e.g. the start of a trial-record
+   * trial, which begins slightly before the recording captures its first frame,
+   * so the value is the (negative) offset between trial start and recording
+   * start. TO DO: Add handling for recording pause durations once we implement
+   * experiment/recording pause/resume functionality.
+   *
+   * @param timestamp_ms - A performance.now() timestamp to convert to stream
+   *   time.
+   * @returns Stream time in milliseconds for that timestamp, or null if not
+   *   recording.
+   */
+  public getStreamTimeAt(timestamp_ms: number): number | null {
+    if (this.recordingStartTime === undefined) {
+      return null;
+    }
+    return timestamp_ms - this.recordingStartTime;
+  }
+
+  /**
+   * The elapsed stream time (in milliseconds) since the current recording
+   * started, as of now. Returns null when no recording is in progress.
+   *
+   * @returns Milliseconds since recording started, or null if not recording.
+   */
+  public getStreamTime(): number | null {
+    return this.getStreamTimeAt(performance.now());
   }
 
   /**
@@ -399,10 +595,26 @@ export default class Recorder {
 
     // Track background uploads in case the consuming plugin is not awaiting the upload.
     // We don't want the timeout version because this one can continue in the background.
-    window.chs.pendingUploads.push({
+    const pendingUpload: uploadRecord = {
       promise: uploadPromise,
       file: snapshot.filename!,
-    });
+      status: "pending",
+    };
+    // Record the upload outcome on the tracked entry as it settles, so that it
+    // can later be written into the trial data (see on_finish). This is a
+    // separate observer of uploadPromise, so it doesn't affect how the upload
+    // promise is consumed elsewhere (the timeout wrapper, plugin awaits, etc.).
+    uploadPromise.then(
+      () => {
+        pendingUpload.status = "success";
+      },
+      (err) => {
+        pendingUpload.status = "failure";
+        pendingUpload.error_message =
+          err instanceof Error ? err.message : String(err);
+      },
+    );
+    window.chs.pendingUploads.push(pendingUpload);
 
     // Return the pair of promises so that the calling plugin can await them.
     return { stopped, uploaded };
