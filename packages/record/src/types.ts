@@ -15,20 +15,10 @@ export type CSSWidthHeight =
   | `${number}${"px" | "cm" | "mm" | "em" | "%"}`
   | "auto";
 
-/**
- * Indicates how the recording's stream-time reference point (media t=0) was
- * determined:
- *
- * - "event": the MediaRecorder "start" event fired within the timeout, so the
- *   reference is accurate.
- * - "fallback": the "start" event did not fire within the timeout, so the
- *   call-site timestamp was used as a fallback. The reference (and any stream
- *   times derived from it) is inaccurate by an unknown amount.
- * - "fallback_corrected": the fallback timestamp was used initially to avoid
- *   blocking, but the "start" event later fired and corrected the reference to
- *   the accurate value.
- */
-export type StartTimeSource = "event" | "fallback" | "fallback_corrected";
+// Re-exported from @lookit/data (the canonical source, since the recording
+// stream-time reference and its source also feed the chs_recording trial data
+// types defined there). See StartTimeSource in @lookit/data/dist/types.
+export type { StartTimeSource } from "@lookit/data/dist/types";
 
 /** Options for the stop method */
 export interface StopOptions {
