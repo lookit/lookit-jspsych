@@ -1,5 +1,12 @@
 # @lookit/templates
 
+## 4.0.0
+
+### Patch Changes
+
+- Updated dependencies [4547808]
+  - @lookit/data@0.4.0
+
 ## 3.2.0
 
 ### Minor Changes
