@@ -1,5 +1,10 @@
 import Api from "@lookit/data";
-import { Child, JsPsychExpData, Study } from "@lookit/data/dist/types";
+import {
+  Child,
+  JsPsychExpData,
+  Response as ApiResponseData,
+  Study,
+} from "@lookit/data/dist/types";
 import chsTemplates from "@lookit/templates";
 import { DataCollection, JsPsych } from "jspsych";
 import { NoJsPsychInstanceError } from "./errors";
@@ -222,7 +227,7 @@ test("jsPsych's on_finish with successful pending uploads", async () => {
         attributes: { hash_child_id: "hash-child-id" },
       },
       pastSessions: {} as Response[],
-      pendingUploads: [{ filename: "video1", promise: successfulUpload }],
+      pendingUploads: [{ file: "video1", promise: successfulUpload }],
     },
   });
 
@@ -258,11 +263,13 @@ test("jsPsych's on_finish with successful pending uploads", async () => {
   expect(displayElement.innerHTML).toContain(chsTemplates.loadingAnimation());
   expect(userFn).toHaveBeenCalledTimes(1);
   expect(userFn).toHaveBeenCalledWith(data);
-  expect(Request).toHaveBeenCalledTimes(1);
+  expect(Request).toHaveBeenCalledTimes(1); // single request: no retries were needed
   expect(global.window.location.replace).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledWith(
     "https://example.com/exit?child=hash-child-id&response=response-uuid",
   );
+  // Nothing failed, so nothing should have been logged.
+  expect(consoleErrorSpy).not.toHaveBeenCalled();
 });
 
 test("jsPsych's on_finish with a rejected pending upload", async () => {
@@ -277,7 +284,7 @@ test("jsPsych's on_finish with a rejected pending upload", async () => {
         attributes: { hash_child_id: "hash-child-id" },
       },
       pastSessions: {} as Response[],
-      pendingUploads: [{ filename: "video1", promise: rejectedUpload }],
+      pendingUploads: [{ file: "video1", promise: rejectedUpload }],
     },
   });
 
@@ -313,14 +320,86 @@ test("jsPsych's on_finish with a rejected pending upload", async () => {
   expect(displayElement.innerHTML).toContain(chsTemplates.loadingAnimation());
   expect(userFn).toHaveBeenCalledTimes(1);
   expect(userFn).toHaveBeenCalledWith(data);
+  // Response data update still succeeds on its own (single request, no retries
+  // needed) — a failed upload doesn't affect it.
   expect(Request).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledTimes(1);
   expect(global.window.location.replace).toHaveBeenCalledWith(
     "https://example.com/exit?child=hash-child-id&response=response-uuid",
   );
+  // The failed upload is logged (once, with no retry) rather than silently dropped.
+  expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    'Pending upload failed for "video1": ',
+    new Error("Upload failed"),
+  );
 });
 
-test("jsPsych's on_finish catches and logs errors while awaiting pending uploads", async () => {
+test("jsPsych's on_finish with all pending uploads rejected", async () => {
+  const rejectedUpload1 = Promise.reject(new Error("Upload failed: video1"));
+  const rejectedUpload2 = Promise.reject(new Error("Upload failed: video2"));
+
+  Object.assign(window, {
+    chs: {
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
+      pastSessions: {} as Response[],
+      pendingUploads: [
+        { file: "video1", promise: rejectedUpload1 },
+        { file: "video2", promise: rejectedUpload2 },
+      ],
+    },
+  });
+
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+
+  const exp_data = [{ key: "value" }];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as DataCollection;
+
+  const userFn = jest.fn();
+
+  // All uploads failing still shouldn't cause on_finish to throw, or block
+  // the response data update / redirect.
+  await expect(
+    on_finish(jsPsychMock as unknown as JsPsych, "some id", userFn)(data),
+  ).resolves.toBeUndefined();
+
+  // Response data update still succeeds independently (single request).
+  expect(Request).toHaveBeenCalledTimes(1);
+  expect(global.window.location.replace).toHaveBeenCalledTimes(1);
+  expect(global.window.location.replace).toHaveBeenCalledWith(
+    "https://example.com/exit?child=hash-child-id&response=response-uuid",
+  );
+
+  // Every failed upload is logged individually — none are retried.
+  expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    'Pending upload failed for "video1": ',
+    new Error("Upload failed: video1"),
+  );
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    'Pending upload failed for "video2": ',
+    new Error("Upload failed: video2"),
+  );
+});
+
+test("jsPsych's on_finish retries the response update, then catches and logs errors after retries are exhausted", async () => {
+  jest.useFakeTimers();
+
   // mock jsPsych getDisplayElement
   const displayElement = { innerHTML: "" };
   const jsPsychMock = {
@@ -347,7 +426,9 @@ test("jsPsych's on_finish catches and logs errors while awaiting pending uploads
 
   // Mock an error that originates from API requests
   const error = new Error("API failed");
-  jest.spyOn(Api, "updateResponse").mockRejectedValue(error);
+  const updateResponseSpy = jest
+    .spyOn(Api, "updateResponse")
+    .mockRejectedValue(error);
   jest.spyOn(Api, "finish").mockResolvedValue([]);
 
   Object.assign(window, {
@@ -363,23 +444,167 @@ test("jsPsych's on_finish catches and logs errors while awaiting pending uploads
     },
   });
 
+  const setTimeoutSpy = jest.spyOn(global, "setTimeout");
+
   const fn = on_finish(
     jsPsychMock as unknown as JsPsych,
     "response-uuid",
     userFn,
   );
 
-  // Should not throw — error is caught internally
-  await fn(data);
+  // Should not throw — error is caught internally after retries are exhausted
+  const finishPromise = fn(data);
+  await jest.runAllTimersAsync();
+  await finishPromise;
 
   expect(displayElement.innerHTML).toBe(chsTemplates.loadingAnimation());
   expect(userFn).toHaveBeenCalledTimes(1);
   expect(userFn).toHaveBeenCalledWith(data);
 
+  // Initial attempt + 3 retries = 4 total calls
+  expect(updateResponseSpy).toHaveBeenCalledTimes(4);
+
+  // Backoff waits of 1s, 2s, then 4s between attempts — ~7s total before
+  // giving up. This is the ceiling on how long the participant waits here.
+  const backoffDelays = setTimeoutSpy.mock.calls.map(([, delay]) => delay);
+  expect(backoffDelays).toEqual([1000, 2000, 4000]);
+
   expect(consoleErrorSpy).toHaveBeenCalledWith(
-    "Error while finishing the experiment and saving data/video: ",
+    "Error while saving final response data after retries: ",
     error,
   );
+
+  // Redirect still happens even though the response update ultimately failed,
+  // so the participant isn't stuck indefinitely. But because updateResponse
+  // never succeeded, the final exp_data and completed:true were never
+  // persisted — the response stays at whatever state the last successful
+  // on_data_update call left it in.
+  expect(global.window.location.replace).toHaveBeenCalledTimes(1);
+
+  jest.useRealTimers();
+});
+
+test("jsPsych's on_finish retries the response update twice, then succeeds", async () => {
+  jest.useFakeTimers();
+
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+
+  const exp_data = [{ key: "value" }];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as DataCollection;
+
+  const userFn = jest.fn();
+
+  const error = new Error("Transient API failure");
+  const updateResponseSpy = jest
+    .spyOn(Api, "updateResponse")
+    .mockRejectedValueOnce(error)
+    .mockRejectedValueOnce(error)
+    .mockResolvedValueOnce({} as ApiResponseData);
+  jest.spyOn(Api, "finish").mockResolvedValue([]);
+
+  Object.assign(window, {
+    chs: {
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
+      pastSessions: {} as Response[],
+      pendingUploads: [],
+    },
+  });
+
+  const setTimeoutSpy = jest.spyOn(global, "setTimeout");
+
+  const fn = on_finish(
+    jsPsychMock as unknown as JsPsych,
+    "response-uuid",
+    userFn,
+  );
+
+  const finishPromise = fn(data);
+  await jest.runAllTimersAsync();
+  await finishPromise;
+
+  // 2 failures + 1 success = 3 total calls; the 3rd one persisted the data,
+  // so nothing is lost.
+  expect(updateResponseSpy).toHaveBeenCalledTimes(3);
+
+  // Only two backoff waits (before attempt 2 and attempt 3) — ~3s total
+  // before the participant sees the redirect.
+  const backoffDelays = setTimeoutSpy.mock.calls.map(([, delay]) => delay);
+  expect(backoffDelays).toEqual([1000, 2000]);
+
+  // Eventual success means nothing gets logged as an error — the retries
+  // were invisible to anyone not watching the network tab.
+  expect(consoleErrorSpy).not.toHaveBeenCalled();
+
+  expect(global.window.location.replace).toHaveBeenCalledTimes(1);
+  expect(global.window.location.replace).toHaveBeenCalledWith(
+    "https://example.com/exit?child=hash-child-id&response=response-uuid",
+  );
+
+  jest.useRealTimers();
+});
+
+test("jsPsych's on_finish catches and logs errors thrown while waiting for pending uploads", async () => {
+  const displayElement = { innerHTML: "" };
+  const jsPsychMock = {
+    getDisplayElement: jest.fn(() => displayElement),
+  };
+
+  const exp_data = [{ key: "value" }];
+  const data = {
+    /**
+     * Mocked jsPsych Data Collection.
+     *
+     * @returns Exp data.
+     */
+    values: () => exp_data,
+  } as DataCollection;
+
+  const userFn = jest.fn();
+  global.Request = jest.fn();
+
+  Object.assign(window, {
+    chs: {
+      study: { attributes: { exit_url: "https://example.com/exit" } } as Study,
+      child: { id: "child-id" } as Child,
+      response: {
+        id: "response-uuid",
+        attributes: { hash_child_id: "hash-child-id" },
+      },
+      pastSessions: {} as Response[],
+      // Not an array, so `.map()` inside the try block throws synchronously —
+      // this is what exercises the outer catch (Promise.allSettled itself
+      // never rejects, so that's the only way into this catch block).
+      pendingUploads: {},
+    },
+  });
+
+  // Should not throw — error is caught internally
+  await expect(
+    on_finish(jsPsychMock as unknown as JsPsych, "some id", userFn)(data),
+  ).resolves.toBeUndefined();
+
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "Error while waiting for pending uploads: ",
+    expect.any(TypeError),
+  );
+
+  // Redirect still happens even though this failed.
+  expect(global.window.location.replace).toHaveBeenCalledTimes(1);
 });
 
 test("jsPsych's on_finish with no recording or pending uploads", async () => {
