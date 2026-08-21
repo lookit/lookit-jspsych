@@ -323,6 +323,95 @@ test("stopButton", async () => {
   expect(plugin["recordFeed"]).toHaveBeenCalledWith(display);
 });
 
+test("stopButton captures chs recording data before stopping", async () => {
+  // Clear call history so the invocationCallOrder comparison below reflects only
+  // this test's calls (mocks are not auto-cleared between tests).
+  (Recorder.prototype.stop as jest.Mock).mockClear();
+  (Recorder.prototype.getChsRecordingData as jest.Mock).mockClear();
+  (
+    Recorder.prototype.stop as jest.Mock<StopResult, [StopOptions?]>
+  ).mockImplementation(() => ({
+    stopped: Promise.resolve("mock-url"),
+    uploaded: Promise.resolve(),
+  }));
+  const recordingData = {
+    filename: "consent.webm",
+    is_session_recording: false,
+    stream_time: null,
+    method: "camera",
+    is_consent: true,
+    start_time_source: "event",
+  };
+  (Recorder.prototype.getChsRecordingData as jest.Mock).mockReturnValueOnce(
+    recordingData,
+  );
+
+  const jsPsych = initJsPsych();
+  const plugin = new VideoConsentPlugin(jsPsych);
+  const display = document.createElement("div");
+  const trial = {
+    locale: "en-us",
+    template: "consent-template-5",
+  } as unknown as TrialType<PluginInfo>;
+
+  display.innerHTML =
+    chsTemplates.consentVideo(trial) + Handlebars.compile(recordFeed)({});
+
+  plugin["recordFeed"] = jest.fn();
+  plugin["stopButton"](display);
+
+  await display
+    .querySelector<HTMLButtonElement>("button#stop")!
+    .dispatchEvent(new Event("click"));
+
+  // Captured as consent footage (non-session recording, no trial-start stream
+  // time), and captured before stop() resets the recorder.
+  expect(Recorder.prototype.getChsRecordingData).toHaveBeenCalledWith(
+    false,
+    null,
+  );
+  const captureOrder = (Recorder.prototype.getChsRecordingData as jest.Mock)
+    .mock.invocationCallOrder[0];
+  const stopOrder = (Recorder.prototype.stop as jest.Mock).mock
+    .invocationCallOrder[0];
+  expect(captureOrder).toBeLessThan(stopOrder);
+  expect(plugin["chsRecordingData"]).toBe(recordingData);
+});
+
+test("endTrial attaches chs_recording when a recording was made", async () => {
+  const jsPsych = initJsPsych();
+  const finishTrialSpy = jest
+    .spyOn(jsPsych, "finishTrial")
+    .mockImplementation(() => {});
+  const plugin = new VideoConsentPlugin(jsPsych);
+  const recordingData = {
+    filename: "consent.webm",
+    is_session_recording: false,
+    stream_time: null,
+    method: "camera",
+    is_consent: true,
+    start_time_source: "event",
+  };
+  plugin["chsRecordingData"] = recordingData as never;
+
+  await plugin["endTrial"]();
+
+  expect(finishTrialSpy).toHaveBeenCalledWith({ chs_recording: recordingData });
+});
+
+test("endTrial omits chs_recording when no recording was made", async () => {
+  const jsPsych = initJsPsych();
+  const finishTrialSpy = jest
+    .spyOn(jsPsych, "finishTrial")
+    .mockImplementation(() => {});
+  const plugin = new VideoConsentPlugin(jsPsych);
+
+  // chsRecordingData is null (participant never recorded).
+  await plugin["endTrial"]();
+
+  expect(finishTrialSpy).toHaveBeenCalledWith(undefined);
+});
+
 test("nextButton", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);

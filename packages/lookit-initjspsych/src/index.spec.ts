@@ -499,6 +499,61 @@ describe("lookit-initjspsych data handling", () => {
       expect(callArgs!.default_iti).toBe(500);
     });
   });
+
+  test("on_trial_start/on_trial_finish hooks capture and attach session recording data and call the user's callbacks", async () => {
+    await jest.isolateModulesAsync(async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const mockInitJsPsych = jest.fn((opts?: JsPsychOptions) => ({
+        run: jest.fn(),
+      }));
+
+      jest.mock("jspsych", () => ({
+        initJsPsych: mockInitJsPsych,
+      }));
+
+      const { default: lookitInitJsPsych } = await import("./index");
+
+      // Simulate an active session recording.
+      const recordingData = {
+        filename: "session.webm",
+        is_session_recording: true,
+        stream_time: { trial_start_ms: 50 },
+      };
+      Object.assign(window, {
+        chs: {
+          sessionRecorder: {
+            getSessionTrialRecordingData: jest
+              .fn()
+              .mockReturnValue(recordingData),
+          },
+        },
+      });
+
+      const userOnTrialStart = jest.fn();
+      const userOnTrialFinish = jest.fn();
+
+      lookitInitJsPsych("uuid")({
+        on_trial_start: userOnTrialStart,
+        on_trial_finish: userOnTrialFinish,
+      } as JsPsychOptions);
+
+      const callArgs = mockInitJsPsych.mock.calls[0][0];
+
+      // on_trial_start captures session data and forwards to the user's callback.
+      const trial = { type: TestPlugin } as unknown as ChsTrialDescription;
+      callArgs!.on_trial_start!(trial as never);
+      expect(userOnTrialStart).toHaveBeenCalledWith(trial);
+
+      // on_trial_finish attaches the captured data and forwards to the user's callback.
+      const data = {
+        trial_index: 0,
+        trial_type: "test",
+      } as JsPsychExpData;
+      callArgs!.on_trial_finish!(data as never);
+      expect(data.chs_recording).toBe(recordingData);
+      expect(userOnTrialFinish).toHaveBeenCalledWith(data);
+    });
+  });
 });
 
 describe("lookit-initjspsych timeline/trial handling", () => {

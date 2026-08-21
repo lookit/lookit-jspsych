@@ -1,5 +1,5 @@
 import Data from "@lookit/data";
-import { LookitWindow } from "@lookit/data/dist/types";
+import { ChsRecordingData, LookitWindow } from "@lookit/data/dist/types";
 import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import { version } from "../package.json";
@@ -101,6 +101,10 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
   private startingMsg: string | null = null;
   private recordingMsg: string | null = null;
   private notRecordingMsg: string | null = null;
+  // Recording data captured when the consent recording is stopped, to be
+  // written into the trial data at endTrial. Captured on each stop, so if the
+  // participant re-records, the last take wins. Null if they never recorded.
+  private chsRecordingData: ChsRecordingData | null = null;
 
   /**
    * Instantiate video consent plugin.
@@ -329,6 +333,12 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     stop.addEventListener("click", async () => {
       stop.disabled = true;
       this.addMessage(display, this.uploadingMsg!);
+      // Capture the recording data before stop(), which resets the recorder and
+      // clears fields like start_time_source. This is consent footage, recorded
+      // as its own (non-session) recording. Stream time is null: the recording
+      // is triggered manually mid-trial, so a trial-start offset isn't
+      // meaningful. is_consent comes through as true (start() was passed true).
+      this.chsRecordingData = this.recorder.getChsRecordingData(false, null);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { stopped, uploaded } = this.recorder.stop({
         maintain_container_size: true,
@@ -359,7 +369,14 @@ export class VideoConsentPlugin implements JsPsychPlugin<Info> {
     await Data.updateResponse(window.chs.response.id, {
       completed_consent_frame: true,
     });
-    this.jsPsych.finishTrial();
+    // Attach the consent recording data (captured at stop) so its upload status
+    // can be matched by filename at experiment on_finish. Omitted if the
+    // participant never recorded (chsRecordingData stays null).
+    this.jsPsych.finishTrial(
+      this.chsRecordingData
+        ? { chs_recording: this.chsRecordingData }
+        : undefined,
+    );
   }
 
   /**

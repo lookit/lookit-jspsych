@@ -78,7 +78,16 @@ export default class StartRecordPlugin implements JsPsychPlugin<Info> {
       .start(false, `${StartRecordPlugin.info.name}-multiframe`)
       .then(() => {
         display_element.innerHTML = "";
-        this.jsPsych.finishTrial();
+        // Record the full recording metadata on the trial that starts the
+        // session recording. Stream time is captured now (just after the
+        // recording started), so trial_start_ms is ~0. Intervening trials get
+        // their own stream time via the CHS on_trial hooks in the wrapper.
+        this.jsPsych.finishTrial({
+          chs_recording: this.recorder.getChsRecordingData(
+            true,
+            this.recorder.getStreamTime(),
+          ),
+        });
       });
   }
 }

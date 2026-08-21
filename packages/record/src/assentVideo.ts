@@ -1,4 +1,4 @@
-import { LookitWindow } from "@lookit/data/dist/types";
+import { ChsRecordingData, LookitWindow } from "@lookit/data/dist/types";
 import chsTemplates from "@lookit/templates";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 import checkmarkIcon from "../img/checkmark-icon.png";
@@ -607,16 +607,28 @@ export class VideoAssentPlugin implements JsPsychPlugin<Info> {
    * @param display - HTML element for experiment.
    */
   private async endTrial(display: HTMLElement) {
+    // Only set when the assent trial actually recorded (record_whole_procedure
+    // or record_last_page); otherwise there's no recording to describe.
+    let chs_recording: ChsRecordingData | undefined;
     if (this.startPromise) {
       this.setBtnDisabled(display, "done", true);
       await this.startPromise;
       this.addMessage(display, this.uploadingMsg!);
+      // Capture the recording data before stop(), which resets the recorder and
+      // clears fields like start_time_source. This is a single-trial (non-
+      // session) recording. Stream time is null: recording may begin at trial
+      // start or on the last page, so a single trial-start offset isn't
+      // meaningful here.
+      chs_recording = this.recorder.getChsRecordingData(false, null);
       const { stopped } = this.recorder.stop();
       await stopped;
     }
     this.jsPsych.finishTrial({
       response: this.response,
       child_age_years: this.childAge,
+      // Attach recording data (when present) so its upload status can be matched
+      // by filename at experiment on_finish.
+      ...(chs_recording ? { chs_recording } : {}),
     });
   }
 

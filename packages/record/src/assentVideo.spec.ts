@@ -663,6 +663,69 @@ test("endTrial with recording awaits stop before calling finishTrial", async () 
   expect(stopOrder).toBeLessThan(finishOrder);
 });
 
+test("endTrial with recording attaches chs_recording captured before stop", async () => {
+  // Clear call history so the invocationCallOrder comparison below reflects only
+  // this test's calls (mocks are not auto-cleared between tests).
+  (Recorder.prototype.stop as jest.Mock).mockClear();
+  (Recorder.prototype.getChsRecordingData as jest.Mock).mockClear();
+  const { jsPsych, plugin, display } = renderTrial({
+    pages: [{ stimulus: "<p>Page 1</p>", show_webcam: false }],
+  });
+
+  const recordingData = {
+    filename: "assent.webm",
+    is_session_recording: false,
+    stream_time: null,
+    method: "camera",
+    is_consent: false,
+    start_time_source: "event",
+  };
+  (Recorder.prototype.getChsRecordingData as jest.Mock).mockReturnValueOnce(
+    recordingData,
+  );
+
+  plugin["response"] = true;
+  plugin["startPromise"] = Promise.resolve();
+
+  await plugin["endTrial"](display);
+
+  // Captured as a non-session recording with no trial-start stream time...
+  expect(Recorder.prototype.getChsRecordingData).toHaveBeenCalledWith(
+    false,
+    null,
+  );
+  // ...and before stop(), which resets the recorder.
+  const captureOrder = (Recorder.prototype.getChsRecordingData as jest.Mock)
+    .mock.invocationCallOrder[0];
+  const stopOrder = (Recorder.prototype.stop as jest.Mock).mock
+    .invocationCallOrder[0];
+  expect(captureOrder).toBeLessThan(stopOrder);
+  expect(jsPsych.finishTrial).toHaveBeenCalledWith({
+    response: true,
+    child_age_years: null,
+    chs_recording: recordingData,
+  });
+});
+
+test("endTrial without recording does not capture or attach chs_recording", async () => {
+  // Clear call history so not.toHaveBeenCalled() reflects only this test (mocks
+  // are not auto-cleared between tests).
+  (Recorder.prototype.getChsRecordingData as jest.Mock).mockClear();
+  const { jsPsych, plugin, display } = renderTrial({
+    pages: [{ stimulus: "<p>Page 1</p>", show_webcam: false }],
+  });
+
+  // No startPromise: the trial never recorded.
+  plugin["response"] = true;
+  await plugin["endTrial"](display);
+
+  expect(Recorder.prototype.getChsRecordingData).not.toHaveBeenCalled();
+  expect(jsPsych.finishTrial).toHaveBeenCalledWith({
+    response: true,
+    child_age_years: null,
+  });
+});
+
 test("endTrial disables done button while recording is stopping", async () => {
   let resolveStopped!: (value: string) => void;
   const stoppedPromise = new Promise<string>((resolve) => {

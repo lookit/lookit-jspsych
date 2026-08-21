@@ -14,7 +14,88 @@ export type Attributes = {
 export type uploadRecord = {
   promise: Promise<void>;
   file: string;
+  /** Upload outcome, updated as the upload promise settles. */
+  status: RecordingUploadStatus;
+  /** Error message captured if the upload failed. */
+  error_message?: string;
 };
+
+/**
+ * How a recording's stream-time reference point (media t=0) was determined. See
+ * the Recorder in @lookit/record for details.
+ *
+ * - "event": the MediaRecorder "start" event fired within the timeout, so the
+ *   reference is accurate.
+ * - "fallback": the "start" event did not fire within the timeout, so a call-site
+ *   timestamp was used. The reference (and any derived stream times) is
+ *   inaccurate by an unknown amount.
+ * - "fallback_corrected": the fallback timestamp was used initially to avoid
+ *   blocking, but the "start" event later fired and corrected the reference.
+ */
+export type StartTimeSource = "event" | "fallback" | "fallback_corrected";
+
+/** Per-file recording upload outcome. */
+export type RecordingUploadStatus = "pending" | "success" | "failure";
+
+/**
+ * Recording stream-time timestamps (milliseconds since the recording started)
+ * for trial events. Extensible: additional event timestamps can be added as new
+ * keys without introducing new top-level trial data keys. When present (i.e.
+ * chs_recording.stream_time is not null), the trial-start timestamp is always
+ * populated.
+ */
+export interface RecordingStreamTime {
+  /**
+   * Stream time at the start of the trial (ms since the recording started).
+   * Negative when the trial started before the recording began — e.g. a
+   * single-trial recording, where the recording starts during the trial, so the
+   * value is the offset between trial start and recording start.
+   */
+  trial_start_ms: number;
+}
+
+/**
+ * CHS recording information attached to a trial's jsPsych data under the
+ * `chs_recording` key. `filename` and `is_session_recording` are always present
+ * when this block exists, since any trial associated with a recording has both.
+ * The remaining fields vary by trial: the recording-level metadata (method,
+ * is_consent) is added on the trial that starts a recording; start_time_source
+ * is captured per trial alongside the stream time (so it reflects the reference
+ * actually used for that trial's stream time); and upload_status/upload_error
+ * are added at experiment on_finish once the upload has settled. stream_time is
+ * always present but may be null when no stream time was captured for the trial
+ * (e.g. the recording's "start" event had not yet fired).
+ */
+export interface ChsRecordingData {
+  /** Video filename for the recording this trial belongs to. */
+  filename: string;
+  /** Whether this is a session (cross-trial) recording. */
+  is_session_recording: boolean;
+  /**
+   * Stream-time timestamps for events within this trial, or null if no stream
+   * time was captured for the trial.
+   */
+  stream_time: RecordingStreamTime | null;
+  /** Whether the recording is camera (video) or microphone (audio only). */
+  method?: "camera" | "microphone";
+  /** Whether this is consent footage. */
+  is_consent?: boolean;
+  /**
+   * How the stream-time reference point was determined, as of when this trial's
+   * stream time was captured. Because it is captured per trial, a trial whose
+   * stream time was measured before a slow "start" event corrected the
+   * reference reports "fallback", while a later trial reports
+   * "fallback_corrected".
+   */
+  start_time_source?: StartTimeSource;
+  /**
+   * Upload outcome for the recording, added at experiment on_finish once the
+   * upload has settled (so in saved data this is "success" or "failure").
+   */
+  upload_status?: RecordingUploadStatus;
+  /** Upload error message, if the upload failed. */
+  upload_error?: string;
+}
 
 export interface Relationships {}
 
@@ -61,6 +142,11 @@ export interface ChildAttrs extends Attributes {
 export interface JsPsychExpData {
   trial_index: number;
   trial_type: string;
+  /**
+   * CHS recording information, present on trials associated with a video/audio
+   * recording.
+   */
+  chs_recording?: ChsRecordingData;
 }
 
 export interface ResponseAttrs extends Attributes {
