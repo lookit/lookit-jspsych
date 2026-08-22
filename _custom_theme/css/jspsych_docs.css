@@ -76,3 +76,60 @@ div.wy-side-nav-search {
 .wy-nav-content-wrap {
   margin-left: 20em;
 }
+
+/* Collapsible details blocks (pymdownx.details), styled to match the
+   readthedocs theme's "note" admonition. Scoped to main content so it doesn't
+   affect any details elements the theme uses in its chrome. */
+[role="main"] details {
+  margin: 1em 0 1.5em;
+  border: 1px solid #6ab0de;
+  border-radius: 4px;
+  background: #e7f2fa;
+  overflow: hidden;
+}
+
+[role="main"] details > summary {
+  display: block; /* replaces the default disclosure marker with our caret */
+  list-style: none;
+  cursor: pointer;
+  padding: 8px 12px 8px 32px;
+  font-weight: 700;
+  color: #fff;
+  background: #6ab0de;
+  position: relative;
+}
+
+[role="main"] details > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Caret that rotates when the block is open. */
+[role="main"] details > summary::before {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-left: 6px solid #fff;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  transform: translateY(-50%);
+  transition: transform 0.15s ease;
+}
+
+[role="main"] details[open] > summary::before {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+/* Keep inline code readable against the colored title bar. */
+[role="main"] details > summary code {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Padding for the body content (everything except the summary). */
+[role="main"] details > :not(summary) {
+  margin: 0.8em 12px;
+}
