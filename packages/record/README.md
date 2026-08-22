@@ -1041,8 +1041,8 @@ that trial's stream time was actually measured against:
   was measured against the corrected event-based reference, so it is as reliable
   as `"event"`.
 
-??? question "Why do my session recording trials have different
-`start_time_source` values?"
+<!-- prettier-ignore -->
+??? question "Why do my session recording trials have different `start_time_source` values?"
 
     A single session recording can have trials with both `"fallback"` and
     `"fallback_corrected"` values, because `start_time_source` is checked and
