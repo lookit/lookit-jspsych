@@ -1021,7 +1021,7 @@ a stream time value:
     single-trial recording is triggered before the trial begins, but the trial
     will probably start before the recording has fully begun, so the recording
     actually gets going a fraction of a second _after_ the trial start.
-  - For **consent** and **assent** recordings, this value is `null` becasue
+  - For **consent** and **assent** recordings, this value is `null` because
     recording starts mid-trial and a trial-start offset isn't meaningful.
 
 #### `start_time_source`
@@ -1041,8 +1041,8 @@ that trial's stream time was actually measured against:
   was measured against the corrected event-based reference, so it is as reliable
   as `"event"`.
 
-??? question "Why do my session recording trials have different
-`start_time_source` values?"
+<!-- prettier-ignore -->
+??? question "Why do my session recording trials have different `start_time_source` values?"
 
     A single session recording can have trials with both `"fallback"` and
     `"fallback_corrected"` values, because `start_time_source` is checked and
