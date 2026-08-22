@@ -1041,27 +1041,26 @@ that trial's stream time was actually measured against:
   was measured against the corrected event-based reference, so it is as reliable
   as `"event"`.
 
-<details>
-<summary>Why do my session recording trials have different `start_time_source` values?</summary>
+??? question "Why do my session recording trials have different
+`start_time_source` values?"
 
-A single session recording can have trials with both `"fallback"` and
-`"fallback_corrected"` values, because `start_time_source` is checked and
-recorded for each trial (alongside the trial's start timestamp).
+    A single session recording can have trials with both `"fallback"` and
+    `"fallback_corrected"` values, because `start_time_source` is checked and
+    recorded for each trial (alongside the trial's start timestamp).
 
-This only comes up on the uncommon `"fallback"` path, i.e. when the recording's
-"start" event doesn't fire within a 1-second timeout. When that happens, the
-reference point for the start of recording uses the fallback estimate, and any
-trials that run report `"fallback"`. If the delayed "start" event does arrive,
-then the recording start time reference is corrected from that point on, and
-every trial after it reports `"fallback_corrected"`. (If the event never
-arrives, there's no correction and all trials will be marked `"fallback"`.)
+    This only comes up on the uncommon `"fallback"` path, i.e. when the
+    recording's "start" event doesn't fire within a 1-second timeout. When that
+    happens, the reference point for the start of recording uses the fallback
+    estimate, and any trials that run report `"fallback"`. If the delayed "start"
+    event does arrive, then the recording start time reference is corrected from
+    that point on, and every trial after it reports `"fallback_corrected"`. (If
+    the event never arrives, there's no correction and all trials will be marked
+    `"fallback"`.)
 
-How the trials split between the two depends on when — and whether — that
-delayed "recording start" event fires. Regardless, each trial's value is
-accurate for its own `stream_time`, so you can trust the label on the trial
-you're looking at rather than reasoning about the recording as a whole.
-
-</details>
+    How the trials split between the two depends on when — and whether — that
+    delayed "recording start" event fires. Regardless, each trial's value is
+    accurate for its own `stream_time`, so you can trust the label on the trial
+    you're looking at rather than reasoning about the recording as a whole.
 
 #### `upload_status` and `upload_error`
 

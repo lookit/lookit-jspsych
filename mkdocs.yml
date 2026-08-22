@@ -46,5 +46,6 @@ extra:
 
 markdown_extensions:
   - admonition
+  - pymdownx.details
   - toc:
       permalink: True
