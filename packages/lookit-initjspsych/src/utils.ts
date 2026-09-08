@@ -7,6 +7,7 @@ import {
 import chsTemplates from "@lookit/templates";
 import { DataCollection, JsPsych } from "jspsych";
 import { NoJsPsychInstanceError } from "./errors";
+import { captureCHSError } from "./sentry";
 import { UserFuncOnDataUpdate, UserFuncOnFinish } from "./types";
 
 declare let window: LookitWindow;
@@ -185,6 +186,7 @@ export const on_finish = (
         "Error while saving final response data after retries: ",
         err,
       );
+      captureCHSError(err, "on_finish_save_response_data");
     }
 
     // Wait for pending recording uploads independently of the response data
@@ -203,6 +205,7 @@ export const on_finish = (
               `Pending upload failed for "${uploads[i].file}": `,
               result.reason,
             );
+            captureCHSError(result.reason, "recording_upload_failed");
           }
         });
 
@@ -249,11 +252,13 @@ export const on_finish = (
               "Error while saving recording upload statuses: ",
               err,
             );
+            captureCHSError(err, "on_finish_save_upload_statuses");
           }
         }
       }
     } catch (err) {
       console.error("Error while waiting for pending uploads: ", err);
+      captureCHSError(err, "on_finish_pending_uploads");
     }
 
     if (exit_url) {
