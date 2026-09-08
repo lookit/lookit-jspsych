@@ -3,7 +3,10 @@ declare global {
     interface ProcessEnv {
       /** Sentry DSN. When unset/empty, Sentry is not initialized. */
       SENTRY_DSN?: string;
-      /** Sentry environment name, e.g. "production" or "staging". */
+      /**
+       * Sentry environment name, currently always 'production'. We can split by
+       * staging/production later via runtime hostname detection.
+       */
       SENTRY_ENVIRONMENT?: string;
       /** Sentry release identifier (e.g. a version or git SHA). */
       SENTRY_RELEASE?: string;
