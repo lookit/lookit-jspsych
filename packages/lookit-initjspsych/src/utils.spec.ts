@@ -8,12 +8,17 @@ import {
 import chsTemplates from "@lookit/templates";
 import { DataCollection, JsPsych } from "jspsych";
 import { NoJsPsychInstanceError } from "./errors";
+import { captureCHSError } from "./sentry";
 import {
   add_session_recording_data,
   get_session_recording_data,
   on_data_update,
   on_finish,
 } from "./utils";
+
+jest.mock("./sentry", () => ({
+  captureCHSError: jest.fn(),
+}));
 
 delete global.window.location;
 global.window = Object.create(window);
@@ -337,6 +342,11 @@ test("jsPsych's on_finish with a rejected pending upload", async () => {
   expect(consoleErrorSpy).toHaveBeenCalledWith(
     'Pending upload failed for "video1": ',
     new Error("Upload failed"),
+  );
+  // The failed upload is also reported to Sentry.
+  expect(captureCHSError).toHaveBeenCalledWith(
+    new Error("Upload failed"),
+    "recording_upload_failed",
   );
 });
 
@@ -676,6 +686,10 @@ test("jsPsych's on_finish retries the response update, then catches and logs err
     "Error while saving final response data after retries: ",
     error,
   );
+  expect(captureCHSError).toHaveBeenCalledWith(
+    error,
+    "on_finish_save_response_data",
+  );
 
   // Redirect still happens even though the response update ultimately failed,
   // so the participant isn't stuck indefinitely. But because updateResponse
@@ -804,6 +818,10 @@ test("jsPsych's on_finish catches and logs errors thrown while waiting for pendi
   expect(consoleErrorSpy).toHaveBeenCalledWith(
     "Error while waiting for pending uploads: ",
     expect.any(TypeError),
+  );
+  expect(captureCHSError).toHaveBeenCalledWith(
+    expect.any(TypeError),
+    "on_finish_pending_uploads",
   );
 
   // Redirect still happens even though this failed.
@@ -1191,6 +1209,10 @@ test("on_finish logs an error if saving the upload statuses (second write) fails
   expect(consoleErrorSpy).toHaveBeenCalledWith(
     "Error while saving recording upload statuses: ",
     new Error("second write failed"),
+  );
+  expect(captureCHSError).toHaveBeenCalledWith(
+    new Error("second write failed"),
+    "on_finish_save_upload_statuses",
   );
 });
 
