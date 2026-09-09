@@ -40,6 +40,16 @@ jobs:
         env:
           DEBUG: "false"
           LOCAL_DOWNLOAD: "false"
+          # Sentry error tracking for the published bundles.
+          # If unset, Sentry stays disabled (the DSN is empty) and the
+          # build still succeeds.
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_ENVIRONMENT: "production"
+          # Use the commit SHA as the release identifier. This is a monorepo, so
+          # a single package's version can't identify the whole build; the SHA
+          # pins every package's source at once, and it's what the source-map
+          # upload is keyed on so stack traces de-minify correctly.
+          SENTRY_RELEASE: ${{ github.sha }}
 
       - name: Build packages
         run: npm run build
