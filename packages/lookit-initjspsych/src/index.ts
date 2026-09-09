@@ -3,6 +3,7 @@ import type { DataCollection, JsPsych as JsPsychType } from "jspsych";
 import * as jspsychModule from "jspsych";
 import type { TimelineArray, TrialDescription } from "jspsych/src/timeline";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
+import { initSentry, setSentryContext } from "./sentry";
 import type {
   ChsJsPsych,
   ChsTimelineArray,
@@ -68,6 +69,11 @@ const isTrialWithType = (
  */
 const lookitInitJsPsych = (responseUuid: string) => {
   return function (opts?: JsPsychOptions): ChsJsPsych {
+    // Initialize Sentry error tracking as early as possible.
+    // No-op if no DSN is configured at build time.
+    initSentry();
+    setSentryContext(responseUuid);
+
     // Omit on_data_update from user-defined options that will be passed into origInitJsPsych.
     // We are using a closure in the on_data_update function so that we can reference the jsPsych instance,
     // and the user-defined function will be passed in through that closure.

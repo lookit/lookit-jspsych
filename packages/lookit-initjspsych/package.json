@@ -26,10 +26,13 @@
     "test": "jest --coverage"
   },
   "dependencies": {
+    "@sentry/browser": "^10.73.0",
     "jspsych": "8.0.3"
   },
   "devDependencies": {
-    "@jspsych/config": "^3.0.1"
+    "@jspsych/config": "^3.0.1",
+    "@rollup/plugin-replace": "^6.0.1",
+    "rollup-plugin-dotenv": "^0.5.1"
   },
   "peerDependencies": {
     "@lookit/data": "^0.4.0"
