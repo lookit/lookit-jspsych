@@ -82,6 +82,21 @@ const info = <const>{
      * session data/responses are omitted.
      */
     only_consent_on_chs: { type: ParameterType.BOOL, default: false },
+    /**
+     * Whether the study also records webcam video outside of CHS, e.g. after
+     * redirecting to another platform, on zoom. This can be used with all
+     * consent templates. The default consent wording describes when recording
+     * happens and who can access recordings as though all recording occurs on
+     * CHS. If false (the default), that wording is unchanged, preserving the
+     * existing consent text for current studies. If true, statements that are
+     * actually specific to CHS recordings are disambiguated (e.g. clarifying
+     * that they refer to recordings made on CHS) so they are not misleading
+     * when there are recordings made elsewhere.
+     */
+    additional_recording_outside_chs: {
+      type: ParameterType.BOOL,
+      default: false,
+    },
   },
   data: {
     chs_type: {
