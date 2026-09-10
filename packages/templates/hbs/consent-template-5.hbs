@@ -64,22 +64,51 @@
 <h2>{{t "consent-template-5.data-collection-header"}}</h2>
 
 <p>
-  {{t "consent-template-5.data-collection-1" only_adult=prompt_only_adults}}
-  {{t "consent-template-5.data-collection-2"}}
+  {{t
+    "consent-template-5.data-collection-1"
+    only_adult=prompt_only_adults
+    additional_recording_outside_chs=additional_recording_outside_chs
+  }}
+  {{t
+    "consent-template-5.data-collection-2"
+    additional_recording_outside_chs=additional_recording_outside_chs
+  }}
 </p>
 
-<p>{{t "consent-template-5.data-collection-3"}}</p>
+<p>
+  {{t
+    "consent-template-5.data-collection-3"
+    additional_recording_outside_chs=additional_recording_outside_chs
+  }}
+</p>
 
-<h2>{{t "consent-template-5.video-privacy-header"}}</h2>
-<p>{{t "consent-template-5.video-privacy-consent"}}</p>
+<h2>
+  {{t
+    "consent-template-5.video-privacy-header"
+    additional_recording_outside_chs=additional_recording_outside_chs
+  }}
+</h2>
+<p>
+  {{t
+    "consent-template-5.video-privacy-consent"
+    additional_recording_outside_chs=additional_recording_outside_chs
+  }}
+</p>
 
 {{#if private_level_only}}
   <p>
     {{t "consent-template-5.video-privacy-private-description"}}
-    {{t "consent-template-5.video-privacy-withdraw-private-only"}}
+    {{t
+      "consent-template-5.video-privacy-withdraw-private-only"
+      additional_recording_outside_chs=additional_recording_outside_chs
+    }}
   </p>
 {{else}}
-  <p>{{t "consent-template-5.video-privacy-overview"}}:</p>
+  <p>
+    {{t
+      "consent-template-5.video-privacy-overview"
+      additional_recording_outside_chs=additional_recording_outside_chs
+    }}:</p>
   <ul>
     <li>
       "{{t "consent-template-5.video-privacy-Private"}}":
@@ -94,7 +123,12 @@
       {{t "consent-template-5.video-privacy-publicity-description"}}
     </li>
   </ul>
-  <p>{{t "consent-template-5.video-privacy-withdraw"}}</p>
+  <p>
+    {{t
+      "consent-template-5.video-privacy-withdraw"
+      additional_recording_outside_chs=additional_recording_outside_chs
+    }}
+  </p>
 {{/if}}
 {{#if include_databrary}}
   <p>{{{t "consent-template-5.databrary"}}}</p>
@@ -112,7 +146,12 @@
   }}
 </p>
 <ul>
-  <li>{{t "consent-template-5.data-use-researchers-item-1"}}</li>
+  <li>
+    {{t
+      "consent-template-5.data-use-researchers-item-1"
+      additional_recording_outside_chs=additional_recording_outside_chs
+    }}
+  </li>
   <li>{{t "consent-template-5.data-use-researchers-item-2"}}</li>
   <li>
     {{t
@@ -132,7 +171,12 @@
 {{/if}}
 
 <h2>{{t "consent-template-5.data-use-Lookit-header"}}</h2>
-<p>{{t "consent-template-5.data-use-Lookit-content"}}</p>
+<p>
+  {{t
+    "consent-template-5.data-use-Lookit-content"
+    additional_recording_outside_chs=additional_recording_outside_chs
+  }}
+</p>
 
 <h2>{{t "consent-template-5.publication-header"}}</h2>
 <p>
