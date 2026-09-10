@@ -1,7 +1,14 @@
+<!-- --8<-- [start:overview] -->
+
 # Record
 
-This package contains the plugins and extensions to record audio and/or video of
-either a single trial or multiple trials.
+This package contains the CHS-jsPsych plugins and extensions related to webcam
+configuration and recordings for consent, assent, single trials, and multiple
+trials.
+
+<!-- --8<-- [end:overview] -->
+
+<!-- --8<-- [start:common-parameters] -->
 
 ## Parameters available in all plugins
 
@@ -24,6 +31,10 @@ following language codes:
 | Japanese       |        | ja    |
 | Portuguese     | Brazil | pt-BR |
 | Portuguese     |        | pt    |
+
+<!-- --8<-- [end:common-parameters] -->
+
+<!-- --8<-- [start:video-config] -->
 
 ## Video Configuration Plugin
 
@@ -60,6 +71,10 @@ const videoConfig = {
     "If you're having any trouble getting your webcam set up, please feel free to call the XYZ lab at (123) 456-7890 and we'd be glad to help you out!",
 };
 ```
+
+<!-- --8<-- [end:video-config] -->
+
+<!-- --8<-- [start:video-consent] -->
 
 ## Video Consent Plugin
 
@@ -150,7 +165,9 @@ Most studies should use `consent-template-5` (the default).
 If you are running a study that ONLY uses webcam recording for the consent
 statement (nothing else is recording during the session), then you should use
 the `consent-recording-only` template. This version removes/modifies some text
-that references additional webcam recordings during the session.
+that references additional webcam recordings during the session (see details
+about changes in the
+[Consent Wording Changes section](consent-wording.md/#changes-with-the-consent-recording-only-template)).
 
 By default, the `consent-recording-only` plugin assumes that, in addition to a
 consent trial, you are using CHS to collect other data/responses. If you are not
@@ -242,7 +259,30 @@ participant on CHS (e.g. the study redirects to an external URL after the
 consent trial). If `false` (the default), then the consent template will contain
 information about how CHS handles data/responses. If `true`, then the template
 will only reference the consent recording, and any statements about CHS access
-to data/responses are omitted.
+to data/responses are omitted. See the Consent Wording Changes section about
+[`only_consent_on_chs`](consent-wording.md#changes-with-only_consent_on_chs-true)
+for the exact wording changes, and about the
+[`consent-recording-only`](consent-wording.md/#changes-with-the-consent-recording-only-template)
+template for how it compares to the standard one.
+
+**`additional_recording_outside_chs` [Boolean | false]**
+
+This parameter applies to all consent templates.
+
+Whether the study also records webcam video _outside_ of CHS, e.g. in a
+different part of the study that is hosted on another platform. The default
+consent wording describes when recording happens and who can access recordings
+as though all recording occurs on CHS, which is misleading if the study also
+records elsewhere.
+
+If `false` (the default), that wording is unchanged, preserving the existing
+consent text for current studies. If `true`, statements that are actually
+specific to CHS recordings are disambiguated (e.g. clarifying that they refer to
+recordings "made on CHS"), and a sentence is added noting that recording also
+takes place outside of CHS. This only affects the webcam-recording statements
+listed in the Consent Wording Changes section about
+[additional recording outside CHS](consent-wording.md#changes-with-the-additional_recording_outside_chs-parameter);
+the rest of the consent form is unchanged.
 
 #### Additional customization available if REQUIRED by your IRB
 
@@ -402,6 +442,39 @@ const videoConsentRecOnly = {
     "After you finish the study, we will email you a $5 BabyStore gift card within approximately three days. To be eligible for the gift card your child must be in the age range for this study, you need to submit a valid consent statement, and we need to see that there is a child with you. But we will send a gift card even if you do not finish the whole study or we are not able to use your child's data! There are no other direct benefits to you or your child from participating, but we hope you will enjoy the experience.",
 };
 ```
+
+**Study also records webcam video outside of CHS**
+
+Set `additional_recording_outside_chs: true` when the study records webcam video
+both on CHS and elsewhere — for example, when CHS collects consent (and possibly
+other data), then redirects the participant to another platform that also
+records. This clarifies that the consent form's statements about webcam
+recording refer to the recordings made on CHS, and adds wording noting that
+recording also happens outside of CHS. It works with any template; the example
+below uses the default `consent-template-5`. See the Consent wording Changes
+section about
+[additional recording outside CHS](consent-wording.md#changes-with-the-additional_recording_outside_chs-parameter)
+for the exact text this changes.
+
+```javascript
+const videoConsent = {
+  type: chsRecord.VideoConsentPlugin,
+  additional_recording_outside_chs: true, // set this to true
+  PIName: "Jane Smith",
+  institution: "Science University",
+  PIContact: "Jane Smith at 123 456 7890",
+  purpose:
+    "Why do babies love cats? This study will help us find out whether babies love cats because of their soft fur or their twitchy tails.",
+  procedures:
+    "Your child will be shown pictures of lots of different cats, along with noises that cats make like meowing and purring. We are interested in which pictures and sounds make your child smile. We will ask you (the parent) to turn around to avoid influencing your child's responses.",
+  payment:
+    "After you finish the study, we will email you a $5 BabyStore gift card within approximately three days. To be eligible for the gift card your child must be in the age range for this study, you need to submit a valid consent statement, and we need to see that there is a child with you. But we will send a gift card even if you do not finish the whole study or we are not able to use your child's data! There are no other direct benefits to you or your child from participating, but we hope you will enjoy the experience.",
+};
+```
+
+<!-- --8<-- [end:video-consent] -->
+
+<!-- --8<-- [start:video-assent] -->
 
 ## Video Assent Plugin
 
@@ -637,6 +710,10 @@ const videoAssent = {
 };
 ```
 
+<!-- --8<-- [end:video-assent] -->
+
+<!-- --8<-- [start:trial-recording] -->
+
 ## Trial Recording Extension
 
 Trial recording can be added to most jsPsych trials. This is a jsPsych extension
@@ -784,6 +861,10 @@ const trialRec = {
   ],
 };
 ```
+
+<!-- --8<-- [end:trial-recording] -->
+
+<!-- --8<-- [start:session-recording] -->
 
 ## Session Recording
 
@@ -973,6 +1054,10 @@ const stopRec = {
 };
 ```
 
+<!-- --8<-- [end:session-recording] -->
+
+<!-- --8<-- [start:recording-data] -->
+
 ## Recording Data
 
 Whenever a trial is associated with a video recording, this package adds a
@@ -1069,3 +1154,159 @@ Video files upload in the background, so a trial's `upload_status` starts out as
 `chs_recording` with the final outcome: `"success"` if the file uploaded, or
 `"failure"` (along with an `upload_error` message) if it didn't. This makes it
 easy to spot, in your data, any recordings that may be missing.
+
+<!-- --8<-- [end:recording-data] -->
+
+<!-- --8<-- [start:consent-wording] -->
+
+## Consent wording changes for different study designs
+
+While there are [several optional parameters](video-consent.md#optional)
+available for customization of the consent form, this section covers the
+template and parameters that are specifically relevant to studies that don't
+quite fit the design that our standard consent form was intended for, i.e. where
+webcam recording takes place during the experiment (not just for consent), and
+where all data collection and webcam recording happens on CHS. This is therefore
+relevant to "hybrid" studies, which are studies that collect some data on CHS
+(even if it's just the consent video) as well as on another platform (whether
+asynchronous, like Qualtrics, or synchronous, like Zoom).
+
+Here's a summary of the relevant study designs, and the template/parameter
+combinations you would use in order to tweak the consent contents for each case.
+The specific changes to the consent form for each of these options are described
+in separate sections below.
+
+1\. **The study only uses CHS webcam recording for the consent statement.**
+
+&nbsp;&nbsp;&nbsp;&nbsp;-> Use
+[`template: "consent-recording-only"`](#changes-with-the-consent-recording-only-template)
+
+- **Same as above AND the study does not collect any other data on CHS** (i.e.
+  it just runs the video config and consent plugins on CHS, then immediately
+  redirects to an external study or scheduling platform).
+
+&nbsp;&nbsp;&nbsp;&nbsp;-> Use
+[`template: "consent-recording-only"`](#changes-with-the-consent-recording-only-template)
+and [`only_consent_on_chs: true`](#changes-with-only_consent_on_chs-true)
+
+2\. **The study collects additional webcam recording outside of CHS.** This can
+apply to any study, regardless of the type of webcam recording happens on CHS
+(just consent or also trial/session recording).
+
+&nbsp;&nbsp;&nbsp;&nbsp;-> Use
+[`additional_recording_outside_chs: true`](#changes-with-the-additional_recording_outside_chs-parameter)
+
+### Changes with the "consent-recording-only" template
+
+The "consent-recording-only" template is a variant of "consent-template-5" for
+studies that record webcam video only to capture verbal consent (for example,
+the study then redirects to an external site). It reuses most of the
+"consent-template-5" wording but rewrites the data-collection, video-privacy,
+data-use, and publication statements so they refer to the consent recording
+rather than to session data in general, and it omits the sections that don't
+apply. The comparison below is at the default parameter settings
+(`only_consent_on_chs: false`, `additional_recording_outside_chs: false`); see
+the next section for the further changes made when `only_consent_on_chs` is
+`true`.
+
+**Structural differences** (sections that the "consent-recording-only" template
+does not render at all):
+
+- **Privacy-level choice.** "consent-template-5" invites the participant to
+  choose a privacy level for their recordings and shows the list of options
+  ("Private", "Scientific", "Publicity") followed by a withdrawal paragraph. The
+  "consent-recording-only" omits this entirely and instead states that the video
+  is treated as "Private" by default (see `video-privacy-private-description`
+  below).
+- **Databrary paragraph.** The optional Databrary sharing paragraph
+  (`include_databrary`) is not rendered.
+
+**Wording differences.** Only the strings that actually differ are listed;
+"consent-template-5" strings not shown here are reused verbatim (this includes
+`data-use-researchers-item-2` and `data-use-researchers-item-3`, which are
+identical in both templates). Differences in the "consent-recording-only"
+template wording are shown in **bold**.
+
+| String                              | `consent-template-5`                                                                                                                                                                                            | `consent-recording-only`                                                                                                                                                                                                                                            |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data-collection-1`                 | During the session, you and your child will be recorded by your computer's webcam and microphone.                                                                                                               | You and your child will be recorded by your computer's webcam and microphone **only while providing verbal consent**.                                                                                                                                               |
+| `data-collection-2`                 | These **webcam recordings**, and other data like answers you enter in forms, are sent securely to the Lookit platform. You can view your past **recordings** on Lookit at any time.                             | This **webcam recording** and other data collected on the CHS/Lookit website are sent securely to the Lookit platform. You can view your past **consent recordings** on Lookit at any time.                                                                         |
+| `data-collection-3`                 | **Data** are stored securely on Lookit servers and by researchers, and are only shared as described in this document. …                                                                                         | **Recordings and data collected on this website** are stored securely on Lookit servers and by researchers, and are only shared as described in this document. …                                                                                                    |
+| `video-privacy-consent`             | We will first check that you really agreed to participate by watching your consent recording. **If we cannot confirm that you agreed to participate, no one will view any other recordings from this session.** | We will first check that you really agreed to participate by watching your consent recording. _(the sentence about not viewing other recordings is dropped, since consent is the only recording)_                                                                   |
+| `video-privacy-private-description` | Researchers with access to your recordings will not share them with anyone else.                                                                                                                                | **Because this study only uses video recording for consent, your video data will be treated as "Private" by default, which means that** the researchers with access to your recordings will not share them with anyone else.                                        |
+| `data-use-researchers-item-1`       | webcam recordings and other data collected during this session                                                                                                                                                  | webcam **consent** recordings and other data collected **on CHS/Lookit** during this session                                                                                                                                                                        |
+| `data-use-Lookit-content`           | The Lookit core team at MIT will also have access to **the data collected during this session,** in addition to your account data. …                                                                            | The Lookit core team at MIT will also have access to **your consent data and other data collected on CHS/Lookit during this session** in addition to your account data. …                                                                                           |
+| `publication-content`               | … We never publish children's birthdates or names. **Even if you choose to share your recordings, we** never publish information that would make it possible to link recordings with your demographic data.     | … We never publish children's birthdates or names. **We** never publish information that would make it possible to link recordings with your demographic data. _(drops the "Even if you choose to share your recordings" clause, since there is no sharing choice)_ |
+
+### Changes with `only_consent_on_chs: true`
+
+Within the "consent-recording-only" template, setting
+[`only_consent_on_chs`](video-consent.md#video-consent-plugin) to `true`
+declares that the consent recording is the _only_ data CHS collects about the
+participant (i.e. the CHS study just runs video config/consent and then
+redirects to an external URL, so no other response data is collected on CHS).
+Statements that imply CHS also collects other session data/responses are
+removed. The table shows the wording with `only_consent_on_chs: true`, with the
+text that is **removed** relative to the default (`false`) noted. Any text not
+listed here is unaffected by this parameter.
+
+| String                        | Wording when `true`                                                                                                             | Removed relative to `false`                                  |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `data-collection-2`           | This webcam recording is sent securely to the Lookit platform. You can view your past consent recordings on Lookit at any time. | "and other data collected on the CHS/Lookit website"         |
+| `data-collection-3`           | Recordings are stored securely on Lookit servers and by researchers, and are only shared as described in this document. …       | "and data collected on this website"                         |
+| `data-use-researchers-item-1` | webcam consent recordings                                                                                                       | "and other data collected on CHS/Lookit during this session" |
+| `data-use-Lookit-content`     | The Lookit core team at MIT will also have access to your consent data in addition to your account data. …                      | "and other data collected on CHS/Lookit during this session" |
+| `publication-content`         | … We may publish individual responses that cannot identify children. We never publish children's birthdates or names. …         | ", like looking times or sequences of button presses"        |
+
+### Changes with the `additional_recording_outside_chs` parameter
+
+The [`additional_recording_outside_chs`](video-consent.md#video-consent-plugin)
+parameter can be used with either the "consent-template-5" or
+"consent-recording-only" template. It is intended to disambiguate the general
+statements about "recordings" to make it clear that those statements just apply
+to the webcam recordings that happen on CHS. The tables below show exactly how
+each consent template's webcam-recording statements change when the
+[`additional_recording_outside_chs`](video-consent.md#video-consent-plugin)
+parameter is set to `true`. Additions relative to the default (`false`) wording
+are shown in **bold**; when a phrase is replaced rather than inserted, the
+original is noted in the last column. Any string not listed here is unaffected
+by this parameter.
+
+Two patterns recur across the templates:
+
+- **"on CHS" / "made on CHS" qualifiers** are added to statements about _when_
+  recording happens, _who_ can access it, and how recordings are stored,
+  withdrawn, and deleted — so those statements clearly refer to CHS recordings
+  only.
+- **An additive off-CHS sentence** ("Other parts of this study take place
+  outside of CHS…") is added in one place to further clarify the scope of the
+  consent information.
+
+Because this parameter can be used with different templates, the exact wording
+changes depends on the template it is used with. The tables below show the
+specific wording changes when used with each template.
+
+#### consent-template-5
+
+| String                                | Wording when `true` (additions in **bold**)                                                                                                                                                                                                                                       | Note                         |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `data-collection-1`                   | During the session **on CHS**, you and your child will be recorded by your computer's webcam and microphone. **Other parts of this study take place outside of CHS, where you and your child may also be recorded. This consent form describes only the recordings made on CHS.** |                              |
+| `data-collection-2`                   | These **CHS** webcam recordings, and other data like answers you enter in forms, are sent securely to the Lookit platform. You can view your past **CHS** recordings on Lookit at any time.                                                                                       |                              |
+| `data-collection-3`                   | Data **collected on CHS** are stored securely on Lookit servers and by researchers…                                                                                                                                                                                               |                              |
+| `video-privacy-header`                | Who will be able to see your **CHS** webcam recordings?                                                                                                                                                                                                                           |                              |
+| `video-privacy-consent`               | …no one will view any other recordings **made on CHS during this session**.                                                                                                                                                                                                       | replaces "from this session" |
+| `video-privacy-overview`              | …you will choose a privacy level for your **CHS** webcam recordings. You can choose…                                                                                                                                                                                              |                              |
+| `video-privacy-withdraw`              | You will also have the option to withdraw your **CHS** recordings. If you do, only your consent recording will be kept and all other **CHS** recordings will be deleted.                                                                                                          |                              |
+| `video-privacy-withdraw-private-only` | At the end of the session, you will have the option to withdraw your **CHS** recordings. …all other recordings **made on CHS** will be deleted.                                                                                                                                   |                              |
+| `data-use-researchers-item-1`         | webcam recordings and other data collected **on CHS** during this session                                                                                                                                                                                                         |                              |
+| `data-use-Lookit-content`             | The Lookit core team at MIT will also have access to the data collected **on CHS** during this session…                                                                                                                                                                           |                              |
+
+#### consent-recording-only
+
+| String                              | Wording when `true` (additions in **bold**)                                                                                                                                                                                                                                                  | Note                                                                                                                                                        |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data-collection-1`                 | You and your child will be recorded by your computer's webcam and microphone while providing verbal consent **on CHS**. **Other parts of this study take place outside of CHS, where you and your child may also be recorded. This consent form describes only the recordings made on CHS.** | drops "only" (the consent recording is no longer the only recording)                                                                                        |
+| `data-collection-3`                 | Recordings **made on CHS** and data collected on this website are stored securely…                                                                                                                                                                                                           |                                                                                                                                                             |
+| `video-privacy-private-description` | Because **the only video recorded on CHS is your consent recording**, your **CHS** video data will be treated as "Private" by default, which means that the researchers with access to your **CHS** recordings will not share them with anyone else.                                         | leading clause replaces "this study only uses video recording for consent"; the "Private by default" statement is kept whether or not this parameter is set |
+
+<!-- --8<-- [end:consent-wording] -->

@@ -228,24 +228,36 @@ consent-template-5:
   benefits-header: What are the benefits?
   data-collection-header: Data collection and webcam recording
   data-collection-1:
-    During the session, you {only_adult, select, true {} other {and your child}}
-    will be recorded by your computer's webcam and microphone.
+    During the session{additional_recording_outside_chs, select, true { on CHS}
+    other {}}, you {only_adult, select, true {} other {and your child}} will be
+    recorded by your computer's webcam and
+    microphone.{additional_recording_outside_chs, select, true { Other parts of
+    this study take place outside of CHS, where you {only_adult, select, true {}
+    other {and your child}} may also be recorded. This consent form describes
+    only the recordings made on CHS.} other {}}
   data-collection-2:
-    These webcam recordings, and other data like answers you enter in forms, are
-    sent securely to the Lookit platform. You can view your past recordings on
-    Lookit at any time.
+    These{additional_recording_outside_chs, select, true { CHS} other {}} webcam
+    recordings, and other data like answers you enter in forms, are sent
+    securely to the Lookit platform. You can view your
+    past{additional_recording_outside_chs, select, true { CHS} other {}}
+    recordings on Lookit at any time.
   data-collection-3:
-    Data are stored securely on Lookit servers and by researchers, and are only
-    shared as described in this document. However, there is always a small risk
-    that data transmitted over the internet may be intercepted or that the
+    Data{additional_recording_outside_chs, select, true { collected on CHS}
+    other {}} are stored securely on Lookit servers and by researchers, and are
+    only shared as described in this document. However, there is always a small
+    risk that data transmitted over the internet may be intercepted or that the
     security of stored data may be compromised.
-  video-privacy-header: Who will be able to see your webcam recordings?
+  video-privacy-header:
+    Who will be able to see your {additional_recording_outside_chs, select, true
+    {CHS }other {}}webcam recordings?
   video-privacy-consent:
     We will first check that you really agreed to participate by watching your
     consent recording. If we cannot confirm that you agreed to participate, no
-    one will view any other recordings from this session.
+    one will view any other recordings {additional_recording_outside_chs,
+    select, true {made on CHS during this session} other {from this session}}.
   video-privacy-overview:
-    At the end of the session, you will choose a privacy level for your webcam
+    At the end of the session, you will choose a privacy level for
+    your{additional_recording_outside_chs, select, true { CHS} other {}} webcam
     recordings. You can choose one of the following privacy levels for your
     videos
   video-privacy-Private: Private
@@ -263,13 +275,17 @@ consent-template-5:
     publicity, for instance in a news segment about the research or to recruit
     more participants.
   video-privacy-withdraw:
-    You will also have the option to withdraw your recordings. If you do, only
-    your consent recording will be kept and all other recordings will be
-    deleted.
-  video-privacy-withdraw-private-only:
-    At the end of the session, you will have the option to withdraw your
+    You will also have the option to withdraw
+    your{additional_recording_outside_chs, select, true { CHS} other {}}
     recordings. If you do, only your consent recording will be kept and all
-    other recordings will be deleted.
+    other{additional_recording_outside_chs, select, true { CHS} other {}}
+    recordings will be deleted.
+  video-privacy-withdraw-private-only:
+    At the end of the session, you will have the option to withdraw
+    your{additional_recording_outside_chs, select, true { CHS} other {}}
+    recordings. If you do, only your consent recording will be kept and all
+    other recordings{additional_recording_outside_chs, select, true { made on
+    CHS} other {}} will be deleted.
   databrary:
     Separately, you can opt in to give access to your recordings and other data
     to authorized users of the secure data library Databrary. This means that
@@ -286,7 +302,9 @@ consent-template-5:
     If you participate in this study, we (the research group led by {name} at
     {institution}) will have access to
   data-use-researchers-item-1:
-    webcam recordings and other data collected during this session
+    webcam recordings and other data collected
+    {additional_recording_outside_chs, select, true {on CHS }other {}}during
+    this session
   data-use-researchers-item-2: your account profile and demographic survey
   data-use-researchers-item-3:
     the {only_adult, select, true {} other {child}} profile for the {only_adult,
@@ -305,8 +323,9 @@ consent-template-5:
   data-use-Lookit-header: How Lookit uses your data
   data-use-Lookit-content:
     The Lookit core team at MIT will also have access to the data collected
-    during this session, in addition to your account data. They use this data to
-    run and improve Lookit, for instance to provide technical support, check how
+    {additional_recording_outside_chs, select, true {on CHS }other {}}during
+    this session, in addition to your account data. They use this data to run
+    and improve Lookit, for instance to provide technical support, check how
     well data collection is working, or see whether Lookit is reaching a diverse
     group of families. Lookit stores data indefinitely unless you withdraw your
     recordings at the end of the study.
@@ -584,25 +603,36 @@ consent-garden:
 consent-recording-only:
   data-collection-1:
     You {only_adult, select, true {} other {and your child}} will be recorded by
-    your computer's webcam and microphone only while providing verbal consent.
+    your computer's webcam and microphone{additional_recording_outside_chs,
+    select, true {} other { only}} while providing verbal
+    consent{additional_recording_outside_chs, select, true { on CHS} other
+    {}}.{additional_recording_outside_chs, select, true { Other parts of this
+    study take place outside of CHS, where you {only_adult, select, true {}
+    other {and your child}} may also be recorded. This consent form describes
+    only the recordings made on CHS.} other {}}
   data-collection-2:
     This webcam recording {only_consent_on_chs, select, true {is} other {and
     other data collected on the CHS/Lookit website are}} sent securely to the
     Lookit platform. You can view your past consent recordings on Lookit at any
     time.
   data-collection-3:
-    Recordings {only_consent_on_chs, select, true {} other {and data collected
-    on this website}} are stored securely on Lookit servers and by researchers,
-    and are only shared as described in this document. However, there is always
-    a small risk that data transmitted over the internet may be intercepted or
+    Recordings{additional_recording_outside_chs, select, true { made on CHS}
+    other {}} {only_consent_on_chs, select, true {} other {and data collected on
+    this website}} are stored securely on Lookit servers and by researchers, and
+    are only shared as described in this document. However, there is always a
+    small risk that data transmitted over the internet may be intercepted or
     that the security of stored data may be compromised.
   video-privacy-consent:
     We will first check that you really agreed to participate by watching your
     consent recording.
   video-privacy-private-description:
-    Because this study only uses video recording for consent, your video data
-    will be treated as "Private" by default, which means that the researchers
-    with access to your recordings will not share them with anyone else.
+    Because {additional_recording_outside_chs, select, true {the only video
+    recorded on CHS is your consent recording} other {this study only uses video
+    recording for consent}}, your {additional_recording_outside_chs, select,
+    true {CHS }other {}}video data will be treated as "Private" by default,
+    which means that the researchers with access to your
+    {additional_recording_outside_chs, select, true {CHS }other {}}recordings
+    will not share them with anyone else.
   data-use-researchers-item-1:
     webcam consent recordings {only_consent_on_chs, select, true {} other {and
     other data collected on CHS/Lookit during this session}}

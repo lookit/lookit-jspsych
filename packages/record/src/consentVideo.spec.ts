@@ -2,7 +2,7 @@ import Data from "@lookit/data";
 import { LookitWindow } from "@lookit/data/dist/types";
 import chsTemplates from "@lookit/templates";
 import Handlebars from "handlebars";
-import { initJsPsych, PluginInfo, TrialType } from "jspsych";
+import { initJsPsych, ParameterType, PluginInfo, TrialType } from "jspsych";
 import playbackFeed from "../hbs/playback-feed.hbs";
 import recordFeed from "../hbs/record-feed.hbs";
 import { VideoConsentPlugin } from "./consentVideo";
@@ -33,6 +33,13 @@ test("Instantiate recorder", () => {
   const jsPsych = initJsPsych();
   const plugin = new VideoConsentPlugin(jsPsych);
   expect(plugin["recorder"]).toBeDefined();
+});
+
+test("additional_recording_outside_chs parameter defaults to false", () => {
+  const param =
+    VideoConsentPlugin.info.parameters.additional_recording_outside_chs;
+  expect(param.type).toBe(ParameterType.BOOL);
+  expect(param.default).toBe(false);
 });
 
 test("Trial", () => {

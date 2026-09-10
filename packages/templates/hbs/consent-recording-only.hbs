@@ -64,16 +64,16 @@
 <h2>{{t "consent-template-5.data-collection-header"}}</h2>
 
 <p>
-  {{t "consent-recording-only.data-collection-1" only_adult=prompt_only_adults only_consent_on_chs=only_consent_on_chs}}
+  {{t "consent-recording-only.data-collection-1" only_adult=prompt_only_adults only_consent_on_chs=only_consent_on_chs additional_recording_outside_chs=additional_recording_outside_chs}}
   {{t "consent-recording-only.data-collection-2" only_consent_on_chs=only_consent_on_chs}}
 </p>
 
-<p>{{t "consent-recording-only.data-collection-3" only_consent_on_chs=only_consent_on_chs}}</p>
+<p>{{t "consent-recording-only.data-collection-3" only_consent_on_chs=only_consent_on_chs additional_recording_outside_chs=additional_recording_outside_chs}}</p>
 
-<h2>{{t "consent-template-5.video-privacy-header"}}</h2>
+<h2>{{t "consent-template-5.video-privacy-header" additional_recording_outside_chs=additional_recording_outside_chs}}</h2>
 <p>{{t "consent-recording-only.video-privacy-consent" only_consent_on_chs=only_consent_on_chs}}</p>
 
-<p>{{t "consent-recording-only.video-privacy-private-description" only_consent_on_chs=only_consent_on_chs}}</p>
+<p>{{t "consent-recording-only.video-privacy-private-description" only_consent_on_chs=only_consent_on_chs additional_recording_outside_chs=additional_recording_outside_chs}}</p>
 
 {{#if additional_video_privacy_statement}}
   <p>{{exp-format additional_video_privacy_statement}}</p>
