@@ -157,6 +157,166 @@ test("video consent param only_consent_on_chs is ignored when the template is no
   );
 });
 
+describe("additional_recording_outside_chs parameter", () => {
+  beforeEach(() => {
+    window.chs = {
+      study: {
+        attributes: {
+          name: "some name",
+          duration: "duration",
+        },
+      },
+    } as typeof window.chs;
+  });
+
+  // The additive sentence that only appears when the flag is true, in whichever
+  // template describes recording that also happens off-CHS.
+  const OFF_CHS_SENTENCE =
+    "Other parts of this study take place outside of CHS, where you and your child may also be recorded. This consent form describes only the recordings made on CHS.";
+
+  describe("consent-template-5", () => {
+    test("default (flag omitted) renders the original CHS-agnostic wording", () => {
+      const result = chsTemplate.consentVideo(getTrial());
+      // original, unqualified statements
+      expect(result).toContain(
+        "During the session, you and your child will be recorded by your computer&#x27;s webcam and microphone.",
+      );
+      expect(result).toContain(
+        "Who will be able to see your webcam recordings?",
+      );
+      expect(result).toContain(
+        "no one will view any other recordings from this session.",
+      );
+      expect(result).toContain(
+        "webcam recordings and other data collected during this session",
+      );
+      // no CHS disambiguation or off-CHS wording leaks in
+      expect(result).not.toContain(OFF_CHS_SENTENCE);
+      expect(result).not.toContain("made on CHS");
+      expect(result).not.toContain("on CHS");
+    });
+
+    test("default matches an explicit false", () => {
+      expect(chsTemplate.consentVideo(getTrial())).toEqual(
+        chsTemplate.consentVideo(
+          getTrial({ additional_recording_outside_chs: false }),
+        ),
+      );
+    });
+
+    test("flag true disambiguates CHS statements and adds off-CHS wording", () => {
+      const result = chsTemplate.consentVideo(
+        getTrial({ additional_recording_outside_chs: true }),
+      );
+      expect(result).toContain(
+        "During the session on CHS, you and your child will be recorded by your computer&#x27;s webcam and microphone.",
+      );
+      expect(result).toContain(OFF_CHS_SENTENCE);
+      expect(result).toContain(
+        "These CHS webcam recordings, and other data like answers you enter in forms, are sent securely to the Lookit platform. You can view your past CHS recordings on Lookit at any time.",
+      );
+      expect(result).toContain(
+        "Data collected on CHS are stored securely on Lookit servers",
+      );
+      expect(result).toContain(
+        "Who will be able to see your CHS webcam recordings?",
+      );
+      expect(result).toContain(
+        "no one will view any other recordings made on CHS during this session.",
+      );
+      expect(result).toContain(
+        "you will choose a privacy level for your CHS webcam recordings.",
+      );
+      expect(result).toContain(
+        "You will also have the option to withdraw your CHS recordings. If you do, only your consent recording will be kept and all other CHS recordings will be deleted.",
+      );
+      expect(result).toContain(
+        "webcam recordings and other data collected on CHS during this session",
+      );
+      expect(result).toContain(
+        "access to the data collected on CHS during this session",
+      );
+    });
+
+    test("flag true scopes the private-only withdraw statement to CHS", () => {
+      const result = chsTemplate.consentVideo(
+        getTrial({
+          private_level_only: true,
+          additional_recording_outside_chs: true,
+        }),
+      );
+      expect(result).toContain(
+        "you will have the option to withdraw your CHS recordings. If you do, only your consent recording will be kept and all other recordings made on CHS will be deleted.",
+      );
+    });
+  });
+
+  describe("consent-recording-only", () => {
+    /**
+     * Build a consent-recording-only trial object.
+     *
+     * @param values - Object to replace default trial values
+     * @returns Trial object with the consent-recording-only template
+     */
+    const recordingTrial = (values: Record<string, unknown> = {}) =>
+      getTrial({ template: "consent-recording-only", ...values });
+
+    test("default matches an explicit false", () => {
+      expect(chsTemplate.consentVideo(recordingTrial())).toEqual(
+        chsTemplate.consentVideo(
+          recordingTrial({ additional_recording_outside_chs: false }),
+        ),
+      );
+    });
+
+    test("default renders the original wording without off-CHS clarifications", () => {
+      const result = chsTemplate.consentVideo(recordingTrial());
+      expect(result).toContain(
+        "You and your child will be recorded by your computer&#x27;s webcam and microphone only while providing verbal consent.",
+      );
+      // private-by-default statement is present regardless of the flag
+      expect(result).toContain(
+        "Because this study only uses video recording for consent, your video data will be treated as &quot;Private&quot; by default, which means that the researchers with access to your recordings will not share them with anyone else.",
+      );
+      expect(result).not.toContain(OFF_CHS_SENTENCE);
+      expect(result).not.toContain("made on CHS");
+    });
+
+    test("flag true adds off-CHS wording and scopes recording statements to CHS", () => {
+      const result = chsTemplate.consentVideo(
+        recordingTrial({ additional_recording_outside_chs: true }),
+      );
+      expect(result).toContain(
+        "webcam and microphone while providing verbal consent on CHS.",
+      );
+      expect(result).toContain(OFF_CHS_SENTENCE);
+      expect(result).toContain(
+        "Recordings made on CHS and data collected on this website are stored securely",
+      );
+    });
+
+    test("flag true keeps the private-by-default statement but scopes it to CHS", () => {
+      const result = chsTemplate.consentVideo(
+        recordingTrial({ additional_recording_outside_chs: true }),
+      );
+      // the private-by-default statement is preserved in all cases
+      expect(result).toContain("by default");
+      expect(result).toContain(
+        "Because the only video recorded on CHS is your consent recording, your CHS video data will be treated as &quot;Private&quot; by default, which means that the researchers with access to your CHS recordings will not share them with anyone else.",
+      );
+    });
+
+    test("private-by-default statement is present whether or not there is additional recording outside CHS", () => {
+      const withFlag = chsTemplate.consentVideo(
+        recordingTrial({ additional_recording_outside_chs: true }),
+      );
+      const withoutFlag = chsTemplate.consentVideo(recordingTrial());
+      expect(withFlag).toContain("by default");
+      expect(withoutFlag).toContain("by default");
+    });
+  });
+});
+
 test("video config template", () => {
   const trial = getTrial();
 
