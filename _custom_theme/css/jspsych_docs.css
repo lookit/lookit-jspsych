@@ -133,3 +133,24 @@ div.wy-side-nav-search {
 [role="main"] details > :not(summary) {
   margin: 0.8em 12px;
 }
+
+/* Content tables (e.g. the consent-wording comparison tables) wrap their cell
+   text and fit the page width, instead of the readthedocs theme's default of
+   single-line cells with a horizontal scrollbar. The theme's JS wraps every
+   content table in `.wy-table-responsive` and applies `white-space: nowrap` to
+   its cells; these rules override that. Scoped to main content so the theme's
+   own chrome tables are unaffected. */
+[role="main"] .wy-table-responsive {
+  overflow-x: auto; /* fallback only; wrapping should prevent a scrollbar */
+}
+
+[role="main"] .wy-table-responsive table {
+  width: 100%;
+}
+
+[role="main"] .wy-table-responsive table td,
+[role="main"] .wy-table-responsive table th {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}

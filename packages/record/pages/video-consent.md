@@ -1,0 +1,1 @@
+--8<-- "record/README.md:video-consent"
