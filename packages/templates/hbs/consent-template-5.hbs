@@ -190,8 +190,10 @@
   {{/each}}
 {{/if}}
 
-<h2>{{t "consent-template-5.research-subject-rights-header"}}</h2>
-<p>{{exp-format research_rights_statement}}</p>
+{{#if research_rights_statement}}
+  <h2>{{t "consent-template-5.research-subject-rights-header"}}</h2>
+  <p>{{exp-format research_rights_statement}}</p>
+{{/if}}
 
 {{#if gdpr}}
   <h2>{{t "consent-template-5.gdpr-header"}}</h2>
