@@ -172,7 +172,7 @@ describe("additional_recording_outside_chs parameter", () => {
   // The additive sentence that only appears when the flag is true, in whichever
   // template describes recording that also happens off-CHS.
   const OFF_CHS_SENTENCE =
-    "Other parts of this study take place outside of CHS, where you and your child may also be recorded. This consent form describes only the recordings made on CHS.";
+    "Other parts of this study take place outside of CHS, where you and your child may also be recorded.";
 
   describe("consent-template-5", () => {
     test("default (flag omitted) renders the original CHS-agnostic wording", () => {
