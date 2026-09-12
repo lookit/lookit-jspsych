@@ -233,8 +233,7 @@ consent-template-5:
     recorded by your computer's webcam and
     microphone.{additional_recording_outside_chs, select, true { Other parts of
     this study take place outside of CHS, where you {only_adult, select, true {}
-    other {and your child}} may also be recorded. This consent form describes
-    only the recordings made on CHS.} other {}}
+    other {and your child}} may also be recorded.} other {}}
   data-collection-2:
     These{additional_recording_outside_chs, select, true { CHS} other {}} webcam
     recordings, and other data like answers you enter in forms, are sent
@@ -608,8 +607,7 @@ consent-recording-only:
     consent{additional_recording_outside_chs, select, true { on CHS} other
     {}}.{additional_recording_outside_chs, select, true { Other parts of this
     study take place outside of CHS, where you {only_adult, select, true {}
-    other {and your child}} may also be recorded. This consent form describes
-    only the recordings made on CHS.} other {}}
+    other {and your child}} may also be recorded.} other {}}
   data-collection-2:
     This webcam recording {only_consent_on_chs, select, true {is} other {and
     other data collected on the CHS/Lookit website are}} sent securely to the

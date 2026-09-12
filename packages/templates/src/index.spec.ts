@@ -172,7 +172,7 @@ describe("additional_recording_outside_chs parameter", () => {
   // The additive sentence that only appears when the flag is true, in whichever
   // template describes recording that also happens off-CHS.
   const OFF_CHS_SENTENCE =
-    "Other parts of this study take place outside of CHS, where you and your child may also be recorded. This consent form describes only the recordings made on CHS.";
+    "Other parts of this study take place outside of CHS, where you and your child may also be recorded.";
 
   describe("consent-template-5", () => {
     test("default (flag omitted) renders the original CHS-agnostic wording", () => {
@@ -315,6 +315,43 @@ describe("additional_recording_outside_chs parameter", () => {
       expect(withoutFlag).toContain("by default");
     });
   });
+});
+
+describe("research_rights_statement parameter", () => {
+  // Translated header for consent-template-5.research-subject-rights-header,
+  // used by both the consent-template-5 and consent-recording-only templates.
+  const RIGHTS_HEADER = "Your rights as a participant";
+  const RIGHTS_STATEMENT = "You may contact the ethics board at 555-1234.";
+
+  beforeEach(() => {
+    window.chs = {
+      study: {
+        attributes: {
+          name: "some name",
+          duration: "duration",
+        },
+      },
+    } as typeof window.chs;
+  });
+
+  test.each(["consent-template-5", "consent-recording-only"])(
+    "%s omits the header when research_rights_statement is empty (default)",
+    (template) => {
+      const result = chsTemplate.consentVideo(getTrial({ template }));
+      expect(result).not.toContain(RIGHTS_HEADER);
+    },
+  );
+
+  test.each(["consent-template-5", "consent-recording-only"])(
+    "%s renders the header and content when research_rights_statement is provided",
+    (template) => {
+      const result = chsTemplate.consentVideo(
+        getTrial({ template, research_rights_statement: RIGHTS_STATEMENT }),
+      );
+      expect(result).toContain(RIGHTS_HEADER);
+      expect(result).toContain(RIGHTS_STATEMENT);
+    },
+  );
 });
 
 test("video config template", () => {
