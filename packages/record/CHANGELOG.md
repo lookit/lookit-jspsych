@@ -1,5 +1,12 @@
 # @lookit/record
 
+## 10.0.0
+
+### Patch Changes
+
+- Updated dependencies [347afd5]
+  - @lookit/templates@4.2.0
+
 ## 9.0.0
 
 ### Minor Changes
