@@ -40,6 +40,8 @@ declare const window: LookitWindow;
 export default class Recorder {
   // How long to wait for the MediaRecorder "start" event before falling back to the call-site timestamp for the recording's stream-time reference.
   private static readonly startEventTimeoutMs = 1000;
+  // Timeslice (ms) passed to MediaRecorder.start(), so that recorded data is delivered to handleDataAvailable for incremental upload throughout the recording.
+  private static readonly timesliceMs = 1000;
 
   private url?: string;
   private _s3?: LookitS3;
@@ -334,7 +336,7 @@ export default class Recorder {
       );
     });
 
-    this.recorder.start();
+    this.recorder.start(Recorder.timesliceMs);
 
     // Wait for the "start" event so recordingStartTime is set (and recording has genuinely begun) before start() resolves and the experiment proceeds.
     // Don't hang if the event never fires: after a timeout, fall back to the call-site timestamp and continue. If the event does fire later, its callback (above) corrects the reference.
