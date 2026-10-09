@@ -209,6 +209,8 @@ test("Recorder start", async () => {
   expect(media.addEventListener).toHaveBeenCalledTimes(3);
   // only the start event has actually occurred
   expect(media.start).toHaveBeenCalledTimes(1);
+  // recording is started with a timeslice so that data is delivered (and uploaded) during recording
+  expect(media.start).toHaveBeenCalledWith(1000);
 });
 
 test("Recorder start sets the stream time reference", async () => {
