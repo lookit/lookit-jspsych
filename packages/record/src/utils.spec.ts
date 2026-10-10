@@ -1,4 +1,7 @@
-import { ageInYears, promiseWithTimeout } from "./utils";
+import { LookitWindow } from "@lookit/data/dist/types";
+import { ageInYears, captureError, promiseWithTimeout } from "./utils";
+
+declare const window: LookitWindow;
 
 let consoleLogSpy: jest.SpyInstance<
   void,
@@ -153,5 +156,43 @@ describe("ageInYears", () => {
     jest.setSystemTime(new Date(2026, 5, 15)); // June 15, 2026
     const dob = new Date(2020, 5, 15); // June 15, 2020 — today is their birthday
     expect(ageInYears(dob)).toBe(6);
+  });
+});
+
+describe("captureError", () => {
+  afterEach(() => {
+    delete (window as Partial<LookitWindow>).chs;
+  });
+
+  test("reports the error through window.chs.captureError", () => {
+    const capture = jest.fn();
+    window.chs = { captureError: capture } as unknown as LookitWindow["chs"];
+    const error = new Error("boom");
+
+    captureError(error, "some_context");
+
+    expect(capture).toHaveBeenCalledWith(error, "some_context", undefined);
+  });
+
+  test("passes extra data through to window.chs.captureError", () => {
+    const capture = jest.fn();
+    window.chs = { captureError: capture } as unknown as LookitWindow["chs"];
+    const error = new Error("boom");
+
+    captureError(error, "some_context", { filename: "fakename" });
+
+    expect(capture).toHaveBeenCalledWith(error, "some_context", {
+      filename: "fakename",
+    });
+  });
+
+  test("does nothing when error reporting is not available", () => {
+    // e.g. preview sessions, where Sentry is not initialized.
+    window.chs = {} as unknown as LookitWindow["chs"];
+    expect(() => captureError(new Error("boom"), "some_context")).not.toThrow();
+
+    // e.g. window.chs not loaded.
+    delete (window as Partial<LookitWindow>).chs;
+    expect(() => captureError(new Error("boom"), "some_context")).not.toThrow();
   });
 });
