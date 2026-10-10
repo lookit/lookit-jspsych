@@ -141,17 +141,44 @@ export const setSentryContext = (responseUuid: string): void => {
  * non-throwing, so this is just extra defense against an unexpected
  * SDK/transport failure.
  *
+ * Values that vary between events (e.g. filenames) should be passed as `extra`
+ * rather than included in the error message, so that the message stays the same
+ * and events group into a single Sentry issue.
+ *
  * @param error - The error/exception to report.
  * @param context - Optional short label for where the error occurred, e.g.
  *   "on_finish_save".
+ * @param extra - Optional extra data to attach to the event, e.g. { filename }.
  */
-export const captureCHSError = (error: unknown, context?: string): void => {
+export const captureCHSError = (
+  error: unknown,
+  context?: string,
+  extra?: Record<string, unknown>,
+): void => {
   try {
     Sentry.captureException(
       error,
-      context ? { tags: { chs_context: context } } : undefined,
+      context || extra
+        ? {
+            ...(context ? { tags: { chs_context: context } } : {}),
+            ...(extra ? { extra } : {}),
+          }
+        : undefined,
     );
   } catch {
     // Swallow: Sentry reporting should not break the experiment's own error handling.
+  }
+};
+
+/**
+ * Expose captureCHSError as window.chs.captureError, so that other CHS packages
+ * (e.g. @lookit/record), which are bundled separately and don't include Sentry,
+ * can report errors through this page's Sentry client. Only exposed when Sentry
+ * is initialized, so those packages' reports are skipped in preview sessions
+ * and builds without a DSN.
+ */
+export const exposeCaptureError = (): void => {
+  if (sentryInitialized && window.chs) {
+    window.chs.captureError = captureCHSError;
   }
 };

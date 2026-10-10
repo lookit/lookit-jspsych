@@ -16,6 +16,9 @@ import play_icon from "../img/play-icon.svg";
 import record_icon from "../img/record-icon.svg";
 import {
   CreateURLError,
+  EmptyRecordingError,
+  MediaRecorderError,
+  MediaTrackEndedError,
   NoFileNameError,
   NoStopPromiseError,
   NoWebCamElementError,
@@ -32,7 +35,7 @@ import {
   StopOptions,
   StopResult,
 } from "./types";
-import { promiseWithTimeout } from "./utils";
+import { captureError, promiseWithTimeout } from "./utils";
 
 declare const window: LookitWindow;
 
@@ -55,6 +58,8 @@ export default class Recorder {
   private recordingStartTime?: number;
   // How recordingStartTime was determined (start event vs. fallback timestamp). Undefined when no recording is in progress.
   private startTimeSource?: StartTimeSource;
+  // Total size (bytes) of the current recording's data, set when the recorder's "stop" event fires. Undefined until then, and cleared on reset.
+  private recordingBytes?: number;
   private stopPromise?: Promise<string>;
   private webcam_element_id = "lookit-jspsych-webcam";
   private mimeType = "video/webm";
@@ -163,6 +168,7 @@ export default class Recorder {
     // Clear the stream-time reference; recording is no longer in progress, so getStreamTime() should return null until the next start().
     this.recordingStartTime = undefined;
     this.startTimeSource = undefined;
+    this.recordingBytes = undefined;
     // TO DO: reset S3/filename/URL?
   }
 
@@ -311,6 +317,8 @@ export default class Recorder {
     this.stopPromise = new Promise<string>((resolve) => {
       this.recorder.addEventListener("stop", this.handleStop(resolve));
     });
+
+    this.addDiagnosticListeners();
 
     if (!this.localDownload) {
       await this.s3.createUpload();
@@ -531,6 +539,8 @@ export default class Recorder {
       filename: this.filename,
       localDownload: this.localDownload,
       url: "null",
+      // Recording size is not known until the stop event fires; filled in below before reset.
+      bytes: undefined as number | undefined,
     };
 
     // Wrap the existing stopPromise with timeout if needed, otherwise return as is.
@@ -545,11 +555,16 @@ export default class Recorder {
 
     // Chain reset off the stop promise, which is either the original stop promise or a promise race with the timeout.
     stopped.finally(() => {
+      // Snapshot the recording size for the upload status before reset() clears it.
+      snapshot.bytes = this.recordingBytes;
       try {
         // It's safe to reset because recording is fully stopped and S3 info has been snapshotted.
         this.reset();
       } catch (err) {
         console.error("Error while resetting recorder after stop: ", err);
+        captureError(err, "recorder_reset_failed", {
+          filename: snapshot.filename,
+        });
       }
     });
 
@@ -563,7 +578,10 @@ export default class Recorder {
           throw new TimeoutError("Recorder stop timed out.");
         }
       } catch (err) {
-        console.warn("Upload failed because recorder stop timed out");
+        console.error("Upload failed because recorder stop timed out");
+        captureError(err, "recording_stop_failed", {
+          filename: snapshot.filename,
+        });
         throw err;
       }
       snapshot.url = url;
@@ -580,6 +598,12 @@ export default class Recorder {
           await snapshot.s3!.completeUpload();
         } catch (err) {
           console.error("Upload failed: ", err);
+          // Reported here so it reaches Sentry even if the participant leaves
+          // before on_finish (which also reports rejected uploads but Sentry skips
+          // the second report of the same error).
+          captureError(err, "recording_upload_failed", {
+            filename: snapshot.filename,
+          });
           throw err;
         }
       }
@@ -608,7 +632,15 @@ export default class Recorder {
     // promise is consumed elsewhere (the timeout wrapper, plugin awaits, etc.).
     uploadPromise.then(
       () => {
-        pendingUpload.status = "success";
+        // An empty recording still uploads "successfully" as a 0-byte file,
+        // so flag it as a failure in the data. This only affects the recorded
+        // status, not the upload promise itself.
+        if (snapshot.bytes === 0) {
+          pendingUpload.status = "failure";
+          pendingUpload.error_message = new EmptyRecordingError().message;
+        } else {
+          pendingUpload.status = "success";
+        }
       },
       (err) => {
         pendingUpload.status = "failure";
@@ -671,9 +703,100 @@ export default class Recorder {
       if (this.blobs.length === 0) {
         throw new CreateURLError();
       }
-      this.url = URL.createObjectURL(new Blob(this.blobs));
+      const recording = new Blob(this.blobs);
+      this.recordingBytes = recording.size;
+      if (recording.size === 0) {
+        console.error(
+          this.diagnosticMessage(
+            this.filename,
+            "stopped with no data (0 bytes)",
+          ),
+        );
+        captureError(
+          new EmptyRecordingError(),
+          "recording_empty",
+          this.diagnosticExtra(this.filename),
+        );
+      } else {
+        console.log(
+          `Recording ${this.filename} stopped: ${recording.size} bytes.`,
+        );
+      }
+      this.url = URL.createObjectURL(recording);
       resolve(this.url);
     };
+  }
+
+  /**
+   * Add listeners that log MediaRecorder errors and media track interruptions
+   * (ended, mute, unmute) for the current recording. These are for diagnosing
+   * failed/empty recordings and do not change recording behavior. Errors and
+   * ended tracks are also reported to Sentry; mute/unmute are only logged (they
+   * appear as breadcrumbs on any Sentry report). Note that "ended" only fires
+   * when a track ends for a reason other than the page calling track.stop()
+   * (e.g. device disconnected or permission revoked), so the normal stop
+   * process does not trigger it.
+   */
+  private addDiagnosticListeners() {
+    const { filename } = this;
+    this.recorder.addEventListener("error", (event) => {
+      const { error } = event as Event & { error?: DOMException };
+      console.error(
+        this.diagnosticMessage(filename, "MediaRecorder error"),
+        error ?? event,
+      );
+      captureError(
+        new MediaRecorderError(error),
+        "media_recorder_error",
+        this.diagnosticExtra(filename),
+      );
+    });
+    this.stream.getTracks().forEach((track) => {
+      track.addEventListener("ended", () => {
+        console.error(
+          this.diagnosticMessage(filename, `${track.kind} track ended`),
+        );
+        captureError(
+          new MediaTrackEndedError(track.kind),
+          "media_track_ended",
+          this.diagnosticExtra(filename),
+        );
+      });
+      track.addEventListener("mute", () => {
+        console.warn(
+          this.diagnosticMessage(filename, `${track.kind} track muted`),
+        );
+      });
+      track.addEventListener("unmute", () => {
+        console.warn(
+          this.diagnosticMessage(filename, `${track.kind} track unmuted`),
+        );
+      });
+    });
+  }
+
+  /**
+   * Format a diagnostic log message with the recording's filename and the
+   * current stream time, so that events can be located in the recording.
+   *
+   * @param filename - Filename of the recording the event belongs to.
+   * @param event - Description of the event.
+   * @returns Log message.
+   */
+  private diagnosticMessage(filename: string | undefined, event: string) {
+    return `Recording ${filename}: ${event} at stream time ${this.getStreamTime()} ms.`;
+  }
+
+  /**
+   * Extra data for a Sentry report about a recording event. Reported as extra
+   * data rather than in the error message so that the message stays the same
+   * and events group into a single Sentry issue.
+   *
+   * @param filename - Filename of the recording the event belongs to.
+   * @returns Extra data for captureError.
+   */
+  private diagnosticExtra(filename: string | undefined) {
+    return { filename, stream_time_ms: this.getStreamTime() };
   }
 
   /**
@@ -775,6 +898,7 @@ export default class Recorder {
           this.reset();
         } catch (err) {
           console.error("Error while resetting recorder after timeout: ", err);
+          captureError(err, "recorder_reset_failed", { filename: id });
         }
       }
     };

@@ -244,12 +244,12 @@ export class TimeoutError extends Error {
  */
 export class EmptyRecordingError extends Error {
   /**
-   * Report a recording that contains no data.
-   *
-   * @param filename - Filename of the empty recording.
+   * Report a recording that contains no data. The message doesn't include the
+   * filename so that these errors group together in Sentry; report the filename
+   * as extra data instead.
    */
-  public constructor(filename: string | undefined) {
-    super(`Recording ${filename} contains no data (0 bytes).`);
+  public constructor() {
+    super("Recording contains no data (0 bytes).");
     this.name = "EmptyRecordingError";
   }
 }
@@ -261,13 +261,14 @@ export class EmptyRecordingError extends Error {
  */
 export class MediaRecorderError extends Error {
   /**
-   * Report a MediaRecorder error event.
+   * Report a MediaRecorder error event. The message doesn't include the
+   * recording's filename or stream time so that these errors group together in
+   * Sentry; report those as extra data instead.
    *
-   * @param msg - Description of the event, including the recording's filename
-   *   and stream time.
    * @param error - The DOMException from the error event, if there is one.
    */
-  public constructor(msg: string, error?: DOMException) {
+  public constructor(error?: DOMException) {
+    const msg = "MediaRecorder error during recording.";
     super(error ? `${msg} ${error.name}: ${error.message}` : msg);
     this.name = "MediaRecorderError";
   }
@@ -280,13 +281,14 @@ export class MediaRecorderError extends Error {
  */
 export class MediaTrackEndedError extends Error {
   /**
-   * Report a media track that ended during a recording.
+   * Report a media track that ended during a recording. The message doesn't
+   * include the recording's filename or stream time so that these errors group
+   * together in Sentry; report those as extra data instead.
    *
-   * @param msg - Description of the event, including the recording's filename
-   *   and stream time.
+   * @param kind - The kind of track that ended ("video" or "audio").
    */
-  public constructor(msg: string) {
-    super(msg);
+  public constructor(kind: string) {
+    super(`Media track (${kind}) ended during recording.`);
     this.name = "MediaTrackEndedError";
   }
 }
