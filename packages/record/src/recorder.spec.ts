@@ -11,6 +11,9 @@ import play_icon from "../img/play-icon.svg";
 import record_icon from "../img/record-icon.svg";
 import {
   CreateURLError,
+  EmptyRecordingError,
+  MediaRecorderError,
+  MediaTrackEndedError,
   NoFileNameError,
   NoStopPromiseError,
   NoWebCamElementError,
@@ -54,8 +57,14 @@ let consoleErrorSpy: jest.SpyInstance<
   unknown
 >;
 
+type MockTrack = {
+  kind: string;
+  stop: jest.Mock<void, []>;
+  addEventListener: jest.Mock<void, [string, () => void]>;
+};
+
 type MockStream = {
-  getTracks: jest.Mock<Array<{ stop: jest.Mock<void, []> }>, []>;
+  getTracks: jest.Mock<MockTrack[], []>;
   clone: () => MockStream;
   readonly active: boolean;
   /** Utility for tests - manually force stream to stop (inactive state). */
@@ -77,17 +86,21 @@ jest.mock("jspsych", () => {
   const createMockStream = (): MockStream => {
     let stopped = false;
 
+    // The same track objects are returned on every getTracks() call, so that
+    // tests can fire events on listeners added to them.
+    const tracks: MockTrack[] = [
+      {
+        kind: "video",
+        stop: jest.fn(() => {
+          stopped = true;
+        }),
+        addEventListener: jest.fn(),
+      },
+    ];
+
     const stream: MockStream = {
       // need to mock 'active', 'clone()', and 'getTracks()`
-      getTracks: jest.fn(() => {
-        return [
-          {
-            stop: jest.fn(() => {
-              stopped = true;
-            }),
-          },
-        ];
-      }),
+      getTracks: jest.fn(() => tracks),
       clone: jest.fn(() => createMockStream()),
       /**
        * Getter for stream's active property
@@ -183,6 +196,8 @@ const cleanHTML = (html: string) => {
 beforeEach(() => {
   jest.useFakeTimers();
   window.chs.pendingUploads = [];
+  // Stands in for the Sentry capture function that lookit-initjspsych exposes.
+  window.chs.captureError = jest.fn();
 
   // Hide the console output during tests. Tests can still assert on these spies to check console calls.
   consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
@@ -205,12 +220,100 @@ test("Recorder start", async () => {
   const media = jsPsych.pluginAPI.getCameraRecorder();
   await rec.start(true, "video-consent");
 
-  // dataavailable, stop, and start listeners have been added
-  expect(media.addEventListener).toHaveBeenCalledTimes(3);
+  // dataavailable, stop, error, and start listeners have been added
+  expect(media.addEventListener).toHaveBeenCalledTimes(4);
   // only the start event has actually occurred
   expect(media.start).toHaveBeenCalledTimes(1);
   // recording is started with a timeslice so that data is delivered (and uploaded) during recording
   expect(media.start).toHaveBeenCalledWith(1000);
+});
+
+test("Recorder start adds diagnostic listeners that log recorder errors and track events", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+  const media = jsPsych.pluginAPI.getCameraRecorder();
+  const [track] = media.stream.getTracks();
+
+  jest.spyOn(performance, "now").mockReturnValue(1000);
+  await rec.start(false, "test-type");
+  const filename = rec["filename"];
+  jest.spyOn(performance, "now").mockReturnValue(3500);
+
+  /**
+   * Get the listener registered for an event on a mocked object.
+   *
+   * @param target - Mocked object with an addEventListener jest.fn.
+   * @param event - Event name.
+   * @returns Listener callback.
+   */
+  const listenerFor = (target: unknown, event: string) =>
+    (
+      target as { addEventListener: jest.Mock }
+    ).addEventListener.mock.calls.find(([e]) => e === event)![1] as (
+      e?: unknown,
+    ) => void;
+
+  const captureError = window.chs.captureError as jest.Mock;
+  // The filename and stream time are reported to Sentry as extra data, and
+  // left out of the error messages so that the errors group together.
+  const extra = { filename, stream_time_ms: 2500 };
+
+  const err = new DOMException("Encoding failed", "UnknownError");
+  listenerFor(media, "error")({ error: err });
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    `Recording ${filename}: MediaRecorder error at stream time 2500 ms.`,
+    err,
+  );
+  expect(captureError).toHaveBeenLastCalledWith(
+    expect.any(MediaRecorderError),
+    "media_recorder_error",
+    extra,
+  );
+  expect(captureError.mock.lastCall[0].message).toBe(
+    "MediaRecorder error during recording. UnknownError: Encoding failed",
+  );
+
+  // An error event without an error property is still reported.
+  const event = new Event("error");
+  listenerFor(media, "error")(event);
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    `Recording ${filename}: MediaRecorder error at stream time 2500 ms.`,
+    event,
+  );
+  expect(captureError).toHaveBeenLastCalledWith(
+    expect.any(MediaRecorderError),
+    "media_recorder_error",
+    extra,
+  );
+  expect(captureError.mock.lastCall[0].message).toBe(
+    "MediaRecorder error during recording.",
+  );
+
+  listenerFor(track, "ended")();
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    `Recording ${filename}: video track ended at stream time 2500 ms.`,
+  );
+  expect(captureError).toHaveBeenLastCalledWith(
+    expect.any(MediaTrackEndedError),
+    "media_track_ended",
+    extra,
+  );
+  expect(captureError.mock.lastCall[0].message).toBe(
+    "Media track (video) ended during recording.",
+  );
+
+  listenerFor(track, "mute")();
+  expect(consoleWarnSpy).toHaveBeenCalledWith(
+    `Recording ${filename}: video track muted at stream time 2500 ms.`,
+  );
+
+  listenerFor(track, "unmute")();
+  expect(consoleWarnSpy).toHaveBeenCalledWith(
+    `Recording ${filename}: video track unmuted at stream time 2500 ms.`,
+  );
+
+  // Mute/unmute are logged but not reported to Sentry.
+  expect(captureError).toHaveBeenCalledTimes(3);
 });
 
 test("Recorder start sets the stream time reference", async () => {
@@ -561,8 +664,13 @@ test("Recorder stop promise times out", async () => {
   expect(consoleWarnSpy).toHaveBeenCalledWith(
     "Recorder stop timed out: fakename",
   );
-  expect(consoleWarnSpy).toHaveBeenCalledWith(
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
     "Upload failed because recorder stop timed out",
+  );
+  expect(window.chs.captureError).toHaveBeenCalledWith(
+    expect.any(TimeoutError),
+    "recording_stop_failed",
+    { filename: "fakename" },
   );
   const settled = await Promise.race([
     Promise.allSettled(window.chs.pendingUploads.map((u) => u.promise)),
@@ -806,6 +914,13 @@ test("Recorder stop catches error in upload", async () => {
     "Upload failed: ",
     Error("Something broke."),
   );
+  // The failure is reported to Sentry when it happens, with the same error
+  // object that the upload promise rejects with.
+  expect(window.chs.captureError).toHaveBeenCalledTimes(1);
+  const [reportedError, context, extra] = (window.chs.captureError as jest.Mock)
+    .mock.calls[0];
+  expect(context).toBe("recording_upload_failed");
+  expect(extra).toStrictEqual({ filename: "fakename" });
   expect(window.chs.pendingUploads.length).toBe(1);
   expect(window.chs.pendingUploads[0].promise).toBeInstanceOf(Promise);
   await expect(
@@ -816,6 +931,9 @@ test("Recorder stop catches error in upload", async () => {
       reason: new Error("Something broke."),
     },
   ]);
+  await expect(window.chs.pendingUploads[0].promise).rejects.toBe(
+    reportedError,
+  );
   // The tracked upload record reflects the failure and captures the message.
   expect(window.chs.pendingUploads[0].status).toBe("failure");
   expect(window.chs.pendingUploads[0].error_message).toBe("Something broke.");
@@ -869,6 +987,11 @@ test("Recorder stop tries to reset after stopping and handles error", async () =
   expect(consoleErrorSpy).toHaveBeenCalledWith(
     "Error while resetting recorder after stop: ",
     Error("Reset failed."),
+  );
+  expect(window.chs.captureError).toHaveBeenCalledWith(
+    Error("Reset failed."),
+    "recorder_reset_failed",
+    { filename: "fakename" },
   );
 });
 
@@ -965,9 +1088,74 @@ test("Recorder handleStop", () => {
 
   expect(resolve).toHaveBeenCalledWith("mock-url");
   expect(rec["url"]).toBe("mock-url");
+  // The recording size is stored and logged
+  expect(rec["recordingBytes"]).toBe(18);
+  expect(consoleLogSpy).toHaveBeenCalledWith(
+    `Recording ${rec["filename"]} stopped: 18 bytes.`,
+  );
+  expect(consoleErrorSpy).not.toHaveBeenCalled();
+  expect(window.chs.captureError).not.toHaveBeenCalled();
 
   // Restore the original createObjectURL function
   global.URL.createObjectURL = originalCreateObjectURL;
+});
+
+test("Recorder handleStop logs an error for an empty (0-byte) recording", () => {
+  const originalCreateObjectURL = global.URL.createObjectURL;
+  global.URL.createObjectURL = jest.fn().mockReturnValue("mock-url");
+
+  const rec = new Recorder(initJsPsych());
+  const resolve = jest.fn();
+  rec["filename"] = "fakename";
+  // Recording started at 1000 ms and stops at 61000 ms
+  rec["recordingStartTime"] = 1000;
+  jest.spyOn(performance, "now").mockReturnValue(61000);
+  // A dataavailable event fired, but with no data
+  rec["blobs"] = [new Blob([])];
+
+  rec["handleStop"](resolve)();
+
+  // Logging only: the stop promise still resolves with the URL
+  expect(resolve).toHaveBeenCalledWith("mock-url");
+  expect(rec["recordingBytes"]).toBe(0);
+  expect(consoleErrorSpy).toHaveBeenCalledWith(
+    "Recording fakename: stopped with no data (0 bytes) at stream time 60000 ms.",
+  );
+  // The filename and stream time are reported as extra data, not in the message.
+  expect(window.chs.captureError).toHaveBeenCalledWith(
+    expect.any(EmptyRecordingError),
+    "recording_empty",
+    { filename: "fakename", stream_time_ms: 60000 },
+  );
+  expect((window.chs.captureError as jest.Mock).mock.calls[0][0].message).toBe(
+    "Recording contains no data (0 bytes).",
+  );
+
+  global.URL.createObjectURL = originalCreateObjectURL;
+});
+
+test("Recorder stop marks the upload status as failure for an empty (0-byte) recording", async () => {
+  const jsPsych = initJsPsych();
+  const rec = new Recorder(jsPsych);
+
+  rec["_s3"] = { completeUpload: jest.fn(() => Promise.resolve()) } as any;
+  rec["filename"] = "fakename";
+  rec["stopPromise"] = Promise.resolve("url");
+  // Simulate handleStop having found an empty recording
+  rec["recordingBytes"] = 0;
+
+  const { uploaded } = rec.stop();
+
+  // The upload itself still succeeds (no functional change)...
+  await expect(uploaded).resolves.toBeUndefined();
+  expect(rec["s3"].completeUpload).toHaveBeenCalledTimes(1);
+  // ...but the tracked status records it as a failure.
+  expect(window.chs.pendingUploads[0].status).toBe("failure");
+  expect(window.chs.pendingUploads[0].error_message).toBe(
+    "Recording contains no data (0 bytes).",
+  );
+  // reset() cleared the recording size
+  expect(rec["recordingBytes"]).toBeUndefined();
 });
 
 test("Recorder handleStop error with no blob data", () => {
@@ -1574,5 +1762,10 @@ test("Recorder createTimeoutHandler catches error when trying to reset recorder 
   expect(consoleErrorSpy).toHaveBeenCalledWith(
     "Error while resetting recorder after timeout: ",
     new Error("Could not reset."),
+  );
+  expect(window.chs.captureError).toHaveBeenCalledWith(
+    new Error("Could not reset."),
+    "recorder_reset_failed",
+    { filename: "fakename" },
   );
 });
