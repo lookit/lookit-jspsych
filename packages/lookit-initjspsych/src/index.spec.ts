@@ -4,7 +4,7 @@ import * as jspsychModule from "jspsych";
 import TestPlugin from "../fixtures/TestPlugin";
 import lookitInitJsPsych from "./";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
-import { initSentry, setSentryContext } from "./sentry";
+import { exposeCaptureError, initSentry, setSentryContext } from "./sentry";
 import type {
   ChsJsPsychPlugin,
   ChsTimelineArray,
@@ -16,6 +16,7 @@ import type {
 jest.mock("./sentry", () => ({
   initSentry: jest.fn(),
   setSentryContext: jest.fn(),
+  exposeCaptureError: jest.fn(),
 }));
 
 describe("lookit-initjspsych initializes and runs", () => {
@@ -27,6 +28,7 @@ describe("lookit-initjspsych initializes and runs", () => {
     lookitInitJsPsych("response-uuid")({});
     expect(initSentry).toHaveBeenCalledTimes(1);
     expect(setSentryContext).toHaveBeenCalledWith("response-uuid");
+    expect(exposeCaptureError).toHaveBeenCalledTimes(1);
   });
 
   test("lookitInitJsPsych returns an instance of jspsych", () => {

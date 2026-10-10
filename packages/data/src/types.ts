@@ -230,6 +230,19 @@ export interface LookitWindow extends Window {
     response: Response;
     sessionRecorder: unknown;
     pendingUploads: uploadRecord[];
+    /**
+     * Reports an error to Sentry, tagged with a short context label, with
+     * optional extra data (e.g. the recording filename). Set by the
+     * lookit-initjspsych package only when Sentry is initialized, so it is
+     * undefined in preview sessions and builds without a Sentry DSN. This lets
+     * other packages (e.g. record) report through the page's Sentry client
+     * without bundling their own copy of Sentry.
+     */
+    captureError?: (
+      error: unknown,
+      context?: string,
+      extra?: Record<string, unknown>,
+    ) => void;
   };
 }
 

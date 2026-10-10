@@ -219,6 +219,29 @@ describe("captureCHSError", () => {
     });
   });
 
+  test("captures with a context tag and extra data when both are provided", async () => {
+    const { captureCHSError } = await importSentry();
+    const error = new Error("boom");
+
+    captureCHSError(error, "recording_empty", { filename: "fakename" });
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(error, {
+      tags: { chs_context: "recording_empty" },
+      extra: { filename: "fakename" },
+    });
+  });
+
+  test("captures with extra data when no context is provided", async () => {
+    const { captureCHSError } = await importSentry();
+    const error = new Error("boom");
+
+    captureCHSError(error, undefined, { filename: "fakename" });
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(error, {
+      extra: { filename: "fakename" },
+    });
+  });
+
   test("captures without extra data when no context is provided", async () => {
     const { captureCHSError } = await importSentry();
     const error = new Error("boom");
@@ -239,5 +262,55 @@ describe("captureCHSError", () => {
     expect(() =>
       captureCHSError(new Error("boom"), "some_context"),
     ).not.toThrow();
+  });
+});
+
+describe("exposeCaptureError", () => {
+  test("exposes captureCHSError on window.chs when Sentry is initialized", async () => {
+    process.env.SENTRY_DSN = "https://examplePublicKey@o0.ingest.sentry.io/0";
+    window.chs = {
+      response: { attributes: { is_preview: false } },
+    } as unknown as LookitWindow["chs"];
+    const { initSentry, exposeCaptureError, captureCHSError } =
+      await importSentry();
+    initSentry();
+
+    exposeCaptureError();
+
+    expect(window.chs.captureError).toBe(captureCHSError);
+  });
+
+  test("does not expose a capture function in preview sessions", async () => {
+    process.env.SENTRY_DSN = "https://examplePublicKey@o0.ingest.sentry.io/0";
+    window.chs = {
+      response: { attributes: { is_preview: true } },
+    } as unknown as LookitWindow["chs"];
+    const { initSentry, exposeCaptureError } = await importSentry();
+    initSentry();
+
+    exposeCaptureError();
+
+    expect(window.chs.captureError).toBeUndefined();
+  });
+
+  test("does not expose a capture function when no DSN is configured", async () => {
+    delete process.env.SENTRY_DSN;
+    window.chs = {
+      response: { attributes: { is_preview: false } },
+    } as unknown as LookitWindow["chs"];
+    const { initSentry, exposeCaptureError } = await importSentry();
+    initSentry();
+
+    exposeCaptureError();
+
+    expect(window.chs.captureError).toBeUndefined();
+  });
+
+  test("does not throw when window.chs is not loaded", async () => {
+    process.env.SENTRY_DSN = "https://examplePublicKey@o0.ingest.sentry.io/0";
+    const { initSentry, exposeCaptureError } = await importSentry();
+    initSentry();
+
+    expect(() => exposeCaptureError()).not.toThrow();
   });
 });

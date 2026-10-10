@@ -237,3 +237,58 @@ export class TimeoutError extends Error {
     this.name = "TimeoutError";
   }
 }
+
+/**
+ * Error reported when a recording stops but contains no data (0 bytes). The
+ * empty file is still uploaded, so this is reported rather than thrown.
+ */
+export class EmptyRecordingError extends Error {
+  /**
+   * Report a recording that contains no data. The message doesn't include the
+   * filename so that these errors group together in Sentry; report the filename
+   * as extra data instead.
+   */
+  public constructor() {
+    super("Recording contains no data (0 bytes).");
+    this.name = "EmptyRecordingError";
+  }
+}
+
+/**
+ * Error reported when the MediaRecorder fires an "error" event during a
+ * recording. Reported rather than thrown, since it occurs in an event
+ * listener.
+ */
+export class MediaRecorderError extends Error {
+  /**
+   * Report a MediaRecorder error event. The message doesn't include the
+   * recording's filename or stream time so that these errors group together in
+   * Sentry; report those as extra data instead.
+   *
+   * @param error - The DOMException from the error event, if there is one.
+   */
+  public constructor(error?: DOMException) {
+    const msg = "MediaRecorder error during recording.";
+    super(error ? `${msg} ${error.name}: ${error.message}` : msg);
+    this.name = "MediaRecorderError";
+  }
+}
+
+/**
+ * Error reported when a media track ends during a recording, for a reason other
+ * than the page stopping it (e.g. the device was disconnected or permission was
+ * revoked). Reported rather than thrown, since it occurs in an event listener.
+ */
+export class MediaTrackEndedError extends Error {
+  /**
+   * Report a media track that ended during a recording. The message doesn't
+   * include the recording's filename or stream time so that these errors group
+   * together in Sentry; report those as extra data instead.
+   *
+   * @param kind - The kind of track that ended ("video" or "audio").
+   */
+  public constructor(kind: string) {
+    super(`Media track (${kind}) ended during recording.`);
+    this.name = "MediaTrackEndedError";
+  }
+}

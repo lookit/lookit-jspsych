@@ -205,7 +205,9 @@ export const on_finish = (
               `Pending upload failed for "${uploads[i].file}": `,
               result.reason,
             );
-            captureCHSError(result.reason, "recording_upload_failed");
+            captureCHSError(result.reason, "recording_upload_failed", {
+              filename: uploads[i].file,
+            });
           }
         });
 

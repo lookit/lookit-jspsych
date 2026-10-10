@@ -1,3 +1,28 @@
+import { LookitWindow } from "@lookit/data/dist/types";
+
+declare const window: LookitWindow;
+
+/**
+ * Report an error to Sentry through the capture function that
+ * lookit-initjspsych exposes on window.chs. Does nothing when that function
+ * isn't set: preview sessions, builds without a Sentry DSN, or experiments not
+ * run through lookit-initjspsych.
+ *
+ * @param error - The error to report.
+ * @param context - Short label for where the error occurred, e.g.
+ *   "recording_upload_failed".
+ * @param extra - Optional extra data to attach to the event, e.g. { filename }.
+ *   Keep values that vary between events here rather than in the error message,
+ *   so that events group into a single Sentry issue.
+ */
+export const captureError = (
+  error: unknown,
+  context: string,
+  extra?: Record<string, unknown>,
+) => {
+  window.chs?.captureError?.(error, context, extra);
+};
+
 /**
  * Helper function for setting up a timeout on a promise.
  *
