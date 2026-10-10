@@ -237,3 +237,56 @@ export class TimeoutError extends Error {
     this.name = "TimeoutError";
   }
 }
+
+/**
+ * Error reported when a recording stops but contains no data (0 bytes). The
+ * empty file is still uploaded, so this is reported rather than thrown.
+ */
+export class EmptyRecordingError extends Error {
+  /**
+   * Report a recording that contains no data.
+   *
+   * @param filename - Filename of the empty recording.
+   */
+  public constructor(filename: string | undefined) {
+    super(`Recording ${filename} contains no data (0 bytes).`);
+    this.name = "EmptyRecordingError";
+  }
+}
+
+/**
+ * Error reported when the MediaRecorder fires an "error" event during a
+ * recording. Reported rather than thrown, since it occurs in an event
+ * listener.
+ */
+export class MediaRecorderError extends Error {
+  /**
+   * Report a MediaRecorder error event.
+   *
+   * @param msg - Description of the event, including the recording's filename
+   *   and stream time.
+   * @param error - The DOMException from the error event, if there is one.
+   */
+  public constructor(msg: string, error?: DOMException) {
+    super(error ? `${msg} ${error.name}: ${error.message}` : msg);
+    this.name = "MediaRecorderError";
+  }
+}
+
+/**
+ * Error reported when a media track ends during a recording, for a reason other
+ * than the page stopping it (e.g. the device was disconnected or permission was
+ * revoked). Reported rather than thrown, since it occurs in an event listener.
+ */
+export class MediaTrackEndedError extends Error {
+  /**
+   * Report a media track that ended during a recording.
+   *
+   * @param msg - Description of the event, including the recording's filename
+   *   and stream time.
+   */
+  public constructor(msg: string) {
+    super(msg);
+    this.name = "MediaTrackEndedError";
+  }
+}
