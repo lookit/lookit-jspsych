@@ -1,6 +1,6 @@
 {
   "name": "@lookit/lookit-initjspsych",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "This package overloads jsPsych's init function.",
   "homepage": "https://github.com/lookit/lookit-jspsych#readme",
   "bugs": {
@@ -35,6 +35,6 @@
     "rollup-plugin-dotenv": "^0.5.1"
   },
   "peerDependencies": {
-    "@lookit/data": "^0.4.0"
+    "@lookit/data": "^0.4.1"
   }
 }
