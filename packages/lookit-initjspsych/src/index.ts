@@ -3,7 +3,7 @@ import type { DataCollection, JsPsych as JsPsychType } from "jspsych";
 import * as jspsychModule from "jspsych";
 import type { TimelineArray, TrialDescription } from "jspsych/src/timeline";
 import { UndefinedTimelineError, UndefinedTypeError } from "./errors";
-import { initSentry, setSentryContext } from "./sentry";
+import { exposeCaptureError, initSentry, setSentryContext } from "./sentry";
 import type {
   ChsJsPsych,
   ChsTimelineArray,
@@ -73,6 +73,8 @@ const lookitInitJsPsych = (responseUuid: string) => {
     // No-op if no DSN is configured at build time.
     initSentry();
     setSentryContext(responseUuid);
+    // Let other CHS packages (e.g. recording) report errors to Sentry.
+    exposeCaptureError();
 
     // Omit on_data_update from user-defined options that will be passed into origInitJsPsych.
     // We are using a closure in the on_data_update function so that we can reference the jsPsych instance,

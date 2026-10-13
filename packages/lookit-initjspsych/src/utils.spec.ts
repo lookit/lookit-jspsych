@@ -343,10 +343,11 @@ test("jsPsych's on_finish with a rejected pending upload", async () => {
     'Pending upload failed for "video1": ',
     new Error("Upload failed"),
   );
-  // The failed upload is also reported to Sentry.
+  // The failed upload is also reported to Sentry, with the filename as extra data.
   expect(captureCHSError).toHaveBeenCalledWith(
     new Error("Upload failed"),
     "recording_upload_failed",
+    { filename: "video1" },
   );
 });
 
